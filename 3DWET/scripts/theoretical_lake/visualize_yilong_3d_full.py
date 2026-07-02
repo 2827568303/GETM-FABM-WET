@@ -102,7 +102,7 @@ ax.plot_surface(X, Y, np.zeros_like(bathy_plot), color='lightblue', alpha=0.2,
 
 # Mark rivers (3D arrows from edges)
 river_colors = {'INFL1': 'green', 'INFL2': 'blue', 'INFL3': 'purple', 'OUTFL': 'red'}
-river_labels = {'INFL1': '北入流', 'INFL2': '西入流(主)', 'INFL3': '南入流', 'OUTFL': '东出流'}
+river_labels = {'INFL1': 'North inflow', 'INFL2': 'West inflow (main)', 'INFL3': 'South inflow', 'OUTFL': 'East outflow'}
 for name, positions in rivers.items():
     for (i, j) in positions:
         xi, yj = x_km[i-1], y_km[j-1]
@@ -114,11 +114,11 @@ for name, positions in rivers.items():
         # Add depth annotation
         ax.text(xi, yj, depth/2, f'{depth:.1f}m', fontsize=7, ha='center', color=color)
 
-ax.set_xlabel('X方向 (km)')
-ax.set_ylabel('Y方向 (km)')
-ax.set_zlabel('水深 (m)')
-ax.set_title('异龙湖三维湖底地形图（标注出入湖河流）\n'
-             '东西长13.8km × 南北宽1.4-3.6km | 平均水深3.5m | 最大水深4.5m',
+ax.set_xlabel('X direction (km)')
+ax.set_ylabel('Y direction (km)')
+ax.set_zlabel('Depth (m)')
+ax.set_title('Yilong Lake 3D bathymetry (annotated inflow/outflow rivers)\n'
+             'E-W length 13.8km × N-S width 1.4-3.6km | avg depth 3.5m | max depth 4.5m',
              fontsize=13, fontweight='bold')
 ax.set_zlim(0, 5.5)
 ax.view_init(elev=25, azim=-55)
@@ -129,7 +129,7 @@ if handles:
     ax.legend(loc='upper left', fontsize=9, framealpha=0.9)
 
 cbar = plt.colorbar(surf, ax=ax, shrink=0.5, aspect=15, pad=0.1)
-cbar.set_label('水深 (m)')
+cbar.set_label('Depth (m)')
 
 plt.tight_layout()
 plt.savefig(os.path.join(FIG_DIR, 'Z01_bathymetry_3d.png'), dpi=150, bbox_inches='tight')
@@ -172,8 +172,8 @@ ax1.plot_surface(X, Y, np.zeros_like(X), color='deepskyblue', alpha=0.3,
 
 ax1.set_xlabel('X (km)')
 ax1.set_ylabel('Y (km)')
-ax1.set_zlabel('深度 (m)')
-ax1.set_title('(a) 三维湖体模型 - 透视视图', fontsize=12)
+ax1.set_zlabel('Depth (m)')
+ax1.set_title('(a) 3D Lake Volume - perspective view', fontsize=12)
 ax1.set_zlim(-5.5, 0.5)
 ax1.view_init(elev=25, azim=-55)
 
@@ -212,13 +212,13 @@ if len(x_slice) > 2:
 
 ax2.set_xlabel('X (km)')
 ax2.set_ylabel('Y (km)')
-ax2.set_zlabel('深度 (m)')
-ax2.set_title('(b) 东西向剖面（中心行）', fontsize=12)
+ax2.set_zlabel('Depth (m)')
+ax2.set_title('(b) E-W cross section (center row)', fontsize=12)
 ax2.set_zlim(-5.5, 0.5)
 ax2.view_init(elev=15, azim=-80)
 
-fig.suptitle('异龙湖三维湖体模型\n'
-             f'湖面积: {lake_mask.sum()*DX*DY/1e6:.1f} km² | 体积: {np.nansum(bathy)*DX*DY/1e6:.0f} 万m³ | 平均水深: {np.nanmean(bathy):.1f}m',
+fig.suptitle('Yilong Lake 3D Lake Volume\n'
+             f'Lake area: {lake_mask.sum()*DX*DY/1e6:.1f} km² | Volume: {np.nansum(bathy)*DX*DY/1e6:.0f} x10^4 m³ | avg depth: {np.nanmean(bathy):.1f}m',
              fontsize=13, fontweight='bold')
 plt.tight_layout()
 plt.savefig(os.path.join(FIG_DIR, 'Z02_lake_volume_3d.png'), dpi=150, bbox_inches='tight')
@@ -232,7 +232,7 @@ print("\n=== Loading 3D data for 12-month snapshots ===")
 
 # Monthly indices (day 1, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335)
 month_days = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335]
-month_names = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 # Load output.nc variables
 ds_out = nc.Dataset(os.path.join(CASE_DIR, 'output.nc'), 'r')
@@ -240,22 +240,22 @@ ds_3d = nc.Dataset(os.path.join(CASE_DIR, 'YILONG.3d.nc'), 'r')
 
 # Water quality variables (from output.nc)
 WQ_VARS = {
-    'abiotic_water_sNH4W': ('NH4+ 铵氮', 'Reds', 'g/m³'),
-    'abiotic_water_sNO3W': ('NO3- 硝氮', 'Blues', 'g/m³'),
-    'abiotic_water_sPO4W': ('PO4³- 磷', 'Purples', 'g/m³'),
-    'abiotic_water_sO2W': ('DO 溶解氧', 'Greens', 'g/m³'),
-    'POM_sDW': ('POM 颗粒有机物', 'Greys', 'g/m³'),
-    'DOM_sDW': ('DOM 溶解有机物', 'Oranges', 'g/m³'),
+    'abiotic_water_sNH4W': ('NH4+ ammonium', 'Reds', 'g/m³'),
+    'abiotic_water_sNO3W': ('NO3- nitrate', 'Blues', 'g/m³'),
+    'abiotic_water_sPO4W': ('PO4³- phosphate', 'Purples', 'g/m³'),
+    'abiotic_water_sO2W': ('DO dissolved oxygen', 'Greens', 'g/m³'),
+    'POM_sDW': ('POM particulate', 'Greys', 'g/m³'),
+    'DOM_sDW': ('DOM dissolved', 'Oranges', 'g/m³'),
 }
 
 # Food web variables (from output.nc)
 FW_VARS = {
-    'diatoms_sDW': ('硅藻', 'YlGn', 'gDW/m³'),
-    'greens_sDW': ('绿藻', 'YlOrBr', 'gDW/m³'),
-    'cyanobacteria_sDW': ('蓝藻', 'PuBuGn', 'gDW/m³'),
-    'cladocerans_sD': ('枝角类', 'Purples', 'gDW/m³'),
-    'JuFish_sD': ('幼鱼', 'Oranges', 'gDW/m³'),
-    'AdFish_sD': ('成鱼', 'Reds', 'gDW/m³'),
+    'diatoms_sDW': ('Diatoms', 'YlGn', 'gDW/m³'),
+    'greens_sDW': ('Greens', 'YlOrBr', 'gDW/m³'),
+    'cyanobacteria_sDW': ('Cyanobacteria', 'PuBuGn', 'gDW/m³'),
+    'cladocerans_sD': ('Cladocerans', 'Purples', 'gDW/m³'),
+    'JuFish_sD': ('Juvenile', 'Oranges', 'gDW/m³'),
+    'AdFish_sD': ('Adult', 'Reds', 'gDW/m³'),
 }
 
 # Temperature from 3d.nc (has 730 records, 2 per day)
@@ -285,8 +285,8 @@ ds_3d.close()
 # ============================================================
 print("\n=== Z03: Water quality 12 months (surface) ===")
 fig, axes = plt.subplots(6, 12, figsize=(36, 16))
-fig.suptitle('异龙湖水质指标空间分布 - 12个代表性月份（表层）\n'
-             '富营养化湖泊水质季节变化',
+fig.suptitle('Yilong Lake water quality spatial distribution - 12 representative months (surface)\n'
+             'Eutrophic lake water quality seasonal variation',
              fontsize=14, fontweight='bold')
 
 for row, (var, (label, cmap, units)) in enumerate(WQ_VARS.items()):
@@ -346,8 +346,8 @@ print("  saved Z03_water_quality_12months.png")
 # ============================================================
 print("\n=== Z04: Food web 12 months (surface) ===")
 fig, axes = plt.subplots(6, 12, figsize=(36, 16))
-fig.suptitle('异龙湖食物网空间分布 - 12个代表性月份（表层）\n'
-             '浮游植物-浮游动物-鱼类季节变化',
+fig.suptitle('Yilong Lake food web spatial distribution - 12 representative months (surface)\n'
+             'Phytoplankton-Zooplankton-Fish seasonal variation',
              fontsize=14, fontweight='bold')
 
 for row, (var, (label, cmap, units)) in enumerate(FW_VARS.items()):
@@ -404,8 +404,8 @@ print("  saved Z04_foodweb_12months.png")
 # ============================================================
 print("\n=== Z05: Temperature 12 months (3D surface) ===")
 fig, axes = plt.subplots(3, 4, figsize=(20, 14), subplot_kw={'projection': '3d'})
-fig.suptitle('异龙湖水温三维分布 - 12个代表性月份\n'
-             '云南高原气候：冬季最低~6°C，夏季最高~26°C',
+fig.suptitle('Yilong Lake water temperature 3D distribution - 12 representative months\n'
+             'Yunnan plateau climate: winter min ~6°C, summer max ~26°C',
              fontsize=14, fontweight='bold')
 
 temp_surf = temp_data[::2, 0, :, :]  # daily surface temp
@@ -449,7 +449,7 @@ cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.7])
 sm = plt.cm.ScalarMappable(cmap='RdYlBu_r', norm=norm)
 sm.set_array([])
 cbar = fig.colorbar(sm, cax=cbar_ax)
-cbar.set_label('温度 (°C)', fontsize=10)
+cbar.set_label('Temperature (°C)', fontsize=10)
 
 plt.tight_layout(rect=[0, 0, 0.9, 0.95])
 plt.savefig(os.path.join(FIG_DIR, 'Z05_temperature_12months_3d.png'), dpi=120, bbox_inches='tight')
@@ -477,7 +477,7 @@ print(f"Center row (j={mid_j}) water columns: {len(water_cols)} (from col {water
 
 # Pick 5 evenly spaced points along the water column
 fracs = [0.0, 0.25, 0.5, 0.75, 1.0]
-label_names = ['P1 西湖湾', 'P2 西湖区', 'P3 湖心', 'P4 东湖湾', 'P5 东出流区']
+label_names = ['P1 West Bay', 'P2 West Zone', 'P3 Center', 'P4 East Bay', 'P5 East Outflow']
 
 for frac, lname in zip(fracs, label_names):
     idx = int(frac * (len(water_cols) - 1))
@@ -492,10 +492,10 @@ for i, j, name in points:
 
 # Variables for heatmaps
 HM_VARS = [
-    ('temperature', '温度', 'RdYlBu_r', '°C'),
-    ('diatoms_sDW', '硅藻', 'YlGn', 'gDW/m³'),
-    ('cyanobacteria_sDW', '蓝藻', 'PuBuGn', 'gDW/m³'),
-    ('cladocerans_sD', '枝角类', 'Purples', 'gDW/m³'),
+    ('temperature', 'Temperature', 'RdYlBu_r', '°C'),
+    ('diatoms_sDW', 'Diatoms', 'YlGn', 'gDW/m³'),
+    ('cyanobacteria_sDW', 'Cyanobacteria', 'PuBuGn', 'gDW/m³'),
+    ('cladocerans_sD', 'Cladocerans', 'Purples', 'gDW/m³'),
     ('abiotic_water_sNH4W', 'NH4+', 'Reds', 'g/m³'),
     ('abiotic_water_sPO4W', 'PO4³-', 'Purples', 'g/m³'),
 ]
@@ -503,8 +503,8 @@ HM_VARS = [
 n_vars = len(HM_VARS)
 n_points = len(points)
 fig, axes = plt.subplots(n_vars, n_points, figsize=(22, 16))
-fig.suptitle('异龙湖5个代表性点位垂向变化热图\n'
-             '横轴：时间(天数) | 纵轴：深度(σ层) | 颜色：浓度',
+fig.suptitle('Yilong Lake vertical heatmap at 5 representative points\n'
+             'x-axis: time (Day) | y-axis: depth (sigma layer) | color: concentration',
              fontsize=14, fontweight='bold')
 
 days_all = np.arange(365)
@@ -547,7 +547,7 @@ for col, ((pi, pj, pname), plabel) in enumerate(zip(points, labels)):
 
         ax.set_xlim(0, 365)
         ax.set_xticks([0, 90, 180, 270, 365])
-        ax.set_xticklabels(['1月', '4月', '7月', '10月', '1月'], fontsize=7)
+        ax.set_xticklabels(['Jan', 'Apr', 'Jul', 'Oct', 'Jan'], fontsize=7)
 
         # Y-axis: show depth (m) instead of sigma index
         sigma_vals = np.linspace(0, 1, profile_t.shape[0])
@@ -558,9 +558,9 @@ for col, ((pi, pj, pname), plabel) in enumerate(zip(points, labels)):
         ax.set_yticklabels(y_ticks_depth, fontsize=7)
 
         if col == 0:
-            ax.set_ylabel(f'{vname}\n深度', fontsize=8)
+            ax.set_ylabel(f'{vname}\ndepth', fontsize=8)
         if row == 0:
-            ax.set_title(f'{plabel}\n(水深{depth_here:.1f}m)', fontsize=9, fontweight='bold')
+            ax.set_title(f'{plabel}\n(depth {depth_here:.1f}m)', fontsize=9, fontweight='bold')
 
         # Add month gridlines
         for m_day in [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335]:
@@ -582,18 +582,18 @@ print("  saved Z06_vertical_heatmap_5points.png")
 # ============================================================
 print("\n=== Z07: Food web vertical 3D at 4 key dates ===")
 fig, axes = plt.subplots(3, 4, figsize=(20, 14), subplot_kw={'projection': '3d'})
-fig.suptitle('异龙湖食物网三维分布 - 4个关键季节（硅藻/枝角类/幼鱼）\n'
-             '展示垂向分布随季节的变化',
+fig.suptitle('Yilong Lake food web 3D distribution - 4 key seasons (Diatoms/Cladocerans/Juvenile)\n'
+             'Showing vertical distribution variation across seasons',
              fontsize=14, fontweight='bold')
 
 # 4 key dates: spring bloom (day 60), summer (day 150), autumn (day 240), winter (day 330)
 key_days = [60, 150, 240, 330]
-key_labels = ['春季 (3月)', '夏季 (6月)', '秋季 (9月)', '冬季 (12月)']
+key_labels = ['Spring (Mar)', 'Summer (Jun)', 'Autumn (Sep)', 'Winter (Dec)']
 
 fw_3d_vars = [
-    ('diatoms_sDW', '硅藻', 'YlGn'),
-    ('cyanobacteria_sDW', '蓝藻', 'PuBuGn'),
-    ('cladocerans_sD', '枝角类', 'Purples'),
+    ('diatoms_sDW', 'Diatoms', 'YlGn'),
+    ('cyanobacteria_sDW', 'Cyanobacteria', 'PuBuGn'),
+    ('cladocerans_sD', 'Cladocerans', 'Purples'),
 ]
 
 for row, (var, vname, cmap) in enumerate(fw_3d_vars):
@@ -635,7 +635,7 @@ for row, (var, vname, cmap) in enumerate(fw_3d_vars):
         ax.set_xticks([])
         ax.set_yticks([])
         ax.set_zticks([-4, -2, 0])
-        ax.set_zticklabels(['4m', '2m', '表层'])
+        ax.set_zticklabels(['4m', '2m', 'Surface'])
         if row == 0:
             ax.set_title(label, fontsize=10, fontweight='bold')
         if col == 0:

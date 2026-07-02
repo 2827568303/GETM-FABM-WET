@@ -1,66 +1,66 @@
-异龙湖模型云端运行报告
+Yilong Lake Model Cloud Run Report
 ======================================================================
 
-运行环境: TRAE 云端 Linux (gfortran 13.3.0, OpenMP 4线程)
-模型版本: GETM 2.5.0 + GOTM 5.4.0 + FABM + WET
-运行日期: 2026-07-02
+Environment: TRAE Cloud Linux (gfortran 13.3.0, OpenMP 4 threads)
+Model Version: GETM 2.5.0 + GOTM 5.4.0 + FABM + WET
+Run Date: 2026-07-02
 
-配置参数:
-  - 网格: 28×8 (500m), 10 sigma层
-  - 时间步: 30秒
-  - 模拟期: 2020-01-01 至 2020-12-31 (365天)
-  - 总步数: 1,051,200
-  - OpenMP线程: 4
+Configuration:
+  - Grid: 28×8 (500m), 10 sigma layers
+  - Timestep: 30 seconds
+  - Simulation Period: 2020-01-01 to 2020-12-31 (365 days)
+  - Total Steps: 1,051,200
+  - OpenMP threads: 4
 
-运行状态:
-  - 退出码: 0 (成功)
-  - 运行时间: 约2小时15分钟 (03:45 - 05:59)
-  - 平均速度: 131 步/秒
-  - Patankar错误: 0 (已修复 macrophytes _PV 初值问题)
-  - Patankar警告: ~1176万 (small pi, 不影响结果)
+Run Status:
+  - Exit Code: 0 (success)
+  - Runtime: about 2 hours 15 minutes (03:45 - 05:59)
+  - Avg Speed: 131 steps/second
+  - Patankar errors: 0 (fixed macrophytes _PV initial value issue)
+  - Patankar warnings: ~11.76 million (small pi, does not affect results)
 
-修复内容:
-  - macrophytes sD_PV/sN_PV/sP_PV/sC_PV 从 0.0 改为源码默认值
-    (1.0/0.002/0.02/0.4), 消除了 Patankar 求解器错误
+Fix Applied:
+  - macrophytes sD_PV/sN_PV/sP_PV/sC_PV changed from 0.0 to source code defaults
+    (1.0/0.002/0.02/0.4), eliminating Patankar solver errors
 
-输出文件:
-  - YILONG.3d.nc: 2.2 GB (730条记录, 3D水动力+生态)
-  - output.nc: 986 MB (365条记录, FABM生态变量)
-  - YILONG.2d.nc: 1.9 MB (730条记录, 2D水位流速)
+Output Files:
+  - YILONG.3d.nc: 2.2 GB (730 records, 3D hydrodynamics + ecology)
+  - output.nc: 986 MB (365 records, FABM ecological variables)
+  - YILONG.2d.nc: 1.9 MB (730 records, 2D water level + velocity)
 
-模型结果统计 (stats_summary.txt):
-  硅藻 diatoms_sDW:      0.0001 ~ 43.99 gDW/m³ (生长良好)
-  绿藻 greens_sDW:        0.0001 ~ 0.23 gDW/m³ (稳定)
-  蓝藻 cyanobacteria_sDW: 0.0001 ~ 6.78 gDW/m³ (生长良好)
-  枝角类 cladocerans_sD:  0.00001 ~ 0.25 gDW/m³ (无级联崩溃!)
-  桡足类 copepods_sD:    0.00001 ~ 0.25 gDW/m³ (无级联崩溃!)
-  幼鱼 JuFish_sD:        0.0001 ~ 0.16 gDW/m³ (稳定)
-  成鱼 AdFish_sD:        0.002 ~ 0.40 gDW/m³ (稳定)
-  凶猛鱼 PiscFish_sD:    0.0001 ~ 0.05 gDW/m³ (稳定)
+Model Statistics Summary (stats_summary.txt):
+  Diatoms diatoms_sDW:        0.0001 ~ 43.99 gDW/m³ (healthy growth)
+  Greens greens_sDW:         0.0001 ~ 0.23 gDW/m³ (stable)
+  Cyanobacteria cyanobacteria_sDW: 0.0001 ~ 6.78 gDW/m³ (healthy growth)
+  Cladocerans cladocerans_sD: 0.00001 ~ 0.25 gDW/m³ (no cascade collapse!)
+  Copepods copepods_sD:      0.00001 ~ 0.25 gDW/m³ (no cascade collapse!)
+  Juvenile JuFish_sD:        0.0001 ~ 0.16 gDW/m³ (stable)
+  Adult AdFish_sD:          0.002 ~ 0.40 gDW/m³ (stable)
+  Piscivorous PiscFish_sD:  0.0001 ~ 0.05 gDW/m³ (stable)
 
-关键结论:
-  1. macrophytes _PV 初值修复后, Patankar错误完全消除
-  2. 食物链完整, 无级联崩溃 (浮游动物和鱼类均保持稳定)
-  3. 营养盐被消耗至零 (NH4/NO3/PO4 末期=0), 表明浮游植物吸收充分
+Key Conclusions:
+  1. After fixing the macrophytes _PV initial values, Patankar errors are fully eliminated
+  2. The food chain is complete, with no cascade collapse (zooplankton and fish both remain stable)
+  3. Nutrients are consumed to zero (NH4/NO3/PO4 end-of-period = 0), indicating sufficient phytoplankton uptake
 
-可视化图表:
+Figure List:
   figures/:
-    Y01_bathymetry.png            - 湖底地形+河流
-    Y02_phytoplankton_timeseries.png - 浮游植物时间序列
-    Y03_phytoplankton_spatial.png  - 浮游植物空间分布
-    Y04_nutrients_temp.png         - 营养盐与温度
-    Y05_vertical_profile.png       - 垂向剖面
-    Y06_cascade_check.png          - 食物链完整性检查
-    Y07_comparison_theoretical.png - 与理论湖对比
-    Y08_summary_table.png          - 汇总表
+    Y01_bathymetry.png            - Lake bottom topography + rivers
+    Y02_phytoplankton_timeseries.png - Phytoplankton time series
+    Y03_phytoplankton_spatial.png  - Phytoplankton spatial distribution
+    Y04_nutrients_temp.png         - Nutrients and temperature
+    Y05_vertical_profile.png       - Vertical profile
+    Y06_cascade_check.png          - Food chain integrity check
+    Y07_comparison_theoretical.png - Comparison with theoretical lake
+    Y08_summary_table.png          - Summary table
 
   figures_3d/:
-    Z01_bathymetry_3d.png          - 3D湖底地形
-    Z02_lake_volume_3d.png         - 3D湖体模型
-    Z03_water_quality_12months.png - 水质12月份
-    Z04_foodweb_12months.png       - 食物网12月份
-    Z05_temperature_12months_3d.png - 温度12月份3D
-    Z06_vertical_heatmap_5points.png - 5点垂向热图
-    Z07_foodweb_3d_4seasons.png   - 食物网3D四季
+    Z01_bathymetry_3d.png          - 3D lake bottom topography
+    Z02_lake_volume_3d.png         - 3D lake body model
+    Z03_water_quality_12months.png - Water quality 12 months
+    Z04_foodweb_12months.png       - Food web 12 months
+    Z05_temperature_12months_3d.png - Temperature 12 months 3D
+    Z06_vertical_heatmap_5points.png - 5-point vertical heatmap
+    Z07_foodweb_3d_4seasons.png   - Food web 3D four seasons
 
-注意: 完整run.log (1.13GB) 因体积过大未入库, 仅保留此摘要。
+Note: The full run.log (1.13GB) was not committed due to its large size; only this summary is retained.
