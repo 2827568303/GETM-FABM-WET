@@ -1,9 +1,10 @@
-! Theoretical Lake - GETM-FABM-WET configuration
+! Theoretical Lake (heart-shaped) - GETM-FABM-WET configuration
+! Grid: 24 x 20 cells, 500 m x 500 m, 70 km², avg 5.3 m, max 10.2 m
 
 &param
     dryrun       = .false.
     runid        = 'THEORETICAL_LAKE'
-    title        = 'Theoretical Lake GETM-FABM-WET'
+    title        = 'Theoretical Lake (heart) GETM-FABM-WET'
     parallel     = .false.
     runtype      = 4
     hotstart     = .false.
@@ -20,14 +21,14 @@
 
 &domain
     vert_cord    = 1
-    maxdepth = 6.0
+    maxdepth = 11.2
     bathy_format = 2
     bathymetry   = 'bathymetry.nc'
     f_plane      = .true.
     il = 1
-    ih = 5
+    ih = 24
     jl = 1
-    jh = 7
+    jh = 20
     crit_depth = 0.3
     min_depth = 0.1
     kdum         = 10
@@ -56,7 +57,7 @@
 &m2d
     elev_method = 1
     elev_const  = 0.0
-    MM = 35
+    MM = 480
     vel2d_adv_split = 1
     vel2d_adv_hor   = 1
     Am          = 1.0
