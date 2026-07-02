@@ -131,7 +131,8 @@ def _check_meteo(path: str, config: LakeConfig) -> List[str]:
     errors = []
     try:
         ds = nc.Dataset(path, "r")
-        for dim, expected in [("lon", config.nx), ("lat", config.ny), ("time", config.n_days)]:
+        # meteo has n_days+1 time points (extra day to cover stop time, see generate_meteo)
+        for dim, expected in [("lon", config.nx), ("lat", config.ny), ("time", config.n_days + 1)]:
             if dim not in ds.dimensions:
                 errors.append(f"meteo.nc: missing dimension '{dim}'")
             elif len(ds.dimensions[dim]) != expected:
