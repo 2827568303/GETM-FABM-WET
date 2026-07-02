@@ -25,9 +25,16 @@ BUILD_DIR="${PROJECT_ROOT}/build"
 INSTALL_DIR="${PROJECT_ROOT}/install"
 
 # Compiler settings
-export CC=gcc-13
-export CXX=g++-13
-export FC=gfortran-13
+# Support both versioned (gcc-13) and unversioned (gcc) compiler names
+if command -v gcc-13 &>/dev/null; then
+    export CC=gcc-13
+    export CXX=g++-13
+    export FC=gfortran-13
+else
+    export CC=gcc
+    export CXX=g++
+    export FC=gfortran
+fi
 
 echo "=========================================="
 echo "  3DWET Model Build Script"
@@ -101,6 +108,7 @@ cd "$BUILD_DIR/getm"
 # conditionally-compiled OpenMP sections (e.g. ip_shchepetkin_mcwilliams.F90).
 cmake "$SRC_DIR/getm/src" \
     -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+    -DCMAKE_MODULE_PATH="${PROJECT_ROOT}/cmake" \
     -DGOTM_BASE="${SRC_DIR}/gotm" \
     -DFABM_PREFIX="$INSTALL_DIR/fabm" \
     -DGETM_USE_FABM=ON \

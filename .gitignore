@@ -1,23 +1,114 @@
-# ������� 
-*.exe 
-*.dll 
-*.pdb 
-*.obj 
-*.o 
-*.a 
-*.so 
-build/ 
-Build/ 
-# �������ļ� 
-*.nc 
-*.h5 
-*.npz 
-*.mat 
-# �༭������ 
-__pycache__/ 
-*.pyc 
-.vscode/ 
-.idea/ 
-*.swp 
-3DWET/src/wet/testcases/lake_bryrup_obm/meteo_file.dat 
-3DWET/src/wet/testcases/lake_bryrup_obm/inflow_chem*.dat 
+# ============================================
+# 3DWET 项目 .gitignore
+# ============================================
+
+# ========== 编译输出 ==========
+# 构建目录（所有历史和当前 build 目录）
+build/
+build_*/
+install/
+install_*/
+bin/
+
+# 例外：3DWET/scripts/build/ 存放的是编译脚本（非编译产物），需纳入版本控制
+!3DWET/scripts/build/
+
+# Fortran/C 编译产物
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.exe
+*.pdb
+*.mod
+*.smod
+
+# CMake 产物
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+!3DWET/src/**/Makefile
+!3DWET/scripts/**/Makefile
+install_manifest.txt
+*.cmake
+!3DWET/src/**/CMakeLists.txt
+!3DWET/src/**/cmake/*.cmake
+
+# ========== 大数据文件 ==========
+# NetCDF 数据文件（地形、气象、河流、输出等）
+*.nc
+*.nc3
+*.nc4
+*.h5
+*.hdf5
+
+# 其他数据格式
+*.npz
+*.mat
+*.grd
+*.p2d
+*.tif
+*.tiff
+
+# WET 测试数据大文件
+3DWET/src/wet/testcases/lake_bryrup_obm/meteo_file.dat
+3DWET/src/wet/testcases/lake_bryrup_obm/inflow_chem*.dat
+
+# 例外：保留必要的配置模板数据
+!3DWET/cases/**/topo.cdl
+!3DWET/cases/**/topo.dat
+!3DWET/cases/**/riverinfo.dat
+!3DWET/cases/**/meteo_input.txt
+
+# ========== 运行日志 ==========
+*.log
+*.out
+*.err
+run_logs/
+run_*.log
+
+# ========== 备份文件 ==========
+*.bak
+*.bak_*
+*.backup
+*.orig
+*~
+*.save
+
+# ========== Python 缓存 ==========
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/lib/
+
+# ========== 编辑器/IDE ==========
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# ========== 系统文件 ==========
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ========== 临时文件 ==========
+tmp/
+temp/
+*.tmp
+*.temp
+
+# ========== Excel 临时文件 ==========
+~$*.xls
+~$*.xlsx
+~$*.xlsm
