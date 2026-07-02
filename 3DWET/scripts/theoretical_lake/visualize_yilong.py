@@ -14,7 +14,7 @@ from matplotlib import gridspec
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-CASE_DIR = '/mnt/c/Users/dinod/Desktop/GETM-FABM-WET/3DWET/case/Yilong'
+CASE_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, '..', '..', 'case', 'Yilong'))
 FIG_DIR = os.path.join(CASE_DIR, 'figures')
 os.makedirs(FIG_DIR, exist_ok=True)
 

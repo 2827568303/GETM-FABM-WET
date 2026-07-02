@@ -418,10 +418,10 @@ instances:
       sN: 0.6                                                    # N (gN/m2) - sD * cNDVeg0=0.02
       sP: 0.06                                                   # P (gP/m2) - sD * cPDVeg0=0.002
       sC: 12.0                                                   # C (gC/m2) - sD * cCPerDW=0.4
-      sD_PV: 0.0                                                 # DW pel. var - set to 0; model computes from benthic sD
-      sN_PV: 0.0                                                 # N pel. var
-      sP_PV: 0.0                                                 # P pel. var
-      sC_PV: 0.0                                                 # C pel. var
+      sD_PV: 1.0                                                 # DW pel. var - use source default (was 0.0, caused Patankar error)
+      sN_PV: 0.002                                               # N pel. var - source default
+      sP_PV: 0.02                                                # P pel. var - source default
+      sC_PV: 0.4                                                 # C pel. var - source default
     coupling:
       NH4_pool_water: abiotic_water/sNH4W                        # ammonium pool for nutrient uptake (g/m3)
       NO3_pool_water: abiotic_water/sNO3W                        # nitrate pool for nutrient uptake (g/m3)
