@@ -1,0 +1,1425 @@
+instances:
+  F0:
+    long_name: prey fish 0-6 cm
+    model: wet/fish
+    coupling:
+      PLANprey1: copepods
+      PLANprey2: cladocerans
+      adult_D: F1/sD
+      adult_N: F1/sN
+      adult_P: F1/sP
+      adult_Res: F1/sFRes
+      adult_Siz: F1/sDSiz
+      DOM_DW_pool_water: DOM/sDW
+      DOM_N_pool_water: DOM/sNW
+      DOM_P_pool_water: DOM/sPW
+      NH4_pool_water: abiotic_water/sNH4W
+      PO4_pool_water: abiotic_water/sPO4W
+      POM_DW_pool_water: POM/sDW
+      POM_N_pool_water: POM/sNW
+      POM_P_pool_water: POM/sPW
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      oxygen_pool_water: abiotic_water/sO2W
+    initialization:
+      sD: 0.01                                       #  DW (gDW/m3)
+      sN: 0.001                                      #  N (gN/m3)
+      sP: 0.000167                                   #  P (gP/m3)
+      sFRes: 0.426                                   #  reserve fraction of biomass (-)
+      sDSiz: 0.03                                    #  average individual fish size (gDW/ind)
+      fVul: 1.0                                      #  biomass fraction vulnerable to predation (-)
+    parameters:
+    # fish stage-structure parameters
+      qStage: 2                                      #  stage coupling method: 0=nothing; 1=repro.; 2=maturation; 3=both (-)
+      fResMax: 0.426                                 #  maximum reserve fraction of total biomass (-)
+      fResMin: 0.167                                 #  minimum reserve fraction of total biomass (-)
+      cMortStarv: 0.2                                #  starvation mortality proportionality constant (-)
+      cDinit: 0.004                                  #  initial individual dry weight of stage (gDW)
+      cDfin:  0.6                                    #  final individual dry weight of stage (gDW)
+    # prey parameters                               
+      qODB: 1                                        #  toggle optimal diet breadth: 0=off; 1=on (-)
+      qOPT: 1                                        #  toggle optimal behavior: 0=off; 1=on (-)
+      nBEN: 0                                        #  number of benthos prey (-)
+      nPISC: 0                                       #  number of fish prey (-)
+      nPLAN: 2                                       #  number of plankton prey (-)
+      fFC: 0.7                                       #  feeding efficiency in refuge relative to arena (-)
+      fPV: 0.95                                      #  predation vulnerability in refuge relative to arena (-)
+      cClearPlan1: 0.29                              #  clearance rate for plankton prey 1 (m3/gDW/d)
+      cClearPlan2: 0.3                               #  clearance rate for plankton prey 2 (m3/gDW/d)
+      fGutOccPlan1: 1.0                              #  gut occupation factor for plankton prey 1 (-)
+      fGutOccPlan2: 1.0                              #  gut occupation factor for plankton prey 2 (-)
+    # fish vital parameters
+      kDConsMax: 0.26                                #  standard dry weight specific maximum consumption rate (gDW/gDW/d)
+      kDRespFi: 0.012                                #  maintenance respiration constant of fish at 20*C (1/d)
+      fDAssFi: 0.8                                   #  C assimilation efficiency of fish (-), default = 0.4
+      fDRespActFi: 1.                                #  additional feeding respiration as fraction of kDRespFi (-)
+      kMortFi: 0.015                                 #  specific mortality of fish (1/d)
+      lVegOpt: false                                 #  switch for macrophyte dependence on fish max assimilation (-)
+      cRelVegPlan: 0.0                               #  decrease of fish plankton feeding per macrophytes cover; max. 0.01 (-)
+      hDVegGrowth: 0.0                               #  lVegOpt = .true.; half-saturation macrophyte density for growth (g/m2)
+    # stochiometric parameters
+      lNutMeth: false                                #  toggle fixed stochiometry (-)
+      fPBone: 0.5                                    #  fraction of fish P fixed in bones and scales (-)
+      fDBone: 0.35                                   #  fraction of fish C fixed in bones and scales (-)
+      fDissEgesFish: 0.25                            #  soluble inorg. nut. frac. of fish egested food (-)
+      fDissMortFish: 0.1                             #  soluble inorg. nut. frac. of dead fish; excl. bones & scales (-)
+      cNDFishRef: 0.1                                #  reference N/C ratio of fish (mgN/mgDW)
+      cPDFishRef: 0.022                              #  reference P/C ratio of fish(mgP/mgDW)
+      fFiDOMW: 0.75                                  #  dissolved organic matter fraction from fish(-)
+    # fish temperature parameters
+      cSigTmFish: 9.42                               #  temperature constant of fish; sigma in Gaussian curve(*C)
+      cTmOptFish: 25.0                               #  optimal temperature of fish(*C)
+    # boundary condition and variable constraint parameters
+      cDFiMin: 1e-10                                 #  minimum DW density (gDW/m3)
+      cDFiIn: 0.0                                    #  external density (gDW/m3)
+      kMigrFish: 0.0005                              #  fish migration rate (1/d)
+    # vertical movement parameters
+      qTrans: 1                                      #  vert. trans. method: 0=no trans.; 1=passive; 2=O2; 3=O2 & Light (-)
+    # diagnostic parameter
+      diagnostics: true                              # turn on extra diagnostics
+  F1:
+    long_name: prey fish 6-12 cm
+    model: wet/fish
+    coupling:
+      BENTprey1: zoobenthos_littoral
+      BENTprey2: zoobenthos_profundal
+      BENTprey3: POM
+      PLANprey1: copepods
+      PLANprey2: cladocerans
+      adult_D: F2/sD
+      adult_N: F2/sN
+      adult_P: F2/sP
+      adult_Res: F2/sFRes
+      adult_Siz: F2/sDSiz
+      juvenile_D: F0/sD 
+      juvenile_N: F0/sN
+      juvenile_P: F0/sP
+      juvenile_Res: F0/sFRes
+      juvenile_Siz: F0/sDSiz
+      DOM_DW_pool_water: DOM/sDW
+      DOM_N_pool_water: DOM/sNW
+      DOM_P_pool_water: DOM/sPW
+      NH4_pool_water: abiotic_water/sNH4W
+      PO4_pool_water: abiotic_water/sPO4W
+      POM_DW_pool_water: POM/sDW
+      POM_N_pool_water: POM/sNW
+      POM_P_pool_water: POM/sPW
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      oxygen_pool_water: abiotic_water/sO2W
+    initialization:
+      sD: 0.2
+      sN: 0.02
+      sP: 0.00332
+      sFRes: 0.426
+      sDSiz: 3.
+      fVul: 1.0
+    parameters:
+    # fish stage-structure parameters
+      qStage: 3
+      fResMax: 0.426
+      fResMin: 0.167
+      cMortStarv: 0.2
+      cDayReprFish: 120.0
+      fGonad: 0.08
+      cDegg: 0.004
+      fReproFish: 0.1
+      cDinit: 0.6
+      cDfin: 6. 
+    # prey parameters
+      nBEN: 3
+      nPISC: 0
+      nPLAN: 2
+      qODB: 1
+      qOPT: 1
+      fFC: 0.7
+      fPV: 0.95
+      kTurbFish: 1.0
+      BENprey_suffix3: S
+      cClearBent1: 0.015
+      cClearBent2: 0.02
+      cClearBent3: 0.2
+      cClearPlan1: 0.14
+      cClearPlan2: 0.21
+      fGutOccBent1: 1.0
+      fGutOccBent2: 1.0
+      fGutOccBent3: 7.2
+      fGutOccPlan1: 1.0
+      fGutOccPlan2: 1.0
+    # fish vital parameters
+      kDConsMax: 0.23
+      kDRespFi: 0.01
+      cRelVegPlan: 0.0
+      fDAssFi: 0.8
+      fDRespActFi: 1.
+      hDVegGrowth: 0.0
+      kMortFi: 0.0005
+      lVegOpt: false
+    # stochiometric parameters
+      lNutMeth: false
+      fPBone: 0.5
+      fDBone: 0.35
+      fDissEgesFish: 0.25
+      fDissMortFish: 0.1
+      cNDFishRef: 0.1
+      cPDFishRef: 0.022
+      fFiDOMW: 0.75
+    # fish temperature parameters
+      cSigTmFish: 9.42
+      cTmOptFish: 25.0    
+    # boundary condition and variable constrain parameters
+      cDFiMin: 1e-10
+      cDFiIn: 0.0
+      kMigrFish: 0.0005
+    # vertical movement parameters
+      qTrans: 1
+    # diagnostic  parameter
+      diagnostics: true
+  F2:
+    long_name: prey fish 12-18 cm
+    model: wet/fish
+    coupling:
+      BENTprey1: zoobenthos_littoral
+      BENTprey2: zoobenthos_profundal
+      BENTprey3: POM
+      PLANprey1: copepods
+      PLANprey2: cladocerans
+      juvenile_D: F0/sD 
+      juvenile_N: F0/sN
+      juvenile_P: F0/sP
+      juvenile_Res: F0/sFRes
+      juvenile_Siz: F0/sDSiz
+      adult_D: F3/sD
+      adult_N: F3/sN
+      adult_P: F3/sP
+      adult_Res: F3/sFRes
+      adult_Siz: F3/sDSiz
+      DOM_DW_pool_water: DOM/sDW
+      DOM_N_pool_water: DOM/sNW
+      DOM_P_pool_water: DOM/sPW
+      NH4_pool_water: abiotic_water/sNH4W
+      PO4_pool_water: abiotic_water/sPO4W
+      POM_DW_pool_water: POM/sDW
+      POM_N_pool_water: POM/sNW
+      POM_P_pool_water: POM/sPW
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      oxygen_pool_water: abiotic_water/sO2W
+    initialization:
+      sD: 0.2
+      sN: 0.02
+      sP: 0.00332
+      sFRes: 0.426
+      sDSiz: 10.
+      fVul: 1.0
+    parameters:
+    # fish stage-structure parameters
+      qStage: 3
+      cDinit: 6
+      cDfin: 20
+      fResMax: 0.426
+      fResMin: 0.167
+      cMortStarv: 0.2
+      cDayReprFish: 120.0
+      fGonad: 0.13
+      cDegg: 0.004
+      fReproFish: 0.1
+    # prey parameters
+      nBEN: 3
+      nPISC: 0
+      nPLAN: 2
+      qODB: 1
+      qOPT: 1
+      fFC: 0.7
+      fPV: 0.95
+      kTurbFish: 1.0
+      BENprey_suffix3: S
+      cClearBent1: 0.02 
+      cClearBent2: 0.025
+      cClearBent3: 0.2
+      cClearPlan1: 0.09
+      cClearPlan2: 0.15
+      fGutOccBent1: 1.0
+      fGutOccBent2: 1.0
+      fGutOccBent3: 7.2
+      fGutOccPlan1: 1.0
+      fGutOccPlan2: 1.0
+    # fish vital parameters
+      kDConsMax: 0.16
+      kDRespFi: 0.009
+      cRelVegPlan: 0.0
+      fDAssFi: 0.8
+      fDRespActFi: 1.
+      hDVegGrowth: 0.0
+      kMortFi: 0.0005
+      lVegOpt: false
+    # stochiometric parameters
+      lNutMeth: false
+      fPBone: 0.5
+      fDBone: 0.35
+      fDissEgesFish: 0.25
+      fDissMortFish: 0.1
+      cNDFishRef: 0.1
+      cPDFishRef: 0.022
+      fFiDOMW: 0.75
+    # fish temperature parameters
+      cSigTmFish: 9.42
+      cTmOptFish: 25.0
+    # boundary condition and variable constrain parameters
+      cDFiMin: 1e-10
+      cDFiIn: 0.0
+      kMigrFish: 0.0005
+    # vertical movement parameters
+      qTrans: 1
+    # diagnostic  parameter
+      diagnostics: true
+  F3:
+    long_name: prey fish 18+ cm
+    model: wet/fish
+    coupling:
+      BENTprey1: zoobenthos_littoral
+      BENTprey2: zoobenthos_profundal
+      BENTprey3: POM
+      PLANprey1: copepods
+      PLANprey2: cladocerans
+      PO4_pool_water: abiotic_water/sPO4W
+      juvenile_D: F0/sD 
+      juvenile_N: F0/sN
+      juvenile_P: F0/sP
+      juvenile_Res: F0/sFRes
+      juvenile_Siz: F0/sDSiz
+      DOM_DW_pool_water: DOM/sDW
+      DOM_N_pool_water: DOM/sNW
+      DOM_P_pool_water: DOM/sPW
+      NH4_pool_water: abiotic_water/sNH4W
+      PO4_pool_water: abiotic_water/sPO4W
+      POM_DW_pool_water: POM/sDW
+      POM_N_pool_water: POM/sNW
+      POM_P_pool_water: POM/sPW
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      oxygen_pool_water: abiotic_water/sO2W
+    initialization:
+      sD: 0.2
+      sN: 0.02
+      sP: 0.00332
+      sFRes: 0.426
+      sDSiz: 30
+      fVul: 1.0
+    parameters:
+    # fish stage-structure parameters
+      qStage: 1
+      fResMax: 0.426
+      fResMin: 0.167
+      cMortStarv: 0.2
+      cDayReprFish: 120.0
+      fGonad: 0.13
+      cDegg: 0.004
+      fReproFish: 0.1
+      cDinit: 20
+      cDfin: 200
+    # prey parameters
+      nBEN: 3
+      nPISC: 0
+      nPLAN: 2
+      qODB: 1
+      qOPT: 1
+      fFC: 0.7
+      fPV: 0.95
+      kTurbFish: 1.0
+      BENprey_suffix3: S
+      cClearBent1: 0.015 
+      cClearBent2: 0.02
+      cClearBent3: 0.2
+      cClearPlan1: 0.07
+      cClearPlan2: 0.12
+      fGutOccBent1: 1.
+      fGutOccBent2: 1.0
+      fGutOccBent3: 7.2
+      fGutOccPlan1: 1.0
+      fGutOccPlan2: 1.0    
+    # fish vital parameters
+      kDConsMax: 0.1
+      kDRespFi: 0.0085
+      cRelVegPlan: 0.0
+      fDAssFi: 0.8
+      fDRespActFi: 1.
+      hDVegGrowth: 0.0
+      kMortFi: 0.0005
+      lVegOpt: false
+    # stochiometric parameters
+      lNutMeth: false
+      fPBone: 0.5
+      fDBone: 0.35
+      fDissEgesFish: 0.25
+      fDissMortFish: 0.1
+      cNDFishRef: 0.1
+      cPDFishRef: 0.022
+      fFiDOMW: 0.75
+    # fish temperature parameters
+      cSigTmFish: 9.42
+      cTmOptFish: 25.0
+    # boundary condition and variable constrain parameters
+      cDFiMin: 1e-10
+      cDFiIn: 0.0
+      kMigrFish: 0.0005    
+    # vertical movement parameters
+      qTrans: 1
+    # diagnostic  parameter
+      diagnostics: true
+  P0:
+    coupling:
+      PISCprey1: F0
+      PISCprey2: F1
+      PISCprey3: F2
+      PISCprey4: F3
+      BENTprey1: zoobenthos_littoral
+      DOM_DW_pool_water: DOM/sDW
+      DOM_N_pool_water: DOM/sNW
+      DOM_P_pool_water: DOM/sPW
+      NH4_pool_water: abiotic_water/sNH4W
+      PO4_pool_water: abiotic_water/sPO4W
+      POM_DW_pool_water: POM/sDW
+      POM_N_pool_water: POM/sNW
+      POM_P_pool_water: POM/sPW
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      oxygen_pool_water: abiotic_water/sO2W
+    initialization:
+      sD: 0.1
+      sN: 0.01
+      sP: 0.00166
+    long_name: predator fish
+    model: wet/fish
+    parameters:
+    # fish stage-structure parameters
+      qStage: 0
+    # prey parameters
+      nBEN: 1
+      nPISC: 4
+      nPLAN: 0
+      qODB: 1
+      qOPT: 1
+      fFC: 1.0
+      fPV: 1.0
+      lAggr: .false.
+      cAggr: 0.0025
+      cClearPisc1: 0.005
+      cClearPisc2: 0.1  
+      cClearPisc3: 0.15 
+      cClearPisc4: 0.1  
+      cClearBent1: 0.01
+      fGutOccPisc1: 1.0
+      fGutOccPisc2: 1.0
+      fGutOccPisc3: 1.0
+      fGutOccPisc4: 1.0
+      fGutOccBent1: 2.35
+    # fish vital parameters
+      cRelVegPlan: 0.0
+      fDAssFi: 0.9
+      fDRespActFi: 1.5
+      kDConsMax: 0.025
+      kDRespFi: 0.004
+      kMortFi: 0.0025
+      lVegOpt: false
+    # stochiometric parameters
+      lNutMeth: false
+      fPBone: 0.5
+      fDBone: 0.35
+      fDissEgesFish: 0.25
+      fDissMortFish: 0.01
+      cNDFishRef: 0.1
+      cPDFishRef: 0.022
+      fFiDOMW: 0.5
+    # fish temperature parameters
+      cSigTmFish: 9.6
+      cTmOptFish: 25.0
+    # boundary condition and variable constrain parameters
+      cDFiMin: 1e-04
+      cDFiIn: 0.0025
+      kMigrFish: 0.0005    
+    # vertical movement parameters
+      qTrans: 1
+    # diagnostic  parameter
+      diagnostics: true
+  cladocerans:
+    coupling:
+      DOM_DW_pool_water: DOM/sDW
+      DOM_N_pool_water: DOM/sNW
+      DOM_P_pool_water: DOM/sPW
+      NH4_pool_water: abiotic_water/sNH4W
+      PO4_pool_water: abiotic_water/sPO4W
+      POM_DW_pool_water: POM/sDW
+      POM_N_pool_water: POM/sNW
+      POM_P_pool_water: POM/sPW
+      SiO2_pool_water: abiotic_water/sSiO2W
+      SiPa_pool_water: abiotic_water/sSiPaW
+      oxygen_pool_water: abiotic_water/sO2W
+      prey_model1: largeCyano
+      prey_model2: smallCyano
+      prey_model3: diatoms
+      prey_model4: POM
+    initialization:
+      sD: 0.05
+      sN: 0.0035
+      sP: 0.0005
+    long_name: cladocerans
+    model: wet/zooplankton
+    parameters:
+      cClearPrey1: 3.5
+      cClearPrey2: 2.62
+      cClearPrey3: 3.036
+      cClearPrey4: 2.63
+      cDCarrZoo: 25.0
+      cDMinZoo: 1.0e-05
+      cMaxLight: 40.0
+      cMinLight: 40.0
+      cMinO2: 2.0
+      cNDZooRef: 0.07
+      cPDZooRef: 0.01
+      cSigTmZoo: 13.0
+      cTmOptZoo: 21.48
+      cVswim: 15.0
+      diagnostics: false
+      fDAssZoo: 0.5
+      fDissEgesZoo: 0.25
+      fDissMortZoo: 0.11
+      fGutOccPrey1: 1.63
+      fGutOccPrey2: 2.067
+      fGutOccPrey3: 1.0
+      fGutOccPrey4: 3.76
+      fZooDOMW: 0.017
+      kDConsMaxZoo: 1.25
+      kDRespZoo: 0.15
+      kMortZoo: 0.002
+      lSi1: false
+      lSi2: false
+      lSi3: false
+      lSi4: false
+      nPrey: 4
+      prey_suffix1: W
+      prey_suffix2: W
+      prey_suffix3: W
+      prey_suffix4: W
+      qODB: 1
+      qTrans: 3
+  copepods:
+    coupling:
+      DOM_DW_pool_water: DOM/sDW
+      DOM_N_pool_water: DOM/sNW
+      DOM_P_pool_water: DOM/sPW
+      NH4_pool_water: abiotic_water/sNH4W
+      PO4_pool_water: abiotic_water/sPO4W
+      POM_DW_pool_water: POM/sDW
+      POM_N_pool_water: POM/sNW
+      POM_P_pool_water: POM/sPW
+      SiO2_pool_water: abiotic_water/sSiO2W
+      SiPa_pool_water: abiotic_water/sSiPaW
+      oxygen_pool_water: abiotic_water/sO2W
+      prey_model1: largeCyano
+      prey_model2: smallCyano
+      prey_model3: diatoms
+      prey_model4: POM
+    initialization:
+      sD: 0.05
+      sN: 0.0035
+      sP: 0.0005
+    long_name: copepods
+    model: wet/zooplankton
+    parameters:
+      cClearPrey1: 3.41
+      cClearPrey2: 2.13
+      cClearPrey3: 2.90
+      cClearPrey4: 1.89
+      cDCarrZoo: 25.0
+      cDMinZoo: 1.0e-05
+      cMaxLight: 40.0
+      cMinLight: 40.0
+      cMinO2: 2.0
+      cNDZooRef: 0.07
+      cPDZooRef: 0.01
+      cSigTmZoo: 13.0
+      cTmOptZoo: 22.38967002140904
+      cVswim: 15.0
+      diagnostics: false
+      fDAssZoo: 0.5
+      fDissEgesZoo: 0.25
+      fDissMortZoo: 0.077
+      fGutOccPrey1: 2.34
+      fGutOccPrey2: 1.78
+      fGutOccPrey3: 1.0
+      fGutOccPrey4: 4.48
+      fZooDOMW: 0.3
+      kDConsMaxZoo: 1.2
+      kDRespZoo: 0.15
+      kMortZoo: 0.002
+      lSi1: false
+      lSi2: false
+      lSi3: false
+      lSi4: false
+      nPrey: 4
+      prey_suffix1: W
+      prey_suffix2: W
+      prey_suffix3: W
+      prey_suffix4: W
+      qODB: 1
+      qTrans: 3
+  CPOM:
+    coupling:
+      DW_transformation_sediment: POM/sDS
+      DW_transformation_sediment_PV: POM/sDS_PV
+      DW_transformation_water: POM/sDW
+      NO3_pool_water: abiotic_water/sNO3W
+      N_transformation_sediment: POM/sNS
+      N_transformation_sediment_PV: POM/sNS_PV
+      N_transformation_water: POM/sNW
+      P_transformation_sediment: POM/sPS
+      P_transformation_sediment_PV: POM/sPS_PV
+      P_transformation_water: POM/sPW
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      oxygen_pool_water: abiotic_water/sO2W
+    initialization:
+      sDS: 20.0
+      sDS_PV: 20.0
+      sDW: 0.1
+      sNS: 0.3
+      sNS_PV: 0.3
+      sNW: 0.01
+      sPS: 0.05
+      sPS_PV: 0.05
+      sPW: 0.001
+    long_name: coarse_pom
+    model: wet/om_pool
+    parameters:
+      NO3PerCW: 1.0
+      cCPerDWS: 0.4
+      cCPerDWW: 0.4
+      cExtSp: 0.15
+      cThetaMinS: 1.02
+      cThetaMinW: 1.02
+      cVSet: 1.0
+      diagnostics: true
+      fRefrDWS: 0.0
+      fRefrNutS: 0.0
+      hNO3DenitW: 1.0
+      hO2BOD: 1.0
+      kDMinS: 0.0001
+      kDMinW: 0.0001
+      kNMinS: 0.001
+      kNMinW: 0.001
+      kPMinS: 0.001
+      kPMinW: 0.001
+      lPOMtoDOM: false
+      lRefrPV: false
+      lRefrpool: false
+      lTransPV: true
+      qTrans: 1
+  DOM:
+    coupling:
+      NO3_pool_water: abiotic_water/sNO3W
+      N_transformation_sediment: abiotic_sediment/sNH4S
+      N_transformation_water: abiotic_water/sNH4W
+      P_transformation_sediment: abiotic_sediment/sPO4S
+      P_transformation_water: abiotic_water/sPO4W
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      oxygen_pool_water: abiotic_water/sO2W
+    initialization:
+      sDS: 10.0
+      sDW: 2.5
+      sNS: 0.06
+      sNW: 0.01
+      sPS: 0.01
+      sPW: 0.001
+    long_name: dom
+    model: wet/om_pool
+    parameters:
+      NO3PerCW: 1.078
+      cCPerDWS: 0.4
+      cCPerDWW: 0.4
+      cExtSp: 0.0
+      cThetaMinS: 1.073
+      cThetaMinW: 1.012
+      cVSet: 0.0
+      diagnostics: true
+      fRefrDWS: 0.0
+      fRefrNutS: 0.0
+      hNO3DenitW: 3.99
+      hO2BOD: 1.18
+      kDMinS: 0.0013
+      kDMinW: 0.0061
+      kNMinS: 0.002
+      kNMinW: 0.032
+      kPMinS: 0.0046
+      kPMinW: 0.0417
+      lPOMtoDOM: false
+      lRefrPV: false
+      lRefrpool: false
+      lTransDWtarget: false
+      lTransPV: false
+      qTrans: 1
+  POM:
+    coupling:
+      DW_refractory_sediment: humus/sDS
+      DW_transformation_sediment: DOM/sDS
+      DW_transformation_water: DOM/sDW
+      NO3_pool_water: abiotic_water/sNO3W
+      N_refractory_sediment: humus/sNS
+      N_transformation_sediment: DOM/sNS
+      N_transformation_water: DOM/sNW
+      P_refractory_sediment: humus/sPS
+      P_transformation_sediment: DOM/sPS
+      P_transformation_water: DOM/sPW
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      oxygen_pool_water: abiotic_water/sO2W
+    initialization:
+      sDS: 450.
+      sDS_PV: 450.
+      sDW: 0.1
+      sNS: 450.
+      sNS_PV: 450.
+      sNW: 0.01
+      sPS: 8.
+      sPS_PV: 8.
+      sPW: 0.001
+    long_name: pom
+    model: wet/om_pool
+    parameters:
+      NO3PerCW: 1.067
+      cCPerDWS: 0.4
+      cCPerDWW: 0.4
+      cExtSp: 0.15
+      cThetaMinS: 1.042
+      cThetaMinW: 1.034
+      cVSet: -0.39
+      diagnostics: true
+      fRefrDWS: 0.082
+      fRefrNutS: 0.11
+      hNO3DenitW: 2.71
+      hO2BOD: 0.82
+      kDMinS: 0.00088
+      kDMinW: 0.011
+      kNMinS: 0.0044
+      kNMinW: 0.022
+      kPMinS: 0.0015
+      kPMinW: 0.0073
+      lPOMtoDOM: true
+      lRefrPV: false
+      lRefrpool: false
+      lTransPV: false
+      qTrans: 1
+  abiotic_sediment:
+    coupling:
+      Trans_CDOM_sediment_update1: DOM/tCTrans
+      Trans_CPOM_sediment_update1: POM/tCTrans
+      Trans_CPOM_sediment_update2: CPOM/tCTrans
+      Trans_DDOM_sediment_update1: DOM/tDTrans
+      Trans_DPOM_sediment_update1: POM/tDTrans
+      Trans_DPOM_sediment_update2: CPOM/tDTrans
+      oxygen_pool_water: abiotic_water/sO2W
+      #water_column_NH4: abiotic_water/sNH4W
+      #water_column_NO3: abiotic_water/sNO3W
+      #water_column_PO4: abiotic_water/sPO4W
+      #water_column_SiO2: abiotic_water/sSiO2W
+    initialization:
+      sDIMS: 9417.95
+      sNH4S: 0.04
+      sNO3S: 0.025
+      sPAIMS: 18.03
+      sPO4S: 0.02
+      sSiO2S: 0.1
+      sSiPaS: 6.19
+    long_name: abiotic_process_in_sediment
+    model: wet/abiotic_sediment
+    parameters:
+      NO3PerCS: 1.0
+      O2PerNH4S: 2.0
+      bPorCorS: 0.97
+      bPorS: 0.93
+      cDepthS: 0.2
+      cKPAdsOxS: 3.99
+      cRelPAdsAlS: 0.134
+      cRelPAdsDWS: 3.55e-05
+      cRelPAdsFeS: 0.077
+      cThetaNitrS: 1.043
+      cTurbDifO2: 29.38
+      coPO4Max: 2.42
+      diagnostics: true
+      fAlDIMS: 0.01
+      fDepthDifS: 0.32
+      fFeDIM: 0.04
+      fRedMaxS: 0.84
+      hNO3DenitS: 0.39
+      hypsograph: true
+      kNitrS: 1.76
+      kO2Dif: 0.00019
+      kPChemPO4: 0.0270
+      kPSorpS: 0.0540
+      kSiMinPaS: 0.03
+      nDOM: 1
+      nPOM: 2
+  abiotic_water:
+    initialization:
+      sDIMW: 4.0
+      sNH4W: 0.05
+      sNO3W: 0.5
+      sO2W: 13.0
+      sPAIMW: 0.0
+      sPO4W: 0.1
+      sSiO2W: 3.5
+      sSiPaW: 0.025
+    long_name: abiotic_process_in_water
+    model: wet/abiotic_water
+    parameters:
+      O2PerNH4W: 2.35
+      cExtSpIM: 0.05
+      cKPAdsOxW: 2.29
+      cRelPAdsAlW: 0.134
+      cRelPAdsDWW: 3.0e-05
+      cRelPAdsFeW: 0.092
+      cThetaAer: 1.
+      cThetaNitrW: 1.038
+      cVSetIM: -1.035
+      diagnostics: true
+      fAlDIMW: 0.01
+      fFeDIMW: 0.04
+      fRedMaxW: 0.83
+      hO2Nitr: 1.77
+      kNitrW: 0.17
+      kPSorpW: 0.061
+      kSiMinPaW: 0.03
+  bot_pel_interface:
+    long_name: bot_pel_interface
+    model: wet/bot_pel_interface
+    parameters:
+      hypsograph: true
+  burial:
+    coupling:
+      DOM_group1: DOM
+      IM_abiotic_update: sediment_exchange/tDAbioIMS
+      POM_exchange_update1: sediment_exchange/tDExchPOMS_1
+      POM_group1: POM
+      POM_group2: humus
+      POM_group3: CPOM
+      POM_macrophyte_update1: macrophytes/tDBedPOMS
+      POM_phytoplankton_update1: largeCyano/tDPOMS
+      POM_phytoplankton_update2: smallCyano/tDPOMS
+      POM_phytoplankton_update3: diatoms/tDPOMS
+      POM_sediment_update1: POM/tDPOMS
+      POM_sediment_update2: humus/tDPOMS
+      POM_sediment_update3: CPOM/tDPOMS
+      POM_zoobenthos_update1: zoobenthos_profundal/tDBentPOMS
+      POM_zoobenthos_update2: zoobenthos_littoral/tDBentPOMS
+      PAIM_in_sediment: abiotic_sediment/sPAIMS
+      NH4_pool_in_sediment: abiotic_sediment/sNH4S
+      bPorS: abiotic_sediment/bPorS
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      cDepthS: abiotic_sediment/cDepthS
+      humus_DW_in_deep_sediment: humus/sDS
+      humus_N_in_deep_sediment: humus/sNS
+      humus_P_in_deep_sediment: humus/sPS
+      inorg_pool_in_sediment: abiotic_sediment/sDIMS
+      NO3_pool_in_sediment: abiotic_sediment/sNO3S
+      particulate_Si_in_sediment: abiotic_sediment/sSiPaS
+      PO4_pool_in_sediment: abiotic_sediment/sPO4S
+    long_name: burial
+    model: wet/burial
+    parameters:
+      cNH4Ground: 1.0
+      cNO3Ground: 0.1
+      cPO4Ground: 0.1
+      cRhoIM: 2500000.0
+      cRhoOM: 1400000.0
+      diagnostics: true
+      fDOrgSoil: 0.1
+      nBENT: 2
+      nDOM: 1
+      nMACRO: 1
+      nPHYT: 3
+      nPOM: 3
+      nPOMexch: 1
+  diatoms:
+    coupling:
+      DOM_DW_pool_sediment: DOM/sDS
+      DOM_DW_pool_water: DOM/sDW
+      DOM_N_pool_sediment: DOM/sNS
+      DOM_N_pool_water: DOM/sNW
+      DOM_P_pool_sediment: DOM/sPS
+      DOM_P_pool_water: DOM/sPW
+      NH4_pool_sediment: abiotic_sediment/sNH4S
+      NH4_pool_water: abiotic_water/sNH4W
+      NO3_pool_water: abiotic_water/sNO3W
+      PO4_pool_sediment: abiotic_sediment/sPO4S
+      PO4_pool_water: abiotic_water/sPO4W
+      POM_DW_pool_sediment: POM/sDS
+      POM_DW_pool_sediment_PV: POM/sDS_PV
+      POM_DW_pool_water: POM/sDW
+      POM_N_pool_sediment: POM/sNS
+      POM_N_pool_sediment_PV: POM/sNS_PV
+      POM_N_pool_water: POM/sNW
+      POM_P_pool_sediment: POM/sPS
+      POM_P_pool_sediment_PV: POM/sPS_PV
+      POM_P_pool_water: POM/sPW
+      SiO2_pool_sediment: abiotic_sediment/sSiO2S
+      SiO2_pool_water: abiotic_water/sSiO2W
+      SiPa_pool_sediment: abiotic_sediment/sSiPaS
+      SiPa_pool_water: abiotic_water/sSiPaW
+      aFunTauTmSet: sediment_exchange/aFunTauTmSet
+      base_resuspension_rate: sediment_exchange/tDResusDead
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      oxygen_pool_water: abiotic_water/sO2W
+    initialization:
+      sDS: 0.003
+      sDS_PV: 0.003
+      sDW: 0.2
+      sNS: 0.0003
+      sNS_PV: 0.0003
+      sNW: 0.05
+      sPS: 3e-05
+      sPS_PV: 3e-05
+      sPW: 0.005
+    long_name: diatom phytoplankton
+    model: wet/phytoplankton
+    parameters:
+      cAffNUpt: 0.2
+      cAffPUpt: 0.2
+      cCPerDW: 0.4
+      cChDMax: 0.012
+      cChDMin: 0.004
+      cDMinS: 1e-05
+      cDMinW: 0.0001
+      cExtSp: 0.25
+      cLOptRef: 25.0
+      cMuMax: 2.55
+      cNDMax: 0.036
+      cNDMin: 0.0059
+      cNFixMax: 0.01
+      cPDMax: 0.013
+      cPDMin: 0.0046
+      cResusExp: -0.38
+      cSiD: 0.15
+      cSigTm: 12.06
+      cTmOpt: 17.7
+      cVNUptMax: 0.07
+      cVPUptMax: 0.028
+      cVSed: 0.94
+      cVSet: -1.031
+      cVSwim: 10
+      diagnostics: false
+      fDOMS: 0.13
+      fDOMW: 0.046
+      fDissMort: 0.23
+      fLVMmin: 0.025
+      fMuNFix: 0.9
+      fNutLimVMdown: 0.68
+      fNutLimVMup: 0.75
+      hLRef: 4.61
+      hO2BOD: 1.0
+      hSiAss: 0.01
+      kDResp: 0.1
+      kMortS: 0.05
+      kMortW: 0.01
+      kResusMax: 0.25
+      lNfix: false
+      lSi: false
+      qLightMethod: 1
+      qTrans: 1
+  humus:
+    coupling:
+      DW_transformation_sediment: DOM/sDS
+      DW_transformation_water: DOM/sDW
+      NO3_pool_water: abiotic_water/sNO3W
+      N_transformation_sediment: DOM/sNS
+      N_transformation_water: DOM/sNW
+      P_transformation_sediment: DOM/sPS
+      P_transformation_water: DOM/sPW
+      afOxySed: abiotic_sediment/afOxySed
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      oxygen_pool_water: abiotic_water/sO2W
+    initialization:
+      sDS: 7677.72
+      sDS_PV: 3719.0
+      sNS: 166.0
+      sNS_PV: 166.0
+      sPS: 16.0
+      sPS_PV: 16.0
+    long_name: humus
+    model: wet/om_pool
+    parameters:
+      NO3PerCW: 1.0
+      cCPerDWS: 0.4
+      cCPerDWW: 0.4
+      cExtSp: 0.15
+      cThetaMinS: 1.074
+      cThetaMinW: 1.02
+      cVSet: 0.5
+      diagnostics: true
+      fRefrDWS: 0.0
+      fRefrNutS: 0.0
+      hNO3DenitW: 1.0
+      hO2BOD: 1.0
+      kDMinS: 0.00021
+      kDMinW: 0.001
+      kNMinS: 5.0e-05
+      kNMinW: 0.01
+      kPMinS: 5.0e-05
+      kPMinW: 0.01
+      lPOMtoDOM: true
+      lRefrPV: false
+      lRefrpool: true
+      lTransPV: false
+      qTrans: 1
+  largeCyano:
+    coupling:
+      DOM_DW_pool_sediment: DOM/sDS
+      DOM_DW_pool_water: DOM/sDW
+      DOM_N_pool_sediment: DOM/sNS
+      DOM_N_pool_water: DOM/sNW
+      DOM_P_pool_sediment: DOM/sPS
+      DOM_P_pool_water: DOM/sPW
+      NH4_pool_sediment: abiotic_sediment/sNH4S
+      NH4_pool_water: abiotic_water/sNH4W
+      NO3_pool_water: abiotic_water/sNO3W
+      PO4_pool_sediment: abiotic_sediment/sPO4S
+      PO4_pool_water: abiotic_water/sPO4W
+      POM_DW_pool_sediment: POM/sDS
+      POM_DW_pool_sediment_PV: POM/sDS_PV
+      POM_DW_pool_water: POM/sDW
+      POM_N_pool_sediment: POM/sNS
+      POM_N_pool_sediment_PV: POM/sNS_PV
+      POM_N_pool_water: POM/sNW
+      POM_P_pool_sediment: POM/sPS
+      POM_P_pool_sediment_PV: POM/sPS_PV
+      POM_P_pool_water: POM/sPW
+      SiO2_pool_sediment: abiotic_sediment/sSiO2S
+      SiO2_pool_water: abiotic_water/sSiO2W
+      SiPa_pool_sediment: abiotic_sediment/sSiPaS
+      SiPa_pool_water: abiotic_water/sSiPaW
+      aFunTauTmSet: sediment_exchange/aFunTauTmSet
+      base_resuspension_rate: sediment_exchange/tDResusDead
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      oxygen_pool_water: abiotic_water/sO2W
+    initialization:
+      sDS: 0.003
+      sDS_PV: 0.003
+      sDW: 0.1
+      sNS: 0.0003
+      sNS_PV: 0.0003
+      sNW: 0.03
+      sPS: 3e-05
+      sPS_PV: 3e-05
+      sPW: 0.003
+    long_name: large cyanos
+    model: wet/phytoplankton
+    parameters:
+      cAffNUpt: 0.2
+      cAffPUpt: 0.8
+      cCPerDW: 0.4
+      cChDMax: 0.015
+      cChDMin: 0.005
+      cDMinS: 1e-05
+      cDMinW: 0.0001
+      cExtSp: 0.35
+      cLOptRef: 23.0
+      cMuMax: 1.26
+      cNDMax: 0.15
+      cNDMin: 0.035
+      cNFixMax: 0.01
+      cPDMax: 0.02
+      cPDMin: 0.0021
+      cResusExp: -0.38
+      cSiD: 0.15
+      cSigTm: 11.42
+      cTmOpt: 23.73
+      cVNUptMax: 0.08
+      cVPUptMax: 0.032
+      cVSed: 0.12
+      cVSet: 0.028
+      cVSwim: 3.29
+      diagnostics: false
+      fDOMS: 0.1
+      fDOMW: 0.044
+      fDissMort: 0.28
+      fLVMmin: 4.92
+      fMuNFix: 0.9
+      fNutLimVMdown: 0.65
+      fNutLimVMup: 0.75
+      hLRef: 31.47
+      hO2BOD: 1.0
+      hSiAss: 0.09
+      kDResp: 0.03
+      kMortS: 0.2
+      kMortW: 0.01
+      kResusMax: 0.25
+      lNfix: false
+      lSi: false
+      qLightMethod: 1
+      qTrans: 4
+  macrophytes:
+    coupling:
+      DOM_DW_pool_sediment: DOM/sDS
+      DOM_DW_pool_water: DOM/sDW
+      DOM_N_pool_sediment: DOM/sNS
+      DOM_N_pool_water: DOM/sNW
+      DOM_P_pool_sediment: DOM/sPS
+      DOM_P_pool_water: DOM/sPW
+      POM_DW_pool_sediment: POM/sDS
+      POM_DW_pool_sediment_PV: POM/sDS_PV
+      POM_DW_pool_water: POM/sDW
+      POM_N_pool_sediment: POM/sNS
+      POM_N_pool_sediment_PV: POM/sNS_PV
+      POM_N_pool_water: POM/sPW
+      POM_P_pool_sediment: POM/sPS
+      POM_P_pool_sediment_PV: POM/sPS_PV
+      POM_P_pool_water: POM/sNW
+      NH4_pool_sediment: abiotic_sediment/sNH4S
+      NH4_pool_water: abiotic_water/sNH4W
+      bPorS: abiotic_sediment/bPorS
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      cDepthS: abiotic_sediment/cDepthS
+      NO3_pool_sediment: abiotic_sediment/sNO3S
+      NO3_pool_water: abiotic_water/sNO3W
+      oxic_layer_fraction: abiotic_sediment/afOxySed
+      oxygen_pool_water: abiotic_water/sO2W
+      PO4_pool_sediment: abiotic_sediment/sPO4S
+      PO4_pool_water: abiotic_water/sPO4W
+    initialization:
+      sD: 1.0
+      sD_PV: 1.0
+      sN: 0.02
+      sN_PV: 0.02
+      sP: 0.002
+      sP_PV: 0.002
+    long_name: macrophytes
+    model: wet/macrophytes
+    parameters:
+      cAffNUptVeg: 0.2
+      cAffPUptVeg: 0.2
+      cCPerDW: 0.4
+      cCovSpVeg: 0.5
+      cDCarrVeg: 300.0
+      cDLayerVeg: 0.0
+      cDVegIn: 1.0
+      cDVegMin: 1.0e-05
+      cDaySumVegMin: 1.0
+      cDayWinVeg: 259.0
+      cExtSpVeg: 0.00069
+      cHeightVeg: 0.5
+      cLengAllo: 15.0
+      cLengMort: 15.0
+      cMuMaxVeg: 0.087
+      cNDVeg0: 0.02
+      cNDVegMax: 0.035
+      cNDVegMin: 0.01
+      cPDVeg0: 0.002
+      cPDVegMax: 0.004
+      cPDVegMin: 0.001
+      cQ10ProdVeg: 1.2
+      cQ10RespVeg: 2.0
+      cSigTmVeg: 20.0
+      cTmInitVeg: 9.0
+      cTmOptVeg: 20.0
+      cVNUptMaxVeg: 0.1
+      cVPUptMaxVeg: 0.01
+      diagnostics: false
+      fDissMortVeg: 0.25
+      fEmergVeg: 0.0
+      fFloatVeg: 0.0
+      fRootVegSum: 0.1
+      fRootVegWin: 0.6
+      fSedUptVegCoef: 2.66
+      fSedUptVegExp: -0.83
+      fSedUptVegMax: 0.5
+      fTOMWMortVeg: 0.1
+      fVegDOMS: 0.0
+      fVegDOMW: 0.0
+      fWinVeg: 0.3
+      hLRefVeg: 17.0
+      hO2BOD: 1.0
+      kDRespVeg: 0.02
+      kMigrVeg: 0.001
+      kMortVegSum: 0.005
+      lCarrVeg: true
+      lEmpUpt: false
+      lGausVeg: false
+      nCompts: 0
+  sediment_exchange:
+    coupling:
+      NH4_in_sediment: abiotic_sediment/sNH4S
+      NH4_in_water: abiotic_water/sNH4W
+      NO3_in_sediment: abiotic_sediment/sNO3S
+      NO3_in_water: abiotic_water/sNO3W
+      PO4_in_sediment: abiotic_sediment/sPO4S
+      PO4_in_water: abiotic_water/sPO4W
+      SiO2_in_water: abiotic_water/sSiO2W
+      PAIM_in_sediment: abiotic_sediment/sPAIMS
+      PAIM_in_water: abiotic_water/sPAIMW
+      bPorCorS: abiotic_sediment/bPorCorS
+      bPorS: abiotic_sediment/bPorS
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      cDepthS: abiotic_sediment/cDepthS
+      dissolved_Si_in_sediment: abiotic_sediment/sSiO2S
+      dom_model1: DOM
+      fDepthDifS: abiotic_sediment/fDepthDifS
+      inorg_pool_in_sediment: abiotic_sediment/sDIMS
+      inorg_pool_in_water: abiotic_water/sDIMW
+      particulate_Si_in_sediment: abiotic_sediment/sSiPaS
+      particulate_Si_in_water: abiotic_water/sSiPaW
+      pom_model1: POM
+      pom_model2: CPOM
+    long_name: sediment_exchange
+    model: wet/sediment_exchange
+    parameters:
+      alpha: 4370.53
+      cFetch: 1000.0
+      cFetchRef: 1000.0
+      cSuspMax: 25.2
+      cSuspMin: 6.1
+      cSuspRef: 0.0
+      cSuspSlope: 2.1
+      cThetaDif: 1.02
+      cThetaSed: 1.01
+      cTurbDifNut: 24.2
+      cVSedIM: 1.12
+      cVSedPOM1: 0.36
+      cVSedPOM2: 1.0
+      cVSetMain: 0.99
+      crt_shear: 0.015
+      diagnostics: true
+      eta: 1.0
+      fLutum: 0.1
+      fLutumRef: 0.2
+      hDepthSusp: 2.0
+      kDDifDOM1: 0.0071
+      kNDifDOM1: 0.00013
+      kNDifNH4: 0.00015
+      kNDifNO3: 0.00013
+      kPDifDOM1: 0.00021
+      kPDifPO4: 8.831348557759717e-05
+      kSiO2Dif: 8.64e-05
+      kVegResus: 0.05
+      nDOM: 1
+      nPOM: 2
+      qResus: 2
+      ref_shear: 1.0
+  smallCyano:
+    coupling:
+      DOM_DW_pool_sediment: DOM/sDS
+      DOM_DW_pool_water: DOM/sDW
+      DOM_N_pool_sediment: DOM/sNS
+      DOM_N_pool_water: DOM/sNW
+      DOM_P_pool_sediment: DOM/sPS
+      DOM_P_pool_water: DOM/sPW
+      NH4_pool_sediment: abiotic_sediment/sNH4S
+      NH4_pool_water: abiotic_water/sNH4W
+      NO3_pool_water: abiotic_water/sNO3W
+      PO4_pool_sediment: abiotic_sediment/sPO4S
+      PO4_pool_water: abiotic_water/sPO4W
+      POM_DW_pool_sediment: POM/sDS
+      POM_DW_pool_sediment_PV: POM/sDS_PV
+      POM_DW_pool_water: POM/sDW
+      POM_N_pool_sediment: POM/sNS
+      POM_N_pool_sediment_PV: POM/sNS_PV
+      POM_N_pool_water: POM/sNW
+      POM_P_pool_sediment: POM/sPS
+      POM_P_pool_sediment_PV: POM/sPS_PV
+      POM_P_pool_water: POM/sPW
+      SiO2_pool_sediment: abiotic_sediment/sSiO2S
+      SiO2_pool_water: abiotic_water/sSiO2W
+      SiPa_pool_sediment: abiotic_sediment/sSiPaS
+      SiPa_pool_water: abiotic_water/sSiPaW
+      aFunTauTmSet: sediment_exchange/aFunTauTmSet
+      base_resuspension_rate: sediment_exchange/tDResusDead
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      oxygen_pool_water: abiotic_water/sO2W
+    initialization:
+      sDS: 0.003
+      sDS_PV: 0.003
+      sDW: 0.1
+      sNS: 0.0003
+      sNS_PV: 0.0003
+      sNW: 0.03
+      sPS: 3e-05
+      sPS_PV: 3e-05
+      sPW: 0.003
+    long_name: small late summer cyanos
+    model: wet/phytoplankton
+    parameters:
+      cAffNUpt: 0.2
+      cAffPUpt: 0.8
+      cCPerDW: 0.4
+      cChDMax: 0.015
+      cChDMin: 0.005
+      cDMinS: 1e-05
+      cDMinW: 0.0001
+      cExtSp: 0.35
+      cLOptRef: 30.0
+      cMuMax: 2.13
+      cNDMax: 0.22
+      cNDMin: 0.068
+      cNFixMax: 0.01
+      cPDMax: 0.011
+      cPDMin: 0.0011
+      cResusExp: -0.38
+      cSiD: 0.15
+      cSigTm: 15.43
+      cTmOpt: 22.32
+      cVNUptMax: 0.08
+      cVPUptMax: 0.018
+      cVSed: 0.28
+      cVSet: -0.063
+      cVSwim: 3.58
+      diagnostics: false
+      fDOMS: 0.046
+      fDOMW: 0.079
+      fDissMort: 0.35
+      fLVMmin: 4.7
+      fMuNFix: 0.9
+      fNutLimVMdown: 0.072
+      fNutLimVMup: 0.75
+      hLRef: 10.31
+      hO2BOD: 1.0
+      hSiAss: 0.09
+      kDResp: 0.03
+      kMortS: 0.2
+      kMortW: 0.01
+      kResusMax: 0.25
+      lNfix: false
+      lSi: false
+      qLightMethod: 1
+      qTrans: 4
+  zoobenthos_littoral:
+    coupling:
+      DOM_DW_pool_sediment: DOM/sDS
+      DOM_N_pool_sediment: DOM/sNS
+      DOM_P_pool_sediment: DOM/sPS
+      NH4_pool_sediment: abiotic_sediment/sNH4S
+      NO3_pool_sediment: abiotic_sediment/sNO3S
+      PO4_pool_sediment: abiotic_sediment/sPO4S
+      POM_DW_pool_sediment: POM/sDS
+      POM_DW_pool_sediment_PV: POM/sDS_PV
+      POM_N_pool_sediment: POM/sNS
+      POM_N_pool_sediment_PV: POM/sNS_PV
+      POM_P_pool_sediment: POM/sPS
+      POM_P_pool_sediment_PV: POM/sPS_PV
+      SiO2_pool_sediment: abiotic_sediment/sSiO2S
+      SiPa_pool_sediment: abiotic_sediment/sSiPaS
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      pO2Sat: abiotic_water/pO2Sat
+      prey_model1: largeCyano
+      prey_model2: smallCyano
+      prey_model3: diatoms
+      prey_model4: POM
+      prey_model5: CPOM
+    initialization:
+      sD: 3.0
+      sD_PV: 3.0
+      sN: 0.21
+      sN_PV: 0.21
+      sP: 0.03
+      sP_PV: 0.03
+    long_name: zoobenthos_littoral
+    model: wet/zoobenthos
+    parameters:
+      cClearPrey1: 0.12
+      cClearPrey2: 0.05
+      cClearPrey3: 0.17
+      cClearPrey4: 0.042
+      cClearPrey5: 0.015
+      cDBentIn: 0.01
+      cDCarrBent: 10.0
+      cDVegCarr: 0.025
+      cNDBentRef: 0.07
+      cPDBentRef: 0.01
+      cSigTmBent: 16.0
+      cTmOptBent: 25.0
+      diagnostics: false
+      fBentDOMS: 0.089
+      fDAssBent: 0.59
+      fDissEgesBent: 0.25
+      fDissMortBent: 0.086
+      fGutOccPrey1: 1.0
+      fGutOccPrey2: 1.0
+      fGutOccPrey3: 1.0
+      fGutOccPrey4: 3.58
+      fGutOccPrey5: 1.0
+      hO2stress: 49.58
+      kDConsMaxBent: 1.9
+      kDRespBent: 0.005
+      kMigrBent: 0.0001
+      kMortBent: 0.001
+      kMortO2: 0.1
+      lSi1: false
+      lSi2: false
+      lSi3: false
+      lSi4: false
+      lSi5: false
+      lVegOpt: false
+      nPrey: 5
+      prey_suffix1: S
+      prey_suffix2: S
+      prey_suffix3: S
+      prey_suffix4: S
+      prey_suffix5: S
+  zoobenthos_profundal:
+    coupling:
+      DOM_DW_pool_sediment: DOM/sDS
+      DOM_N_pool_sediment: DOM/sNS
+      DOM_P_pool_sediment: DOM/sPS
+      NH4_pool_sediment: abiotic_sediment/sNH4S
+      NO3_pool_sediment: abiotic_sediment/sNO3S
+      PO4_pool_sediment: abiotic_sediment/sPO4S
+      POM_DW_pool_sediment: POM/sDS
+      POM_DW_pool_sediment_PV: POM/sDS_PV
+      POM_N_pool_sediment: POM/sNS
+      POM_N_pool_sediment_PV: POM/sNS_PV
+      POM_P_pool_sediment: POM/sPS
+      POM_P_pool_sediment_PV: POM/sPS_PV
+      SiO2_pool_sediment: abiotic_sediment/sSiO2S
+      SiPa_pool_sediment: abiotic_sediment/sSiPaS
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+      pO2Sat: abiotic_water/pO2Sat
+      prey_model1: largeCyano
+      prey_model2: smallCyano
+      prey_model3: diatoms
+      prey_model4: POM
+    initialization:
+      sD: 3.0
+      sD_PV: 3.0
+      sN: 0.21
+      sN_PV: 0.21
+      sP: 0.03
+      sP_PV: 0.03
+    long_name: zoobenthos_profundal
+    model: wet/zoobenthos
+    parameters:
+      cClearPrey1: 0.016
+      cClearPrey2: 0.025
+      cClearPrey3: 0.041
+      cClearPrey4: 0.045
+      cDBentIn: 0.01
+      cDCarrBent: 10.0
+      cDVegCarr: 0.025
+      cNDBentRef: 0.07
+      cPDBentRef: 0.01
+      cSigTmBent: 16.0
+      cTmOptBent: 25.0
+      diagnostics: false
+      fBentDOMS: 0.14
+      fDAssBent: 0.15
+      fDissEgesBent: 0.25
+      fDissMortBent: 0.062
+      fGutOccPrey1: 1.0
+      fGutOccPrey2: 1.0
+      fGutOccPrey3: 1.0
+      fGutOccPrey4: 6.58
+      hO2stress: 0.0
+      kDConsMaxBent: 1.6
+      kDRespBent: 0.005
+      kMigrBent: 0.001
+      kMortBent: 0.001
+      kMortO2: 0.0
+      lSi1: false
+      lSi2: false
+      lSi3: false
+      lSi4: false
+      lVegOpt: false
+      nPrey: 4
+      prey_suffix1: S
+      prey_suffix2: S
+      prey_suffix3: S
+      prey_suffix4: S

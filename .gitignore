@@ -19,3 +19,5 @@ __pycache__/
 .vscode/ 
 .idea/ 
 *.swp 
+3DWET/src/wet/testcases/lake_bryrup_obm/meteo_file.dat 
+3DWET/src/wet/testcases/lake_bryrup_obm/inflow_chem*.dat 
