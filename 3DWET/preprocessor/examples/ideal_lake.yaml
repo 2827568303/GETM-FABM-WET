@@ -1,0 +1,103 @@
+# IdealLake - Standardized idealized test lake for 3DWET pipeline validation
+# This is a synthetic, simplified lake designed to validate the preprocessing
+# and model building pipeline. Use it to verify that the standardized input
+# files are correct and the model runs stably.
+#
+# Usage:
+#   python -m preprocessor.run_preprocess -c preprocessor/examples/ideal_lake.yaml
+#   python -m model_builder.assemble_case -c preprocessor/examples/ideal_lake.yaml
+#   cd case/IdealLake && /path/to/getm_cartesian
+
+lake_name: "IdealLake"
+runid: "IDEALLAKE"
+
+# Small grid for fast testing (15x5 = 75 cells)
+nx: 15
+ny: 5
+dx: 500.0
+dy: 500.0
+
+# Central China location
+lat0: 30.0
+lon0: 120.0
+x0_utm: 500000.0
+y0_utm: 3300000.0
+
+# Uniform moderate depth
+avg_depth: 3.5
+max_depth: 7.0
+min_depth: 1.0
+shape: "oval"
+shape_param: 0.45
+
+n_sigma: 10
+maxdepth: 8.0
+crit_depth: 0.3
+min_depth_getm: 0.1
+
+# Short 3-day run for fast validation
+start_date: "2020-06-01"
+end_date: "2020-06-03"
+timestep: 30.0
+
+# Temperate climate (simplified)
+avg_temp: 20.0
+temp_amplitude: 5.0
+temp_peak_day: 170
+annual_precip: 800.0
+wet_season_start: 120
+wet_season_end: 300
+avg_wind_speed: 2.0
+wind_direction_variation: 1.0
+slp: 101325.0       # sea level (no elevation correction for ideal lake)
+avg_rh: 70.0
+avg_tcc: 0.4
+evap_avg: 3.0
+
+# Simple river config: 1 inflow + 1 outflow
+rivers:
+  - name: "INFL1"
+    edge: "west"
+    flow_type: "inflow"
+    base_flow: 2.0
+    temp: 18.0
+    nh4: 0.20
+    no3: 1.0
+    po4: 0.04
+    doc: 5.0
+    poc: 2.0
+    seasonal_amp: 0.2
+  - name: "OUTFL"
+    edge: "east"
+    flow_type: "outflow"
+    base_flow: 0.0
+    temp: 18.0
+    nh4: 0.10
+    no3: 0.8
+    po4: 0.03
+    doc: 4.0
+    poc: 1.5
+    seasonal_amp: 0.2
+
+# Eutrophic conditions (same as Yilong defaults)
+trophic_state: "eutrophic"
+nh4_init: 0.30
+no3_init: 1.0
+po4_init: 0.06
+sio2_init: 3.5
+o2_init: 10.0
+dim_init: 10.0
+
+diatoms_init: 0.30
+greens_init: 0.20
+cyanobacteria_init: 0.30
+cladocerans_init: 0.30
+copepods_init: 0.30
+jufish_init: 0.15
+adfish_init: 0.40
+piscfish_init: 0.05
+
+macrophyte_biomass: 30.0
+macrophyte_depth_range: [1.0, 2.5]
+
+case_dir: "case/IdealLake"

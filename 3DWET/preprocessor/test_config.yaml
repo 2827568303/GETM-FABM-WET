@@ -1,0 +1,102 @@
+# Test lake config for validating preprocessor pipeline
+lake_name: "TestLake"
+runid: "TESTLAKE"
+
+nx: 20
+ny: 6
+dx: 500.0
+dy: 500.0
+
+lat0: 30.0
+lon0: 120.0
+x0_utm: 500000.0
+y0_utm: 3300000.0
+
+avg_depth: 3.5
+max_depth: 7.0
+min_depth: 1.0
+shape: "oval"
+shape_param: 0.45
+
+n_sigma: 10
+maxdepth: 8.0
+
+start_date: "2020-01-01"
+end_date: "2020-12-31"
+timestep: 30.0
+
+avg_temp: 18.0
+temp_amplitude: 7.5
+temp_peak_day: 170
+annual_precip: 900.0
+wet_season_start: 120
+wet_season_end: 300
+avg_wind_speed: 2.5
+slp: 86000.0
+avg_rh: 70.0
+avg_tcc: 0.4
+evap_avg: 3.0
+
+rivers:
+  - name: "INFL1"
+    edge: "north"
+    flow_type: "inflow"
+    base_flow: 1.5
+    temp: 15.0
+    nh4: 0.20
+    no3: 1.5
+    po4: 0.05
+    doc: 5.0
+    poc: 2.0
+  - name: "INFL2"
+    edge: "west"
+    flow_type: "inflow"
+    base_flow: 3.0
+    temp: 15.0
+    nh4: 0.30
+    no3: 2.0
+    po4: 0.08
+    doc: 8.0
+    poc: 3.0
+  - name: "INFL3"
+    edge: "south"
+    flow_type: "inflow"
+    base_flow: 1.0
+    temp: 15.0
+    nh4: 0.15
+    no3: 1.0
+    po4: 0.04
+    doc: 4.0
+    poc: 1.5
+  - name: "OUTFL"
+    edge: "east"
+    flow_type: "outflow"
+    base_flow: 0.0
+    temp: 15.0
+    nh4: 0.10
+    no3: 1.2
+    po4: 0.04
+    doc: 5.0
+    poc: 2.0
+
+trophic_state: "eutrophic"
+nh4_init: 0.30
+no3_init: 1.0
+po4_init: 0.06
+sio2_init: 3.5
+o2_init: 10.0
+dim_init: 10.0
+
+diatoms_init: 0.30
+greens_init: 0.20
+cyanobacteria_init: 0.30
+cladocerans_init: 0.30
+copepods_init: 0.30
+jufish_init: 0.15
+adfish_init: 0.40
+piscfish_init: 0.05
+
+macrophyte_biomass: 30.0
+macrophyte_depth_range: [1.0, 2.5]
+
+case_dir: "case/TestLake"
