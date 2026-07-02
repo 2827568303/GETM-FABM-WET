@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GETM-FABM-WET 生态水动力模型系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f5f7fa;
+            color: #1f2937;
+            line-height: 1.6;
+            overflow: hidden;
+            height: 100vh;
+        }
+        .app-layout {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 220px;
+            background: linear-gradient(180deg, #1e3a5f 0%, #2d5a87 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .sidebar-header {
+            padding: 20px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-header h1 {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+        .nav-menu {
+            flex: 1;
+            padding: 12px 0;
+            overflow-y: auto;
+        }
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            color: rgba(255,255,255,0.8);
+        }
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border-left-color: #60a5fa;
+        }
+        .nav-item .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .sidebar-footer {
+            padding: 12px 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 12px;
+            opacity: 0.6;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .topbar {
+            height: 56px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            flex-shrink: 0;
+        }
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .topbar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .project-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+        .project-name {
+            color: #2d5a87;
+            font-weight: 500;
+        }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            color: #374151;
+        }
+        .btn:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+        .btn-primary {
+            background: #2d5a87;
+            color: white;
+            border-color: #2d5a87;
+        }
+        .btn-primary:hover {
+            background: #1e3a5f;
+            border-color: #1e3a5f;
+        }
+        .btn-success {
+            background: #059669;
+            color: white;
+            border-color: #059669;
+        }
+        .btn-success:hover {
+            background: #047857;
+            border-color: #047857;
+        }
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+            border-color: #dc2626;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+            border-color: #b91c1c;
+        }
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .page-header {
+            margin-bottom: 24px;
+        }
+        .page-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        .page-desc {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .form-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+        }
+        .form-label .unit {
+            color: #9ca3af;
+            font-weight: 400;
+            margin-left: 4px;
+        }
+        .form-input {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #2d5a87;
+            box-shadow: 0 0 0 3px rgba(45,90,135,0.1);
+        }
+        .form-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+            cursor: pointer;
+        }
+        .form-select:focus {
+            outline: none;
+            border-color: #2d5a87;
+        }
+        .switch-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .switch-item:last-child {
+            border-bottom: none;
+        }
+        .switch-label {
+            font-size: 14px;
+            color: #374151;
+        }
+        .switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #d1d5db;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2d5a87;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .project-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .project-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .project-card:hover {
+            border-color: #2d5a87;
+            box-shadow: 0 4px 12px rgba(45,90,135,0.1);
+        }
+        .project-card-icon {
+            width: 40px;
+            height: 40px;
+            background: #eff6ff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+        .project-card-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        .project-card-date {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        .new-project-card {
+            border: 2px dashed #d1d5db;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+            color: #9ca3af;
+        }
+        .new-project-card:hover {
+            border-color: #2d5a87;
+            color: #2d5a87;
+            background: #f9fafb;
+        }
+        .new-project-card .plus-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal {
+            background: white;
+            border-radius: 10px;
+            padding: 24px;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .log-panel {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            height: 400px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+        .log-line {
+            padding: 2px 0;
+        }
+        .log-info { color: #60a5fa; }
+        .log-error { color: #f87171; }
+        .log-warn { color: #fbbf24; }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-idle { background: #f3f4f6; color: #6b7280; }
+        .status-running { background: #dbeafe; color: #1e40af; }
+        .status-completed { background: #d1fae5; color: #065f46; }
+        .status-failed { background: #fee2e2; color: #991b1b; }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        .status-running .status-dot {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .run-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .progress-bar-container {
+            flex: 1;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2d5a87, #60a5fa);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        .empty-state-text {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .empty-state-hint {
+            font-size: 13px;
+            color: #d1d5db;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 1000px) {
+            .two-col { grid-template-columns: 1fr; }
+        }
+        .viewer-container {
+            width: 100%;
+            height: calc(100vh - 180px);
+            background: #0a1628;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        #three-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .viewer-controls {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10;
+            min-width: 200px;
+        }
+        .viewer-controls h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+        .viewer-controls .form-item {
+            margin-bottom: 8px;
+        }
+        .viewer-legend {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10;
+            min-width: 180px;
+        }
+        .legend-title {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+        .legend-bar {
+            height: 12px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #313695, #4575b4, #74add1, #abd9e9, #e0f3f8, #ffffbf, #fee090, #fdae61, #f46d43, #d73027, #a50026);
+            margin-bottom: 6px;
+        }
+        .legend-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #6b7280;
+        }
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #9ca3af;
+        }
+        .step-item.active {
+            color: #2d5a87;
+            font-weight: 600;
+        }
+        .step-item.completed {
+            color: #059669;
+        }
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #9ca3af;
+        }
+        .step-item.active .step-number {
+            background: #2d5a87;
+            color: white;
+        }
+        .step-item.completed .step-number {
+            background: #059669;
+            color: white;
+        }
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: #e5e7eb;
+            max-width: 40px;
+        }
+        .step-item.completed + .step-line {
+            background: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>GETM-FABM-WET</h1>
+                <p>生态水动力模型系统 v1.0</p>
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item active" data-page="projects">
+                    <span class="nav-icon">📁</span>
+                    <span>项目管理</span>
+                </div>
+                <div class="nav-item" data-page="preprocess">
+                    <span class="nav-icon">⚙️</span>
+                    <span>前处理配置</span>
+                </div>
+                <div class="nav-item" data-page="run">
+                    <span class="nav-icon">▶️</span>
+                    <span>运行控制</span>
+                </div>
+                <div class="nav-item" data-page="postprocess">
+                    <span class="nav-icon">📊</span>
+                    <span>后处理分析</span>
+                </div>
+                <div class="nav-item" data-page="viewer3d">
+                    <span class="nav-icon">🌊</span>
+                    <span>3D 可视化</span>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                GETM 2.5.0 + FABM + WET
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <span class="topbar-title" id="topbar-title">项目管理</span>
+                    <div class="project-info">
+                        <span>当前项目：</span>
+                        <span class="project-name" id="current-project">未选择</span>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <button class="btn btn-sm" onclick="saveProject()" id="btn-save" style="display:none;">💾 保存项目</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="page active" id="page-projects">
+                    <div class="page-header">
+                        <h2 class="page-title">项目管理</h2>
+                        <p class="page-desc">创建或打开模型项目，开始你的生态水动力模拟</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">我的项目</div>
+                        <div class="project-list" id="project-list">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page" id="page-preprocess">
+                    <div class="page-header">
+                        <h2 class="page-title">前处理配置</h2>
+                        <p class="page-desc">配置水动力、生态参数及初始条件</p>
+                    </div>
+                    <div class="step-indicator">
+                        <div class="step-item active" data-step="1">
+                            <span class="step-number">1</span>
+                            <span>水动力设置</span>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step-item" data-step="2">
+                            <span class="step-number">2</span>
+                            <span>生态模块</span>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step-item" data-step="3">
+                            <span class="step-number">3</span>
+                            <span>初始条件</span>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step-item" data-step="4">
+                            <span class="step-number">4</span>
+                            <span>输出设置</span>
+                        </div>
+                    </div>
+                    <div class="card" id="step-hydro">
+                        <div class="card-title">水动力设置</div>
+                        <div class="form-grid">
+                            <div class="form-item">
+                                <label class="form-label">网格 X 方向格数</label>
+                                <input type="number" class="form-input" id="cfg-grid-nx" value="25">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">网格 Y 方向格数</label>
+                                <input type="number" class="form-input" id="cfg-grid-ny" value="25">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">X 方向步长 <span class="unit">(m)</span></label>
+                                <input type="number" class="form-input" id="cfg-dx" value="100">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">Y 方向步长 <span class="unit">(m)</span></label>
+                                <input type="number" class="form-input" id="cfg-dy" value="100">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">平均水深 <span class="unit">(m)</span></label>
+                                <input type="number" class="form-input" id="cfg-depth" value="10" step="0.1">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">垂直层数</label>
+                                <input type="number" class="form-input" id="cfg-nlev" value="5">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">时间步长 <span class="unit">(秒)</span></label>
+                                <input type="number" class="form-input" id="cfg-timestep" value="300">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">开始时间</label>
+                                <input type="datetime-local" class="form-input" id="cfg-start">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">结束时间</label>
+                                <input type="datetime-local" class="form-input" id="cfg-end">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">生态模块选择</div>
+                        <div class="switch-item">
+                            <span class="switch-label">浮游植物 (Phytoplankton)</span>
+                            <label class="switch">
+                                <input type="checkbox" id="mod-phytoplankton" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="switch-item">
+                            <span class="switch-label">浮游动物 (Zooplankton)</span>
+                            <label class="switch">
+                                <input type="checkbox" id="mod-zooplankton" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="switch-item">
+                            <span class="switch-label">鱼类 (Fish)</span>
+                            <label class="switch">
+                                <input type="checkbox" id="mod-fish">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="switch-item">
+                            <span class="switch-label">沉水植物 (Macrophytes)</span>
+                            <label class="switch">
+                                <input type="checkbox" id="mod-macrophytes">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="switch-item">
+                            <span class="switch-label">底栖生物 (Zoobenthos)</span>
+                            <label class="switch">
+                                <input type="checkbox" id="mod-zoobenthos">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">营养盐初始条件</div>
+                        <div class="form-grid">
+                            <div class="form-item">
+                                <label class="form-label">溶解氧 <span class="unit">(mg/L)</span></label>
+                                <input type="number" class="form-input" id="init-o2" value="8.0" step="0.1">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">氨氮 NH4 <span class="unit">(mg N/L)</span></label>
+                                <input type="number" class="form-input" id="init-nh4" value="0.05" step="0.01">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">硝酸盐 NO3 <span class="unit">(mg N/L)</span></label>
+                                <input type="number" class="form-input" id="init-no3" value="0.5" step="0.1">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">磷酸盐 PO4 <span class="unit">(mg P/L)</span></label>
+                                <input type="number" class="form-input" id="init-po4" value="0.02" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">输出设置</div>
+                        <div class="form-grid">
+                            <div class="form-item">
+                                <label class="form-label">输出间隔 <span class="unit">(秒)</span></label>
+                                <input type="number" class="form-input" id="out-dt" value="3600">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">保存 2D 结果</label>
+                                <label class="switch" style="margin-top:4px;">
+                                    <input type="checkbox" id="out-save2d" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">保存 3D 结果</label>
+                                <label class="switch" style="margin-top:4px;">
+                                    <input type="checkbox" id="out-save3d" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page" id="page-run">
+                    <div class="page-header">
+                        <h2 class="page-title">运行控制</h2>
+                        <p class="page-desc">启动模型模拟，实时查看运行状态</p>
+                    </div>
+                    <div class="card">
+                        <div class="run-controls">
+                            <button class="btn btn-success" id="btn-start-run" onclick="startRun()">▶ 开始运行</button>
+                            <button class="btn btn-danger" id="btn-stop-run" onclick="stopRun()" style="display:none;">⏹ 停止运行</button>
+                            <span class="status-badge status-idle" id="run-status">
+                                <span class="status-dot"></span>
+                                <span>就绪</span>
+                            </span>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar"></div>
+                            </div>
+                        </div>
+                        <div class="card-title">运行日志</div>
+                        <div class="log-panel" id="log-panel">
+                            <div class="log-line">等待模型运行...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page" id="page-postprocess">
+                    <div class="page-header">
+                        <h2 class="page-title">后处理分析</h2>
+                        <p class="page-desc">查看模拟结果的时间序列和空间分布</p>
+                    </div>
+                    <div id="postprocess-content">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📊</div>
+                            <div class="empty-state-text">暂无结果数据</div>
+                            <div class="empty-state-hint">请先运行模型生成结果</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page" id="page-viewer3d">
+                    <div class="page-header">
+                        <h2 class="page-title">3D 可视化</h2>
+                        <p class="page-desc">三维湖泊地形与水质变量可视化</p>
+                    </div>
+                    <div class="viewer-container">
+                        <canvas id="three-canvas"></canvas>
+                        <div class="viewer-controls">
+                            <h4>显示设置</h4>
+                            <div class="form-item">
+                                <label class="form-label">变量选择</label>
+                                <select class="form-select" id="viewer-var" onchange="update3DViewer()">
+                                    <option value="temp">温度 (°C)</option>
+                                    <option value="wet_totC">总有机碳 (gC/m³)</option>
+                                    <option value="wet_totN">总氮 (gN/m³)</option>
+                                    <option value="wet_totP">总磷 (gP/m³)</option>
+                                    <option value="wet_chla">叶绿素 a (μg/L)</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">时间步</label>
+                                <input type="range" class="form-input" id="viewer-time" min="0" value="0" oninput="update3DViewer()">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">显示模式</label>
+                                <select class="form-select" id="viewer-mode" onchange="update3DViewer()">
+                                    <option value="volume">体渲染</option>
+                                    <option value="slice">切片显示</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="viewer-legend">
+                            <div class="legend-title" id="legend-title">温度</div>
+                            <div class="legend-bar"></div>
+                            <div class="legend-labels">
+                                <span id="legend-min">低</span>
+                                <span id="legend-max">高</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="new-project-modal">
+        <div class="modal">
+            <div class="modal-title">新建项目</div>
+            <div class="form-item">
+                <label class="form-label">项目名称</label>
+                <input type="text" class="form-input" id="new-project-name" placeholder="请输入项目名称" value="新建湖泊模拟">
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('new-project-modal')">取消</button>
+                <button class="btn btn-primary" onclick="createProject()">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            currentProject: null,
+            currentConfig: null,
+            results: null,
+            runPolling: null,
+        };
+
+        const pages = ['projects', 'preprocess', 'run', 'postprocess', 'viewer3d'];
+        const pageTitles = {
+            projects: '项目管理',
+            preprocess: '前处理配置',
+            run: '运行控制',
+            postprocess: '后处理分析',
+            viewer3d: '3D 可视化',
+        };
+
+        function navigate(page) {
+            pages.forEach(p => {
+                document.getElementById('page-' + p).classList.toggle('active', p === page);
+            });
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.page === page);
+            });
+            document.getElementById('topbar-title').textContent = pageTitles[page];
+
+            if (page === 'postprocess') {
+                loadResults();
+            }
+            if (page === 'viewer3d') {
+                init3DViewer();
+            }
+        }
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => navigate(item.dataset.page));
+        });
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('show');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        async function loadProjects() {
+            try {
+                const res = await fetch('/api/projects/list');
+                const projects = await res.json();
+                const listEl = document.getElementById('project-list');
+                listEl.innerHTML = '';
+
+                const newCard = document.createElement('div');
+                newCard.className = 'project-card new-project-card';
+                newCard.onclick = () => openModal('new-project-modal');
+                newCard.innerHTML = `
+                    <div class="plus-icon">+</div>
+                    <div>新建项目</div>
+                `;
+                listEl.appendChild(newCard);
+
+                projects.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'project-card';
+                    card.onclick = () => openProject(p.id);
+                    card.innerHTML = `
+                        <div class="project-card-icon">🌊</div>
+                        <div class="project-card-name">${p.name}</div>
+                        <div class="project-card-date">${p.created_at ? new Date(p.created_at).toLocaleString('zh-CN') : ''}</div>
+                    `;
+                    listEl.appendChild(card);
+                });
+            } catch (e) {
+                console.error('加载项目列表失败', e);
+            }
+        }
+
+        async function createProject() {
+            const name = document.getElementById('new-project-name').value.trim();
+            if (!name) {
+                alert('请输入项目名称');
+                return;
+            }
+            try {
+                const res = await fetch('/api/projects/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    closeModal('new-project-modal');
+                    await openProject(data.project_id);
+                    loadProjects();
+                }
+            } catch (e) {
+                alert('创建项目失败: ' + e.message);
+            }
+        }
+
+        async function openProject(projectId) {
+            try {
+                const res = await fetch('/api/projects/open', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ project_id: projectId }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    state.currentProject = projectId;
+                    state.currentConfig = data.config;
+                    document.getElementById('current-project').textContent = data.config.name;
+                    document.getElementById('btn-save').style.display = 'inline-block';
+                    loadConfigToForm(data.config);
+                    navigate('preprocess');
+                }
+            } catch (e) {
+                alert('打开项目失败: ' + e.message);
+            }
+        }
+
+        function loadConfigToForm(config) {
+            const h = config.hydro || {};
+            const e = config.ecology || {};
+            const n = e.nutrients || {};
+            const o = config.output || {};
+
+            document.getElementById('cfg-grid-nx').value = h.grid_nx || 25;
+            document.getElementById('cfg-grid-ny').value = h.grid_ny || 25;
+            document.getElementById('cfg-dx').value = h.dx || 100;
+            document.getElementById('cfg-dy').value = h.dy || 100;
+            document.getElementById('cfg-depth').value = h.depth || 10;
+            document.getElementById('cfg-nlev').value = h.nlev || 5;
+            document.getElementById('cfg-timestep').value = h.timestep || 300;
+
+            if (h.start_date) {
+                document.getElementById('cfg-start').value = h.start_date.replace(' ', 'T');
+            }
+            if (h.end_date) {
+                document.getElementById('cfg-end').value = h.end_date.replace(' ', 'T');
+            }
+
+            const mods = e.modules || {};
+            document.getElementById('mod-phytoplankton').checked = mods.phytoplankton !== false;
+            document.getElementById('mod-zooplankton').checked = mods.zooplankton !== false;
+            document.getElementById('mod-fish').checked = !!mods.fish;
+            document.getElementById('mod-macrophytes').checked = !!mods.macrophytes;
+            document.getElementById('mod-zoobenthos').checked = !!mods.zoobenthos;
+
+            document.getElementById('init-o2').value = n.O2_initial || 8.0;
+            document.getElementById('init-nh4').value = n.NH4_initial || 0.05;
+            document.getElementById('init-no3').value = n.NO3_initial || 0.5;
+            document.getElementById('init-po4').value = n.PO4_initial || 0.02;
+
+            document.getElementById('out-dt').value = o.out_dt || 3600;
+            document.getElementById('out-save2d').checked = o.save2d !== false;
+            document.getElementById('out-save3d').checked = o.save3d !== false;
+        }
+
+        function collectConfigFromForm() {
+            if (!state.currentConfig) state.currentConfig = {};
+            const startVal = document.getElementById('cfg-start').value;
+            const endVal = document.getElementById('cfg-end').value;
+
+            state.currentConfig.hydro = {
+                grid_nx: parseInt(document.getElementById('cfg-grid-nx').value) || 25,
+                grid_ny: parseInt(document.getElementById('cfg-grid-ny').value) || 25,
+                dx: parseFloat(document.getElementById('cfg-dx').value) || 100,
+                dy: parseFloat(document.getElementById('cfg-dy').value) || 100,
+                depth: parseFloat(document.getElementById('cfg-depth').value) || 10,
+                nlev: parseInt(document.getElementById('cfg-nlev').value) || 5,
+                timestep: parseInt(document.getElementById('cfg-timestep').value) || 300,
+                start_date: startVal ? startVal.replace('T', ' ') : '2000-01-01 00:00:00',
+                end_date: endVal ? endVal.replace('T', ' ') : '2000-01-02 00:00:00',
+            };
+            state.currentConfig.ecology = {
+                model: 'wet',
+                modules: {
+                    phytoplankton: document.getElementById('mod-phytoplankton').checked,
+                    zooplankton: document.getElementById('mod-zooplankton').checked,
+                    fish: document.getElementById('mod-fish').checked,
+                    macrophytes: document.getElementById('mod-macrophytes').checked,
+                    zoobenthos: document.getElementById('mod-zoobenthos').checked,
+                },
+                nutrients: {
+                    O2_initial: parseFloat(document.getElementById('init-o2').value) || 8.0,
+                    NH4_initial: parseFloat(document.getElementById('init-nh4').value) || 0.05,
+                    NO3_initial: parseFloat(document.getElementById('init-no3').value) || 0.5,
+                    PO4_initial: parseFloat(document.getElementById('init-po4').value) || 0.02,
+                }
+            };
+            state.currentConfig.output = {
+                out_dt: parseInt(document.getElementById('out-dt').value) || 3600,
+                save2d: document.getElementById('out-save2d').checked,
+                save3d: document.getElementById('out-save3d').checked,
+            };
+            return state.currentConfig;
+        }
+
+        async function saveProject() {
+            if (!state.currentProject) {
+                alert('请先创建或打开项目');
+                return;
+            }
+            const config = collectConfigFromForm();
+            try {
+                const res = await fetch('/api/projects/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ project_id: state.currentProject, config }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('项目已保存');
+                }
+            } catch (e) {
+                alert('保存失败: ' + e.message);
+            }
+        }
+
+        async function startRun() {
+            try {
+                const res = await fetch('/api/run/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({}),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('btn-start-run').style.display = 'none';
+                    document.getElementById('btn-stop-run').style.display = 'inline-block';
+                    document.getElementById('run-status').className = 'status-badge status-running';
+                    document.getElementById('run-status').querySelector('span:last-child').textContent = '运行中';
+                    document.getElementById('log-panel').innerHTML = '';
+                    startLogPolling();
+                } else {
+                    alert('启动失败: ' + data.error);
+                }
+            } catch (e) {
+                alert('启动失败: ' + e.message);
+            }
+        }
+
+        async function stopRun() {
+            try {
+                await fetch('/api/run/stop', { method: 'POST' });
+                stopLogPolling();
+                updateRunStatus('stopped');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function startLogPolling() {
+            if (state.runPolling) return;
+            state.runPolling = setInterval(pollRunStatus, 1000);
+        }
+        function stopLogPolling() {
+            if (state.runPolling) {
+                clearInterval(state.runPolling);
+                state.runPolling = null;
+            }
+        }
+
+        async function pollRunStatus() {
+            try {
+                const res = await fetch('/api/run/status');
+                const data = await res.json();
+                updateLogPanel(data.logs);
+                if (data.status !== 'running') {
+                    stopLogPolling();
+                    updateRunStatus(data.status);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function updateLogPanel(logs) {
+            const panel = document.getElementById('log-panel');
+            const currentLines = panel.children.length;
+            if (logs.length > currentLines) {
+                for (let i = currentLines; i < logs.length; i++) {
+                    const line = document.createElement('div');
+                    line.className = 'log-line';
+                    let text = logs[i];
+                    if (text.includes('[INFO]') || text.includes('info')) {
+                        line.classList.add('log-info');
+                    } else if (text.includes('[ERROR]') || text.includes('FATAL') || text.includes('Error')) {
+                        line.classList.add('log-error');
+                    } else if (text.includes('[WARN]') || text.includes('warning')) {
+                        line.classList.add('log-warn');
+                    }
+                    line.textContent = text;
+                    panel.appendChild(line);
+                }
+                panel.scrollTop = panel.scrollHeight;
+            }
+        }
+
+        function updateRunStatus(status) {
+            const badge = document.getElementById('run-status');
+            const textSpan = badge.querySelector('span:last-child');
+            badge.className = 'status-badge';
+            if (status === 'running') {
+                badge.classList.add('status-running');
+                textSpan.textContent = '运行中';
+                document.getElementById('btn-start-run').style.display = 'none';
+                document.getElementById('btn-stop-run').style.display = 'inline-block';
+            } else if (status === 'completed') {
+                badge.classList.add('status-completed');
+                textSpan.textContent = '已完成';
+                document.getElementById('btn-start-run').style.display = 'inline-block';
+                document.getElementById('btn-stop-run').style.display = 'none';
+                document.getElementById('progress-bar').style.width = '100%';
+            } else if (status === 'failed') {
+                badge.classList.add('status-failed');
+                textSpan.textContent = '失败';
+                document.getElementById('btn-start-run').style.display = 'inline-block';
+                document.getElementById('btn-stop-run').style.display = 'none';
+            } else {
+                badge.classList.add('status-idle');
+                textSpan.textContent = '就绪';
+                document.getElementById('btn-start-run').style.display = 'inline-block';
+                document.getElementById('btn-stop-run').style.display = 'none';
+            }
+        }
+
+        async function loadResults() {
+            try {
+                const res = await fetch('/api/results');
+                const data = await res.json();
+                if (data.error) {
+                    document.getElementById('postprocess-content').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📊</div>
+                            <div class="empty-state-text">暂无结果数据</div>
+                            <div class="empty-state-hint">${data.error}</div>
+                        </div>
+                    `;
+                    return;
+                }
+                state.results = data;
+                renderPostprocess(data);
+            } catch (e) {
+                document.getElementById('postprocess-content').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <div class="empty-state-text">加载失败</div>
+                        <div class="empty-state-hint">${e.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderPostprocess(data) {
+            const container = document.getElementById('postprocess-content');
+            container.innerHTML = `
+                <div class="two-col">
+                    <div class="card">
+                        <div class="card-title">溶解氧</div>
+                        <div class="chart-container"><canvas id="chart-o2"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">叶绿素 a</div>
+                        <div class="chart-container"><canvas id="chart-chla"></canvas></div>
+                    </div>
+                </div>
+                <div class="two-col">
+                    <div class="card">
+                        <div class="card-title">氨氮 NH4</div>
+                        <div class="chart-container"><canvas id="chart-nh4"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">硝酸盐 NO3</div>
+                        <div class="chart-container"><canvas id="chart-no3"></canvas></div>
+                    </div>
+                </div>
+                <div class="two-col">
+                    <div class="card">
+                        <div class="card-title">总氮 wet_totN</div>
+                        <div class="chart-container"><canvas id="chart-totn"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">总磷 wet_totP</div>
+                        <div class="chart-container"><canvas id="chart-totp"></canvas></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">浮游动物</div>
+                    <div class="chart-container"><canvas id="chart-zoo"></canvas></div>
+                </div>
+            `;
+
+            const colors = ['#2d5a87', '#e74c3c', '#27ae60', '#f39c12', '#8e44ad'];
+            const timeLabels = (data.time?.values || []).map((_, i) => '第' + (i + 1) + '步');
+
+            function makeChart(id, varName) {
+                const ts = data.timeseries[varName];
+                if (!ts) return;
+                const ctx = document.getElementById(id).getContext('2d');
+                let datasets = [];
+                if (ts.type === '3d_center') {
+                    const n = Math.min(ts.nlevels, 5);
+                    for (let i = 0; i < n; i++) {
+                        datasets.push({
+                            label: '第' + (i + 1) + '层',
+                            data: ts.values.map(r => r[i]),
+                            borderColor: colors[i % colors.length],
+                            backgroundColor: 'transparent',
+                            tension: 0.3,
+                            pointRadius: 2,
+                        });
+                    }
+                } else {
+                    datasets.push({
+                        label: ts.long_name,
+                        data: ts.values,
+                        borderColor: colors[0],
+                        backgroundColor: colors[0] + '20',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2,
+                    });
+                }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: { labels: timeLabels, datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: datasets.length > 1, position: 'right' } },
+                        scales: { x: { ticks: { maxTicksLimit: 10 } } },
+                    }
+                });
+            }
+
+            const findVar = (kw) => Object.keys(data.timeseries).find(k => k.toLowerCase().includes(kw.toLowerCase()));
+
+            makeChart('chart-o2', findVar('O2W') || '');
+            makeChart('chart-chla', findVar('wet_chla') || '');
+            makeChart('chart-nh4', findVar('NH4W') || '');
+            makeChart('chart-no3', findVar('NO3W') || '');
+            makeChart('chart-totn', 'wet_totN');
+            makeChart('chart-totp', 'wet_totP');
+            makeChart('chart-zoo', findVar('zooplankton_rPDZoo') || '');
+        }
+
+        let threeScene, threeCamera, threeRenderer, threeControls;
+        let lakeMesh, waterMesh;
+        let threeInitialized = false;
+
+        function init3DViewer() {
+            if (threeInitialized) return;
+            threeInitialized = true;
+
+            const canvas = document.getElementById('three-canvas');
+            const container = canvas.parentElement;
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+
+            threeScene = new THREE.Scene();
+            threeScene.background = new THREE.Color(0x0a1628);
+
+            threeCamera = new THREE.PerspectiveCamera(60, w / h, 0.1, 10000);
+            threeCamera.position.set(800, 600, 800);
+
+            threeRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            threeRenderer.setSize(w, h);
+            threeRenderer.setPixelRatio(window.devicePixelRatio);
+
+            threeControls = new THREE.OrbitControls(threeCamera, threeRenderer.domElement);
+            threeControls.enableDamping = true;
+            threeControls.dampingFactor = 0.05;
+
+            const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+            threeScene.add(ambient);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(500, 800, 500);
+            threeScene.add(dirLight);
+
+            createLakeModel();
+
+            window.addEventListener('resize', onWindowResize);
+            animate3D();
+        }
+
+        function createLakeModel() {
+            const nx = 25, ny = 25;
+            const dx = 40, dy = 40;
+            const depth = 50;
+
+            const bathyGeo = new THREE.PlaneGeometry(nx * dx, ny * dy, nx - 1, ny - 1);
+            bathyGeo.rotateX(-Math.PI / 2);
+
+            const pos = bathyGeo.attributes.position;
+            for (let i = 0; i < pos.count; i++) {
+                const x = pos.getX(i);
+                const y = pos.getZ(i);
+                const cx = (nx - 1) * dx / 2;
+                const cy = (ny - 1) * dy / 2;
+                const dist = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
+                const maxDist = Math.min(cx, cy);
+                let d = depth * (1 - (dist / maxDist) ** 2);
+                d = Math.max(2, Math.min(depth, d));
+                pos.setY(i, -d);
+            }
+            bathyGeo.computeVertexNormals();
+
+            const bathyMat = new THREE.MeshStandardMaterial({
+                color: 0x8b7355,
+                roughness: 0.8,
+                side: THREE.DoubleSide,
+            });
+            const bottom = new THREE.Mesh(bathyGeo, bathyMat);
+            threeScene.add(bottom);
+
+            const waterGeo = new THREE.PlaneGeometry(nx * dx, ny * dy, nx - 1, ny - 1);
+            waterGeo.rotateX(-Math.PI / 2);
+            const waterMat = new THREE.MeshStandardMaterial({
+                color: 0x4da6ff,
+                transparent: true,
+                opacity: 0.6,
+                side: THREE.DoubleSide,
+                roughness: 0.1,
+                metalness: 0.1,
+            });
+            waterMesh = new THREE.Mesh(waterGeo, waterMat);
+            waterMesh.position.y = 0;
+            threeScene.add(waterMesh);
+
+            const edgeGeo = new THREE.EdgesGeometry(bathyGeo);
+            const edgeMat = new THREE.LineBasicMaterial({ color: 0x3d5a80, opacity: 0.3, transparent: true });
+            const edges = new THREE.LineSegments(edgeGeo, edgeMat);
+            threeScene.add(edges);
+
+            const grid = new THREE.GridHelper(nx * dx, nx, 0x1e3a5f, 0x1e3a5f);
+            grid.position.y = -depth - 5;
+            grid.material.opacity = 0.2;
+            grid.material.transparent = true;
+            threeScene.add(grid);
+
+            const boxGeo = new THREE.BoxGeometry(nx * dx, 2, ny * dy);
+            const boxEdges = new THREE.EdgesGeometry(boxGeo);
+            const boxLines = new THREE.LineSegments(boxEdges, new THREE.LineBasicMaterial({ color: 0x60a5fa, opacity: 0.5, transparent: true }));
+            boxLines.position.y = 1;
+            threeScene.add(boxLines);
+
+            update3DViewer();
+        }
+
+        function update3DViewer() {
+            if (!threeInitialized) return;
+            const varName = document.getElementById('viewer-var').value;
+            const legendTitle = document.getElementById('viewer-var').options[document.getElementById('viewer-var').selectedIndex].text;
+            document.getElementById('legend-title').textContent = legendTitle;
+        }
+
+        function onWindowResize() {
+            const canvas = document.getElementById('three-canvas');
+            const container = canvas.parentElement;
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            threeCamera.aspect = w / h;
+            threeCamera.updateProjectionMatrix();
+            threeRenderer.setSize(w, h);
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            threeControls.update();
+            threeRenderer.render(threeScene, threeCamera);
+        }
+
+        loadProjects();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+﻿   call self%add_to_aggregate_variable(type_bulk_standard_variable(name='total_aDSubVeg',units='gDW/m2',aggregate_variable=.true.),self%id_aDSubVeg_PV,scale_factor=1._rk)

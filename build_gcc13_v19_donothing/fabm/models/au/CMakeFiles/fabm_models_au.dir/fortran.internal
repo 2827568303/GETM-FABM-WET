@@ -1,0 +1,6 @@
+# The fortran modules provided by this target.
+provides
+ au_model_library.mod
+ au_pp_jacob_monod.mod
+ au_pp_lotka_volterra.mod
+ au_prey_predator.mod

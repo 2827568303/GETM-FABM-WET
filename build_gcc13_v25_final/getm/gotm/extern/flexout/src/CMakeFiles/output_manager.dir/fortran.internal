@@ -1,0 +1,13 @@
+# The fortran modules provided by this target.
+provides
+ flexout_version.mod
+ memory_output.mod
+ netcdf_output.mod
+ output_manager.mod
+ output_manager_core.mod
+ output_operators_base.mod
+ output_operators_interp.mod
+ output_operators_library.mod
+ output_operators_slice.mod
+ output_operators_time_average.mod
+ text_output.mod

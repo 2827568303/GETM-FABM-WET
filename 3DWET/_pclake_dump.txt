@@ -1,0 +1,889 @@
+====================================================================================================
+SHEET: states (state variables & initial conditions) - 135 rows
+====================================================================================================
+Id    InitStateName                  StateName                      Unit               Turbid0        Clear1         Description
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+0.0   _cDepthW0_                     _sDepthW_                      _m_                2.0            2.0            Depth_of_hypolimnion_lake_water
+1.0   _cMixDepthW0_                  _sMixDepthW_                   _m_                4.0            4.0            Depth_of_mixing_layer
+2.0   _cNH4WHyp0_                    _sNH4WHyp_                     _gN_*_m_^-3        0.366024       0.00609666     N_in_NH4_in_hypolimnion_lake_water
+3.0   _cNO3WHyp0_                    _sNO3WHyp_                     _gN_*_m_^-3        4.10222        0.0478965      N_in_NO3_in_hypolimnion_lake_water
+4.0   _cPO4WHyp0_                    _sPO4WHyp_                     _gP_*_m_^-3        0.848485       0.00413697     P_in_PO4_in_hypolimnion_lake_water
+5.0   _cPAIMWHyp0_                   _sPAIMWHyp_                    _gP_*_m_^-3        0.000690958    3.65239e-05    P_adsorbed_onto_IM_in_hypolimnion_lake_water
+6.0   _cSiO2WHyp0_                   _sSiO2WHyp_                    _gSi_*_m_^-3       6.6665         3.37866        Dissolved_Si_in_hypolimnion_lake_water
+7.0   _cO2WHyp0_                     _sO2WHyp_                      _gO2_*_m_^-3       6.91704        11.6569        Oxygen_in_hypolimnion_lake_water
+8.0   _cDDetWHyp0_                   _sDDetWHyp_                    _gDW_*_m_^-3       6.16687        0.244886       Detritus_DW_in_hypolimnion_lake_water
+9.0   _cNDetWHyp0_                   _sNDetWHyp_                    _gN_*_m_^-3        0.419992       0.0127278      Detritus_N_in_hypolimnion_lake_water
+10.0  _cPDetWHyp0_                   _sPDetWHyp_                    _gP_*_m_^-3        0.0613011      0.00206263     Detritus_P_in_hypolimnion_lake_water
+11.0  _cSiDetWHyp0_                  _sSiDetWHyp_                   _gSi_*_m_^-3       0.336682       0.0188717      Detritus_Si_in_hypolimnion_lake_water
+12.0  _cDIMWHyp0_                    _sDIMWHyp_                     _gDW_*_m_^-3       2.02593        1.8808         Inorganic_matter_in_hypolimnion_lake_water
+13.0  _cDDiatWHyp0_                  _sDDiatWHyp_                   _gDW_*_m_^-3       0.00618313     0.000340934    Diatoms_DW_in_hypolimnion_lake_water
+14.0  _cNDiatWHyp0_                  _sNDiatWHyp_                   _gN_*_m_^-3        0.000308909    1.68532e-05    Diatoms_N_in_hypolimnion_lake_water
+15.0  _cPDiatWHyp0_                  _sPDiatWHyp_                   _gP_*_m_^-3        3.60854e-05    1.6877e-06     Diatoms_P_in_hypolimnion_lake_water
+16.0  _cDGrenWHyp0_                  _sDGrenWHyp_                   _gDW_*_m_^-3       0.01658        0.00040319     Green_algae_DW_in_hypolimnion_lake_water
+17.0  _cNGrenWHyp0_                  _sNGrenWHyp_                   _gN_*_m_^-3        0.00164675     3.92877e-05    Green_algae_N_in_hypolimnion_lake_water
+18.0  _cPGrenWHyp0_                  _sPGrenWHyp_                   _gP_*_m_^-3        0.000246188    5.70935e-06    Green_algae_P_in_hypolimnion_lake_water
+19.0  _cDBlueWHyp0_                  _sDBlueWHyp_                   _gDW_*_m_^-3       0.419656       0.122963       Blue-greens_DW_in_hypolimnion_lake_water
+20.0  _cNBlueWHyp0_                  _sNBlueWHyp_                   _gN_*_m_^-3        0.0622182      0.0174495      Blue-greens_N_in_hypolimnion_lake_water
+21.0  _cPBlueWHyp0_                  _sPBlueWHyp_                   _gP_*_m_^-3        0.010485       0.00303843     Blue-greens_P_in_hypolimnion_lake_water
+22.0  _cDZooHyp0_                    _sDZooHyp_                     _gDW_*_m_^-3       0.0438986      0.00126899     Zooplankton_DW_in_hypolimnion_lake_water
+23.0  _cNZooHyp0_                    _sNZooHyp_                     _gN_*_m_^-3        0.0030729      8.88295e-05    Zooplankton_N_in_hypolimnion_lake_water
+24.0  _cPZooHyp0_                    _sPZooHyp_                     _gP_*_m_^-3        0.000438986    1.26899e-05    Zooplankton_P_in_hypolimnion_lake_water
+25.0  _cDFiAd0_                      _sDFiAd_                       _gDW_*_m_^-2       2.22476        0.0437768      Adult_fish_DW_in_lake_water
+26.0  _cDFiJv0_                      _sDFiJv_                       _gDW_*_m_^-2       0.902286       0.0315172      Young_fish_DW_in_lake_water
+27.0  _cNFiAd0_                      _sNFiAd_                       _gN_*_m_^-2        0.222476       0.00442711     Adult_fish_N_in_lake_water
+28.0  _cNFiJv0_                      _sNFiJv_                       _gN_*_m_^-2        0.0902286      0.00321777     Young_fish_N_in_lake_water
+29.0  _cPFiAd0_                      _sPFiAd_                       _gP_*_m_^-2        0.0489448      0.000960253    Adult_fish_P_in_lake_water
+30.0  _cPFiJv0_                      _sPFiJv_                       _gP_*_m_^-2        0.0198503      0.000689218    Young_fish_P_in_lake_water
+31.0  _cDPisc0_                      _sDPisc_                       _gDW_*_m_^-2       0.000247524    0.000244021    Predatory_fish_DW_in_lake_water
+32.0  _cNH4S0_                       _sNH4S_                        _gN_*_m_^-2        0.20993        0.00448356     N_in_NH4_in_lake_sediment_pore_water
+33.0  _cNO3S0_                       _sNO3S_                        _gN_*_m_^-2        0.0951569      0.0199878      N_in_NO3_in_lake_sediment_pore_water
+34.0  _cPO4S0_                       _sPO4S_                        _gP_*_m_^-2        0.0518355      0.00398183     P_in_PO4_in_lake_sediment_pore_water
+35.0  _cPAIMS0_                      _sPAIMS_                       _gP_*_m_^-2        2.72036        1.17883        P_adsorbed_onto_IM_in_lake_sediment
+36.0  _cDDetS0_                      _sDDetS_                       _gDW_*_m_^-2       481.77         49.3701        Detritus_DW_in_lake_sediment
+37.0  _cNDetS0_                      _sNDetS_                       _gN_*_m_^-2        28.6447        1.24226        Detritus_N_in_lake_sediment
+38.0  _cPDetS0_                      _sPDetS_                       _gP_*_m_^-2        4.05956        0.179405       Detritus_P_in_lake_sediment
+39.0  _cSiDetS0_                     _sSiDetS_                      _gSi_*_m_^-2       32.8693        9.04405        Detritus_Si_in_lake_sediment
+40.0  _cDHumS0_                      _sDHumS_                       _gDW_*_m_^-2       6811.77        2922.43        Humus_DW_in_lake_sediment
+41.0  _cNHumS0_                      _sNHumS_                       _gN_*_m_^-2        340.739        87.3245        Humus_N_in_lake_sediment
+42.0  _cPHumS0_                      _sPHumS_                       _gP_*_m_^-2        45.916         9.58959        Humus_P_in_lake_sediment
+43.0  _cDIMS0_                       _sDIMS_                        _gDW_*_m_^-2       26171.9        33889.0        Inorganic_matter_in_lake_sediment
+44.0  _cDDiatS0_                     _sDDiatS_                      _gDW_*_m_^-2       0.00846761     0.000500987    Diatoms_DW_on_lake_sediment
+45.0  _cNDiatS0_                     _sNDiatS_                      _gN_*_m_^-2        0.00042315     2.47344e-05    Diatoms_N_on_lake_sediment
+46.0  _cPDiatS0_                     _sPDiatS_                      _gP_*_m_^-2        4.87493e-05    2.47852e-06    Diatoms_P_on_lake_sediment
+47.0  _cDGrenS0_                     _sDGrenS_                      _gDW_*_m_^-2       0.0108474      0.000278883    Green_algae_DW_on_lake_sediment
+48.0  _cNGrenS0_                     _sNGrenS_                      _gN_*_m_^-2        0.00106509     2.65268e-05    Green_algae_N_on_lake_sediment
+49.0  _cPGrenS0_                     _sPGrenS_                      _gP_*_m_^-2        0.000158797    3.76431e-06    Green_algae_P_on_lake_sediment
+50.0  _cDBlueS0_                     _sDBlueS_                      _gDW_*_m_^-2       0.0429925      0.0129563      Blue-greens_DW_on_lake_sediment
+51.0  _cNBlueS0_                     _sNBlueS_                      _gN_*_m_^-2        0.00633354     0.00181829     Blue-greens_N_on_lake_sediment
+52.0  _cPBlueS0_                     _sPBlueS_                      _gP_*_m_^-2        0.00107212     0.000319316    Blue-greens_P_on_lake_sediment
+53.0  _cDVeg0_                       _sDVeg_                        _gDW_*_m_^-2       0.0469937      100.0          Vegetation_DW_in_lake_water
+54.0  _cNVeg0_                       _sNVeg_                        _gN_*_m_^-2        0.00164117     0.00175766     Vegetation_N_in_lake_water
+55.0  _cPVeg0_                       _sPVeg_                        _gP_*_m_^-2        0.000164088    0.000175735    Vegetation_P_in_lake_water
+56.0  _cVegHeight0_                  _sVegHeight_                   _m_                1.0            1.0            Height_of_vegetation
+57.0  _cDBent0_                      _sDBent_                       _gDW_*_m_^-2       2.91398        0.60132        Zoobenthos_DW_in_lake_sediment
+58.0  _cNBent0_                      _sNBent_                       _gN_*_m_^-2        0.203978       0.0420924      Zoobenthos_N_in_lake_sediment
+59.0  _cPBent0_                      _sPBent_                       _gP_*_m_^-2        0.0291398      0.0060132      Zoobenthos_P_in_lake_sediment
+60.0  _cDepthWM0_                    _sDepthWM_                     _m_                0.5            0.5            Depth_of_marsh_water
+61.0  _cNH4WM0_                      _sNH4WM_                       _gN_*_m_^-3        0.1            0.1            N_in_NH4_in_marsh_water
+62.0  _cNO3WM0_                      _sNO3WM_                       _gN_*_m_^-3        0.1            0.1            N_in_NO3_in_marsh_water
+63.0  _cPO4WM0_                      _sPO4WM_                       _gP_*_m_^-3        0.01           0.01           P_in_PO4_in_marsh_water
+64.0  _cPAIMWM0_                     _sPAIMWM_                      _gP_*_m_^-3        0.0            0.0            P_adsorbed_onto_IM_in_marsh_water
+65.0  _cSiO2WM0_                     _sSiO2WM_                      _gSi_*_m_^-3       3.0            3.0            Dissolved_Si_in_marsh_water
+66.0  _cO2WM0_                       _sO2WM_                        _gO2_*_m_^-3       10.0           10.0           Oxygen_in_marsh_water
+67.0  _cDDetWM0_                     _sDDetWM_                      _gDW_*_m_^-3       2.0            2.0            Detritus_DW_in_marsh_water
+68.0  _cNDetWM0_                     _sNDetWM_                      _gN_*_m_^-3        0.05           0.05           Detritus_N_in_marsh_water
+69.0  _cPDetWM0_                     _sPDetWM_                      _gP_*_m_^-3        0.005          0.005          Detritus_P_in_marsh_water
+70.0  _cSiDetWM0_                    _sSiDetWM_                     _gSi_*_m_^-3       0.02           0.02           Detritus_Si_in_marsh_water
+71.0  _cDIMWM0_                      _sDIMWM_                       _gDW_*_m_^-3       5.0            3.84865        Inorganic_matter_in_marsh_water
+72.0  _cDDiatWM0_                    _sDDiatWM_                     _gDW_*_m_^-3       0.5            0.5            Diatoms_DW_in_marsh_water
+73.0  _cNDiatWM0_                    _sNDiatWM_                     _gN_*_m_^-3        0.05           0.05           Diatoms_N_in_marsh_water
+74.0  _cPDiatWM0_                    _sPDiatWM_                     _gP_*_m_^-3        0.005          0.005          Diatoms_P_in_marsh_water
+75.0  _cDGrenWM0_                    _sDGrenWM_                     _gDW_*_m_^-3       0.5            0.5            Green_algae_DW_in_marsh_water
+76.0  _cNGrenWM0_                    _sNGrenWM_                     _gN_*_m_^-3        0.05           0.05           Green_algae_N_in_marsh_water
+77.0  _cPGrenWM0_                    _sPGrenWM_                     _gP_*_m_^-3        0.005          0.005          Green_algae_P_in_marsh_water
+78.0  _cDBlueWM0_                    _sDBlueWM_                     _gDW_*_m_^-3       3.0            3.0            Blue-greens_DW_in_marsh_water
+79.0  _cNBlueWM0_                    _sNBlueWM_                     _gN_*_m_^-3        0.3            0.3            Blue-greens_N_in_marsh_water
+80.0  _cPBlueWM0_                    _sPBlueWM_                     _gP_*_m_^-3        0.03           0.03           Blue-greens_P_in_marsh_water
+81.0  _cDZooM0_                      _sDZooM_                       _gDW_*_m_^-3       0.05           0.05           Zooplankton_DW_in_marsh_water
+82.0  _cNZooM0_                      _sNZooM_                       _gN_*_m_^-3        0.0035         0.0035         Zooplankton_N_in_marsh_water
+83.0  _cPZooM0_                      _sPZooM_                       _gP_*_m_^-3        0.0005         0.0005         Zooplankton_P_in_marsh_water
+84.0  _cNH4SM0_                      _sNH4SM_                       _gN_*_m_^-2        1.0            1.0            N_in_NH4_in_marsh_sediment_pore_water
+85.0  _cNO3SM0_                      _sNO3SM_                       _gN_*_m_^-2        0.01           0.01           N_in_NO3_in_marsh_sediment_pore_water
+86.0  _cPO4SM0_                      _sPO4SM_                       _gP_*_m_^-2        0.181703       0.181703       P_in_PO4_in_marsh_sediment_pore_water
+87.0  _cPAIMSM0_                     _sPAIMSM_                      _gP_*_m_^-2        17.9886        17.9886        P_adsorbed_onto_IM_in_marsh_sediment
+88.0  _cDDetSM0_                     _sDDetSM_                      _gDW_*_m_^-2       181.703        181.703        Detritus_DW_in_marsh_sediment
+89.0  _cNDetSM0_                     _sNDetSM_                      _gN_*_m_^-2        4.54258        4.54258        Detritus_N_in_marsh_sediment
+90.0  _cPDetSM0_                     _sPDetSM_                      _gP_*_m_^-2        0.454258       0.454258       Detritus_P_in_marsh_sediment
+91.0  _cSiDetSM0_                    _sSiDetSM_                     _gSi_*_m_^-2       1.81703        1.81703        Detritus_Si_in_marsh_sediment
+92.0  _cDHumSM0_                     _sDHumSM_                      _gDW_*_m_^-2       3452.36        3452.36        Humus_DW_in_marsh_sediment
+93.0  _cNHumSM0_                     _sNHumSM_                      _gN_*_m_^-2        172.618        172.618        Humus_N_in_marsh_sediment
+94.0  _cPHumSM0_                     _sPHumSM_                      _gP_*_m_^-2        17.2618        17.2618        Humus_Pin_marsh_sediment
+95.0  _cDIMSM0_                      _sDIMSM_                       _gDW_*_m_^-2       32706.5        32706.5        Inorganic_matter_in_marsh_sediment
+96.0  _cDRootPhra0_                  _sDRootPhra_                   _gDW_*_m_^-2       5000.0         5000.0         Root_biomass_DW_in_marsh_sediment
+97.0  _cDShootPhra0_                 _sDShootPhra_                  _gDW_*_m_^-2       1000.0         1000.0         Shoot_biomass_DW_in_marsh_water
+98.0  _cNRootPhra0_                  _sNRootPhra_                   _gN_*_m_^-2        100.0          100.0          Root_biomass_N_in_marsh_sediment
+99.0  _cNShootPhra0_                 _sNShootPhra_                  _gN_*_m_^-2        20.0           20.0           Shoot_biomass_N_in_marsh_water
+100.0 _cPRootPhra0_                  _sPRootPhra_                   _gP_*_m_^-2        10.0           10.0           Root_biomass_P_in_marsh_sediment
+101.0 _cPShootPhra0_                 _sPShootPhra_                  _gP_*_m_^-2        2.0            2.0            Shoot_biomass_P_in_marsh_water
+102.0 _cNH4WEpi0_                    _sNH4WEpi_                     _gN_*_m_^-3        0.42609        0.00600606     N_in_NH4_in_epilimnion_lake_water
+103.0 _cNO3WEpi0_                    _sNO3WEpi_                     _gN_*_m_^-3        4.10144        0.0453714      N_in_NO3_in_epilimnion_lake_water
+104.0 _cPO4WEpi0_                    _sPO4WEpi_                     _gP_*_m_^-3        0.839063       0.00360102     P_in_PO4_in_epilimnion_lake_water
+105.0 _cPAIMWEpi0_                   _sPAIMWEpi_                    _gP_*_m_^-3        0.000257388    7.02713e-06    P_adsorbed_onto_IM_in_epilimnion_lake_water
+106.0 _cSiO2WEpi0_                   _sSiO2WEpi_                    _gSi_*_m_^-3       6.54808        3.36502        Dissolved_Si_in_epilimnion_lake_water
+107.0 _cO2WEpi0_                     _sO2WEpi_                      _gO2_*_m_^-3       9.94226        12.3486        Oxygen_in_epilimnion_lake_water
+108.0 _cDDetWEpi0_                   _sDDetWEpi_                    _gDW_*_m_^-3       6.15446        0.19883        Detritus_DW_in_epilimnion_lake_water
+109.0 _cNDetWEpi0_                   _sNDetWEpi_                    _gN_*_m_^-3        0.422563       0.0107471      Detritus_N_in_epilimnion_lake_water
+110.0 _cPDetWEpi0_                   _sPDetWEpi_                    _gP_*_m_^-3        0.0614683      0.00174397     Detritus_P_in_epilimnion_lake_water
+111.0 _cSiDetWEpi0_                  _sSiDetWEpi_                   _gSi_*_m_^-3       0.328126       0.0139001      Detritus_Si_in_epilimnion_lake_water
+112.0 _cDIMWEpi0_                    _sDIMWEpi_                     _gDW_*_m_^-3       0.665416       0.60856        Inorganic_matter_in_epilimnion_lake_water
+113.0 _cDDiatWEpi0_                  _sDDiatWEpi_                   _gDW_*_m_^-3       0.0153058      0.000782094    Diatoms_DW_in_epilimnion_lake_water
+114.0 _cNDiatWEpi0_                  _sNDiatWEpi_                   _gN_*_m_^-3        0.000749939    3.10909e-05    Diatoms_N_in_epilimnion_lake_water
+115.0 _cPDiatWEpi0_                  _sPDiatWEpi_                   _gP_*_m_^-3        9.11694e-05    3.03903e-06    Diatoms_P_in_epilimnion_lake_water
+116.0 _cDGrenWEpi0_                  _sDGrenWEpi_                   _gDW_*_m_^-3       0.0282398      0.000634716    Green_algae_DW_in_epilimnion_lake_water
+117.0 _cNGrenWEpi0_                  _sNGrenWEpi_                   _gN_*_m_^-3        0.00251493     4.77545e-05    Green_algae_N_in_epilimnion_lake_water
+118.0 _cPGrenWEpi0_                  _sPGrenWEpi_                   _gP_*_m_^-3        0.00036937     6.26041e-06    Green_algae_P_in_epilimnion_lake_water
+119.0 _cDBlueWEpi0_                  _sDBlueWEpi_                   _gDW_*_m_^-3       0.439664       0.133003       Blue-greens_DW_in_epilimnion_lake_water
+120.0 _cNBlueWEpi0_                  _sNBlueWEpi_                   _gN_*_m_^-3        0.0611171      0.0170507      Blue-greens_N_in_epilimnion_lake_water
+121.0 _cPBlueWEpi0_                  _sPBlueWEpi_                   _gP_*_m_^-3        0.0106432      0.00312485     Blue-greens_P_in_epilimnion_lake_water
+122.0 _cDZooEpi0_                    _sDZooEpi_                     _gDW_*_m_^-3       0.0448336      0.00348191     Zooplankton_DW_in_epilimnion_lake_water
+123.0 _cNZooEpi0_                    _sNZooEpi_                     _gN_*_m_^-3        0.00313835     0.000243734    Zooplankton_N_in_epilimnion_lake_water
+124.0 _cPZooEpi0_                    _sPZooEpi_                     _gP_*_m_^-3        0.000448336    3.48191e-05    Zooplankton_P_in_epilimnion_lake_water
+125.0 _cDBlueSurf0_                  _sDBlueSurf_                   _gDW_*_m_^-2       1e-29          0.001          Blue-greens_DW_in_surface_layer
+126.0 _cNBlueSurf0_                  _sNBlueSurf_                   _gN_*_m_^-2        8.905622561066296e-31 7.523758657415284e-05 Blue-greens_N_in_surface_layer
+127.0 _cPBlueSurf0_                  _sPBlueSurf_                   _gP_*_m_^-2        1.3079766853872904e-31 9.863324699550665e-06 Blue-greens_P_in_surface_layer
+128.0 _cDExtTotT0_                   _sDExtTotT_                    _gDW_*_m_^-2       33594.0        36887.8        Total_amount_of_DW_moved_into_or_out_from_the_system
+129.0 _cNExtTotT0_                   _sNExtTotT_                    _gN_*_m_^-2        444.908        89.8814        Total_amount_of_N_moved_into_or_out_from_the_system
+130.0 _cPExtTotT0_                   _sPExtTotT_                    _gP_*_m_^-2        66.6182        11.0949        Total_amount_of_P_moved_into_or_out_from_the_system
+131.0 _cSiExtTotT0_                  _sSiExtTotT_                   _gSi_*_m_^-2       137.204        59.9003        Total_amount_of_Si_moved_into_or_out_from_the_system
+132.0 _cO2ExtTotT0_                  _sO2ExtTotT_                   _gO2_*m_^-2        121.292        178.864        Total_amount_of_O2_moved_into_or_out_from_the_system
+-1.0                                                                                                                 
+
+
+====================================================================================================
+SHEET: parameters - 551 rows
+====================================================================================================
+Id    Name                                Unit               Min          Max          Default0     Description
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+0.0   _InitCalc_                          0.0                0.0          0.0          0.0          Switch
+1.0   _CalcMass_                          0.0                0.0          0.0          1.0          Switch
+2.0   _ConstDepth_                        0.0                0.0          0.0          1.0          Switch
+3.0   _InitDepth_                         0.0                0.0          0.0          1.0          Switch
+4.0   _ConstTrans_                        0.0                0.0          0.0          1.0          Switch
+5.0   _InclTran_                          0.0                0.0          0.0          1.0          Switch
+6.0   _InclVeg_                           0.0                0.0          1.0          1.0          Switch
+7.0   _InclBur_                           0.0                0.0          1.0          1.0          Switch
+8.0   _InclWeb_                           0.0                0.0          1.0          1.0          Switch
+9.0   _InclMarsh_                         0.0                0.0          1.0          1.0          Switch
+10.0  _InclSeason_                        0.0                0.0          1.0          1.0          Switch
+11.0  _InclStrat_                         0.0                0.0          0.0          0.0          Switch
+12.0  _InclLat_                           0.0                0.0          0.0          1.0          Switch
+13.0  _InclSurf_                          0.0                0.0          0.0          0.0          Switch
+14.0  _InclNfix_                          0.0                0.0          0.0          0.0          Switch
+15.0  _calcMixDepth_                      0.0                0.0          0.0          1.0          Switch
+16.0  _calcQEv_                           0.0                0.0          0.0          1.0          Switch
+17.0  _DayStart_                          _d_                0.0          0.0          0.0          Invoer
+18.0  _ReadDepthW_                        0.0                0.0          0.0          0.0          Switch
+19.0  _ReadTemp_                          0.0                0.0          0.0          0.0          Switch
+20.0  _ReadStrat_                         0.0                0.0          0.0          0.0          Switch
+21.0  _ReadLOut_                          0.0                0.0          0.0          0.0          Switch
+22.0  _ReadVWind_                         0.0                0.0          0.0          0.0          Switch
+23.0  _ReadQIn_                           0.0                0.0          0.0          0.0          Switch
+24.0  _ReadQOutEpi_                       0.0                0.0          0.0          0.0          Switch
+25.0  _ReadQOutHyp_                       0.0                0.0          0.0          0.0          Switch
+26.0  _ReadQEv_                           0.0                0.0          0.0          0.0          Switch
+27.0  _ReadPLoad_                         0.0                0.0          0.0          1.0          Switch
+28.0  _ReadNLoad_                         0.0                0.0          0.0          0.0          Switch
+29.0  _ReadNutFrac_                       0.0                0.0          0.0          0.0          Switch
+30.0  _ReadPLoadPhyt_                     0.0                0.0          0.0          0.0          Switch
+31.0  _ReadDLoadDet_                      0.0                0.0          0.0          0.0          Switch
+32.0  _ReadVegShade_                      0.0                0.0          0.0          0.0          Switch
+33.0  _UseExpVeg_                         0.0                0.0          1.0          1.0          Switch
+34.0  _UsePhotVeg_                        0.0                0.0          1.0          1.0          Switch
+35.0  _UseLWinVeg_                        0.0                0.0          1.0          1.0          Switch
+36.0  _UseVegHeight_                      0.0                0.0          1.0          0.0          Switch
+37.0  _ReadDLoadIM_                       0.0                0.0          0.0          0.0          Switch
+38.0  _UseSeasonLoad_                     0.0                0.0          0.0          0.0          Switch
+39.0  _UsePulseLoad_                      0.0                0.0          0.0          0.0          Switch
+40.0  _mDepthW_                           _m_                0.0          0.0          0.1          Parameter
+41.0  _mMixDepth_                         _m_                0.0          0.0          4.5          Input_factor
+42.0  _mTempEpi_                          _oC_               0.0          0.0          0.0          Optional_input_table
+43.0  _mTempHyp_                          _oC_               0.0          0.0          0.0          Optional_input_table
+44.0  _mStrat_                            0.0                0.0          0.0          0.0          Optional_input_table
+45.0  _mLOut_                             _J_*_s_^-1*_m_^-2  0.0          0.0          0.0          Optional_input_table
+46.0  _mVegShade_                         0.0                0.0          0.0          0.0          Optional_input_table
+47.0  _mVWind_                            _m_*_s^-1_         0.0          0.0          0.0          Optional_input_table
+48.0  _mQIn_                              _mm_*_d_^-1        0.0          0.0          20.0         Optional_input_table
+49.0  _mQOutEpi_                          _mm_*_d_^-1        0.0          0.0          0.0          Optional_input_table
+50.0  _mQOutHyp_                          _mm_*_d_^-1        0.0          0.0          0.0          Optional_input_table
+51.0  _mQEv_                              _mm_*_d_^-1        0.0          0.0          0.0          Optional_input_table
+52.0  _mPLoad_                            _gP_*_m_^-2*_d_^-1 0.0001       0.005        0.001        Optional_input_table
+53.0  _mPLoadMult_                        0.0                0.1          10.0         1.0          Optional_input_table
+54.0  _mPLoadPO4_                         _gP_*_m_^-2*_d_^-1 0.0          0.0          0.0          Optional_input_table
+55.0  _mPLoadOrg_                         _gP_*_m_^-2*_d_^-1 0.0          0.0          0.0          Optional_input_table
+56.0  _mPLoadPhytTot_                     _gP_*_m_^-2*_d_^-1 0.0          0.0          0.0          Optional_input_table
+57.0  _mNLoad_                            _gN_*_m_^-2*_d_^-1 0.0          0.0          0.01         Optional_input_table
+58.0  _mNLoadNH4_                         _gN_*_m_^-2*_d_^-1 0.0          0.0          0.0          Optional_input_table
+59.0  _mNLoadNO3_                         _gN_*_m_^-2*_d_^-1 0.0          0.0          0.0          Optional_input_table
+60.0  _mNLoadOrg_                         _gN_*_m_^-2*_d_^-1 0.0          0.0          0.0          Optional_input_table
+61.0  _mNLoadPhytTot_                     _gN_*_m_^-2*_d_^-2 0.0          0.0          0.0          Optional_input_table
+62.0  _mDLoadDet_                         _gDW_*_m_^-2*_d_^-1 0.0          0.0          0.0          Optional_input_table
+63.0  _mDLoadIM_                          _gDW_*_m_^-2*_d_^-1 0.0          0.0          0.0          Optional_input_table
+64.0  _StartTime_                         _d_                0.0          0.0          0.0          Invoer
+65.0  _EndTime_                           _d_                0.0          0.0          365.0        Invoer
+66.0  _YearZero_                          _y_                0.0          0.0          0.0          Parameter
+67.0  _cDepthWInit0_                      _m_                0.0          0.0          2.0          Switch
+68.0  _cMinDepthHypEpi_                   _m_                0.0          0.0          0.01         Switch
+69.0  _cFetch_                            _m_                800.0        1200.0       1000.0       Input_factor
+70.0  _fMarsh_                            _m_^2*_m_^-2       0.0          0.0          0.0          Input_factor
+71.0  _fLutum_                            0.0                0.0          0.0          0.03         Input_factor
+72.0  _kExchW_                            _d_^-1             0.0          0.0          1.0          Input_factor
+73.0  _kExchMaxW_                         _m_^2*_d_^-1       0.0          0.0          0.0001728    Input_factor
+74.0  _cAMix_                             _m_^-_cBMix_*_m_   0.0          0.0          0.569        Input_factor
+75.0  _cBMix_                             0.0                0.0          0.0          0.336        Input_factor
+76.0  _cfHyp_                             _m_^2*_m_^-2       0.0          0.0          1.0          Input_factor
+77.0  _fFeDIM_                            _gFe_*_gDW_^-1     0.0          0.0          0.003        Input_factor
+78.0  _fAlDIM_                            _gAl_*_gDW_^-1     0.0          0.0          0.003        Input_factor
+79.0  _fVegShade_                         0.0                0.0          0.0          0.0          Parameter
+80.0  _cTmAveEpi_                         _oC_               0.0          0.0          15.0         Input_factor
+81.0  _cTmVarEpi_                         _oC_               0.0          0.0          10.0         Input_factor
+82.0  _cTmAveHyp_                         _oC_               0.0          0.0          5.0          Input_factor
+83.0  _cTmVarHyp_                         _oC_               0.0          0.0          4.0          Input_factor
+84.0  _cStratTm_                          _oC_               0.0          0.0          1.0          Input_factor
+85.0  _cTimeLag_                          _d_                0.0          0.0          40.0         Input_factor
+86.0  _cVWind_                            _m_*_s^-1_         0.0          0.0          2.0          Input_factor
+87.0  _cQInf_                             _mm_*_d_^-1        0.0          0.0          0.0          Input_factor
+88.0  _cPBackLoad_                        _gP_*_m_^-2*_d_^-1 0.0          0.0          0.0          Input_factor
+89.0  _cNBackLoad_                        _gP_*_m_^-2*_d_^-1 0.0          0.0          0.0          Input_factor
+90.0  _cLDayAve_                          _J_*_m_^-2*_d_^-1  0.0          0.0          10000000.0   Input_factor
+91.0  _cLDayVar_                          _J_*_m_^-2*_d_^-1  0.0          0.0          8000000.0    Input_factor
+92.0  _cfDayAve_                          _h_*_h_^-1         0.0          0.0          0.5          Input_factor
+93.0  _cfDayVar_                          0.0                0.0          0.0          0.2          Input_factor
+94.0  _fRefl_                             0.0                0.0          0.0          0.2          Input_factor
+95.0  _cExtWat_                           _m_^-1             0.0          0.0          0.5          Input_factor
+96.0  _cDredInterval_                     _y_                0.0          0.0          9999000.0    Input_factor
+97.0  _cDredStart_                        _y_                0.0          0.0          9999000.0    Input_factor
+98.0  _cDepthRef_                         _m_                0.0          0.0          1e-28        Input_factor
+99.0  _cLengDred_                         _d_                0.0          0.0          10.0         Input_factor
+100.0 _fEffDred_                          0.0                0.0          0.0          0.95         Input_factor
+101.0 _fEffDredBent_                      0.0                0.0          0.0          0.5          Input_factor
+102.0 _fPAR_                              0.0                0.0          0.0          0.48         Parameter
+103.0 _cLAlloVeg_                         _J_*_s_^-1*_m_^-1  0.0          0.0          50.1         Parameter
+104.0 _cVegInitLen_                       _d_                0.0          0.0          22.0         Parameter
+105.0 _cVegWinLen_                        _d_                0.0          0.0          22.0         Parameter
+106.0 _cExtSpDet_                         _m_^2*_gDW_^-1     0.0          0.0          0.15         Parameter
+107.0 _cExtSpIM_                          _m_^2*_gDW_^-1     0.0          0.0          0.05         Parameter
+108.0 _fDTotS0_                           _gDW_*_gDW_^-1     0.0          0.0          0.5          Initial_values
+109.0 _fDOrgS0_                           _gDW_*_gDW_^-1     0.0          0.0          0.08         Initial_values
+110.0 _fDDetS0_                           _gDW_*_gDW_^-1     0.0          0.0          0.05         Initial_values
+111.0 _fSedPhyt0_                         _gDWDiat_*_gDW_^-1 0.0          0.0          0.01         Initial_values
+112.0 _fPInorgS0_                         _gP_*_gDW_^-1      0.0          0.0          0.0005       Initial_values
+113.0 _fPAdsS0_                           0.0                0.0          0.0          0.99         Initial_values
+114.0 _cPDDet0_                           _gP_*_gDW_^-1      0.0          0.0          0.0025       Initial_values
+115.0 _cNDDet0_                           _gN_*_gDW_^-1      0.0          0.0          0.025        Initial_values
+116.0 _cSiDDet0_                          _gSi_*_gDW_^-1     0.0          0.0          0.01         Initial_values
+117.0 _cPDHum0_                           _gP_*_gDW_^-1      0.0          0.0          0.005        Initial_values
+118.0 _cNDHum0_                           _gN_*_gDW_^-1      0.0          0.0          0.05         Initial_values
+119.0 _cPDPhyt0_                          _gP_*_gDW_^-1      0.0          0.0          0.01         Initial_values
+120.0 _cNDPhyt0_                          _gN_*_gDW_^-1      0.0          0.0          0.1          Initial_values
+121.0 _cPDDiat0_                          _gP_*_gDW_^-1      0.0          0.0          0.01         Initial_values
+122.0 _cNDDiat0_                          _gN_*_gDW_^-1      0.0          0.0          0.1          Initial_values
+123.0 _cPDGren0_                          _gP_*_gDW_^-1      0.0          0.0          0.01         Initial_values
+124.0 _cNDGren0_                          _gN_*_gDW_^-1      0.0          0.0          0.1          Initial_values
+125.0 _cPDBlue0_                          _gP_*_gDW_^-1      0.0          0.0          0.01         Initial_values
+126.0 _cNDBlue0_                          _gN_*_gDW_^-1      0.0          0.0          0.1          Initial_values
+127.0 _cPDVeg0_                           _gP_*_gDW_^-1      0.0          0.0          0.002        Initial_values
+128.0 _cNDVeg0_                           _gN_*_gDW_^-1      0.0          0.0          0.02         Initial_values
+129.0 _cSiDDiat_                          _gSi_*_gDW_^-1     0.0          0.0          0.15         Initial_values
+130.0 _cPDZooRef_                         _gP_*_gDW_^-1      0.0          0.0          0.01         Initial_values
+131.0 _cNDZooRef_                         _gN_*_gDW_^-1      0.0          0.0          0.07         Initial_values
+132.0 _cPDBentRef_                        _gP_*_gDW_^-1      0.0          0.0          0.01         Initial_values
+133.0 _cNDBentRef_                        _gN_*_gDW_^-1      0.0          0.0          0.07         Initial_values
+134.0 _cPDFishRef_                        _gP_*_gDW_^-1      0.0          0.0          0.022        Initial_values
+135.0 _cNDFishRef_                        _gN_*_gDW_^-1      0.0          0.0          0.1          Initial_values
+136.0 _cPDPisc_                           _gP_*_gDW_^-1      0.0          0.0          0.022        Initial_values
+137.0 _cNDPisc_                           _gN_*_gDW_^-1      0.0          0.0          0.1          Initial_values
+138.0 _cQIn_                              _mm_*_d_^-1        0.0          0.0          20.0         Input_factor
+139.0 _cQInSum_                           _mm_*_d_^-1        0.0          0.0          20.0         Input_factor
+140.0 _cQInWin_                           _mm_*_d_^-1        0.0          0.0          20.0         Input_factor
+141.0 _cMaxWOut_                          _d_^-1             0.0          0.0          1.0          Input_factor
+142.0 _cDepthWMin_                        _m_                0.0          0.0          0.1          Input_factor
+143.0 _cDepthWMax_                        _m_                0.0          0.0          1000.0       Input_factor
+144.0 _cQInExtraApril1_                   _mm_*_d_^-1        0.0          0.0          0.0          Input_factor
+145.0 _cQInExtraOct1_                     _mm_*_d_^-1        0.0          0.0          0.0          Input_factor
+146.0 _cQOutExtraApril1_                  _mm_*_d_^-1        0.0          0.0          0.0          Input_factor
+147.0 _cQOutExtraOct1_                    _mm_*_d_^-1        0.0          0.0          0.0          Input_factor
+148.0 _cQEvAve_                           _mm_*_d_^-1        0.0          0.0          1.5          Input_factor
+149.0 _cQEvVar_                           _mm_*_d_^-1        0.0          0.0          1.3          Input_factor
+150.0 _cPLoad_                            _gP_*_m_^-2*_d_^-1 0.0          0.0          0.005        Input_factor
+151.0 _cPLoadSum_                         _gP_*_m_^-2*_d_^-1 0.0          0.0          0.005        Input_factor
+152.0 _cPLoadWin_                         _gP_*_m_^-2*_d_^-1 0.0          0.0          0.005        Input_factor
+153.0 _fPO4In_                            0.0                0.0          0.0          0.5          Input_factor
+154.0 _fPhytInWin_                        0.0                0.0          0.0          0.02         Input_factor
+155.0 _fPhytInSum_                        0.0                0.0          0.0          0.1          Input_factor
+156.0 _fDiatPhytIn_                       0.0                0.0          0.0          0.33         Input_factor
+157.0 _fGrenPhytIn_                       0.0                0.0          0.0          0.34         Input_factor
+158.0 _fBluePhytIn_                       0.0                0.0          0.0          0.33         Input_factor
+159.0 _cNLoad_                            _gN_*_m_^-2*_d_^-1 0.0          0.0          0.05         Input_factor
+160.0 _cNLoadSum_                         _gN_*_m_^-2*_d_^-1 0.0          0.0          0.05         Input_factor
+161.0 _cNLoadWin_                         _gN_*_m_^-2*_d_^-1 0.0          0.0          0.05         Input_factor
+162.0 _cNPLoadMeas_                       _gN_*_gP_^-1       0.0          0.0          10.0         Input_factor
+163.0 _cNPPhytIn_                         _gP_*_gDW_^-1      0.0          0.0          7.0          Input_factor
+164.0 _cNPDetIn_                          _gP_*_gDW_^-1      0.0          0.0          7.0          Input_factor
+165.0 _fNH4DissIn_                        0.0                0.0          0.0          0.5          Input_factor
+166.0 _cNDPhytIn_                         _gN_*_gDW_^-1      0.0          0.0          0.07         Input_factor
+167.0 _cNDDetIn_                          _gN_*_gDW_^-1      0.0          0.0          0.07         Input_factor
+168.0 _cDIMIn_                            _gDW_*_m_^-3       0.0          0.0          5.0          Input_factor
+169.0 _cO2In_                             _gO2_*_m_^-3       0.0          0.0          5.0          Input_factor
+170.0 _cSiO2In_                           _gSi_*_m_^-3       0.0          0.0          3.0          Input_factor
+171.0 _cSiDDetIn_                         _gSi_*_gDW_^-1     0.0          0.0          0.05         Input_factor
+172.0 _cDZooIn_                           _gDW_*_m_^-3       0.0          0.0          0.1          Input_factor
+173.0 _cDayApril1_                        _d_                0.0          0.0          91.0         Input_factor
+174.0 _cDayOct1_                          _d_                0.0          0.0          273.0        Input_factor
+175.0 _cLengChange_                       _d_                0.0          0.0          10.0         Input_factor
+176.0 _cNLoadS_                           _gN_*_m_^-2*_d_^-1 0.0          0.0          0.0          Input_factor
+177.0 _fNH4LoadS_                         0.0                0.0          0.0          0.5          Input_factor
+178.0 _cDErosTot_                         _gDW_*_m_^-2*_d_^-1 0.0          0.0          0.0          Input_factor
+179.0 _fSedErosIM_                        0.0                0.0          0.0          0.95         Input_factor
+180.0 _fHypErosIM_                        0.0                0.0          0.0          0.0          Input_factor
+181.0 _fDOrgSoil_                         0.0                0.0          0.0          0.1          Input_factor
+182.0 _cPDSoilOM_                         _gP_*_gDW_^-1      0.0          0.0          0.001        Input_factor
+183.0 _cNDSoilOM_                         _gN_*_gDW_^-1      0.0          0.0          0.01         Input_factor
+184.0 _cPO4Ground_                        _gP_*_m_^-3        0.0          0.0          0.1          Input_factor
+185.0 _cNH4Ground_                        _gN_*_m_^-3        0.0          0.0          1.0          Input_factor
+186.0 _cNO3Ground_                        _gN_*_m_^-3        0.0          0.0          0.1          Input_factor
+187.0 _cDepthS_                           _m_                0.0          0.0          0.1          Parameter
+188.0 _cCPerDW_                           _gC_*_gDW_^-1      0.0          0.0          0.4          Parameter
+189.0 _cRhoIM_                            _gDW_*_m_^-3       0.0          0.0          2500000.0    Parameter
+190.0 _cRhoOM_                            _gDW_*_m_^-3       0.0          0.0          1400000.0    Parameter
+191.0 _cTmRef_                            _oC_               0.0          0.0          20.0         Parameter
+192.0 _cAerRoot_                          _m_^(1.5)*_s_^(0.5)*_d_^-1 0.0          0.0          0.727        Parameter
+193.0 _cAerLin_                           _s_*_d_^-1         0.0          0.0          -0.371       Parameter
+194.0 _cAerSquare_                        _s_^2*_m_^-1*_d^-1_ 0.0          0.0          0.0376       Parameter
+195.0 _cThetaAer_                         1^[_oC_^-1]        0.0          0.0          1.024        Parameter
+196.0 _kFloatAer_                         _m_^2*_gDW_^-1     0.0          0.0          0.01         Parameter
+197.0 _kBlueSurfAer_                      _m_^2*_gDW_^-1     0.0          0.0          0.01         Parameter
+198.0 _cVSetIM_                           _m_*_d_^-1         0.0          0.0          1.0          Parameter
+199.0 _cVSetDet_                          _m_*_d_^-1         0.0          0.0          0.25         Parameter
+200.0 _cThetaSet_                         1^[_oC_^-1]        0.0          0.0          1.01         Parameter
+201.0 _cSuspMin_                          0.0                0.0          0.0          6.1          Parameter
+202.0 _cSuspMax_                          0.0                0.0          0.0          25.2         Parameter
+203.0 _cSuspSlope_                        _m_                0.0          0.0          2.1          Parameter
+204.0 _hDepthSusp_                        _m_                0.0          0.0          2.0          Parameter
+205.0 _cFetchRef_                         _m_                0.0          0.0          1000.0       Parameter
+206.0 _fLutumRef_                         0.0                0.0          0.0          0.2          Parameter
+207.0 _cSuspRef_                          _gDW_*_m_^-2*_d_^-1 0.0          0.0          0.5          Parameter
+208.0 _kVegResus_                         _m_^2*_gDW_^-1     0.0          0.0          0.01         Parameter
+209.0 _kTurbFish_                         _gDW_*_gDW_^-1*_d_^-1 0.0          0.0          1.0          Parameter
+210.0 _kResusPhytMax_                     _d_^-1             0.0          0.0          0.25         Parameter
+211.0 _cResusPhytExp_                     _gDW_^-1*_m_^2*_d_^1 0.0          0.0          -0.379       Parameter
+212.0 _cThetaMinW_                        0.0                0.0          0.0          1.07         Parameter
+213.0 _kDMinDetW_                         _d_^-1             0.0          0.0          0.01         Parameter
+214.0 _hO2BOD_                            _gO2_*_m_^-3       0.0          0.0          1.0          Parameter
+215.0 _O2PerNO3_                          0.0                0.0          0.0          1.5          Parameter
+216.0 _cThetaMinS_                        0.0                0.0          0.0          1.07         Parameter
+217.0 _kDMinDetS_                         _d_^-1             0.0          0.0          0.002        Parameter
+218.0 _fRefrDetS_                         0.0                0.0          0.0          0.15         Parameter
+219.0 _hNO3Denit_                         _gN_*_m_^-3        0.0          0.0          2.0          Parameter
+220.0 _NO3PerC_                           0.0                0.0          0.0          0.8          Parameter
+221.0 _kDMinHum_                          _d_^-1             0.0          0.0          1e-05        Parameter
+222.0 _kNitrW_                            _d_^-1             0.0          0.0          0.1          Parameter
+223.0 _kNitrS_                            _d_^-1             0.0          0.0          1.0          Parameter
+224.0 _cThetaNitr_                        _oC_               0.0          0.0          1.08         Parameter
+225.0 _O2PerNH4_                          0.0                0.0          0.0          2.0          Parameter
+226.0 _hO2Nitr_                           _gO2_*_m_^-3       0.0          0.0          2.0          Parameter
+227.0 _kPDifPO4_                          _m_^2*_d_^-1       0.0          0.0          7.2e-05      Parameter
+228.0 _kNDifNO3_                          _m_^2*_d_^-1       0.0          0.0          8.6e-05      Parameter
+229.0 _kNDifNH4_                          _m_^2*_d_^-1       0.0          0.0          0.000112     Parameter
+230.0 _kO2Dif_                            _m_^2*_d_^-1       0.0          0.0          2.6e-05      Parameter
+231.0 _cThetaDif_                         _oC_               0.0          0.0          1.02         Parameter
+232.0 _fDepthDifS_                        0.0                0.0          0.0          0.5          Parameter
+233.0 _cTurbDifNut_                       0.0                0.0          0.0          5.0          Parameter
+234.0 _cTurbDifO2_                        0.0                0.0          0.0          5.0          Parameter
+235.0 _kPSorp_                            _d_^-1             0.0          0.0          0.05         Parameter
+236.0 _cRelPAdsD_                         _gP_*_gDW_^-1      0.0          0.0          3e-05        Parameter
+237.0 _cRelPAdsFe_                        _gP_*_gFe_^-1      0.0          0.0          0.065        Parameter
+238.0 _cRelPAdsAl_                        _gP_*_gAl_^-1      0.0          0.0          0.134        Parameter
+239.0 _cKPAdsOx_                          _m_^3*_gP_^-1      0.0          0.0          0.6          Parameter
+240.0 _fRedMax_                           0.0                0.0          0.0          0.9          Parameter
+241.0 _coPO4Max_                          _gP_*_m_^-3        0.0          0.0          1.0          Parameter
+242.0 _kPChemPO4_                         _m_*_d_^-1         0.0          0.0          0.03         Parameter
+243.0 _cDayManVeg1_                       _d_                0.0          0.0          -9999000.0   Input_factor
+244.0 _cDayManVeg2_                       _d_                0.0          0.0          -9999000.0   Input_factor
+245.0 _fManVeg_                           0.0                0.0          0.0          0.0          Input_factor
+246.0 _cLengMan_                          _d_                0.0          0.0          10.0         Input_factor
+247.0 _cYearStartBirds_                   _y_                0.0          0.0          0.0          Input_factor
+248.0 _cDayStartBirds_                    _d_                0.0          0.0          46.0         Input_factor
+249.0 _cDayEndBirds_                      _d_                0.0          0.0          288.0        Input_factor
+250.0 _cBirdsPerha_                       _coot_*_ha_^-1     0.0          0.0          0.0          Input_factor
+251.0 _cDGrazPerBird_                     _gDW_*_coot_^-1*_d_^-1 0.0          0.0          45.0         Parameter
+252.0 _hDVegBird_                         _gDW_*_m_^-2       0.0          0.0          5.0          Parameter
+253.0 _fDAssBird_                         0.0                0.0          0.0          0.5          Parameter
+254.0 _fDissEgesBird_                     0.0                0.0          0.0          0.25         Parameter
+255.0 _fDissMortVeg_                      0.0                0.0          0.0          0.25         Parameter
+256.0 _cLengAllo_                         _d_                0.0          0.0          15.0         Parameter
+257.0 _cLengMort_                         _d_                0.0          0.0          15.0         Parameter
+258.0 _UseEmpUpt_                         0.0                0.0          0.0          0.0          Switch
+259.0 _fSedUptVegMax_                     0.0                0.0          0.0          0.998        Parameter
+260.0 _fSedUptVegCoef_                    0.0                0.0          0.0          2.66         Parameter
+261.0 _fSedUptVegExp_                     0.0                0.0          0.0          -0.83        Parameter
+262.0 _fRootVegSum_                       _gDW_*_gDW_^-1     0.0          0.0          0.1          Parameter
+263.0 _fRootVegWin_                       _gDW_*_gDW_^-1     0.0          0.0          0.6          Parameter
+264.0 _fFloatVeg_                         _gDW_*_gDW_^-1     0.0          0.0          0.0          Parameter
+265.0 _fEmergVeg_                         _gDW_*_gDW_^-1     0.0          0.0          0.0          Parameter
+266.0 _cVegHeight_                        _m_                0.0          0.0          3.0          Parameter
+267.0 _cVegHeightWin_                     _m_                0.0          0.0          2.0          Parameter
+268.0 _cVegMaxHeight_                     _m_                0.0          0.0          3.0          Parameter
+269.0 _cVegHPar1_                         0.0                0.0          0.0          0.0191       Conversion
+270.0 _cVegHPar2_                         0.0                0.0          0.0          0.7969       Conversion
+271.0 _cVegL_                             0.0                0.0          0.0          1.0          Conversion
+272.0 _cDStemVeg_                         _gDW_*_m_^-1       0.0          0.0          1.97         Parameter
+273.0 _cDensVeg_                          _m_^-2             0.0          0.0          10.0         Parameter
+274.0 _fDepth1Veg_                        0.0                0.0          0.0          0.0          Parameter
+275.0 _fDepth2Veg_                        0.0                0.0          0.0          1.0          Parameter
+276.0 _cDLayerVeg_                        _gDW_*_m_^-2       0.0          0.0          0.0          Parameter
+277.0 _cCovSpVeg_                         _gDW_^-1*_m_^2     0.0          0.0          0.5          Parameter
+278.0 _kMigrVeg_                          _d_^-1             0.0          0.0          0.001        Parameter
+279.0 _cDVegIn_                           _gDW_*_m_^-2       0.0          0.0          1.0          Parameter
+280.0 _cTmInitVeg_                        _oC_               0.0          0.0          9.0          Parameter
+281.0 _cPhotInitVeg_                      _h_                0.0          0.0          12.0         Parameter
+282.0 _cDCarrVeg_                         _gDW_*_m_^-2       0.0          0.0          400.0        Parameter
+283.0 _cMuMaxVeg_                         _gDW_*_gDW_^-1*_d_^-1 0.0          0.0          0.2          Parameter
+284.0 _cQ10ProdVeg_                       0.0                0.0          0.0          1.2          Parameter
+285.0 _hLRefVeg_                          _J_*_s_^-1*_m_^-2  0.0          0.0          13.0         Parameter
+286.0 _cExtSpVeg_                         _m_^2*_gDW_^-1     0.0          0.0          0.01         Parameter
+287.0 _kDRespVeg_                         _d_^-1             0.0          0.0          0.016        Parameter
+288.0 _cQ10RespVeg_                       0.0                0.0          0.0          2.0          Parameter
+289.0 _kMortVegSum_                       _d_^-1             0.0          0.0          0.005        Parameter
+290.0 _fWinVeg_                           0.0                0.0          0.0          0.3          Parameter
+291.0 _cDayWinVeg_                        _d_                0.0          0.0          259.0        Parameter
+292.0 _fDetWMortVeg_                      0.0                0.0          0.0          0.1          Parameter
+293.0 _cPrefVegBird_                      0.0                0.0          0.0          1.0          Parameter
+294.0 _cVPUptMaxVeg_                      _gP_*_gDW_^-1*_d_^-1 0.0          0.0          0.01         Parameter
+295.0 _cAffPUptVeg_                       _m_^3*_gDW_^-1*_d_^-1 0.0          0.0          0.2          Parameter
+296.0 _cPDVegMin_                         _gP_*_gDW_^-1      0.0          0.0          0.0008       Parameter
+297.0 _cPDVegMax_                         _gP_*_gDW_^-1      0.0          0.0          0.0035       Parameter
+298.0 _cVNUptMaxVeg_                      _gN_*_gDW_^-1*_d_^-1 0.0          0.0          0.1          Parameter
+299.0 _cAffNUptVeg_                       _m_^3*_gDW_^-1*_d_^-1 0.0          0.0          0.2          Parameter
+300.0 _cNDVegMin_                         _gN_*_gDW_^-1      0.0          0.0          0.01         Parameter
+301.0 _cNDVegMax_                         _gN_*_gDW_^-1      0.0          0.0          0.035        Parameter
+302.0 _cPACoefMin_                        0.0                0.0          0.0          1.5          Parameter
+303.0 _cPACoefMax_                        0.0                0.0          0.0          2.5          Parameter
+304.0 _hPACoef_                           _gDW_*_m_^-3       0.0          0.0          3.0          Parameter
+305.0 _cSecchiPlus_                       _m_                0.0          0.0          0.0          Parameter
+306.0 _cEuph_                             0.0                0.0          0.0          1.7          Parameter
+307.0 _cCovSpPhyt_                        _gDW_^-1*_m_^2     0.0          0.0          2.0          Parameter
+308.0 _cTmOptLoss_                        _oC_               0.0          0.0          25.0         Parameter
+309.0 _cSigTmLoss_                        _oC_               0.0          0.0          13.0         Parameter
+310.0 _fDissMortPhyt_                     0.0                0.0          0.0          0.2          Parameter
+311.0 _fDissLoss_                         0.0                0.0          0.0          0.25         Parameter
+312.0 _cMuMaxDiat_                        _d_^-1             0.0          0.0          2.0          Parameter
+313.0 _cTmOptDiat_                        _oC_               0.0          0.0          18.0         Parameter
+314.0 _cSigTmDiat_                        _oC_               0.0          0.0          20.0         Parameter
+315.0 _cExtSpDiat_                        _m_^2*_gDW_^-1     0.0          0.0          0.25         Parameter
+316.0 _UseSteeleDiat_                     0.0                0.0          0.0          1.0          Parameter
+317.0 _cLOptRefDiat_                      _J_*_s_^-1*_m_^-2  0.0          0.0          54.0         Parameter
+318.0 _hLRefDiat_                         _J_*_s_^-1*_m_^-2  0.0          0.0          1000.0       Parameter
+319.0 _cChDDiatMin_                       _gChl_*_gDW_^-1    0.0          0.0          0.004        Parameter
+320.0 _cChDDiatMax_                       _gChl_*_gDW_^-1    0.0          0.0          0.012        Parameter
+321.0 _kDRespDiat_                        _d_^-1             0.0          0.0          0.1          Parameter
+322.0 _kLossDiat_                         _d_^-1             0.0          0.0          0.25         Parameter
+323.0 _kMortDiatW_                        _d_^-1             0.0          0.0          0.01         Parameter
+324.0 _kMortDiatS_                        _d_^-1             0.0          0.0          0.05         Parameter
+325.0 _cVSetDiat_                         _m_*_d_^-1         0.0          0.0          0.5          Parameter
+326.0 _cVPUptMaxDiat_                     _gP_*_gDW_^-1*_d_^-1 0.0          0.0          0.01         Parameter
+327.0 _cAffPUptDiat_                      _m_^3*_gDW_^-1*_d_^-1 0.0          0.0          0.2          Parameter
+328.0 _cPDDiatMin_                        _gP_*_gDW_^-1      0.0          0.0          0.0005       Parameter
+329.0 _cPDDiatMax_                        _gP_*_gDW_^-1      0.0          0.0          0.005        Parameter
+330.0 _cVNUptMaxDiat_                     _gN_*_gDW_^-1*_d_^-1 0.0          0.0          0.07         Parameter
+331.0 _cAffNUptDiat_                      _m_^3*_gDW_^-1*_d_^-1 0.0          0.0          0.2          Parameter
+332.0 _cNDDiatMin_                        _gN_*_gDW_^-1      0.0          0.0          0.01         Parameter
+333.0 _cNDDiatMax_                        _gN_*_gDW_^-1      0.0          0.0          0.05         Parameter
+334.0 _hSiAssDiat_                        _gSi_*_m_^-3       0.0          0.0          0.09         Parameter
+335.0 _cMuMaxGren_                        _d_^-1             0.0          0.0          1.5          Parameter
+336.0 _cTmOptGren_                        _oC_               0.0          0.0          25.0         Parameter
+337.0 _cSigTmGren_                        _oC_               0.0          0.0          15.0         Parameter
+338.0 _cExtSpGren_                        _m_^2*_gDW_^-1     0.0          0.0          0.25         Parameter
+339.0 _UseSteeleGren_                     0.0                0.0          0.0          0.0          Parameter
+340.0 _hLRefGren_                         _J_*_s_^-1*_m_^-2  0.0          0.0          17.0         Parameter
+341.0 _cLOptRefGren_                      _J_*_s_^-1*_m_^-2  0.0          0.0          1000.0       Parameter
+342.0 _cChDGrenMin_                       _gChl_*_gDW_^-1    0.0          0.0          0.01         Parameter
+343.0 _cChDGrenMax_                       _gChl_*_gDW_^-1    0.0          0.0          0.02         Parameter
+344.0 _kDRespGren_                        _d_^-1             0.0          0.0          0.075        Parameter
+345.0 _kLossGren_                         _d_^-1             0.0          0.0          0.25         Parameter
+346.0 _kMortGrenW_                        _d_^-1             0.0          0.0          0.01         Parameter
+347.0 _kMortGrenS_                        _d_^-1             0.0          0.0          0.05         Parameter
+348.0 _cVSetGren_                         _m_*_d_^-1         0.0          0.0          0.2          Parameter
+349.0 _cVPUptMaxGren_                     _gP_*_gDW_^-1*_d_^-1 0.0          0.0          0.01         Parameter
+350.0 _cAffPUptGren_                      _m_^3*_gDW_^-1*_d_^-1 0.0          0.0          0.2          Parameter
+351.0 _cPDGrenMin_                        _gP_*_gDW_^-1      0.0          0.0          0.0015       Parameter
+352.0 _cPDGrenMax_                        _gP_*_gDW_^-1      0.0          0.0          0.015        Parameter
+353.0 _cVNUptMaxGren_                     _gN_*_gDW_^-1*_d_^-1 0.0          0.0          0.07         Parameter
+354.0 _cAffNUptGren_                      _m_^3*_gDW_^-1*_d_^-1 0.0          0.0          0.2          Parameter
+355.0 _cNDGrenMin_                        _gN_*_gDW_^-1      0.0          0.0          0.02         Parameter
+356.0 _cNDGrenMax_                        _gN_*_gDW_^-1      0.0          0.0          0.1          Parameter
+357.0 _hSiAssGren_                        _gSi_*_m_^-3       0.0          0.0          0.0          Parameter
+358.0 _cMuMaxBlue_                        _d_^-1             0.0          0.0          0.6          Parameter
+359.0 _cTmOptBlue_                        _oC_               0.0          0.0          25.0         Parameter
+360.0 _cSigTmBlue_                        _oC_               0.0          0.0          12.0         Parameter
+361.0 _cExtSpBlue_                        _m_^2*_gDW_^-1     0.0          0.0          0.35         Parameter
+362.0 _UseSteeleBlue_                     0.0                0.0          0.0          1.0          Parameter
+363.0 _cLOptRefBlue_                      _J_*_s_^-1*_m_^-2  0.0          0.0          13.6         Parameter
+364.0 _hLRefBlue_                         _J_*_s_^-1*_m_^-2  0.0          0.0          1000.0       Parameter
+365.0 _cChDBlueMin_                       _gChl_*_gDW_^-1    0.0          0.0          0.005        Parameter
+366.0 _cChDBlueMax_                       _gChl_*_gDW_^-1    0.0          0.0          0.015        Parameter
+367.0 _cCyDBlueMin_                       _gChl_*_gDW_^-1    0.0          0.0          0.004        Parameter
+368.0 _cCyDBlueMax_                       _gChl_*_gDW_^-1    0.0          0.0          0.06         Parameter
+369.0 _kDRespBlue_                        _d_^-1             0.0          0.0          0.03         Parameter
+370.0 _kLossBlue_                         _d_^-1             0.0          0.0          0.03         Parameter
+371.0 _kMortBlueW_                        _d_^-1             0.0          0.0          0.01         Parameter
+372.0 _kMortBlueS_                        _d_^-1             0.0          0.0          0.2          Parameter
+373.0 _cNfixMaxBlue_                      _ugN_*_mgChl_^-1*_d_^-1 0.0          0.0          60.0         Parameter
+374.0 _cNfixDarkBlue_                     _ugN_*_mgChl_^-1*_d_^-1 0.0          0.0          9.5          Parameter
+375.0 _cAlphNfix_                         (_J_*_m_^-2*_s_^-1)^-1 0.0          0.0          0.036        Parameter
+376.0 _cDepthSurf_                        _m_                0.0          0.0          0.01         Parameter
+377.0 _cDBlueSurfMin_                     _gDW_*_m_^-2       0.0          0.0          1e-05        Parameter
+378.0 _cStepPow_                          0.0                0.0          0.0          20.0         Parameter
+379.0 _cChlaThrBlue_                      _mgChl_*_m_^-3     0.0          0.0          10.0         Parameter
+380.0 _cVWindThrBlue_                     _m_*_s_^-1         0.0          0.0          3.0          Parameter
+381.0 _cTmThrBlue_                        _oC_               0.0          0.0          15.0         Parameter
+382.0 _cVFloMaxBlueW_                     _m_*_d_^-1         0.0          0.0          10.0         Parameter
+383.0 _cVSetBlue_                         _m_*_d_^-1         0.0          0.0          0.06         Parameter
+384.0 _cVPUptMaxBlue_                     _gP_*_gDW_^-1*_d_^-1 0.0          0.0          0.04         Parameter
+385.0 _cAffPUptBlue_                      _m_^3*_gDW_^-1*_d_^-1 0.0          0.0          0.8          Parameter
+386.0 _cPDBlueMin_                        _gP_*_gDW_^-1      0.0          0.0          0.0025       Parameter
+387.0 _cPDBlueMax_                        _gP_*_gDW_^-1      0.0          0.0          0.025        Parameter
+388.0 _cVNUptMaxBlue_                     _gN_*_gDW_^-1*_d_^-1 0.0          0.0          0.07         Parameter
+389.0 _cAffNUptBlue_                      _m_^3*_gDW_^-1*_d_^-1 0.0          0.0          0.2          Parameter
+390.0 _cNDBlueMin_                        _gN_*_gDW_^-1      0.0          0.0          0.03         Parameter
+391.0 _cNDBlueMax_                        _gN_*_gDW_^-1      0.0          0.0          0.15         Parameter
+392.0 _fFiJvMortHyp_                      0.0                0.0          0.0          0.0          Parameter
+393.0 _fFiJvEgesHyp_                      0.0                0.0          0.0          0.1          Parameter
+394.0 _fFiJvExcrHyp_                      0.0                0.0          0.0          0.1          Parameter
+395.0 _fFiAdMortHyp_                      0.0                0.0          0.0          0.0          Parameter
+396.0 _fFiAdEgesHyp_                      0.0                0.0          0.0          0.9          Parameter
+397.0 _fFiAdExcrHyp_                      0.0                0.0          0.0          0.9          Parameter
+398.0 _fPiscMortHyp_                      0.0                0.0          0.0          0.0          Parameter
+399.0 _fPiscEgesHyp_                      0.0                0.0          0.0          0.5          Parameter
+400.0 _fPiscExcrHyp_                      0.0                0.0          0.0          0.5          Parameter
+401.0 _hSiAssBlue_                        _gSi_*_m_^-3       0.0          0.0          0.0          Parameter
+402.0 _cDBentIn_                          _gDW_*_m_^-2       0.0          0.0          0.01         Parameter
+403.0 _kMigrBent_                         _d_^-1             0.0          0.0          0.001        Parameter
+404.0 _kMigrFish_                         _d_^-1             0.0          0.0          0.001        Parameter
+405.0 _cDFiJvIn_                          _gDW_*_m_^-2       0.0          0.0          0.005        Parameter
+406.0 _cDFiAdIn_                          _gDW_*_m_^-2       0.0          0.0          0.005        Parameter
+407.0 _kHarvFishWin_                      _d_^-1             0.0          0.0          0.0          Parameter
+408.0 _kHarvFishSum_                      _d_^-1             0.0          0.0          0.0          Parameter
+409.0 _cDPiscIn_                          _gDW_*_m_^-2       0.0          0.0          0.001        Parameter
+410.0 _kMigrPisc_                         _d_^-1             0.0          0.0          0.001        Parameter
+411.0 _kHarvPiscWin_                      _d_^-1             0.0          0.0          0.0          Parameter
+412.0 _kHarvPiscSum_                      _d_^-1             0.0          0.0          0.0          Parameter
+413.0 _cFiltMax_                          _m_^3*_gDW_^-1*_d_^-1 3.0          6.0          4.5          Parameter
+414.0 _hFilt_                             _gDW_*_m_^-3       0.0          0.0          1.0          Parameter
+415.0 _cDCarrZoo_                         _gSi_*_m_^-3       0.0          0.0          25.0         Parameter
+416.0 _cPrefDiat_                         0.0                0.0          0.0          0.75         Parameter
+417.0 _cPrefGren_                         0.0                0.0          0.0          0.75         Parameter
+418.0 _cPrefBlue_                         0.0                0.0          0.0          0.125        Parameter
+419.0 _cPrefDet_                          0.0                0.0          0.0          0.25         Parameter
+420.0 _cPrefBlueSurf_                     0.0                0.0          0.0          0.125        Parameter
+421.0 _fDAssZoo_                          0.0                0.0          0.0          0.35         Parameter
+422.0 _fDissEgesZoo_                      0.0                0.0          0.0          0.25         Parameter
+423.0 _kDRespZoo_                         _d_^-1             0.0          0.0          0.15         Parameter
+424.0 _kMortZoo_                          _d_^-1             0.0          0.0          0.04         Parameter
+425.0 _fDissMortZoo_                      0.0                0.0          0.0          0.1          Parameter
+426.0 _cTmOptZoo_                         _oC_               0.0          0.0          25.0         Parameter
+427.0 _cSigTmZoo_                         _oC_               0.0          0.0          13.0         Parameter
+428.0 _cDCarrBent_                        _gDW_*_m_^-2       0.0          0.0          10.0         Parameter
+429.0 _kDAssBent_                         _d_^-1             0.0          0.0          0.1          Parameter
+430.0 _hDFoodBent_                        _gDW_*_m_^-2       0.0          0.0          200.0        Parameter
+431.0 _fDAssBent_                         0.0                0.0          0.0          0.3          Parameter
+432.0 _fDissEgesBent_                     0.0                0.0          0.0          0.25         Parameter
+433.0 _kDRespBent_                        _d_^-1             0.0          0.0          0.005        Parameter
+434.0 _kMortBent_                         _d_^-1             0.0          0.0          0.005        Parameter
+435.0 _fDissMortBent_                     0.0                0.0          0.0          0.1          Parameter
+436.0 _cTmOptBent_                        _oC_               0.0          0.0          25.0         Parameter
+437.0 _cSigTmBent_                        _oC_               0.0          0.0          16.0         Parameter
+438.0 _fDBone_                            0.0                0.0          0.0          0.35         Parameter
+439.0 _fPBone_                            0.0                0.0          0.0          0.5          Parameter
+440.0 _cDCarrFish_                        _gDW_*_m_^-2       0.0          0.0          15.0         Parameter
+441.0 _fDissEgesFish_                     0.0                0.0          0.0          0.25         Parameter
+442.0 _fDissMortFish_                     0.0                0.0          0.0          0.1          Parameter
+443.0 _cTmOptFish_                        _oC_               0.0          0.0          25.0         Parameter
+444.0 _cSigTmFish_                        _oC_               0.0          0.0          10.0         Parameter
+445.0 _cDayReprFish_                      0.0                0.0          0.0          120.0        Parameter
+446.0 _fReprFish_                         0.0                0.0          0.0          0.02         Parameter
+447.0 _fAgeFish_                          0.0                0.0          0.0          0.5          Parameter
+448.0 _cRelVegFish_                       0.0                0.0          0.0          0.009        Parameter
+449.0 _kDAssFiJv_                         _d_^-1             0.0          0.0          0.12         Parameter
+450.0 _hDZooFiJv_                         _gDW_*_m_^-2       0.0          0.0          1.25         Parameter
+451.0 _fDAssFiJv_                         0.0                0.0          0.0          0.4          Parameter
+452.0 _kDRespFiJv_                        _d_^-1             0.0          0.0          0.01         Parameter
+453.0 _kMortFiJv_                         _d_^-1             0.0          0.0          0.00137      Parameter
+454.0 _kDAssFiAd_                         _d_^-1             0.0          0.0          0.06         Parameter
+455.0 _hDBentFiAd_                        _gDW_*_m_^-2       0.0          0.0          2.5          Parameter
+456.0 _fDAssFiAd_                         0.0                0.0          0.0          0.4          Parameter
+457.0 _kDRespFiAd_                        _d_^-1             0.0          0.0          0.004        Parameter
+458.0 _kMortFiAd_                         _d_^-1             0.0          0.0          0.00027      Parameter
+459.0 _cDCarrPiscMax_                     _gDW_*_m_^-2       0.0          0.0          1.2          Parameter
+460.0 _cDCarrPiscMin_                     _gDW_*_m_^-2       0.0          0.0          0.1          Parameter
+461.0 _cDCarrPiscBare_                    _gDW_*_m_^-2       0.0          0.0          0.1          Parameter
+462.0 _cDPhraMinPisc_                     _gDW_*_m_^-2       0.0          0.0          50.0         Parameter
+463.0 _cCovVegMin_                        0.0                0.0          0.0          40.0         Parameter
+464.0 _cTmOptVeg_                         _oC_               0.0          0.0          20.0         Parameter
+465.0 _cSigTmVeg_                         _oC_               0.0          0.0          20.0         Parameter
+466.0 _cRelPhraPisc_                      _gDW_*_m_^-2       0.0          0.0          0.075        Parameter
+467.0 _cRelVegPisc_                       _gDW_*_m_^-2       0.0          0.0          0.03         Parameter
+468.0 _kDAssPisc_                         _d_^-1             0.0          0.0          0.025        Parameter
+469.0 _hDVegPisc_                         _gDW_*_m_^-2       0.0          0.0          5.0          Parameter
+470.0 _hDFishPisc_                        _gDW_*_m_^-2       0.0          0.0          1.0          Parameter
+471.0 _fDAssPisc_                         0.0                0.0          0.0          0.4          Parameter
+472.0 _fDissEgesPisc_                     0.0                0.0          0.0          0.25         Parameter
+473.0 _kDRespPisc_                        _d_^-1             0.0          0.0          0.005        Parameter
+474.0 _kMortPisc_                         _d_^-1             0.0          0.0          0.00027      Parameter
+475.0 _fDissMortPisc_                     0.0                0.0          0.0          0.1          Parameter
+476.0 _cTmOptPisc_                        _oC_               0.0          0.0          25.0         Parameter
+477.0 _cSigTmPisc_                        _oC_               0.0          0.0          10.0         Parameter
+478.0 _cDepthSM_                          _m_                0.0          0.0          0.1          Parameter
+479.0 _kExchMaxM_                         _m_^3*_m_^-3*_d_^-1 0.0          0.0          1.0          Parameter
+480.0 _hfMarsh_                           _m_^2*_m_^-2       0.0          0.0          0.1          Parameter
+481.0 _fDTotSM0_                          _gDW_*_gDW_^-1     0.0          0.0          0.3          Parameter
+482.0 _fDOrgSM0_                          _gDW_*_gDW_^-1     0.0          0.0          0.1          Parameter
+483.0 _fDDetSM0_                          _gDW_*_gDW_^-1     0.0          0.0          0.05         Parameter
+484.0 _fPInorgSM0_                        _gP_*_gDW_^-1      0.0          0.0          0.0005       Parameter
+485.0 _cPDPhra0_                          _gP_*_gDW_^-1      0.0          0.0          0.002        Parameter
+486.0 _cNDPhra0_                          _gN_*_gDW_^-1      0.0          0.0          0.02         Parameter
+487.0 _cDensStemPhra_                     _m_^-2             0.0          0.0          61.5         Parameter
+488.0 _cTmInitPhra_                       _oC_               0.0          0.0          8.0          Parameter
+489.0 _fDAllPhra_                         0.0                0.0          0.0          0.3          Parameter
+490.0 _kDAllPhra_                         _d_^-1             0.0          0.0          0.05         Parameter
+491.0 _cDStemPhra_                        _gDW_*_m_^-1       0.0          0.0          6.0          Parameter
+492.0 _cQ10ProdPhra_                      0.0                0.0          0.0          2.0          Parameter
+493.0 _cMuPhraMax_                        _d_^-1             0.0          0.0          0.03         Parameter
+494.0 _cDShootPhraMax_                    _gDW_*_m_^-2       0.0          0.0          3500.0       Parameter
+495.0 _cCovSpPhra_                        _gDW_^-1*_m_^-2    0.0          0.0          0.1          Parameter
+496.0 _cPDPhraMin_                        0.0                0.0          0.0          0.0008       Parameter
+497.0 _cPDPhraMax_                        0.0                0.0          0.0          0.003        Parameter
+498.0 _cNDPhraMin_                        0.0                0.0          0.0          0.008        Parameter
+499.0 _cNDPhraMax_                        0.0                0.0          0.0          0.03         Parameter
+500.0 _cAffNUptPhra_                      _m_^3*_gDW_^-1*_d_^-1 0.0          0.0          0.0002       Parameter
+501.0 _cAffPUptPhra_                      _m_^3*_gDW_^-1*_d_^-1 0.0          0.0          0.0002       Parameter
+502.0 _cVNUptPhraMax_                     _gN_*_gDW_^-1*_d_^-1 0.0          0.0          0.1          Parameter
+503.0 _cVPUptPhraMax_                     _gP_*_gDW_^-1      0.0          0.0          0.01         Parameter
+504.0 _kDRespPhra_                        _d_^-1             0.0          0.0          0.001        Parameter
+505.0 _cQ10RespPhra_                      1^[_oC_^-1]        0.0          0.0          2.5          Parameter
+506.0 _fDayWin_                           0.0                0.0          0.0          0.52         Parameter
+507.0 _fDRealPhra_                        0.0                0.0          0.0          0.85         Parameter
+508.0 _kDRealPhra_                        _d_^-1             0.0          0.0          0.05         Parameter
+509.0 _kDMortShootPhra_                   _d_^-1             0.0          0.0          0.0          Parameter
+510.0 _kDMortRootPhra_                    _d_^-1             0.0          0.0          0.000391     Parameter
+511.0 _cDayWinPhra_                       _d_                0.0          0.0          259.0        Parameter
+512.0 _cDayManPhra_                       _d_                0.0          0.0          255.0        Input_factor
+513.0 _fManPhra_                          _d_^-1             0.0          0.0          0.0          Input_factor
+514.0 _kDManShootPhra_                    _d_^-1             0.0          0.0          1.0          Input_factor
+515.0 _DaysPerYear_                       _d_*_y_^-1         0.0          0.0          365.0        Conversion
+516.0 _TenDays_                           _d_                0.0          0.0          10.0         Conversion
+517.0 _HoursInDay_                        _h_                0.0          0.0          24.0         Conversion
+518.0 _HoursPerDay_                       _h_*_d_^-1         0.0          0.0          24.0         Conversion
+519.0 _SecsPerDay_                        _s_*_d_^-1         0.0          0.0          86400.0      Conversion
+520.0 _mmPerm_                            _mm_*_m_^-1        0.0          0.0          1000.0       Conversion
+521.0 _m2Perha_                           _m_^2*_ha_^-1      0.0          0.0          10000.0      Conversion
+522.0 _mgPerg_                            _mgChl_*_gChl_^-1  0.0          0.0          1000.0       Conversion
+523.0 _gPerkg_                            _g_*_kg_           0.0          0.0          1000.0       Conversion
+524.0 _gPerton_                           _g_*_ton_^-1       0.0          0.0          1000000.0    Conversion
+525.0 _PerDay_                            _d_^-1             0.0          0.0          1.0          Conversion
+526.0 _PerCent_                           0.0                0.0          0.0          0.01         Conversion
+527.0 _NearZero_                          0.0                0.0          0.0          1e-28        Conversion
+528.0 _molO2molC_                         _gO2_*_gC_^-1      0.0          0.0          2.6667       Conversion
+529.0 _molO2molN_                         _gO2_*_gN_^-1      0.0          0.0          2.2857       Conversion
+530.0 _molNmolC_                          _gN_*_gC_^-1       0.0          0.0          1.1667       Conversion
+531.0 _ugPerg_                            _ug_*_g_^-1        0.0          0.0          1000000.0    Conversion
+532.0 _cRhoWat_                           _gDW_*_m_^-3       0.0          0.0          1000000.0    Conversion
+533.0 _cSolar_                            _J_*_s_^-1*_m_^-2  1361.0       1375.0       1368.0       Conversion
+534.0 _cLAT_                              _deg_              -90.0        90.0         52.0         Conversion
+535.0 _cPhiR_                             _rad_              0.409        0.409        0.409        Conversion
+536.0 _cDayR_                             _d_                173.0        173.0        173.0        Conversion
+537.0 _fCloudH_                           0.0                0.0          1.0          0.15         Conversion
+538.0 _fCloudM_                           0.0                0.0          1.0          0.15         Conversion
+539.0 _fCloudL_                           0.0                0.0          1.0          0.15         Conversion
+540.0 _cTrans_                            0.0                0.0          1.0          0.41         Conversion
+541.0 _Pi_                                0.0                0.0          0.0          3.14159265358979 Conversion
+542.0 _cHeath_                            0.0                0.0          160.0        100.0        Conversion
+543.0 _cAlpha_                            0.0                0.0          4.25         2.0          Conversion
+544.0 _cDepthMeasoChl_                    _m_                0.0          0.0          0.3          Conversion
+545.0 _cPMax_                             0.0                0.0          0.0          1.3          Conversion
+546.0 _cDepthMetaMin_                     _m_                0.0          0.0          0.0001       Conversion
+547.0 _fMeta_                             0.0                0.0          0.0          0.13         Conversion
+548.0 _kBub_                              _m_*_d_^-1         0.0          0.0          0.4          Conversion
+-1.0                                                                                                
+
+
+====================================================================================================
+SHEET: initialstates - 187 rows
+====================================================================================================
+Id    Name                           Unit               Description
+----------------------------------------------------------------------------------------------------
+0.0   _sMixDepthW0_                  _m_                Mixing_depth
+1.0   _aInclStrat0_                  _m_                Presence_of_stratification
+2.0   _sDepthW0_                     _m_                Total_Depth_of_lake_water
+3.0   _MassHyp0_                     _m_                Conversion_factor_from_concentration_to_mass
+4.0   _sNH4WHyp0_                    _gN_*_m_^-2        N_in_NH4_in_hypolimnion_lake_water
+5.0   _sNO3WHyp0_                    _gN_*_m_^-2        N_in_NO3_in_hypolimnion_lake_water
+6.0   _sPO4WHyp0_                    _gP_*_m_^-2        P_in_PO4_in_hypolimnion_lake_water
+7.0   _sPAIMWHyp0_                   _gP_*_m_^-2        P_adsorbed_onto_IM_in_hypolimnion_lake_water
+8.0   _sSiO2WHyp0_                   _gSi_*_m_^-2       Dissolved_Si_in_hypolimnion_lake_water
+9.0   _sO2WHyp0_                     _gO2_*_m_^-2       Oxygen_in_hypolimnion_lake_water
+10.0  _sDDetWHyp0_                   _gDW_*_m_^-2       Detritus_DW_in_hypolimnion_lake_water
+11.0  _sNDetWHyp0_                   _gN_*_m_^-2        Detritus_N_in_hypolimnion_lake_water
+12.0  _sPDetWHyp0_                   _gP_*_m_^-2        Detritus_P_in_hypolimnion_lake_water
+13.0  _sSiDetWHyp0_                  _gSi_*_m_^-2       Detritus_Si_in_hypolimnion_lake_water
+14.0  _sDIMWHyp0_                    _gDW_*_m_^-2       Inorganic_matter_in_hypolimnion_lake_water
+15.0  _sDDiatWHyp0_                  _gDW_*_m_^-2       Diatoms_DW_in_hypolimnion_lake_water
+16.0  _sNDiatWHyp0_                  _gN_*_m_^-2        Diatoms_N_in_hypolimnion_lake_water
+17.0  _sPDiatWHyp0_                  _gP_*_m_^-2        Diatoms_P_in_hypolimnion_lake_water
+18.0  _sDGrenWHyp0_                  _gDW_*_m_^-2       Green_algae_DW_in_hypolimnion_lake_water
+19.0  _sNGrenWHyp0_                  _gN_*_m_^-2        Green_algae_N_in_hypolimnion_lake_water
+20.0  _sPGrenWHyp0_                  _gP_*_m_^-2        Green_algae_P_in_hypolimnion_lake_water
+21.0  _sDBlueWHyp0_                  _gDW_*_m_^-2       Blue-greens_DW_in_hypolimnion_lake_water
+22.0  _sNBlueWHyp0_                  _gN_*_m_^-2        Blue-greens_N_in_hypolimnion_lake_water
+23.0  _sPBlueWHyp0_                  _gP_*_m_^-2        Blue-greens_P_in_hypolimnion_lake_water
+24.0  _sDZooHyp0_                    _gDW_*_m_^-2       Zooplankton_DW_in_hypolimnion_lake_water
+25.0  _sNZooHyp0_                    _gN_*_m_^-2        Zooplankton_N_in_hypolimnion_lake_water
+26.0  _sPZooHyp0_                    _gP_*_m_^-2        Zooplankton_P_in_hypolimnion_lake_water
+27.0  _sDFiAd0_                      _gDW_*_m_^-2       Adult_fish_DW_in_lake_water
+28.0  _sDFiJv0_                      _gDW_*_m_^-2       Young_fish_DW_in_lake_water
+29.0  _sNFiAd0_                      _gN_*_m_^-2        Adult_fish_N_in_lake_water
+30.0  _sNFiJv0_                      _gN_*_m_^-2        Young_fish_N_in_lake_water
+31.0  _sPFiAd0_                      _gP_*_m_^-2        Adult_fish_P_in_lake_water
+32.0  _sPFiJv0_                      _gP_*_m_^-2        Young_fish_P_in_lake_water
+33.0  _sDPisc0_                      _gDW_*_m_^-2       Predatory_fish_DW_in_lake_water
+34.0  _MassEpi0_                     _m_                Conversion_factor_from_concentration_to_mass
+35.0  _sNH4WEpi0_                    _gN_*_m_^-2        N_in_NH4_in_epilimnion_lake_water
+36.0  _sNO3WEpi0_                    _gN_*_m_^-2        N_in_NO3_in_epilimnion_lake_water
+37.0  _sPO4WEpi0_                    _gP_*_m_^-2        P_in_PO4_in_epilimnion_lake_water
+38.0  _sPAIMWEpi0_                   _gP_*_m_^-2        P_adsorbed_onto_IM_in_epilimnion_lake_water
+39.0  _sSiO2WEpi0_                   _gSi_*_m_^-2       Dissolved_Si_in_epilimnion_lake_water
+40.0  _sO2WEpi0_                     _gO2_*_m_^-2       Oxygen_in_epilimnion_lake_water
+41.0  _sDDetWEpi0_                   _gDW_*_m_^-2       Detritus_DW_in_epilimnion_lake_water
+42.0  _sNDetWEpi0_                   _gN_*_m_^-2        Detritus_N_in_epilimnion_lake_water
+43.0  _sPDetWEpi0_                   _gP_*_m_^-2        Detritus_P_in_epilimnion_lake_water
+44.0  _sSiDetWEpi0_                  _gSi_*_m_^-2       Detritus_Si_in_epilimnion_lake_water
+45.0  _sDIMWEpi0_                    _gDW_*_m_^-2       Inorganic_matter_in_epilimnion_lake_water
+46.0  _sDDiatWEpi0_                  _gDW_*_m_^-2       Diatoms_DW_in_epilimnion_lake_water
+47.0  _sNDiatWEpi0_                  _gN_*_m_^-2        Diatoms_N_in_epilimnion_lake_water
+48.0  _sPDiatWEpi0_                  _gP_*_m_^-2        Diatoms_P_in_epilimnion_lake_water
+49.0  _sDGrenWEpi0_                  _gDW_*_m_^-2       Green_algae_DW_in_epilimnion_lake_water
+50.0  _sNGrenWEpi0_                  _gN_*_m_^-2        Green_algae_N_in_epilimnion_lake_water
+51.0  _sPGrenWEpi0_                  _gP_*_m_^-2        Green_algae_P_in_epilimnion_lake_water
+52.0  _sDBlueWEpi0_                  _gDW_*_m_^-2       Blue-greens_DW_in_epilimnion_lake_water
+53.0  _sNBlueWEpi0_                  _gN_*_m_^-2        Blue-greens_N_in_epilimnion_lake_water
+54.0  _sPBlueWEpi0_                  _gP_*_m_^-2        Blue-greens_P_in_epilimnion_lake_water
+55.0  _sDZooEpi0_                    _gDW_*_m_^-2       Zooplankton_DW_in_epilimnion_lake_water
+56.0  _sNZooEpi0_                    _gN_*_m_^-2        Zooplankton_N_in_epilimnion_lake_water
+57.0  _sPZooEpi0_                    _gP_*_m_^-2        Zooplankton_P_in_epilimnion_lake_water
+58.0  _sDBlueSurf0_                  _gDW_*_m_^-2       Blue-greens_DW_in_epilimnion_lake_water
+59.0  _sNBlueSurf0_                  _gN_*_m_^-2        Blue-greens_N_in_epilimnion_lake_water
+60.0  _sPBlueSurf0_                  _gP_*_m_^-2        Blue-greens_P_in_epilimnion_lake_water
+61.0  _sNH4S0_                       _gN_*_m_^-2        N_in_NH4_in_lake_sediment_pore_water
+62.0  _sNO3S0_                       _gN_*_m_^-2        N_in_NO3_in_lake_sediment_pore_water
+63.0  _bRhoSolidS0_                  _gDW_*_m_^-3       Average_density_of_solid_material
+64.0  _bPorS0_                       _m_^3*_m_^-3       Porosity
+65.0  _bRhoTotS0_                    _gDW_*_m_^-3       Bulk_density_of_sediment
+66.0  _bDTotS0_                      _gDW_*_m_^-2       Total_dry-weight_in_top_layer
+67.0  _sPO4S0_                       _gP_*_m_^-2        P_in_PO4_in_lake_sediment_pore_water
+68.0  _sPAIMS0_                      _gP_*_m_^-2        P_adsorbed_onto_IM_in_lake_sediment
+69.0  _sDDetS0_                      _gDW_*_m_^-2       Detritus_DW_in_lake_sediment
+70.0  _sNDetS0_                      _gN_*_m_^-2        Detritus_N_in_lake_sediment
+71.0  _sPDetS0_                      _gP_*_m_^-2        Detritus_P_in_lake_sediment
+72.0  _sSiDetS0_                     _gSi_*_m_^-2       Detritus_Si_in_lake_sediment
+73.0  _sDHumS0_                      _gDW_*_m_^-2       Humus_DW_in_lake_sediment
+74.0  _sNHumS0_                      _gN_*_m_^-2        Humus_N_in_lake_sediment
+75.0  _sPHumS0_                      _gP_*_m_^-2        Humus_P_in_lake_sediment
+76.0  _sDIMS0_                       _gDW_*_m_^-2       Inorganic_matter_in_lake_sediment
+77.0  _sDDiatS0_                     _gDW_*_m_^-2       Diatoms_DW_on_lake_sediment
+78.0  _sNDiatS0_                     _gN_*_m_^-2        Diatoms_N_on_lake_sediment
+79.0  _sPDiatS0_                     _gP_*_m_^-2        Diatoms_P_on_lake_sediment
+80.0  _sDGrenS0_                     _gDW_*_m_^-2       Green_algae_DW_on_lake_sediment
+81.0  _sNGrenS0_                     _gN_*_m_^-2        Green_algae_N_on_lake_sediment
+82.0  _sPGrenS0_                     _gP_*_m_^-2        Green_algae_P_on_lake_sediment
+83.0  _sDBlueS0_                     _gDW_*_m_^-2       Blue-greens_DW_on_lake_sediment
+84.0  _sNBlueS0_                     _gN_*_m_^-2        Blue-greens_N_on_lake_sediment
+85.0  _sPBlueS0_                     _gP_*_m_^-2        Blue-greens_P_on_lake_sediment
+86.0  _sDVeg0_                       _gDW_*_m_^-2       Vegetation_DW_in_lake_water
+87.0  _sNVeg0_                       _gN_*_m_^-2        Vegetation_N_in_lake_water
+88.0  _sPVeg0_                       _gP_*_m_^-2        Vegetation_P_in_lake_water
+89.0  _sVegHeight0_                  _m_                Height_of_the_vegetation
+90.0  _sDBent0_                      _gDW_*_m_^-2       Zoobenthos_DW_in_lake_sediment
+91.0  _sNBent0_                      _gN_*_m_^-2        Zoobenthos_N_in_lake_sediment
+92.0  _sPBent0_                      _gP_*_m_^-2        Zoobenthos_P_in_lake_sediment
+93.0  _sDepthWM0_                    _m_                Depth_of_marsh_water
+94.0  _MassWM0_                      _m_                Conversion_factor_from_concentration_to_mass
+95.0  _sNH4WM0_                      _gN_*_m_^-2        N_in_NH4_in_marsh_water
+96.0  _sNO3WM0_                      _gN_*_m_^-2        N_in_NO3_in_marsh_water
+97.0  _sPO4WM0_                      _gP_*_m_^-2        P_in_PO4_in_marsh_water
+98.0  _sPAIMWM0_                     _gP_*_m_^-2        P_adsorbed_onto_IM_in_marsh_water
+99.0  _sSiO2WM0_                     _gSi_*_m_^-2       Dissolved_Si_in_marsh_water
+100.0 _sO2WM0_                       _gO2_*_m_^-2       Oxygen_in_marsh_water
+101.0 _sDDetWM0_                     _gDW_*_m_^-2       Detritus_DW_in_marsh_water
+102.0 _sNDetWM0_                     _gN_*_m_^-2        Detritus_N_in_marsh_water
+103.0 _sPDetWM0_                     _gP_*_m_^-2        Detritus_P_in_marsh_water
+104.0 _sSiDetWM0_                    _gSi_*_m_^-2       Detritus_Si_in_marsh_water
+105.0 _sDIMWM0_                      _gDW_*_m_^-2       Inorganic_matter_in_marsh_water
+106.0 _sDDiatWM0_                    _gDW_*_m_^-2       Diatoms_DW_in_marsh_water
+107.0 _sNDiatWM0_                    _gN_*_m_^-2        Diatoms_N_in_marsh_water
+108.0 _sPDiatWM0_                    _gP_*_m_^-2        Diatoms_P_in_marsh_water
+109.0 _sDGrenWM0_                    _gDW_*_m_^-2       Green_algae_DW_in_marsh_water
+110.0 _sNGrenWM0_                    _gN_*_m_^-2        Green_algae_N_in_marsh_water
+111.0 _sPGrenWM0_                    _gP_*_m_^-2        Green_algae_P_in_marsh_water
+112.0 _sDBlueWM0_                    _gDW_*_m_^-2       Blue-greens_DW_in_marsh_water
+113.0 _sNBlueWM0_                    _gN_*_m_^-2        Blue-greens_N_in_marsh_water
+114.0 _sPBlueWM0_                    _gP_*_m_^-2        Blue-greens_P_in_marsh_water
+115.0 _sDZooM0_                      _gDW_*_m_^-2       Zooplankton_DW_in_marsh_water
+116.0 _sNZooM0_                      _gN_*_m_^-2        Zooplankton_N_in_marsh_water
+117.0 _sPZooM0_                      _gP_*_m_^-2        Zooplankton_P_in_marsh_water
+118.0 _sNH4SM0_                      _gN_*_m_^-2        N_in_NH4_in_marsh_sediment_pore_water
+119.0 _sNO3SM0_                      _gN_*_m_^-2        N_in_NO3_in_marsh_sediment_pore_water
+120.0 _bRhoSolidSM0_                 _gDW_*_m_^-3       Average_density_of_solid_material
+121.0 _bPorSM0_                      _m_^3*_m_^-3       Porosity
+122.0 _bRhoTotSM0_                   _gDW_*_m_^-3       Bulk_density_of_sediment
+123.0 _bDTotSM0_                     _gDW_*_m_^-2       Total_dry-weight_in_top_layer
+124.0 _fPAdsSM0_                     0.0                Adsorbed_fraction_of_inorg._P_in_sediment
+125.0 _sPO4SM0_                      _gP_*_m_^-2        P_in_PO4_in_marsh_sediment_pore_water
+126.0 _sPAIMSM0_                     _gP_*_m_^-2        P_adsorbed_onto_IM_in_marsh_sediment
+127.0 _sDDetSM0_                     _gDW_*_m_^-2       Detritus_DW_in_marsh_sediment
+128.0 _sNDetSM0_                     _gN_*_m_^-2        Detritus_N_in_marsh_sediment
+129.0 _sPDetSM0_                     _gP_*_m_^-2        Detritus_P_in_marsh_sediment
+130.0 _sSiDetSM0_                    _gSi_*_m_^-2       Detritus_Si_in_marsh_sediment
+131.0 _sDHumSM0_                     _gDW_*_m_^-2       Humus_DW_in_marsh_sediment
+132.0 _sNHumSM0_                     _gN_*_m_^-2        Humus_N_in_marsh_sediment
+133.0 _sPHumSM0_                     _gP_*_m_^-2        Humus_Pin_marsh_sediment
+134.0 _sDIMSM0_                      _gDW_*_m_^-2       Inorganic_matter_in_marsh_sediment
+135.0 _sDRootPhra0_                  _gDW_*_m_^-2       Root_biomass_DW_in_marsh_sediment
+136.0 _sDShootPhra0_                 _gDW_*_m_^-2       Shoot_biomass_DW_in_marsh_water
+137.0 _sNRootPhra0_                  _gN_*_m_^-2        Root_biomass_N_in_marsh_sediment
+138.0 _sNShootPhra0_                 _gN_*_m_^-2        Shoot_biomass_N_in_marsh_water
+139.0 _sPRootPhra0_                  _gP_*_m_^-2        Root_biomass_P_in_marsh_sediment
+140.0 _sPShootPhra0_                 _gP_*_m_^-2        Shoot_biomass_P_in_marsh_water
+141.0 _uDPhytWHyp0_                  _gDW_*_m_^-2       Total_initial_DW_in_phytoplankton_in_lake_water
+142.0 _uDPhytWEpi0_                  _gDW_*_m_^-2       Total_initial_DW_in_phytoplankton_in_lake_water
+143.0 _uPPhytWHyp0_                  _gP_*_m_^-2        Total_initial_P_in_phytoplankton_in_lake_water
+144.0 _uPPhytWEpi0_                  _gP_*_m_^-2        Total_initial_P_in_phytoplankton_in_lake_water
+145.0 _uNPhytWHyp0_                  _gN_*_m_^-2        Total_initial_N_in_phytoplankton_in_lake_water
+146.0 _uNPhytWEpi0_                  _gN_*_m_^-2        Total_initial_N_in_phytoplankton_in_lake_water
+147.0 _uDPhytS0_                     _gDW_*_m_^-2       Total_initial_DW_in_phytoplankton_in_lake_sediment
+148.0 _uPPhytS0_                     _gP_*_m_^-2        Total_initial_P_in_phytoplankton_in_lake_sediment
+149.0 _uNPhytS0_                     _gN_*_m_^-2        Total_initial_N_in_phytoplankton_in_lake_sediment
+150.0 _uDPhytWM0_                    _gDW_*_m_^-2       Total_initial_DW_in_phytoplankton_in_marsh_water
+151.0 _uPPhytWM0_                    _gP_*_m_^-2        Total_initial_P_in_phytoplankton_in_marsh_water
+152.0 _uNPhytWM0_                    _gN_*_m_^-2        Total_initial_N_in_phytoplankton_in_marsh_water
+153.0 _uSiDiatWM0_                   _gSi_*_m_^-2       Total_initial_Si_in_phytoplankton_in_marsh_water
+154.0 _uDVeg0_                       _gDW_*_m_^-2       Total_initial_DW_vegetation_in_the_lake
+155.0 _uPVeg0_                       _gP_*_m_^-2        Total_initial_P_vegetation_in_the_lake
+156.0 _uNVeg0_                       _gN_*_m_^-2        Total_initial_N_vegetation_in_the_lake
+157.0 _uDFish0_                      _gDW_*_m_^-2       Total_initial_DW_in_white_fish_in_the_lake
+158.0 _uPFish0_                      _gP_*_m_^-2        Total_initial_P_in_white_fish_in_the_lake
+159.0 _uNFish0_                      _gN_*_m_^-2        Total_initial_N_in_white_fish_in_the_lake
+160.0 _uPPisc0_                      _gP_*_m_^-2        Total_initial_P_in_pisc_Fish_in_the_lake
+161.0 _uNPisc0_                      _gN_*_m_^-2        Total_initial_N_in_pisc_Fish_in_the_lake
+162.0 _uO2TotTHyp0_                  _gO2_*_m_^-2       Total_initial_O2_in_the_marsh
+163.0 _uDTotTHyp0_                   _gDW_*_m_^-2       Total_initial_DW_in_the_lake
+164.0 _uPTotTHyp0_                   _gP_*_m_^-2        Total_initial_P_in_the_lake
+165.0 _uNTotTHyp0_                   _gN_*_m_^-2        Total_initial_N_in_the_lake
+166.0 _uSiTotTHyp0_                  _gSi_*_m_^-2       Total_initial_Si_in_the_lake
+167.0 _uDTotTSurf0_                  _gDW_*_m_^-2       Total_initial_DW_at_the_surface
+168.0 _uPTotTSurf0_                  _gP_*_m_^-2        Total_initial_P_at_the_surface
+169.0 _uNTotTSurf0_                  _gN_*_m_^-2        Total_initial_N_at_the_surface
+170.0 _uDTotM0_                      _gDW_*_m_^-2       Total_initial_DW_in_the_marsh
+171.0 _uPTotM0_                      _gP_*_m_^-2        Total_initial_P_in_the_marsh
+172.0 _uNTotM0_                      _gN_*_m_^-2        Total_initial_N_in_the_marsh
+173.0 _uSiTotM0_                     _gSi_*_m_^-2       Total_initial_Si_in_the_marsh
+174.0 _uO2TotM0_                     _gO2_*_m_^-2       Total_initial_Si_in_the_marsh
+175.0 _uO2TotT0_                     _gO2_*_m_^-2       Total_initial_O2_in_the_marsh
+176.0 _uDTotT0_                      _gDW_*_m_^-2       Total_initial_DW_in_the_lake
+177.0 _uPTotT0_                      _gP_*_m_^-2        Total_initial_P_in_the_lake
+178.0 _uNTotT0_                      _gN_*_m_^-2        Total_initial_N_in_the_lake
+179.0 _uSiTotT0_                     _gSi_*_m_^-2       Total_initial_Si_in_the_lake
+180.0 _sDExtTotT0_                   _gDW_*_m_^-2       Total_amount_of_DW_moved_into_or_out_from_the_system
+181.0 _sNExtTotT0_                   _gN_*_m_^-2        Total_amount_of_N_moved_into_or_out_from_the_system
+182.0 _sPExtTotT0_                   _gP_*_m_^-2        Total_amount_of_P_moved_into_or_out_from_the_system
+183.0 _sSiExtTotT0_                  _gSi_*_m_^-2       Total_amount_of_Si_moved_into_or_out_from_the_system
+184.0 _sO2ExtTotT0_                  _gO2_*_m_^-2       Total_amount_of_O2_moved_into_or_out_from_the_system
+-1.0                                                    

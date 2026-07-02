@@ -1,0 +1,20 @@
+netcdf topo {
+dimensions:
+    x = 5 ;
+    y = 5 ;
+variables:
+    int grid_type ;
+    float x(x) ;
+    float y(y) ;
+    float bathymetry(y, x) ;
+data:
+    grid_type = 1 ;
+    x = 1, 2, 3, 4, 5 ;
+    y = 1, 2, 3, 4, 5 ;
+    bathymetry =
+        10, 10, 10, 10, 10,
+        10, 10, 10, 10, 10,
+        10, 10, 10, 10, 10,
+        10, 10, 10, 10, 10,
+        10, 10, 10, 10, 10 ;
+}

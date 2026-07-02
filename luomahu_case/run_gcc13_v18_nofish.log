@@ -1,0 +1,198 @@
+ ------------------------------------------------------------------------
+ getm: Started on  20260629 211908.192
+ ------------------------------------------------------------------------
+ GETM version: 2.5.0 ( branch)
+ GOTM version: 5.4.0 (unknown branch)
+ FABM version: unknown (unknown branch)
+ ------------------------------------------------------------------------
+ Compiler: GNU 13.3.0
+    Compiled for serial execution
+       without OpenMP thread capability
+    Fortran 95 compilation
+    Using DYNAMIC memory allocation
+    Using double precision
+    CARTESIAN
+    _FABM_
+ ------------------------------------------------------------------------
+ Initialising....
+ ------------------------------------------------------------------------
+    the run id is: LUOMAHU_WET
+    the title is:  Luomahu Lake GETM-FABM-WET
+    3D run - full (hotstart= F )
+    init_time
+        Time step:         30.000000000000000       seconds
+        Time format:               2
+        Start:          2020-01-01 00:00:00
+        Stop:           2020-01-31 00:00:00
+         ==>           30  day(s) and            0  seconds ==>        86400  micro time steps
+    init_domain
+        Reading bathymetry and grid information ...
+        using NetCDF version: 4.9.2 of Mar 31 2024 08:09:36 $
+        using cartesian grid.
+        reading bathymetry: 
+            iextr (iextr_topo):           44 (          44 )
+            jextr (jextr_topo):           54 (          54 )
+            axes names:    x, y
+            mapping ill:ihl => ilg:ihg :            1 :          44 =>           1 :          44
+            mapping jll:jhl => jlg:jhg :            1 :          54 =>           1 :          54
+        checking for dx and dy
+            dx and dy will be calculated from axes information
+        reading/constructing coordinate variables: x, y
+            dx=    500.00000000000000      , dy=    500.00000000000000     
+        checking for additional variable(s): lonc, latc, convc 
+            lonc - OK
+            latc - OK
+            convc is not in the file
+        done - reading bathymetry and grid
+        Using sigma coordinates
+        calculating metrics
+        Assuming constant Coriolis parameter - lat =    0.0000000000000000     
+        Using constant bottom roughness
+        Dimensions:            1 :          44 ,           1 :          54 ,           0 :           5
+        # waterpoints =         1164  of         2376
+    init_meteo
+        Metforcing= F
+    init_rivers()
+        river_method=            1
+        river_data=   rivers.nc
+        river_format=            2
+        river_ramp=             -1
+        river_factor=    1.0000000000000000     
+        use_river_temp=  F
+        use_river_salt=  F
+        river_outflow_properties_follow_source_cell= T
+        read_river_info()
+               1                YIHE   26   12     2.6    -1.0    -1.0 inside
+               2              LUONAN   12   42     5.8    -1.0    -1.0 inside
+               3               DAYUN    7   32    13.9    -1.0    -1.0 inside
+               4           ZHANGSHAN   32   15     2.1    -1.0    -1.0 inside
+               5              YANGHE   35   28     1.7    -1.0    -1.0 inside
+               6                ERHE   38   22     2.0    -1.0    -1.0 inside
+            Number of unique rivers:            6
+            split:           1           1           1           1           1           1
+    init_2d
+        init_variables_2d
+        init_advection
+        Advection of depth-averaged velocities
+            full step splitting: u + v
+             upstream advection (first-order, monotone)
+             without diffusion
+        setting initial surface elevation to    0.00000000    
+        An_method=0 -> horizontal numerical diffusion not included
+        sealevel_check=0 --> NaN checks disabled
+        Open boundary= F
+    init_3d
+        splitting factor M:           10
+        init_variables_3d
+        init_advection_3d
+        Advection of horizontal 3D velocities
+            full step splitting: u + v + w
+             horizontal: upstream advection (first-order, monotone)
+STOP 1
+                         without diffusion
+             vertical  : upstream advection (first-order, monotone)
+                         without iteration
+        Advection of TKE and eps
+            full step splitting: u + v + w
+             horizontal: upstream advection (first-order, monotone)
+                         without diffusion
+             vertical  : upstream advection (first-order, monotone)
+                         without iteration
+        ip_ramp=          -1
+        vel_check=           0
+        using sigma vertical coordinates
+        HCC check
+        init_temperature()
+            setting to constant value    5.00000000    
+            Advection of temperature
+            full step splitting: u + v + w
+             horizontal: upstream advection (first-order, monotone)
+                         without diffusion
+             vertical  : upstream advection (first-order, monotone)
+                         without iteration
+            setting attenuation coefficients to constant values:
+                Jerlov Type I (=case I): A=0.58, g1=0.35 , g2=23.0
+            temp_check=           0
+        init_eqstate()
+            linear equation of state
+                T0   =    10.000000000000000     
+                S0   =    35.000000000000000     
+                dtr0 =    2.0000000000000001E-004
+                dsr0 =    8.0000000000000004E-004
+        init_internal_pressure()
+            Blumber-Mellor scheme
+    init_turbulence_nml
+        done.
+    post_init_turbulence
+        allocation turbulence memory..
+        done.
+         
+        --------------------------------------------------------
+        You are using a one-equation model
+        with a parabolic prescribed length-scale.
+        The properties of this model are:
+         
+            Schmidt-number for k,          sig_k =   1.0000000000000000     
+            von Karman constant,           kappa =  0.40000000596046448     
+         
+            Value of the stability function
+            in the log-law,                   cm0 =  0.54769999999999996     
+            in shear-free turbulence,        cmsf =  0.54769999999999996     
+         
+            At the surface:
+            spatial decay rate (no shear), alpha =  -1.1179879434352886     
+            length-scale slope (no shear), L     =  0.40000000596046448     
+        --------------------------------------------------------
+         
+        background turbulent viscosity set to   0.0000000000000000     
+        background turbulent diffusivity set to   0.0000000000000000     
+    init_tridiagonal
+        init_getm_fabm()
+    configure_gotm_fabm
+        done.
+ FATAL ERROR: classify_variables: Variable POM/DW_refractory_sediment_PV must be coupled to an existing state variable.
+ Initializing abiotic_water...
+    model type: wet/abiotic_water
+    initialization succeeded.
+ Initializing abiotic_sediment...
+    model type: wet/abiotic_sediment
+    initialization succeeded.
+ Initializing bot_pel_interface...
+    model type: wet/bot_pel_interface
+    initialization succeeded.
+ Initializing burial...
+    model type: wet/burial
+    initialization succeeded.
+ Initializing sediment_exchange...
+    model type: wet/sediment_exchange
+    initialization succeeded.
+ Initializing POM...
+    model type: wet/om_pool
+    initialization succeeded.
+ Initializing DOM...
+    model type: wet/om_pool
+    initialization succeeded.
+ Initializing humus...
+    model type: wet/om_pool
+    initialization succeeded.
+ Initializing macrophytes...
+    model type: wet/macrophytes
+    initialization succeeded.
+ Initializing cyanobacteria...
+    model type: wet/phytoplankton
+    initialization succeeded.
+ Initializing diatoms...
+    model type: wet/phytoplankton
+    initialization succeeded.
+ Initializing greens...
+    model type: wet/phytoplankton
+    initialization succeeded.
+ Initializing cladocerans...
+    model type: wet/zooplankton
+    initialization succeeded.
+ Initializing copepods...
+    model type: wet/zooplankton
+    initialization succeeded.
+ Initializing zoobenthos...
+    model type: wet/zoobenthos
+    initialization succeeded.

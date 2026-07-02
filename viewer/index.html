@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GETM-FABM-WET 可视化工具</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; color: #333; }
+        .header { background: #1a73e8; color: white; padding: 15px 20px; text-align: center; }
+        .container { display: flex; height: calc(100vh - 60px); }
+        .sidebar { width: 320px; background: white; padding: 15px; overflow-y: auto; border-right: 1px solid #ddd; }
+        .main { flex: 1; padding: 15px; display: flex; flex-direction: column; }
+        .panel { margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 6px; }
+        .panel h3 { font-size: 14px; margin-bottom: 10px; color: #555; }
+        select, input, button { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
+        button { background: #1a73e8; color: white; cursor: pointer; border: none; }
+        button:hover { background: #1557b0; }
+        .tabs { display: flex; margin-bottom: 10px; }
+        .tab { padding: 8px 16px; background: #ddd; cursor: pointer; border-radius: 4px 4px 0 0; margin-right: 5px; }
+        .tab.active { background: #1a73e8; color: white; }
+        .tab-content { display: none; flex: 1; background: white; border-radius: 0 4px 4px 4px; }
+        .tab-content.active { display: flex; }
+        canvas { width: 100%; height: 100%; }
+        .info { font-size: 12px; color: #666; margin-top: 5px; }
+        .color-bar { height: 20px; margin-top: 10px; border-radius: 2px; }
+        .legend { display: flex; justify-content: space-between; font-size: 11px; margin-top: 5px; }
+        .var-item { padding: 4px; cursor: pointer; border-radius: 3px; }
+        .var-item:hover { background: #e8f0fe; }
+        .var-item.selected { background: #1a73e8; color: white; }
+        .slider-label { font-size: 12px; color: #666; margin-top: 5px; }
+        .error { color: red; font-size: 12px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>GETM-FABM-WET 三维模型结果可视化</h1>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <div class="panel">
+                <h3>文件选择</h3>
+                <select id="fileSelect"></select>
+            </div>
+            
+            <div class="panel">
+                <h3>变量列表</h3>
+                <div id="varList" style="max-height: 200px; overflow-y: auto;"></div>
+            </div>
+            
+            <div class="panel">
+                <h3>时间步</h3>
+                <input type="range" id="timeSlider" min="0" max="0" value="0">
+                <div class="slider-label"><span id="timeValue">0</span> / <span id="timeMax">0</span></div>
+            </div>
+            
+            <div class="panel">
+                <h3>垂向层</h3>
+                <select id="zSelect"></select>
+            </div>
+            
+            <div class="panel">
+                <h3>数据范围</h3>
+                <div>最小值: <span id="minValue">-</span></div>
+                <div>最大值: <span id="maxValue">-</span></div>
+                <div>平均值: <span id="meanValue">-</span></div>
+            </div>
+        </div>
+        
+        <div class="main">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('heatmap')">二维热图</div>
+                <div class="tab" onclick="switchTab('profile')">垂向剖面</div>
+                <div class="tab" onclick="switchTab('timeseries')">时间序列</div>
+            </div>
+            
+            <div class="tab-content active" id="heatmap">
+                <canvas id="heatmapCanvas"></canvas>
+                <div class="color-bar" id="colorBar"></div>
+                <div class="legend">
+                    <span id="legendMin">-</span>
+                    <span id="legendMax">-</span>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="profile">
+                <canvas id="profileCanvas"></canvas>
+            </div>
+            
+            <div class="tab-content" id="timeseries">
+                <canvas id="tsCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFile = null;
+        let currentVar = null;
+        let ncInfo = null;
+        let currentData = null;
+        let currentTab = 'heatmap';
+
+        const colors = [
+            [0, 0, 139], [0, 0, 191], [0, 51, 255], [0, 102, 255], [0, 153, 255],
+            [0, 204, 255], [0, 255, 255], [51, 255, 204], [102, 255, 153],
+            [153, 255, 102], [204, 255, 51], [255, 255, 0], [255, 204, 0],
+            [255, 153, 0], [255, 102, 0], [255, 51, 0], [255, 0, 0], [191, 0, 0], [139, 0, 0]
+        ];
+
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+        }
+
+        function getColor(value, min, max) {
+            if (value === null || value === undefined) return '#ffffff';
+            if (min === max) return rgbToHex(128, 128, 128);
+            const t = (value - min) / (max - min);
+            const idx = Math.max(0, Math.min(colors.length - 1, Math.floor(t * (colors.length - 1))));
+            return rgbToHex(...colors[idx]);
+        }
+
+        function drawColorBar(min, max) {
+            const bar = document.getElementById('colorBar');
+            let gradient = 'linear-gradient(to right, ';
+            for (let i = 0; i < colors.length; i++) {
+                const t = i / (colors.length - 1);
+                const value = min + t * (max - min);
+                gradient += rgbToHex(...colors[i]);
+                if (i < colors.length - 1) gradient += ', ';
+            }
+            gradient += ')';
+            bar.style.background = gradient;
+            document.getElementById('legendMin').textContent = min.toFixed(4);
+            document.getElementById('legendMax').textContent = max.toFixed(4);
+        }
+
+        async function loadFiles() {
+            const res = await fetch('/api/files');
+            const files = await res.json();
+            const select = document.getElementById('fileSelect');
+            select.innerHTML = files.map(f => `<option value="${f.path}">${f.name} (${f.size})</option>`).join('');
+            if (files.length > 0) {
+                currentFile = files[0].path;
+                loadFileInfo(currentFile);
+            }
+        }
+
+        async function loadFileInfo(path) {
+            const res = await fetch(`/api/info?path=${encodeURIComponent(path)}`);
+            ncInfo = await res.json();
+            
+            const varList = document.getElementById('varList');
+            const vars3d = ncInfo.variables.filter(v => v.ndim >= 3 && v.dimensions.includes('time'));
+            varList.innerHTML = vars3d.map(v => 
+                `<div class="var-item" onclick="selectVar('${v.name}')" title="${v.long_name} (${v.units})">${v.name}</div>`
+            ).join('');
+            
+            const timeSlider = document.getElementById('timeSlider');
+            timeSlider.max = ncInfo.time ? ncInfo.time.nsteps - 1 : 0;
+            document.getElementById('timeMax').textContent = ncInfo.time ? ncInfo.time.nsteps - 1 : 0;
+            
+            updateZSelect();
+            
+            if (vars3d.length > 0) {
+                selectVar(vars3d[0].name);
+            }
+        }
+
+        function updateZSelect() {
+            const select = document.getElementById('zSelect');
+            const sigma = ncInfo && ncInfo.variables.find(v => v.name === 'sigma');
+            if (sigma && sigma.shape[0] > 0) {
+                select.innerHTML = sigma.shape[0].map((_, i) => 
+                    `<option value="${i}">Layer ${i}</option>`
+                ).join('');
+            } else {
+                select.innerHTML = '<option value="0">Single layer</option>';
+            }
+        }
+
+        async function selectVar(name) {
+            currentVar = name;
+            document.querySelectorAll('.var-item').forEach(el => el.classList.remove('selected'));
+            document.querySelector(`[onclick="selectVar('${name}')"]`)?.classList.add('selected');
+            await loadData();
+        }
+
+        async function loadData() {
+            if (!currentFile || !currentVar) return;
+            
+            const timeStep = document.getElementById('timeSlider').value;
+            const zLevel = document.getElementById('zSelect').value;
+            
+            const url = `/api/data?path=${encodeURIComponent(currentFile)}&var=${currentVar}&time=${timeStep}&z=${zLevel}`;
+            const res = await fetch(url);
+            currentData = await res.json();
+            
+            updateStats();
+            draw();
+        }
+
+        function updateStats() {
+            if (!currentData || !currentData.data) return;
+            
+            let flat = [];
+            function flatten(arr) {
+                arr.forEach(item => Array.isArray(item) ? flatten(item) : (item !== null && flat.push(item)));
+            }
+            flatten(currentData.data);
+            
+            if (flat.length === 0) return;
+            
+            const min = Math.min(...flat);
+            const max = Math.max(...flat);
+            const mean = flat.reduce((a, b) => a + b, 0) / flat.length;
+            
+            document.getElementById('minValue').textContent = min.toFixed(6);
+            document.getElementById('maxValue').textContent = max.toFixed(6);
+            document.getElementById('meanValue').textContent = mean.toFixed(6);
+            
+            drawColorBar(min, max);
+        }
+
+        function draw() {
+            if (!currentData) return;
+            
+            if (currentTab === 'heatmap') drawHeatmap();
+            else if (currentTab === 'profile') drawProfile();
+            else if (currentTab === 'timeseries') drawTimeseries();
+        }
+
+        function drawHeatmap() {
+            const canvas = document.getElementById('heatmapCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, rect.width, rect.height);
+            
+            if (!currentData || !currentData.data) return;
+            
+            const data = currentData.data;
+            if (!Array.isArray(data) || data.length === 0) return;
+            
+            let flat = [];
+            function flatten(arr) {
+                arr.forEach(item => Array.isArray(item) ? flatten(item) : (item !== null && flat.push(item)));
+            }
+            flatten(data);
+            
+            if (flat.length === 0) return;
+            
+            const min = Math.min(...flat);
+            const max = Math.max(...flat);
+            
+            const rows = data.length;
+            const cols = data[0].length;
+            
+            const cellWidth = rect.width / cols;
+            const cellHeight = rect.height / rows;
+            
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const val = data[r][c];
+                    ctx.fillStyle = getColor(val, min, max);
+                    ctx.fillRect(c * cellWidth, r * cellHeight, cellWidth, cellHeight);
+                }
+            }
+        }
+
+        function drawProfile() {
+            const canvas = document.getElementById('profileCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, rect.width, rect.height);
+            
+            if (!currentData || !currentData.data) return;
+            
+            const data = currentData.data;
+            if (!Array.isArray(data) || data.length === 0) return;
+            
+            let flat = [];
+            function flatten(arr) {
+                arr.forEach(item => Array.isArray(item) ? flatten(item) : (item !== null && flat.push(item)));
+            }
+            flatten(data);
+            
+            if (flat.length === 0) return;
+            
+            const min = Math.min(...flat);
+            const max = Math.max(...flat);
+            
+            const centerCol = Math.floor(data[0].length / 2);
+            const values = data.map(row => row[centerCol]);
+            
+            const padding = 50;
+            const chartWidth = rect.width - padding * 2;
+            const chartHeight = rect.height - padding * 2;
+            
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, padding + chartHeight);
+            ctx.lineTo(padding + chartWidth, padding + chartHeight);
+            ctx.stroke();
+            
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#666';
+            ctx.fillText('Depth', padding - 40, padding + chartHeight / 2);
+            ctx.fillText('Value', padding + chartWidth / 2, padding + chartHeight + 30);
+            
+            const step = chartHeight / (values.length - 1);
+            values.forEach((val, i) => {
+                if (val === null) return;
+                const x = padding + ((val - min) / (max - min)) * chartWidth;
+                const y = padding + chartHeight - i * step;
+                
+                ctx.fillStyle = getColor(val, min, max);
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function drawTimeseries() {
+            const canvas = document.getElementById('tsCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, rect.width, rect.height);
+            
+            if (!ncInfo || !currentVar) return;
+            
+            ctx.font = '14px Arial';
+            ctx.fillStyle = '#666';
+            ctx.fillText('时间序列功能需要重新加载数据...', rect.width / 2 - 100, rect.height / 2);
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(tab).classList.add('active');
+            draw();
+        }
+
+        document.getElementById('fileSelect').addEventListener('change', (e) => {
+            currentFile = e.target.value;
+            loadFileInfo(currentFile);
+        });
+
+        document.getElementById('timeSlider').addEventListener('input', (e) => {
+            document.getElementById('timeValue').textContent = e.target.value;
+            loadData();
+        });
+
+        document.getElementById('zSelect').addEventListener('change', loadData);
+
+        window.addEventListener('resize', draw);
+
+        loadFiles();
+    </script>
+</body>
+</html>

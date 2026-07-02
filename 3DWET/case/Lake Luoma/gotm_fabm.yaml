@@ -1,0 +1,13 @@
+fabm:
+  use: true
+  freshwater_impact: true
+  repair_state: true
+  feedbacks:
+    shade: false
+    albedo: true
+    surface_drag: true
+  numerics:
+    ode_method: 1
+    split_factor: 1
+    w_adv_discr: 6
+    cnpar: 1.0

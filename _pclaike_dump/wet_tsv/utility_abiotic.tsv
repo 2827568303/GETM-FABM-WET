@@ -1,0 +1,241 @@
+category	name	unit	description	original_formula	code_implementation	source_file	line_range
+Module constants	cTmRef	-	reference temperature	20.0	real(rk), parameter :: cTmRef=20.0_rk	utility.F90	20-20
+Module constants	Pi	-	pi	3.14159265358979	real(rk),parameter :: Pi=3.14159265358979_rk	utility.F90	71-71
+Module constants	deg2rad	rad	degree to radian conversion	Pi/180.0	real(rk),parameter :: deg2rad=Pi/180._rk	utility.F90	72-72
+Module constants	ecliptic	rad	obliquity of ecliptic	23.439*deg2rad	real(rk),parameter :: ecliptic=23.439_rk*deg2rad	utility.F90	73-73
+Temperature functions	uFunTmArrh	-	Arrhenius temperature dependency	cTheta**(uTm-cTmRef)	uFunTmArrh = cTheta**(uTm-cTmRef)	utility.F90	27-35
+Temperature functions	uFunTmGaus	-	Gaussian temperature dependency	exp(-0.5/cSigTm**2 *((uTm-cTmOpt)**2 - (cTmRef -cTmOpt)**2))	uFunTmGaus = exp(-0.5_rk/cSigTm**2 *((uTm-cTmOpt)**2 - (cTmRef -cTmOpt)**2))	utility.F90	40-48
+Temperature functions	uFunTmQ10	-	Q10 temperature dependency of plants	(cQ10Veg)**(0.1*(uTm-cTmRef))	uFunTmQ10 = ((cQ10Veg )** (0.1_rk * (uTm - cTmRef)))	utility.F90	53-61
+Auxiliary variables	m	-	daylength intermediate variable	1.0-tan(deg2rad*latitude)*tan(ecliptic*cos(0.0172*Day))	m = 1._rk-tan(deg2rad*latitude)*tan(ecliptic*cos(0.0172_rk*Day))	utility.F90	78-78
+Auxiliary variables	DayLength	-	fraction of day with sun shine	acos(1.0-m)/Pi	DayLength = acos(1._rk-m)/Pi	utility.F90	79-79
+O2 processes	Tabs	K	absolute temperature	temp + 273.15	Tabs = temp + 273.15_rk	utility.F90	94-94
+O2 processes	a	-	O2 solubility coefficient a	-173.4292 + 249.6339*100/Tabs + 143.3483*log(Tabs/100)	a = -173.4292_rk + 249.6339_rk * 100 / Tabs + 143.3483_rk * log(Tabs/100)	utility.F90	95-95
+O2 processes	b	-	O2 solubility coefficient b	21.8492*Tabs/100	b = 21.8492_rk * Tabs / 100	utility.F90	96-96
+O2 processes	c	-	O2 salinity correction	salt * (-0.033096 + 0.014259*Tabs/100.0 - 0.0017*(Tabs/100)**2)	c = salt * (-0.033096_rk + 0.014259_rk * Tabs / 100.0_rk - 0.0017_rk * (Tabs / 100)**2)	utility.F90	97-97
+O2 processes	sol_coeff	-	O2 solubility coefficient	a - b + c	sol_coeff = a - b + c	utility.F90	98-98
+O2 processes	uFunO2Sat	g/m3	oxygen saturation concentration	1.42763 * exp(sol_coeff)	uFunO2Sat = 1.42763 * exp(sol_coeff)	utility.F90	86-101
+Module constants	secs_pr_day	s/d	seconds per day	86400.0	real(rk),parameter :: secs_pr_day=86400.0_rk	abiotic_water.F90	49-49
+Module constants	NearZero	-	near zero value	1e-33	real(rk),parameter :: NearZero = 0.000000000000000000000000000000001_rk	abiotic_water.F90	50-50
+Module constants	molO2molC	mol/mol	molar O2 per mol C	2.6667	real(rk),parameter :: molO2molC = 2.6667_rk	abiotic_water.F90	51-51
+Module constants	molO2molN	mol/mol	molar O2 per mol N	2.2857	real(rk),parameter :: molO2molN = 2.2857_rk	abiotic_water.F90	52-52
+Module constants	molNmolC	mol/mol	molar N per mol C	1.1667	real(rk),parameter :: molNmolC = 1.1667_rk	abiotic_water.F90	53-53
+Parameters	cExtSpIM	m2/gDW	specific extinction inorganic matter	0.05	call self%get_parameter(self%cExtSpIM, 'cExtSpIM', 'm2/gDW', 'specific extinction inorganic matter', default=0.05_rk)	abiotic_water.F90	67-67
+Parameters	cKPAdsOxW	m3/gP	P adsorption affinity at oxidized conditions	0.6	call self%get_parameter(self%cKPAdsOxW, 'cKPAdsOxW', 'm3/gP', 'P adsorption affinity at oxidized conditions', default=0.6_rk)	abiotic_water.F90	68-68
+Parameters	cRelPAdsAlW	gP/gAl	maximum P adsorption per g Al	0.134	call self%get_parameter(self%cRelPAdsAlW, 'cRelPAdsAlW', 'gP/gAl', 'maximum P adsorption per g Al', default=0.134_rk)	abiotic_water.F90	69-69
+Parameters	cRelPAdsDWW	gP/gDW	maximum P adsorption per g DW	0.00003	call self%get_parameter(self%cRelPAdsDWW, 'cRelPAdsDWW', 'gP/gDW', 'maximum P adsorption per g DW', default=0.00003_rk)	abiotic_water.F90	70-70
+Parameters	cRelPAdsFeW	gP/gFe	maximum P adsorption per g Fe	0.0675	call self%get_parameter(self%cRelPAdsFeW, 'cRelPAdsFeW', 'gP/gFe', 'maximum P adsorption per g Fe', default=0.0675_rk)	abiotic_water.F90	71-71
+Parameters	cThetaAer	1/e^*C	temperature coefficient for reaeration	1.011	call self%get_parameter(self%cThetaAer, 'cThetaAer', '1/e^*C', 'temperature coefficient for reaeration', default=1.011_rk)	abiotic_water.F90	72-72
+Parameters	cThetaNitrW	1/e^*C	temperature coefficient for nitrification	1.03	call self%get_parameter(self%cThetaNitrW, 'cThetaNitrW', '1/e^*C', 'temperature coefficient for nitrification', default=1.03_rk)	abiotic_water.F90	73-73
+Parameters	cVSetSi	m/d	maximum settling rate of Si particulate	-0.3	call self%get_parameter(self%cVSetSi, 'cVSetSi', 'm/d', 'maximum settling rate of Si particulate', default=-0.3_rk, scale_factor=1.0_rk/secs_pr_day)	abiotic_water.F90	74-74
+Parameters	cVSetIM	m/d	maximum settling rate of inorganic matter	-1.1	call self%get_parameter(self%cVSetIM, 'cVSetIM', 'm/d', 'maximum settling rate of inorganic matter', default=-1.1_rk, scale_factor=1.0_rk/secs_pr_day)	abiotic_water.F90	75-75
+Parameters	fAlDIMW	gAl/gDW	Al content of inorganic matter	0.01	call self%get_parameter(self%fAlDIMW, 'fAlDIMW', 'gAl/gDW', 'Al content of inorganic matter', default=0.01_rk)	abiotic_water.F90	76-76
+Parameters	fFeDIMW	gFe/gDW	Fe content of inorganic matter	0.01	call self%get_parameter(self%fFeDIMW, 'fFeDIMW', 'gFe/gDW', 'Fe content of inorganic matter', default=0.01_rk)	abiotic_water.F90	77-77
+Parameters	fRedMaxW	-	maximum reduction factor of P adsorption affinity	0.9	call self%get_parameter(self%fRedMaxW, 'fRedMaxW', '-', 'maximum reduction factor of P adsorption affinity', default=0.9_rk)	abiotic_water.F90	78-78
+Parameters	hO2BOD	mgO2/l	half saturation oxygen conc. for BOD	1.0	call self%get_parameter(self%hO2BOD, 'hO2BOD', 'mgO2/l', 'half saturation oxygen conc. for BOD', default=1.0_rk)	abiotic_water.F90	79-79
+Parameters	hO2Nitr	mgO2/l	half saturation oxygen conc. for nitrification	2.0	call self%get_parameter(self%hO2Nitr, 'hO2Nitr', 'mgO2/l', 'half saturation oxygen conc. for nitrification', default=2.0_rk)	abiotic_water.F90	80-80
+Parameters	kNitrW	1/d	nitrification rate constant in water at 20*C	0.3	call self%get_parameter(self%kNitrW, 'kNitrW', '1/d', 'nitrification rate constant in water at 20*C', default=0.3_rk, scale_factor=1.0_rk/secs_pr_day)	abiotic_water.F90	81-81
+Parameters	kPSorpW	1/d	P adsorption rate constant	0.05	call self%get_parameter(self%kPSorpW, 'kPSorpW', '1/d', 'P adsorption rate constant', default=0.05_rk, scale_factor=1.0_rk/secs_pr_day)	abiotic_water.F90	82-82
+Parameters	O2PerNH4W	mol/mol	used O2 per NH4 nitrified	2.0	call self%get_parameter(self%O2PerNH4W, 'O2PerNH4W', 'mol/mol', 'used O2 per NH4 nitrified', default=2.0_rk)	abiotic_water.F90	83-83
+Parameters	cThetaMinSiW	1/e^*C	temperature coefficient of SiO2 mineralization	1.02	call self%get_parameter(self%cThetaMinSiW, 'cThetaMinSiW', '1/e^*C', 'temperature coefficient of SiO2 mineralization', default=1.02_rk)	abiotic_water.F90	85-85
+Parameters	kSiMinPaW	1/d	biodissolution constant of particulate Si to SiO2 at 20*C	0.03	call self%get_parameter(self%kSiMinPaW, 'kSiMinPaW', '1/d', 'biodissolution constant of particulate Si to SiO2 at 20*C', default=0.03_rk, scale_factor=1.0_rk/secs_pr_day)	abiotic_water.F90	86-86
+Parameters	tDDepoIM	g/m2/d	inorganic matter deposition	0.0	call self%get_parameter(self%tDDepoIM, 'tDDepoIM', 'g/m2/d', 'inorganic matter deposition', default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)	abiotic_water.F90	88-88
+Parameters	tPDepoPO4	g/m2/d	phosphate deposition	0.0	call self%get_parameter(self%tPDepoPO4, 'tPDepoPO4', 'g/m2/d', 'phosphate deposition', default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)	abiotic_water.F90	89-89
+Parameters	tNDepoNH4	g/m2/d	ammonium deposition	0.0	call self%get_parameter(self%tNDepoNH4, 'tNDepoNH4', 'g/m2/d', 'ammonium deposition', default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)	abiotic_water.F90	90-90
+Parameters	tNDepoNO3	g/m2/d	nitrate deposition	0.0	call self%get_parameter(self%tNDepoNO3, 'tNDepoNO3', 'g/m2/d', 'nitrate deposition', default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)	abiotic_water.F90	91-91
+Parameters	diagnostics	-	toggle diagnostic output	.false.	call self%get_parameter(self%diagnostics, 'diagnostics', '-', 'toggle diagnostic output', default=.false.)	abiotic_water.F90	93-93
+State variables	sDIMW	g/m3	inorganic matter	initial_value=5.0_rk; vertical_movement=cVSetIM	call self%register_state_variable(self%id_sDIMW, 'sDIMW', 'g/m3','inorganic matter', initial_value=5.0_rk, minimum=0.0_rk,vertical_movement=self%cVSetIM, no_river_dilution=.TRUE.)	abiotic_water.F90	97-97
+State variables	sSiPaW	g/m3	particulate Si	initial_value=0.02_rk; vertical_movement=cVSetSi	call self%register_state_variable(self%id_sSiPaW, 'sSiPaW', 'g/m3','particulate Si', initial_value=0.02_rk, minimum=0.0_rk,vertical_movement=self%cVSetSi, no_river_dilution=.TRUE.)	abiotic_water.F90	99-99
+State variables	sPO4W	g/m3	phosphate	initial_value=0.01_rk	call self%register_state_variable(self%id_sPO4W, 'sPO4W', 'g/m3','phosphate', initial_value=0.01_rk, minimum=0.0_rk, no_river_dilution=.TRUE.)	abiotic_water.F90	101-101
+State variables	sPAIMW	g/m3	IM-adsorbed P	initial_value=0.0_rk; vertical_movement=cVSetIM	call self%register_state_variable(self%id_sPAIMW, 'sPAIMW', 'g/m3','IM-adsorbed P', initial_value=0.0_rk, minimum=0.0_rk,vertical_movement=self%cVSetIM, no_river_dilution=.TRUE.)	abiotic_water.F90	102-102
+State variables	sNH4W	g/m3	ammonium	initial_value=0.1_rk	call self%register_state_variable(self%id_sNH4W, 'sNH4W', 'g/m3','ammonium', initial_value=0.1_rk, minimum=0.0_rk, no_river_dilution=.TRUE.)	abiotic_water.F90	103-103
+State variables	sNO3W	g/m3	nitrate	initial_value=0.1_rk	call self%register_state_variable(self%id_sNO3W, 'sNO3W', 'g/m3','nitrate', initial_value=0.1_rk, minimum=0.0_rk, no_river_dilution=.TRUE.)	abiotic_water.F90	104-104
+State variables	sSiO2W	g/m3	silica dioxide	initial_value=3.0_rk	call self%register_state_variable(self%id_sSiO2W, 'sSiO2W', 'g/m3','silica dioxide', initial_value=3.0_rk, minimum=0.0_rk, no_river_dilution=.TRUE.)	abiotic_water.F90	105-105
+State variables	sO2W	g/m3	oxygen	initial_value=10.0_rk	call self%register_state_variable(self%id_sO2W, 'sO2W', 'g/m3','oxygen', initial_value=10.0_rk, minimum=0.0_rk, no_river_dilution=.TRUE.)	abiotic_water.F90	107-107
+Diagnostic variables	wind	m/s	windspeed	-	call self%register_diagnostic_variable(self%id_wind, 'wind', 'm/s', 'windspeed', output=output_instantaneous, source=source_do_surface)	abiotic_water.F90	109-109
+Diagnostic variables	extIM	-	extIM	-	call self%register_diagnostic_variable(self%id_extIM, 'extIM', '-', 'extIM', output=output_instantaneous)	abiotic_water.F90	110-110
+Diagnostic variables	tO2Aer	g/m2/s	O2_reareation	-	call self%register_diagnostic_variable(self%id_tO2Aer, 'tO2Aer', 'g/m2/s', 'O2_reareation', output=output_instantaneous, source=source_do_surface)	abiotic_water.F90	112-112
+Diagnostic variables	pO2Sat	pct	oxygen saturation	-	call self%register_diagnostic_variable(self%id_pO2Sat, 'pO2Sat', 'pct', 'oxygen saturation', output=output_instantaneous)	abiotic_water.F90	114-114
+Diagnostic variables	wSiMinPaW	g/m3/s	rate Si particulate mineralization	-	call self%register_diagnostic_variable(self%id_wSiMinPaW, 'wSiMinPaW', 'g/m3/s', 'rate Si particulate mineralization', output=output_instantaneous)	abiotic_water.F90	116-116
+Diagnostic variables	wPSorpIMW	g/m3/s	rate P adsorped	-	call self%register_diagnostic_variable(self%id_wPSorpIMW, 'wPSorpIMW', 'g/m3/s', 'rate P adsorped', output=output_instantaneous)	abiotic_water.F90	117-117
+Diagnostic variables	wNNitrW	g/m3/s	rate nitrification	-	call self%register_diagnostic_variable(self%id_wNNitrW, 'wNNitrW', 'g/m3/s', 'rate nitrification', output=output_instantaneous)	abiotic_water.F90	118-118
+Diagnostic variables	wO2NitrW	g/m3/s	rate O2 cons. by nitrification	-	call self%register_diagnostic_variable(self%id_wO2NitrW, 'wO2NitrW', 'g/m3/s', 'rate O2 cons. by nitrification', output=output_instantaneous)	abiotic_water.F90	120-120
+Diagnostic variables	BTdummy	gDW/m2/d	bioturbation dummy	-	call self%register_diagnostic_variable(self%id_BTdummy, 'BTdummy', 'gDW/m2/d', 'bioturbation dummy', output=output_none)	abiotic_water.F90	130-130
+Diagnostic variables	TMdummy	gDW/m2	total macrophyte dummy	-	call self%register_diagnostic_variable(self%id_TMdummy, 'TMdummy', 'gDW/m2', 'total macrophyte dummy', output=output_none)	abiotic_water.F90	132-132
+Diagnostic variables	aDSubVegdummy	gDW/m2	dummy aDSubVeg	-	call self%register_diagnostic_variable(self%id_aDSubVegdummy, 'aDSubVegdummy', 'gDW/m2', 'dummy aDSubVeg', output=output_none)	abiotic_water.F90	135-135
+Diagnostic variables	aCovVegdummy	%	dummy aCovVeg	-	call self%register_diagnostic_variable(self%id_aCovVegdummy, 'aCovVegdummy', '%', 'dummy aCovVeg', output=output_none)	abiotic_water.F90	137-137
+Diagnostic variables	afCovSurfVegdummy	-	dummy afCovSurfVeg	-	call self%register_diagnostic_variable(self%id_afCovSurfVegdummy, 'afCovSurfVegdummy', '-', 'dummy afCovSurfVeg', output=output_none)	abiotic_water.F90	140-140
+Diagnostic variables	chladummy	ug/L	dummy chlorophyl a	-	call self%register_diagnostic_variable(self%id_chladummy, 'chladummy', 'ug/L', 'dummy chlorophyl a', output=output_none)	abiotic_water.F90	143-143
+Dependencies	uTm	-	temperature	-	call self%register_dependency(self%id_uTm, standard_variables%temperature)	abiotic_water.F90	146-146
+Dependencies	uVWind	-	wind_speed	-	call self%register_dependency(self%id_uVWind, standard_variables%wind_speed)	abiotic_water.F90	147-147
+Dependencies	salt	-	practical_salinity	-	call self%register_dependency(self%id_salt, standard_variables%practical_salinity)	abiotic_water.F90	148-148
+Temperature functions	uFunTmNitr	-	nitrification temperature function	uFunTmArrh(uTm,cThetaNitrW)	uFunTmNitr = uFunTmArrh(uTm,self%cThetaNitrW)	abiotic_water.F90	197-197
+Temperature functions	uFunTmMinSiW	-	remineralization Si temperature function	uFunTmArrh(uTm,cThetaMinSiW)	uFunTmMinSiW = uFunTmArrh(uTm,self%cThetaMinSiW)	abiotic_water.F90	198-198
+Si mineralization	wSiMinPaW	-	particulate_OM_Si mineralization	kSiMinPaW * uFunTmMinSiW * sSiPaW	wSiMinPaW = self%kSiMinPaW * uFunTmMinSiW * sSiPaW	abiotic_water.F90	202-202
+O2 processes	aCorO2BOD	-	correction_of_O2_demand_in_water_at_low_oxygen_conc.	sO2W / (hO2BOD + sO2W)	aCorO2BOD = sO2W / (self%hO2BOD + sO2W)	abiotic_water.F90	203-203
+P adsorption	aPAdsMaxW	-	max. P adsorption per g inorg. matter in water	cRelPAdsDWW+aCorO2BOD*cRelPAdsFeW*fFeDIMW+cRelPAdsAlW*fAlDIMW	aPAdsMaxW = self%cRelPAdsDWW+aCorO2BOD*self%cRelPAdsFeW*self%fFeDIMW+self%cRelPAdsAlW*self%fAlDIMW	abiotic_water.F90	210-210
+P adsorption	aKPAdsW	-	P adsorption affinity corrected for redox conditions	(1.0 - fRedMaxW * (1.0-aCorO2BOD)) * cKPAdsOxW	aKPAdsW = (1.0_rk - self%fRedMaxW * (1.0_rk-aCorO2BOD)) * self%cKPAdsOxW	abiotic_water.F90	211-211
+P adsorption	aPIsoAdsW	-	P adsorption isotherm onto inorg. matter in water	aPAdsMaxW * aKPAdsW * sPO4W / (1.0 + aKPAdsW * sPO4W)	aPIsoAdsW = aPAdsMaxW * aKPAdsW * sPO4W / (1.0_rk + aKPAdsW * sPO4W)	abiotic_water.F90	212-212
+P adsorption	aPEqIMW	-	equilibrium conc.	aPIsoAdsW * sDIMW	aPEqIMW = aPIsoAdsW * sDIMW	abiotic_water.F90	213-213
+P adsorption	wPSorpIMW	-	adsorption flux in water	kPSorpW * (aPEqIMW - sPAIMW)	wPSorpIMW = self%kPSorpW * (aPEqIMW - sPAIMW)	abiotic_water.F90	214-214
+Nitrification	aCorO2NitrW	-	oxygen correction for nitrification	sO2W*sO2W / (hO2Nitr*hO2Nitr + sO2W*sO2W)	aCorO2NitrW = sO2W*sO2W / (self%hO2Nitr*self%hO2Nitr + sO2W*sO2W)	abiotic_water.F90	218-218
+Nitrification	wNNitrW	-	nitrification flux	kNitrW * uFunTmNitr * aCorO2NitrW * sNH4W	wNNitrW = self%kNitrW * uFunTmNitr * aCorO2NitrW * sNH4W	abiotic_water.F90	219-219
+O2 processes	wO2NitrW	-	O2 flux due to nitrification	O2PerNH4W * molO2molN * wNNitrW	wO2NitrW = self%O2PerNH4W * molO2molN * wNNitrW	abiotic_water.F90	228-228
+O2 processes	cO2Sat	-	O2 saturation in water	uFunO2Sat(salt,uTm)	cO2Sat = uFunO2Sat(salt,uTm)	abiotic_water.F90	229-229
+O2 processes	pO2Sat	pct	O2 pct saturation in water	sO2W / cO2Sat * 100	pO2Sat = sO2W / cO2Sat * 100	abiotic_water.F90	230-230
+Fluxes	wDAbioIMW	-	DW inorganic matter flux in water	0.0	wDAbioIMW = 0.0_rk	abiotic_water.F90	234-234
+Fluxes	wSiAbioPaW	-	Si particulate OM flux in water	- wSiMinPaW	wSiAbioPaW = - wSiMinPaW	abiotic_water.F90	235-235
+Fluxes	wPAbioPO4W	-	PO4 flux in water	- wPSorpIMW	wPAbioPO4W = - wPSorpIMW	abiotic_water.F90	236-236
+Fluxes	wPAbioAIMW	-	P absorbed on inorganic matter flux in water	wPSorpIMW	wPAbioAIMW = wPSorpIMW	abiotic_water.F90	237-237
+Fluxes	wNAbioNH4W	-	NH4 flux in water	- wNNitrW	wNAbioNH4W = - wNNitrW	abiotic_water.F90	238-238
+Fluxes	wSiAbioSiO2W	-	SiO2 flux in water	wSiMinPaW	wSiAbioSiO2W = wSiMinPaW	abiotic_water.F90	239-239
+Fluxes	wNAbioNO3W	-	NO3 flux in water	wNNitrW	wNAbioNO3W = wNNitrW	abiotic_water.F90	240-240
+Fluxes	wO2AbioW	-	O2 flux in water	- wO2NitrW	wO2AbioW = - wO2NitrW	abiotic_water.F90	241-241
+Derivatives	sDIMW	-	ODE for inorganic matter	wDAbioIMW	_SET_ODE_(self%id_sDIMW,wDAbioIMW)	abiotic_water.F90	247-247
+Derivatives	sPO4W	-	ODE for phosphate	wPAbioPO4W	_SET_ODE_(self%id_sPO4W,wPAbioPO4W)	abiotic_water.F90	248-248
+Derivatives	sPAIMW	-	ODE for IM-adsorbed P	wPAbioAIMW	_SET_ODE_(self%id_sPAIMW,wPAbioAIMW)	abiotic_water.F90	249-249
+Derivatives	sNH4W	-	ODE for ammonium	wNAbioNH4W	_SET_ODE_(self%id_sNH4W,wNAbioNH4W)	abiotic_water.F90	250-250
+Derivatives	sNO3W	-	ODE for nitrate	wNAbioNO3W	_SET_ODE_(self%id_sNO3W,wNAbioNO3W)	abiotic_water.F90	251-251
+Derivatives	sSiO2W	-	ODE for silica dioxide	wSiAbioSiO2W	_SET_ODE_(self%id_sSiO2W,wSiAbioSiO2W)	abiotic_water.F90	252-252
+Derivatives	sO2W	-	ODE for oxygen	wO2AbioW	_SET_ODE_(self%id_sO2W,wO2AbioW)	abiotic_water.F90	253-253
+Derivatives	sSiPaW	-	ODE for particulate Si	wSiAbioPaW	_SET_ODE_(self%id_sSiPaW,wSiAbioPaW)	abiotic_water.F90	254-254
+Diagnostic variables	pO2Sat	pct	set diagnostic pO2Sat	pO2Sat	_SET_DIAGNOSTIC_(self%id_pO2Sat,pO2Sat)	abiotic_water.F90	258-258
+Diagnostic variables	TMdummy	-	set dummy diagnostic	0.0	_SET_DIAGNOSTIC_(self%id_TMdummy,0.0_rk)	abiotic_water.F90	262-262
+Diagnostic variables	BTdummy	-	set dummy diagnostic	0.0	_SET_DIAGNOSTIC_(self%id_BTdummy,0.0_rk)	abiotic_water.F90	263-263
+Diagnostic variables	chladummy	-	set dummy diagnostic	0.0	_SET_DIAGNOSTIC_(self%id_chladummy,0.0_rk)	abiotic_water.F90	264-264
+Diagnostic variables	aCovVegdummy	-	set dummy diagnostic	0.0	_SET_DIAGNOSTIC_(self%id_aCovVegdummy,0.0_rk)	abiotic_water.F90	265-265
+Diagnostic variables	aDSubVegdummy	-	set dummy diagnostic	0.0	_SET_DIAGNOSTIC_(self%id_aDSubVegdummy,0.0_rk)	abiotic_water.F90	266-266
+Diagnostic variables	afCovSurfVegdummy	-	set dummy diagnostic	0.0	_SET_DIAGNOSTIC_(self%id_afCovSurfVegdummy,0.0_rk)	abiotic_water.F90	267-267
+Fluxes	wSiMinPaW	-	diagnostic output rate Si particulate mineralization	wSiMinPaW	_SET_DIAGNOSTIC_(self%id_wSiMinPaW, wSiMinPaW)	abiotic_water.F90	272-272
+Fluxes	wPSorpIMW	-	diagnostic output rate P adsorped	wPSorpIMW	_SET_DIAGNOSTIC_(self%id_wPSorpIMW, wPSorpIMW)	abiotic_water.F90	273-273
+Fluxes	wNNitrW	-	diagnostic output rate nitrification	wNNitrW	_SET_DIAGNOSTIC_(self%id_wNNitrW, wNNitrW)	abiotic_water.F90	274-274
+Fluxes	wO2NitrW	-	diagnostic output rate O2 cons. by nitrification	wO2NitrW	_SET_DIAGNOSTIC_(self%id_wO2NitrW, wO2NitrW)	abiotic_water.F90	275-275
+Light limitation	extIM	-	light extinction from inorganic matter	cExtSpIM*sDIMW	extIM=self%cExtSpIM*sDIMW	abiotic_water.F90	300-300
+Light limitation	extIM	-	set light extinction	extIM	_SET_EXTINCTION_(extIM)	abiotic_water.F90	304-304
+Light limitation	extIM	-	set diagnostic extIM	extIM	_SET_DIAGNOSTIC_(self%id_extIM,extIM)	abiotic_water.F90	305-305
+Reaeration	uFunTmAer	-	temperature function of reaeration	uFunTmArrh(uTm,cThetaAer)	uFunTmAer = uFunTmArrh(uTm,self%cThetaAer)	abiotic_water.F90	332-332
+Reaeration	uO2Sat	-	oxygen saturation concentration	14.652 - 0.41022 * uTm + 0.007991 * uTm*uTm - 0.000077774 * uTm*uTm*uTm	uO2Sat = 14.652_rk - 0.41022 * uTm + 0.007991_rk * uTm*uTm - 0.000077774_rk * uTm*uTm*uTm	abiotic_water.F90	333-333
+Reaeration	kAer	-	reaeration coefficient	(0.727*((uVWind)**(0.5))-0.371*uVWind+0.0376*uVWind*uVWind)	kAer=(0.727_rk*((uVWind)**(0.5_rk))-0.371_rk*uVWind+0.0376_rk*uVWind*uVWind)	abiotic_water.F90	334-334
+Reaeration	aFunLemnAer	-	duckweed function of reaeration	1.0	aFunLemnAer = 1.0_rk	abiotic_water.F90	335-335
+Reaeration	tO2Aer	-	reaeration flux of O2 into the water	kAer * uFunTmAer * (uO2Sat - sO2W) * aFunLemnAer	tO2Aer = kAer * uFunTmAer * (uO2Sat - sO2W) * aFunLemnAer	abiotic_water.F90	336-336
+Reaeration	sO2W	-	surface exchange O2 reaeration	tO2Aer	_SET_SURFACE_EXCHANGE_(self%id_sO2W,tO2Aer/secs_pr_day)	abiotic_water.F90	340-340
+Reaeration	tO2Aer	-	horizontal diagnostic O2 reaeration	tO2Aer	_SET_HORIZONTAL_DIAGNOSTIC_(self%id_tO2Aer,tO2Aer/secs_pr_day)	abiotic_water.F90	341-341
+Reaeration	wind	-	horizontal diagnostic windspeed	uVWind	_SET_HORIZONTAL_DIAGNOSTIC_(self%id_wind,uVWind)	abiotic_water.F90	342-342
+Atmospheric deposition	sDIMW	-	surface exchange IM deposition	tDDepoIM	_SET_SURFACE_EXCHANGE_(self%id_sDIMW, self%tDDepoIM)	abiotic_water.F90	343-343
+Atmospheric deposition	sNH4W	-	surface exchange NH4 deposition	tNDepoNH4	_SET_SURFACE_EXCHANGE_(self%id_sNH4W, self%tNDepoNH4)	abiotic_water.F90	344-344
+Atmospheric deposition	sNO3W	-	surface exchange NO3 deposition	tNDepoNO3	_SET_SURFACE_EXCHANGE_(self%id_sNO3W, self%tNDepoNO3)	abiotic_water.F90	345-345
+Atmospheric deposition	sPO4W	-	surface exchange PO4 deposition	tPDepoPO4	_SET_SURFACE_EXCHANGE_(self%id_sPO4W, self%tPDepoPO4)	abiotic_water.F90	346-346
+Module constants	secs_pr_day	s/d	seconds per day	86400.0	real(rk),parameter :: secs_pr_day= 86400.0_rk	abiotic_sediment.F90	55-55
+Module constants	NearZero	-	near zero value	1e-33	real(rk),parameter :: NearZero=0.000000000000000000000000000000001_rk	abiotic_sediment.F90	56-56
+Module constants	molO2molC	mol/mol	molar O2 per mol C	2.6667	real(rk),parameter :: molO2molC=2.6667_rk	abiotic_sediment.F90	57-57
+Module constants	molO2molN	mol/mol	molar O2 per mol N	2.2857	real(rk),parameter :: molO2molN=2.2857_rk	abiotic_sediment.F90	58-58
+Module constants	molNmolC	mol/mol	molar N per mol C	1.1667	real(rk),parameter :: molNmolC=1.1667_rk	abiotic_sediment.F90	59-59
+Parameters	cDepthS	m	sediment depth	0.1	call self%get_parameter(self%cDepthS, 'cDepthS', 'm', 'sediment depth', default=0.1_rk)	abiotic_sediment.F90	76-76
+Parameters	fDepthDifS	-	nutrient diffusion distance as fraction of sediment depth	0.5	call self%get_parameter(self%fDepthDifS, 'fDepthDifS', '-', 'nutrient diffusion distance as fraction of sediment depth', default=0.5_rk)	abiotic_sediment.F90	77-77
+Parameters	bPorCorS	m3/m3	sediment porosity corrected for tortuosity	0.737275	call self%get_parameter(self%bPorCorS, 'bPorCorS', 'm3/m3', 'sediment porosity corrected for tortuosity', default=0.737275_rk)	abiotic_sediment.F90	78-78
+Parameters	O2PerNH4S	mol/mol	O2 used per NH4 nitrified	2.0	call self%get_parameter(self%O2PerNH4S, 'O2PerNH4S', 'mol/mol', 'O2 used per NH4 nitrified', default=2.0_rk)	abiotic_sediment.F90	80-80
+Parameters	kNitrS	1/d	nitrification rate constant at 20*C	1.2	call self%get_parameter(self%kNitrS, 'kNitrS', '1/d', 'nitrification rate constant at 20*C', default=1.2_rk, scale_factor =1.0_rk/secs_pr_day)	abiotic_sediment.F90	81-81
+Parameters	cThetaNitrS	1/e^*C	temperature coefficient for nitrification	1.03	call self%get_parameter(self%cThetaNitrS, 'cThetaNitrS', '1/e^*C', 'temperature coefficient for nitrification', default=1.03_rk)	abiotic_sediment.F90	82-82
+Parameters	NO3PerCS	mol/mol	NO3 denitrified per C mineralized	1.0	call self%get_parameter(self%NO3PerCS, 'NO3PerCS', 'mol/mol', 'NO3 denitrified per C mineralized', default=1.0_rk)	abiotic_sediment.F90	83-83
+Parameters	hNO3DenitS	mgN/l	quadratic half-sat. NO3 conc. for denitrification	0.5	call self%get_parameter(self%hNO3DenitS, 'hNO3DenitS', 'mgN/l', 'quadratic half-sat. NO3 conc. for denitrification', default=0.5_rk)	abiotic_sediment.F90	84-84
+Parameters	kPSorpS	1/d	P sorption rate constant	0.03	call self%get_parameter(self%kPSorpS, 'kPSorpS', '1/d', 'P sorption rate constant', default=0.03_rk, scale_factor=1.0_rk/secs_pr_day)	abiotic_sediment.F90	85-85
+Parameters	cRelPAdsDWS	gP/gDW	max. P adsorption per g DW	0.00003	call self%get_parameter(self%cRelPAdsDWS, 'cRelPAdsDWS', 'gP/gDW', 'max. P adsorption per g DW', default=0.00003_rk)	abiotic_sediment.F90	86-86
+Parameters	cRelPAdsFeS	gP/gFe	max. P adsorption per g Fe	0.06	call self%get_parameter(self%cRelPAdsFeS, 'cRelPAdsFeS', 'gP/gFe', 'max. P adsorption per g Fe', default=0.06_rk)	abiotic_sediment.F90	87-87
+Parameters	fFeDIM	gFe/gD	Fe content of inorganic matter	0.04	call self%get_parameter(self%fFeDIM, 'fFeDIM', 'gFe/gD', 'Fe content of inorganic matter', default=0.04_rk)	abiotic_sediment.F90	88-88
+Parameters	cRelPAdsAlS	gP/gAl	max. P adsorption per g Al	0.134	call self%get_parameter(self%cRelPAdsAlS, 'cRelPAdsAlS', 'gP/gAl', 'max. P adsorption per g Al', default=0.134_rk)	abiotic_sediment.F90	89-89
+Parameters	fAlDIMS	gAl/gD	Al content of inorganic matter	0.01	call self%get_parameter(self%fAlDIMS, 'fAlDIMS', 'gAl/gD', 'Al content of inorganic matter', default=0.01_rk)	abiotic_sediment.F90	90-90
+Parameters	fRedMaxS	-	max. reduction factor of P adsorption affinity	0.96	call self%get_parameter(self%fRedMaxS, 'fRedMaxS', '-', 'max. reduction factor of P adsorption affinity', default=0.96_rk)	abiotic_sediment.F90	91-91
+Parameters	cKPAdsOxS	m3/gP	P adsorption affinity at oxidized conditions	1.5	call self%get_parameter(self%cKPAdsOxS, 'cKPAdsOxS', 'm3/gP', 'P adsorption affinity at oxidized conditions', default=1.5_rk)	abiotic_sediment.F90	92-92
+Parameters	kPChemPO4	1/d	chemical PO4 loss rate	0.03	call self%get_parameter(self%kPChemPO4, 'kPChemPO4', '1/d', 'chemical PO4 loss rate', default=0.03_rk, scale_factor=1.0_rk/secs_pr_day)	abiotic_sediment.F90	93-93
+Parameters	coPO4Max	mgP/l	max. soluble reactive P conc. in pore water	1.4	call self%get_parameter(self%coPO4Max, 'coPO4Max', 'mgP/l', 'max. soluble reactive P conc. in pore water', default=1.4_rk)	abiotic_sediment.F90	94-94
+Parameters	bPorS	m3/m3	sediment porosity	0.58	call self%get_parameter(self%bPorS, 'bPorS', 'm3/m3', 'sediment porosity', default=0.58_rk)	abiotic_sediment.F90	95-95
+Parameters	cThetaDifO2	1/e^*C	temperature coefficient for O2 diffusion	1.01	call self%get_parameter(self%cThetaDifO2, 'cThetaDifO2', '1/e^*C', 'temperature coefficient for O2 diffusion', default=1.01_rk)	abiotic_sediment.F90	96-96
+Parameters	kO2Dif	m2/d	O2 diffusion constant at 20*C	0.00017	call self%get_parameter(self%kO2Dif, 'kO2Dif', 'm2/d', 'O2 diffusion constant at 20*C', default=0.00017_rk, scale_factor=1.0_rk/secs_pr_day)	abiotic_sediment.F90	97-97
+Parameters	cTurbDifO2	-	bioturbation factor for oxygen diffusion	5.0	call self%get_parameter(self%cTurbDifO2, 'cTurbDifO2', '-', 'bioturbation factor for oxygen diffusion', default=5.0_rk)	abiotic_sediment.F90	98-98
+Parameters	kDMinHum	1/d	humic decomposition constant at 20*C	0.00005	call self%get_parameter(self%kDMinHum, 'kDMinHum', '1/d', 'humic decomposition constant at 20*C', default=0.00005_rk, scale_factor=1.0_rk/secs_pr_day)	abiotic_sediment.F90	99-99
+Parameters	cThetaMinSiS	1/e^*C	temperature coefficient of SiO2 mineralization	1.074	call self%get_parameter(self%cThetaMinSiS, 'cThetaMinSiS', '1/e^*C', 'temperature coefficient of SiO2 mineralization', default=1.074_rk)	abiotic_sediment.F90	100-100
+Parameters	kSiMinPaS	1/d	SiPOM to SiO2 biodissolution constant at 20*C	0.03	call self%get_parameter(self%kSiMinPaS, 'kSiMinPaS', '1/d', 'SiPOM to SiO2 biodissolution constant at 20*C', default=0.03_rk, scale_factor=1.0_rk/secs_pr_day)	abiotic_sediment.F90	101-101
+Parameters	nPOM	-	number of benthic particulate OM instances	0	call self%get_parameter(self%nPOM, 'nPOM', '-', 'number of benthic particulate OM instances', default=0)	abiotic_sediment.F90	102-102
+Parameters	nDOM	-	number of benthic dissolved OM instances	0	call self%get_parameter(self%nDOM, 'nDOM', '-', 'number of benthic dissolved OM instances', default=0)	abiotic_sediment.F90	103-103
+Parameters	diagnostics	-	toggle diagnostic output	.false.	call self%get_parameter(self%diagnostics, 'diagnostics', '-', 'toggle diagnostic output', default=.false.)	abiotic_sediment.F90	105-105
+Parameters	hypsograph	-	indicate hypsograph presence/absence	-	call self%get_parameter(self%hypsograph, 'hypsograph', '-', 'indicate hypsograph presence/absence')	abiotic_sediment.F90	106-106
+State variables	sDIMS	g/m2	inorganic matter	initial_value=39611.3_rk	call self%register_state_variable(self%id_sDIMS, 'sDIMS', 'g/m2', 'inorganic matter', initial_value=39611.3_rk, minimum=10.0_rk)	abiotic_sediment.F90	110-110
+State variables	sSiPaS	g/m2	particulate Si	initial_value=1.82_rk	call self%register_state_variable(self%id_sSiPaS, 'sSiPaS', 'g/m2', 'particulate Si', initial_value=1.82_rk, minimum=0.0_rk)	abiotic_sediment.F90	111-111
+State variables	sSiO2S	g/m2	dissolved SiO2	initial_value=1.82_rk	call self%register_state_variable(self%id_sSiO2S, 'sSiO2S', 'g/m2', 'dissolved SiO2', initial_value=1.82_rk, minimum=0.0_rk)	abiotic_sediment.F90	112-112
+State variables	sPO4S	g/m2	phosphate	initial_value=0.182_rk	call self%register_state_variable(self%id_sPO4S, 'sPO4S', 'g/m2', 'phosphate', initial_value=0.182_rk, minimum=0.0_rk)	abiotic_sediment.F90	113-113
+State variables	sPAIMS	g/m2	absorbed phosphate	initial_value=17.99_rk	call self%register_state_variable(self%id_sPAIMS, 'sPAIMS', 'g/m2', 'absorbed phosphate', initial_value=17.99_rk, minimum=0.0_rk)	abiotic_sediment.F90	114-114
+State variables	sNH4S	g/m2	ammonium	initial_value=0.02_rk	call self%register_state_variable(self%id_sNH4S, 'sNH4S', 'g/m2', 'ammonium', initial_value=0.02_rk, minimum=0.0_rk)	abiotic_sediment.F90	115-115
+State variables	sNO3S	g/m2	nitrate	initial_value=0.002_rk	call self%register_state_variable(self%id_sNO3S, 'sNO3S', 'g/m2', 'nitrate', initial_value=0.002_rk, minimum=0.0_rk)	abiotic_sediment.F90	116-116
+State variables	O2ConsSed	g/m3	oxygen pool water	-	call self%register_state_dependency(self%id_O2ConsSed, 'oxygen_pool_water','g/m3', 'oxygen pool water')	abiotic_sediment.F90	118-118
+Diagnostic variables	afOxySed	-	fraction of aerobic sediment	-	call self%register_diagnostic_variable(self%id_afOxySed, 'afOxySed', '-', 'fraction of aerobic sediment', output=output_instantaneous, domain=domain_bottom, source=source_do_bottom)	abiotic_sediment.F90	120-120
+Diagnostic variables	aPEqIMS	-	equilibrium adsorbed PO4	-	call self%register_diagnostic_variable(self%id_aPEqIMS, 'aPEqIMS', '-', 'equilibrium adsorbed PO4', output=output_instantaneous, domain=domain_bottom, source=source_do_bottom)	abiotic_sediment.F90	121-121
+Diagnostic variables	tDAbioO2S	g/m2/d	O2 consumption	-	call self%register_diagnostic_variable(self%id_tDAbioO2S, 'tDAbioO2S', 'g/m2/d', 'O2 consumption', output=output_instantaneous, domain=domain_bottom, source=source_do_bottom)	abiotic_sediment.F90	122-122
+Diagnostic variables	tDAbioIMS	g/m2/s	IM ROC	-	call self%register_diagnostic_variable(self%id_tDAbioIMS, 'tDAbioIMS', 'g/m2/s', 'IM ROC', output=output_none, domain=domain_bottom, source=source_do_bottom)	abiotic_sediment.F90	123-123
+Diagnostic variables	bPorS	m3/m3	sediment porosity	-	call self%register_diagnostic_variable(self%id_bPorS, 'bPorS', 'm3/m3', 'sediment porosity', output=output_none, domain=domain_bottom, missing_value=self%bPorS, source=source_do_bottom)	abiotic_sediment.F90	125-125
+Diagnostic variables	bPorCorS	m3/m3	sediment porosity corrected for tortuosity	-	call self%register_diagnostic_variable(self%id_bPorCorS, 'bPorCorS', 'm3/m3', 'sediment porosity corrected for tortuosity', output=output_none, domain=domain_bottom, missing_value=self%bPorCorS, source=source_do_bottom)	abiotic_sediment.F90	126-126
+Diagnostic variables	cDepthS	m	sediment depth	-	call self%register_diagnostic_variable(self%id_cDepthS, 'cDepthS', 'm', 'sediment depth', output=output_none, domain=domain_bottom, missing_value=self%cDepthS, source=source_do_bottom)	abiotic_sediment.F90	127-127
+Diagnostic variables	fDepthDifS	m	diffusion distance as fraction of sediment depth	-	call self%register_diagnostic_variable(self%id_fDepthDifS, 'fDepthDifS', 'm', 'diffusion distance as fraction of sediment depth', output=output_none, domain=domain_bottom, missing_value=self%fDepthDifS, source=source_do_bottom)	abiotic_sediment.F90	128-128
+Diagnostic variables	tDPOMdummy	gDW/m2	dummy total sediment POM increase from biology	-	call self%register_diagnostic_variable(self%id_tDPOMdummy, 'tDPOMdummy', 'gDW/m2', 'dummy total sediment POM increase from biology', domain=domain_bottom, source=source_do_bottom)	abiotic_sediment.F90	129-129
+Diagnostic variables	bot_pel_conv	-	current conversion between m-2 and m-3	-	call self%register_diagnostic_variable(self%id_bot_pel_conv_out, 'bot_pel_conv', '-', 'current conversion between m-2 and m-3', output=output_none, domain=domain_bottom, source=source_do_bottom)	abiotic_sediment.F90	146-146
+Diagnostic variables	tPChemPO4	g/m2/s	rate chem. loss of diss. P from pore water	-	call self%register_diagnostic_variable(self%id_tPChemPO4, 'tPChemPO4', 'g/m2/s', 'rate chem. loss of diss. P from pore water', output=output_instantaneous, domain=domain_bottom, source=source_do_bottom)	abiotic_sediment.F90	149-149
+Diagnostic variables	tPSorpIMS	g/m2/s	rate P sorped to IM	-	call self%register_diagnostic_variable(self%id_tPSorpIMS, 'tPSorpIMS', 'g/m2/s', 'rate P sorped to IM', output=output_instantaneous, domain=domain_bottom, source=source_do_bottom)	abiotic_sediment.F90	150-150
+Diagnostic variables	tNNitrS	g/m2/s	rate nitrification	-	call self%register_diagnostic_variable(self%id_tNNitrS, 'tNNitrS', 'g/m2/s', 'rate nitrification', output=output_instantaneous, domain=domain_bottom, source=source_do_bottom)	abiotic_sediment.F90	151-151
+Diagnostic variables	tNDenitS	g/m2/s	rate denitrification	-	call self%register_diagnostic_variable(self%id_tNDenitS, 'tNDenitS', 'g/m2/s', 'rate denitrification', output=output_instantaneous, domain=domain_bottom, source=source_do_bottom)	abiotic_sediment.F90	152-152
+Diagnostic variables	tSiMinPaS	g/m2/s	rate Si particulate mineralization	-	call self%register_diagnostic_variable(self%id_tSiMinPaS, 'tSiMinPaS', 'g/m2/s', 'rate Si particulate mineralization', output=output_instantaneous, domain=domain_bottom, source=source_do_bottom)	abiotic_sediment.F90	153-153
+Diagnostic variables	fPEqIMS	-	fraction of PAIMS in equilibrium	-	call self%register_diagnostic_variable(self%id_fPEqIMS, 'fPEqIMS', '-', 'fraction of PAIMS in equilibrium', output=output_instantaneous, domain=domain_bottom, source=source_do_bottom)	abiotic_sediment.F90	154-154
+Dependencies	uTm	-	temperature	-	call self%register_dependency(self%id_uTm, standard_variables%temperature)	abiotic_sediment.F90	157-157
+Dependencies	depth	-	bottom_depth	-	call self%register_dependency(self%id_depth, standard_variables%bottom_depth)	abiotic_sediment.F90	158-158
+Dependencies	dz	-	cell_thickness	-	call self%register_dependency(self%id_dz, standard_variables%cell_thickness)	abiotic_sediment.F90	159-159
+Dependencies	bot_pel_conv	-	bot_pel_conv	-	call self%register_dependency(self%id_bot_pel_conv, type_bulk_standard_variable(name='bot_pel_conv',units='-'))	abiotic_sediment.F90	161-161
+Auxiliary variables	oNO3S	-	conc. of dissolved NO3 in interstitial water	max(0.0, sNO3S / cDepthS / bPorS)	oNO3S = max(0.0_rk, sNO3S / self%cDepthS / self%bPorS)	abiotic_sediment.F90	218-218
+Auxiliary variables	oPO4S	-	conc. of dissolved PO4 in interstitial water	max(0.0, sPO4S / cDepthS / bPorS)	oPO4S = max(0.0_rk, sPO4S / self%cDepthS / self%bPorS)	abiotic_sediment.F90	220-220
+Temperature functions	uFunTmDifO2	-	temperature function of O2 diffusion	uFunTmArrh(uTm,cThetaDifO2)	uFunTmDifO2= uFunTmArrh(uTm,self%cThetaDifO2)	abiotic_sediment.F90	226-226
+O2 processes	aDepthDif	-	average diffusion distance	max(NearZero, fDepthDifS*cDepthS)	aDepthDif= max(NearZero, self%fDepthDifS*self%cDepthS)	abiotic_sediment.F90	230-230
+O2 processes	akO2DifCor	-	corrected O2 diffusion coefficient	kO2Dif*uFunTmDifO2*cTurbDifO2*bPorCorS	akO2DifCor=self%kO2Dif*uFunTmDifO2*self%cTurbDifO2*self%bPorCorS	abiotic_sediment.F90	231-231
+O2 processes	tO2Dif	-	O2 diffusion (water to sediment)	akO2DifCor*sO2W/aDepthDif	tO2Dif= akO2DifCor*sO2W/aDepthDif	abiotic_sediment.F90	232-232
+Temperature functions	uFunTmNitr	-	Temperature dependence of nitrification	uFunTmArrh(uTm,cThetaNitrS)	uFunTmNitr=uFunTmArrh(uTm,self%cThetaNitrS)	abiotic_sediment.F90	238-238
+Nitrification	tNNitrS_base	-	potential nitrification (before oxygen)	kNitrS*uFunTmNitr*sNH4S	tNNitrS_base=self%kNitrS*uFunTmNitr*sNH4S	abiotic_sediment.F90	239-239
+O2 processes	tTotSOD	-	calculate total sediment oxygen demand	max(NearZero, (molO2molC*(sum(tCTrans_POM) + sum(tCTrans_DOM)) + O2PerNH4S*molO2molN*tNNitrS_base) / cDepthS)	tTotSOD=max(NearZero, (molO2molC*(sum(tCTrans_POM) + sum(tCTrans_DOM)) + self%O2PerNH4S*molO2molN*tNNitrS_base) / self%cDepthS)	abiotic_sediment.F90	243-244
+O2 processes	aDepthOxySed	-	calculate oxygen penetration depth	((2.0 * sO2W * akO2DifCor / tTotSOD) )** (0.5)	aDepthOxySed=(((2.0_rk * sO2W * akO2DifCor / tTotSOD) )** (0.5_rk))	abiotic_sediment.F90	245-245
+O2 processes	afOxySed	-	calculate fraction aerobic sediment	min(1.0, max(0.0, aDepthOxySed/cDepthS))	afOxySed=min(1.0, max(0.0_rk, aDepthOxySed/self%cDepthS))	abiotic_sediment.F90	246-246
+O2 processes	tO2MinTOMS	-	calculate total oxygen consumption by TOM	molO2molC*afOxySed*(sum(tCTrans_POM) + sum(tCTrans_DOM))	tO2MinTOMS=molO2molC*afOxySed*(sum(tCTrans_POM) + sum(tCTrans_DOM))	abiotic_sediment.F90	247-247
+Denitrification	tCDenitS	-	calculate C mineralization flux by denitrification	oNO3S*oNO3S/(hNO3DenitS*hNO3DenitS+oNO3S*oNO3S)*(1.0-afOxySed)*(sum(tCTrans_POM) + sum(tCTrans_DOM))	tCDenitS=oNO3S*oNO3S/(self%hNO3DenitS*self%hNO3DenitS+oNO3S*oNO3S)*(1.0-afOxySed)*(sum(tCTrans_POM) + sum(tCTrans_DOM))	abiotic_sediment.F90	251-252
+Denitrification	tNDenitS	-	calculate N denitrification flux	NO3PerCS*molNmolC*tCDenitS	tNDenitS=self%NO3PerCS*molNmolC*tCDenitS	abiotic_sediment.F90	253-253
+Nitrification	tNNitrS	-	calculate nitrification flux	afOxySed*tNNitrS_base	tNNitrS=afOxySed*tNNitrS_base	abiotic_sediment.F90	257-257
+Nitrification	tO2NitrS	-	calculate O2 flux due to nitrification	O2PerNH4S*molO2molN*tNNitrS	tO2NitrS=self%O2PerNH4S*molO2molN*tNNitrS	abiotic_sediment.F90	258-258
+P adsorption	aPAdsMaxS	-	calculate max. P adsorption per g of inorg. matter	cRelPAdsDWS+afOxySed*cRelPAdsFeS*fFeDIM+cRelPAdsAlS*fAlDIMS	aPAdsMaxS =self%cRelPAdsDWS+afOxySed*self%cRelPAdsFeS*self%fFeDIM+self%cRelPAdsAlS*self%fAlDIMS	abiotic_sediment.F90	262-262
+P adsorption	aKPAdsS	-	calculate P adsorption affinity corrected for redox conditions	(1.0-fRedMaxS*(1.0-afOxySed))*cKPAdsOxS	aKPAdsS=(1.0_rk-self%fRedMaxS*(1.0_rk-afOxySed))*self%cKPAdsOxS	abiotic_sediment.F90	263-263
+P adsorption	aPIsoAdsS	-	calculate P adsorption isotherm onto inorg. matter in sediment	aPAdsMaxS*aKPAdsS*oPO4S/(1.0+aKPAdsS*oPO4S)	aPIsoAdsS=aPAdsMaxS*aKPAdsS*oPO4S/(1.0_rk+aKPAdsS*oPO4S)	abiotic_sediment.F90	264-264
+P adsorption	aPEqIMS	-	calculate equilibrium amount	aPIsoAdsS * sDIMS	aPEqIMS = aPIsoAdsS * sDIMS	abiotic_sediment.F90	265-265
+P adsorption	fPEqIMS	-	calculate fraction of PAIMS is in equilibrium	sPAIMS / max(aPEqIMS, NearZero)	fPEqIMS = sPAIMS / max(aPEqIMS, NearZero)	abiotic_sediment.F90	266-266
+P adsorption	tPSorpIMS	-	calculate sorption	kPSorpS*(aPEqIMS-sPAIMS)	tPSorpIMS=self%kPSorpS*(aPEqIMS-sPAIMS)	abiotic_sediment.F90	267-267
+P adsorption	tPChemPO4	-	calculate chem. loss of dissolved P from pore water	max( 0.0, kPChemPO4*(oPO4S-coPO4Max))	tPChemPO4=max( 0.0_rk,self%kPChemPO4*(oPO4S-self%coPO4Max))	abiotic_sediment.F90	268-268
+Si mineralization	uFunTmMinSiS	-	remineralization Si temperature function	uFunTmArrh(uTm,cThetaMinSiS)	uFunTmMinSiS = uFunTmArrh(uTm,self%cThetaMinSiS)	abiotic_sediment.F90	274-274
+Si mineralization	tSiMinPaS	-	calculate upper sediment Si decomposition	kSiMinPaS*uFunTmMinSiS*sSiPaS	tSiMinPaS = self%kSiMinPaS*uFunTmMinSiS*sSiPaS	abiotic_sediment.F90	275-275
+Fluxes	tDAbioIMS	-	total ROC of IM in sediment	0.0	tDAbioIMS = 0.0_rk	abiotic_sediment.F90	281-281
+Fluxes	tPAbioPO4S	-	total ROC of PO4 in the sediment	- tPSorpIMS - tPChemPO4	tPAbioPO4S = - tPSorpIMS - tPChemPO4	abiotic_sediment.F90	282-282
+Fluxes	tPAbioAIMS	-	total ROC of absorbed P in the sediment	tPSorpIMS	tPAbioAIMS = tPSorpIMS	abiotic_sediment.F90	283-283
+Fluxes	tNAbioNH4S	-	total ROC of NH4 in the sediment	- tNNitrS	tNAbioNH4S = - tNNitrS	abiotic_sediment.F90	284-284
+Fluxes	tNAbioNO3S	-	total ROC of NO3 in the sediment	tNNitrS - tNDenitS	tNAbioNO3S = tNNitrS - tNDenitS	abiotic_sediment.F90	285-285
+Fluxes	tSiAbioPaS	-	total ROC of POM Si in the sediment	- tSiMinPaS	tSiAbioPaS = - tSiMinPaS	abiotic_sediment.F90	286-286
+Fluxes	tSiO2AbioS	-	total ROC of SiO2 in the sediment	tSiMinPaS	tSiO2AbioS = tSiMinPaS	abiotic_sediment.F90	287-287
+Auxiliary variables	bot_pel_conv	-	conversion factor hypsograph case	1.0/bot_pel_conv	bot_pel_conv = 1.0_rk/bot_pel_conv	abiotic_sediment.F90	293-293
+Auxiliary variables	bot_pel_conv	-	conversion factor non-hypsograph case	1.0/bot_pel_conv	bot_pel_conv = 1.0_rk/bot_pel_conv	abiotic_sediment.F90	296-296
+Derivatives	sDIMS	-	bottom ODE for inorganic matter	tDAbioIMS	_SET_BOTTOM_ODE_(self%id_sDIMS,tDAbioIMS)	abiotic_sediment.F90	304-304
+Derivatives	sSiPaS	-	bottom ODE for particulate Si	tSiAbioPaS	_SET_BOTTOM_ODE_(self%id_sSiPaS,tSiAbioPaS)	abiotic_sediment.F90	305-305
+Derivatives	sNH4S	-	bottom ODE for ammonium	tNAbioNH4S	_SET_BOTTOM_ODE_(self%id_sNH4S,tNAbioNH4S)	abiotic_sediment.F90	306-306
+Derivatives	sNO3S	-	bottom ODE for nitrate	tNAbioNO3S	_SET_BOTTOM_ODE_(self%id_sNO3S,tNAbioNO3S)	abiotic_sediment.F90	307-307
+Derivatives	sPO4S	-	bottom ODE for phosphate	tPAbioPO4S	_SET_BOTTOM_ODE_(self%id_sPO4S,tPAbioPO4S)	abiotic_sediment.F90	308-308
+Derivatives	sPAIMS	-	bottom ODE for absorbed phosphate	tPAbioAIMS	_SET_BOTTOM_ODE_(self%id_sPAIMS,tPAbioAIMS)	abiotic_sediment.F90	309-309
+Derivatives	sSiO2S	-	bottom ODE for dissolved SiO2	tSiO2AbioS	_SET_BOTTOM_ODE_(self%id_sSiO2S,tSiO2AbioS)	abiotic_sediment.F90	310-310
+Bottom exchange	O2ConsSed	-	bottom exchange O2 consumption	- tO2MinTOMS - tO2NitrS	_SET_BOTTOM_EXCHANGE_(self%id_O2ConsSed, - tO2MinTOMS - tO2NitrS)	abiotic_sediment.F90	314-314
+Diagnostic variables	afOxySed	-	set diagnostic fraction aerobic sediment	afOxySed	_SET_HORIZONTAL_DIAGNOSTIC_(self%id_afOxySed,afOxySed)	abiotic_sediment.F90	320-320
+Diagnostic variables	aPEqIMS	-	set diagnostic equilibrium adsorbed PO4	aPEqIMS	_SET_HORIZONTAL_DIAGNOSTIC_(self%id_aPEqIMS,aPEqIMS)	abiotic_sediment.F90	321-321
+Diagnostic variables	tDAbioIMS	-	set diagnostic IM ROC	tDAbioIMS	_SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDAbioIMS,tDAbioIMS)	abiotic_sediment.F90	325-325
+Diagnostic variables	tDAbioO2S	g/m2/d	set diagnostic O2 consumption	(-tO2MinTOMS - tO2NitrS)	_SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDAbioO2S,(-tO2MinTOMS - tO2NitrS)*secs_pr_day)	abiotic_sediment.F90	326-326
+Diagnostic variables	tDPOMdummy	-	set dummy diagnostic	0.0	_SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDPOMdummy,0.0_rk)	abiotic_sediment.F90	331-331
+Fluxes	tPChemPO4	-	diagnostic output rate chem. loss of diss. P	tPChemPO4	_SET_HORIZONTAL_DIAGNOSTIC_(self%id_tPChemPO4, tPChemPO4)	abiotic_sediment.F90	336-336
+Fluxes	tPSorpIMS	-	diagnostic output rate P sorped to IM	tPSorpIMS	_SET_HORIZONTAL_DIAGNOSTIC_(self%id_tPSorpIMS, tPSorpIMS)	abiotic_sediment.F90	337-337
+Fluxes	tNNitrS	-	diagnostic output rate nitrification	tNNitrS	_SET_HORIZONTAL_DIAGNOSTIC_(self%id_tNNitrS, tNNitrS)	abiotic_sediment.F90	338-338
+Fluxes	tNDenitS	-	diagnostic output rate denitrification	tNDenitS	_SET_HORIZONTAL_DIAGNOSTIC_(self%id_tNDenitS, tNDenitS)	abiotic_sediment.F90	339-339
+Fluxes	tSiMinPaS	-	diagnostic output rate Si particulate mineralization	tSiMinPaS	_SET_HORIZONTAL_DIAGNOSTIC_(self%id_tSiMinPaS, tSiMinPaS)	abiotic_sediment.F90	340-340
+Diagnostic variables	fPEqIMS	-	diagnostic output fraction of PAIMS in equilibrium	fPEqIMS	_SET_HORIZONTAL_DIAGNOSTIC_(self%id_fPEqIMS, fPEqIMS)	abiotic_sediment.F90	341-341

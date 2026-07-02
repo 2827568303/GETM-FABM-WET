@@ -1,0 +1,6 @@
+# The fortran modules provided by this target.
+provides
+ bb_filter_feeder.mod
+ bb_lorenz63.mod
+ bb_model_library.mod
+ bb_passive.mod

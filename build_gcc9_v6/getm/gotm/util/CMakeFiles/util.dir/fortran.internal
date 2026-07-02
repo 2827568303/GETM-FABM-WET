@@ -1,0 +1,8 @@
+# The fortran modules provided by this target.
+provides
+ eqstate.mod
+ gotm_compilation.mod
+ gotm_version.mod
+ mtridiagonal.mod
+ time.mod
+ util.mod

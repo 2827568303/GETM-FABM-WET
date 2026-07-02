@@ -1,0 +1,158 @@
+! Luomahu Lake - GETM-FABM-WET configuration
+
+&param
+    dryrun       = .false.
+    runid        = 'LUOMAHU_WET'
+    title        = 'Luomahu Lake GETM-FABM-WET'
+    parallel     = .false.
+    runtype      = 4
+    hotstart     = .false.
+    use_epoch    = .false.
+    save_initial = .false.
+/
+
+&time
+    timestep     = 30.0
+    timefmt      = 2
+    start        = '2020-01-01 00:00:00'
+    stop         = '2020-01-31 00:00:00'
+/
+
+&domain
+    vert_cord    = 1
+    maxdepth = 25.0
+    bathy_format = 2
+    bathymetry   = 'bathymetry.nc'
+    f_plane      = .true.
+    il = 1
+    ih = 44
+    jl = 1
+    jh = 54
+    crit_depth = 1.5
+    min_depth = 0.5
+    kdum         = 5
+    z0_method    = 0
+    z0_const     = 0.001
+    check_cfl    = .false.
+/
+
+&meteo
+    metforcing   = .false.
+    met_method   = 1
+    tx           = 0.0
+    ty           = 0.0
+    swr_const    = -100.0
+    shf_const    = 0.0
+/
+
+&rivers
+    river_method = 1
+/
+
+&m2d
+    elev_method = 1
+    elev_const  = 0.0
+    MM = 2376
+    vel2d_adv_split = 1
+    vel2d_adv_hor   = 1
+    Am          = 1.0
+    An_method   = 0
+    An_const    = 0.001
+/
+
+&m3d
+    M = 10
+    cnpar = 1.0
+    cord_relax = 0.0
+    adv_ver_iterations = 1
+    vel3d_adv_split = 1
+    vel3d_adv_hor = 1
+    vel3d_adv_ver = 1
+    turb_adv_split = 1
+    turb_adv_hor = 1
+    turb_adv_ver = 1
+    calc_temp = .true.
+    calc_salt = .false.
+    avmback = 0.0
+    avhback = 0.0
+    ip_method = 1
+    ip_ramp = -1
+    vel_check = 0
+    min_vel = 0.0
+    max_vel = 0.0
+    bdy3d = .false.
+    bdyfmt_3d = 1
+    bdy3d_ramp = 0
+    bdyfile_3d = ' '
+    bdy3d_tmrlx = .false.
+    bdy3d_tmrlx_ucut = 0.0
+    bdy3d_tmrlx_max = 0.0
+    bdy3d_tmrlx_min = 0.0
+/
+
+&temp
+    temp_method = 1
+    temp_const = 5.0
+    temp_adv_split = 1
+    temp_adv_hor = 1
+    temp_adv_ver = 1
+    temp_AH = -1.0
+    attenuation_method = 0
+    A_const = 0.6
+    g1_const = 0.5
+    g2_const = 20.0
+    swr_bot_refl_frac = 0.0
+    swr_min_bot_frac = 0.0
+    temp_check = 0
+    min_temp = -2.0
+    max_temp = 40.0
+/
+
+&eqstate
+    eqstate_method = 1
+    T0 = 10.0
+    S0 = 35.0
+    p0 = 0.0
+    dtr0 = 0.0002
+    dsr0 = 0.0008
+/
+
+&io_spec
+    out_fmt = 2
+    hotin_fmt = 2
+    hotout_fmt = 2
+    save_metrics = .false.
+    save_masks = .false.
+    save_2d = .true.
+    save_3d = .true.
+    save_vel = .true.
+    destag = .false.
+    save_strho = .true.
+    save_s = .false.
+    save_t = .true.
+    save_rho = .false.
+    save_rad = .false.
+    save_turb = .true.
+    save_tke = .true.
+    save_eps = .true.
+    save_num = .true.
+    save_nuh = .true.
+    save_ss_nn = .false.
+    save_taub = .false.
+    first_2d = 1
+    step_2d = 2880
+    sync_2d = 2880
+    first_3d = 1
+    step_3d = 2880
+    sync_3d = 2880
+    save_meteo = .false.
+    save_numerical_analyses = .false.
+/
+
+&getm_fabm
+    fabm_config = 'fabm.yaml'
+    fabm = .true.
+/
+&diagnostics
+    diagnostics = .false.
+/

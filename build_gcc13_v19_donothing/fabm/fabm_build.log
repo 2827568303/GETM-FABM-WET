@@ -1,0 +1,248 @@
+[  2%] Built target yaml
+[  9%] Built target fabm_base
+[ 10%] Built target fabm_models_klimacampus
+[ 10%] Built target fabm_models_hzg
+[ 13%] Built target fabm_models_iow
+[ 15%] Built target fabm_models_metu
+[ 15%] Built target fabm_models_msi
+[ 18%] Built target fabm_models_au
+[ 22%] Built target fabm_models_bb
+[ 40%] Built target fabm_models_aed
+[ 44%] Built target fabm_models_gotm
+[ 54%] Built target fabm_models_jrc
+[ 57%] Built target fabm_models_examples
+[ 59%] Built target fabm_models_pml
+[ 63%] Built target fabm_models_selma
+[ 68%] Built target fabm_models_su
+[ 76%] Built target fabm_models_niva
+[ 80%] Built target fabm_models_akvaplan
+[ 81%] Building Fortran object models/wet/src/CMakeFiles/fabm_models_wet.dir/fish.F90.o
+[ 82%] Building Fortran object models/wet/src/CMakeFiles/fabm_models_wet.dir/om_pool.F90.o
+[ 83%] Building Fortran object models/wet/src/CMakeFiles/fabm_models_wet.dir/phytoplankton.F90.o
+[ 83%] Building Fortran object models/wet/src/CMakeFiles/fabm_models_wet.dir/sediment_exchange.F90.o
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:357:41:
+
+  357 | subroutine get_vertical_movement(self, _ARGUMENTS_VERTICAL_MOVEMENT_)
+      |                                         1
+Error: Invalid character in name at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:358:44:
+
+  358 |    class (type_wet_fish), intent(in) :: self
+      |                                            1
+Error: Unexpected data declaration statement in CONTAINS section at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:359:5:
+
+  359 |    _DECLARE_ARGUMENTS_VERTICAL_MOVEMENT_
+      |     1
+Error: Invalid character in name at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:360:32:
+
+  360 |    real(rk) :: uTm, sDFi, oxygen
+      |                                1
+Error: Unexpected data declaration statement in CONTAINS section at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:361:25:
+
+  361 |    _LOOP_BEGIN_
+      |                         1
+Error: Symbol ‘environment’ at (1) has no IMPLICIT type
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:362:32:
+
+  362 |       vertical_movement = 0.0_rk
+      |                                1
+Error: Unexpected assignment statement in CONTAINS section at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:363:6:
+
+  363 |    _LOOP_END_
+      |      1
+Error: Expecting END MODULE statement at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:364:3:
+
+  364 | end subroutine get_vertical_movement
+      |   1
+Error: Expecting END MODULE statement at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:61:15:
+
+   61 |       procedure :: check_state
+      |               1
+Error: Argument mismatch for the overriding procedure ‘check_state’ at (1): INTENT mismatch in argument 'self'
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:60:15:
+
+   60 |       procedure :: get_vertical_movement
+      |               1
+Error: ‘get_vertical_movement’ must be a module procedure or an external procedure with an explicit interface at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:153:12:
+
+  153 |    call self%register_horizontal_dependency(self%id_bot_pel_conv,type_bulk_standard_variable(name='bot_pel_conv',units='m-1'))
+      |            1
+Error: Found no matching specific binding for the call to the GENERIC ‘register_horizontal_dependency’ at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:155:88:
+
+  155 |    call self%register_global_dependency(self%id_Day, type_global_standard_variable(name='day',units='d'))
+      |                                                                                        1
+Error: Keyword argument requires explicit interface for procedure ‘type_global_standard_variable’ at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:155:53:
+
+  155 |    call self%register_global_dependency(self%id_Day, type_global_standard_variable(name='day',units='d'))
+      |                                                     1
+Error: Function ‘type_global_standard_variable’ at (1) has no IMPLICIT type
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:155:88:
+
+  155 |    call self%register_global_dependency(self%id_Day, type_global_standard_variable(name='day',units='d'))
+      |                                                                                        1
+Error: Keyword argument requires explicit interface for procedure ‘type_global_standard_variable’ at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:155:53:
+
+  155 |    call self%register_global_dependency(self%id_Day, type_global_standard_variable(name='day',units='d'))
+      |                                                     1
+Error: Function ‘type_global_standard_variable’ at (1) has no IMPLICIT type
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:155:88:
+
+  155 |    call self%register_global_dependency(self%id_Day, type_global_standard_variable(name='day',units='d'))
+      |                                                                                        1
+Error: Keyword argument requires explicit interface for procedure ‘type_global_standard_variable’ at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:155:53:
+
+  155 |    call self%register_global_dependency(self%id_Day, type_global_standard_variable(name='day',units='d'))
+      |                                                     1
+Error: Function ‘type_global_standard_variable’ at (1) has no IMPLICIT type
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:155:12:
+
+  155 |    call self%register_global_dependency(self%id_Day, type_global_standard_variable(name='day',units='d'))
+      |            1
+Error: Found no matching specific binding for the call to the GENERIC ‘register_global_dependency’ at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:334:88:
+
+  334 |          call self%register_model_dependency(self%id_PRED_D(i_pred),'PRED'//trim(index))
+      |                                                                                        1
+Error: Type mismatch in argument ‘id’ at (1); passed TYPE(type_state_variable_id) to TYPE(type_model_id)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:336:18:
+
+  336 |          call self%request_coupling_to_model(self%id_FiSt_D(i_pred),self%id_PRED_D(i_pred),'stress_D')
+      |                  1
+Error: Found no matching specific binding for the call to the GENERIC ‘request_coupling_to_model’ at (1)
+make[2]: *** [models/wet/src/CMakeFiles/fabm_models_wet.dir/build.make:153: models/wet/src/CMakeFiles/fabm_models_wet.dir/fish.F90.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [CMakeFiles/Makefile2:935: models/wet/src/CMakeFiles/fabm_models_wet.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2
+[  7%] Built target fabm_base
+[  9%] Built target yaml
+[ 27%] Built target fabm_models_aed
+[ 28%] Built target fabm_models_hzg
+[ 31%] Built target fabm_models_iow
+[ 31%] Built target fabm_models_klimacampus
+[ 32%] Built target fabm_models_metu
+[ 33%] Built target fabm_models_msi
+[ 36%] Built target fabm_models_au
+[ 40%] Built target fabm_models_bb
+[ 50%] Built target fabm_models_examples
+[ 54%] Built target fabm_models_gotm
+[ 57%] Built target fabm_models_jrc
+[ 59%] Built target fabm_models_pml
+[ 63%] Built target fabm_models_selma
+[ 68%] Built target fabm_models_su
+[ 76%] Built target fabm_models_niva
+[ 80%] Built target fabm_models_akvaplan
+[ 81%] Building Fortran object models/wet/src/CMakeFiles/fabm_models_wet.dir/fish.F90.o
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:357:41:
+
+  357 | subroutine get_vertical_movement(self, _ARGUMENTS_VERTICAL_MOVEMENT_)
+      |                                         1
+Error: Invalid character in name at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:358:44:
+
+  358 |    class (type_wet_fish), intent(in) :: self
+      |                                            1
+Error: Unexpected data declaration statement in CONTAINS section at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:359:5:
+
+  359 |    _DECLARE_ARGUMENTS_VERTICAL_MOVEMENT_
+      |     1
+Error: Invalid character in name at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:360:32:
+
+  360 |    real(rk) :: uTm, sDFi, oxygen
+      |                                1
+Error: Unexpected data declaration statement in CONTAINS section at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:361:25:
+
+  361 |    _LOOP_BEGIN_
+      |                         1
+Error: Symbol ‘environment’ at (1) has no IMPLICIT type
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:362:32:
+
+  362 |       vertical_movement = 0.0_rk
+      |                                1
+Error: Unexpected assignment statement in CONTAINS section at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:363:6:
+
+  363 |    _LOOP_END_
+      |      1
+Error: Expecting END MODULE statement at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:364:3:
+
+  364 | end subroutine get_vertical_movement
+      |   1
+Error: Expecting END MODULE statement at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:61:15:
+
+   61 |       procedure :: check_state
+      |               1
+Error: Argument mismatch for the overriding procedure ‘check_state’ at (1): INTENT mismatch in argument 'self'
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:60:15:
+
+   60 |       procedure :: get_vertical_movement
+      |               1
+Error: ‘get_vertical_movement’ must be a module procedure or an external procedure with an explicit interface at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:153:12:
+
+  153 |    call self%register_horizontal_dependency(self%id_bot_pel_conv,type_bulk_standard_variable(name='bot_pel_conv',units='m-1'))
+      |            1
+Error: Found no matching specific binding for the call to the GENERIC ‘register_horizontal_dependency’ at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:155:88:
+
+  155 |    call self%register_global_dependency(self%id_Day, type_global_standard_variable(name='day',units='d'))
+      |                                                                                        1
+Error: Keyword argument requires explicit interface for procedure ‘type_global_standard_variable’ at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:155:53:
+
+  155 |    call self%register_global_dependency(self%id_Day, type_global_standard_variable(name='day',units='d'))
+      |                                                     1
+Error: Function ‘type_global_standard_variable’ at (1) has no IMPLICIT type
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:155:88:
+
+  155 |    call self%register_global_dependency(self%id_Day, type_global_standard_variable(name='day',units='d'))
+      |                                                                                        1
+Error: Keyword argument requires explicit interface for procedure ‘type_global_standard_variable’ at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:155:53:
+
+  155 |    call self%register_global_dependency(self%id_Day, type_global_standard_variable(name='day',units='d'))
+      |                                                     1
+Error: Function ‘type_global_standard_variable’ at (1) has no IMPLICIT type
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:155:88:
+
+  155 |    call self%register_global_dependency(self%id_Day, type_global_standard_variable(name='day',units='d'))
+      |                                                                                        1
+Error: Keyword argument requires explicit interface for procedure ‘type_global_standard_variable’ at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:155:53:
+
+  155 |    call self%register_global_dependency(self%id_Day, type_global_standard_variable(name='day',units='d'))
+      |                                                     1
+Error: Function ‘type_global_standard_variable’ at (1) has no IMPLICIT type
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:155:12:
+
+  155 |    call self%register_global_dependency(self%id_Day, type_global_standard_variable(name='day',units='d'))
+      |            1
+Error: Found no matching specific binding for the call to the GENERIC ‘register_global_dependency’ at (1)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:334:88:
+
+  334 |          call self%register_model_dependency(self%id_PRED_D(i_pred),'PRED'//trim(index))
+      |                                                                                        1
+Error: Type mismatch in argument ‘id’ at (1); passed TYPE(type_state_variable_id) to TYPE(type_model_id)
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/wet/src/fish.F90:336:18:
+
+  336 |          call self%request_coupling_to_model(self%id_FiSt_D(i_pred),self%id_PRED_D(i_pred),'stress_D')
+      |                  1
+Error: Found no matching specific binding for the call to the GENERIC ‘request_coupling_to_model’ at (1)
+make[2]: *** [models/wet/src/CMakeFiles/fabm_models_wet.dir/build.make:153: models/wet/src/CMakeFiles/fabm_models_wet.dir/fish.F90.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:935: models/wet/src/CMakeFiles/fabm_models_wet.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2

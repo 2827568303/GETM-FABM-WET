@@ -1,0 +1,13 @@
+# The fortran modules provided by this target.
+provides
+ examples_benthic_predator.mod
+ examples_duplicator.mod
+ examples_light_cycle.mod
+ examples_mean.mod
+ examples_model_library.mod
+ examples_npzd_det.mod
+ examples_npzd_model_library.mod
+ examples_npzd_nut.mod
+ examples_npzd_phy.mod
+ examples_npzd_zoo.mod
+ nonlocal.mod

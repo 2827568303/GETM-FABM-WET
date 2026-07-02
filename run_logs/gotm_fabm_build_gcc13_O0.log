@@ -1,0 +1,64 @@
+=== STDOUT ===
+[  0%] Building Fortran object gotm/extern/flexout/extern/yaml/CMakeFiles/yaml.dir/yaml_types.F90.o
+[  0%] Building Fortran object gotm/extern/flexout/extern/yaml/CMakeFiles/yaml.dir/yaml.F90.o
+[ 10%] Building Fortran object gotm/extern/flexout/extern/yaml/CMakeFiles/yaml.dir/yaml_settings.F90.o
+[ 10%] Building Fortran object gotm/extern/flexout/extern/yaml/CMakeFiles/yaml.dir/yaml_version.F90.o
+[ 20%] Linking Fortran static library libyaml.a
+[ 20%] Built target yaml
+[ 20%] Building Fortran object gotm/util/CMakeFiles/util.dir/compilation.F90.o
+[ 20%] Building Fortran object gotm/util/CMakeFiles/util.dir/eqstate.F90.o
+[ 30%] Building Fortran object gotm/util/CMakeFiles/util.dir/gotm_version.F90.o
+[ 40%] Building Fortran object gotm/util/CMakeFiles/util.dir/time.F90.o
+[ 40%] Building Fortran object gotm/util/CMakeFiles/util.dir/tridiagonal.F90.o
+[ 40%] Building Fortran object gotm/util/CMakeFiles/util.dir/util.F90.o
+[ 50%] Building Fortran object gotm/util/CMakeFiles/util.dir/adv_center.F90.o
+[ 50%] Building Fortran object gotm/util/CMakeFiles/util.dir/convert_fluxes.F90.o
+[ 50%] Building Fortran object gotm/util/CMakeFiles/util.dir/diff_center.F90.o
+[ 60%] Building Fortran object gotm/util/CMakeFiles/util.dir/diff_face.F90.o
+[ 70%] Building Fortran object gotm/util/CMakeFiles/util.dir/gridinterpol.F90.o
+[ 70%] Building Fortran object gotm/util/CMakeFiles/util.dir/lagrange.F90.o
+[ 70%] Building Fortran object gotm/util/CMakeFiles/util.dir/ode_solvers.F90.o
+[ 80%] Linking Fortran static library libutil.a
+[ 80%] Built target util
+[ 80%] Building Fortran object gotm/extern/flexout/src/CMakeFiles/field_manager.dir/field_manager.F90.o
+[ 90%] Linking Fortran static library libfield_manager.a
+[ 90%] Built target field_manager
+[ 90%] Building Fortran object gotm/fabm/CMakeFiles/gotm_fabm.dir/gotm_fabm.F90.o
+
+=== STDERR ===
+/mnt/c/Users/dinod/Desktop/GETM-FABM-PCLake/gotm/src/fabm/gotm_fabm.F90:250:33:
+
+  250 |    subroutine configure_gotm_fabm(cfg)
+      |                                 1
+internal compiler error: Segmentation fault
+0x104239b internal_error(char const*, ...)
+	???:0
+0x195234d gfc_copy_dt_decls_ifequal(gfc_symbol*, gfc_symbol*, bool)
+	???:0
+0x1950404 gfc_get_derived_type(gfc_symbol*, int)
+	???:0
+0x194fc17 gfc_get_derived_type(gfc_symbol*, int)
+	???:0
+0x194fc17 gfc_get_derived_type(gfc_symbol*, int)
+	???:0
+0x194fc17 gfc_get_derived_type(gfc_symbol*, int)
+	???:0
+0x19508c0 gfc_typenode_for_spec(gfc_typespec*, int)
+	???:0
+0x1950f51 gfc_sym_type(gfc_symbol*, bool)
+	???:0
+0x195138f gfc_get_function_type(gfc_symbol*, gfc_actual_arglist*, char const*)
+	???:0
+0x18bf2ca gfc_create_function_decl(gfc_namespace*, bool)
+	???:0
+0x1898ce5 gfc_generate_module_code(gfc_namespace*)
+	???:0
+0x184a06d gfc_parse_file()
+	???:0
+Please submit a full bug report, with preprocessed source (by using -freport-bug).
+Please include the complete backtrace with any bug report.
+See <file:///usr/share/doc/gcc-13/README.Bugs> for instructions.
+make[3]: *** [gotm/fabm/CMakeFiles/gotm_fabm.dir/build.make:75: gotm/fabm/CMakeFiles/gotm_fabm.dir/gotm_fabm.F90.o] Error 1
+make[2]: *** [CMakeFiles/Makefile2:902: gotm/fabm/CMakeFiles/gotm_fabm.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:909: gotm/fabm/CMakeFiles/gotm_fabm.dir/rule] Error 2
+make: *** [Makefile:455: gotm_fabm] Error 2

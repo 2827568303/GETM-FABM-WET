@@ -1,0 +1,21 @@
+CMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.5 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+-- FABM host: gotm
+CMake Deprecation Warning at yaml/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.5 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+-- Installation prefix: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v19_donothing/fabm
+-- Configuring done (0.8s)
+-- Generating done (3.3s)
+-- Build files have been written to: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/build_gcc13_v19_donothing/fabm

@@ -1,0 +1,1 @@
+/usr/bin/gfortran-13 -O0 -g -fcheck=all -fbacktrace CMakeFiles/test_host.dir/test/host.F90.o CMakeFiles/test_host.dir/test/models.F90.o -o test_host  libfabm.a 

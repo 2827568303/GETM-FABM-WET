@@ -1,0 +1,3 @@
+bibtex2html -nodoc -noheader -s ieeetr -d -a --revkeys getm_pub.bib
+sed -i "s/>DOI</ target=\'_blank\'>DOI</g" getm_pub.html
+chmod u+rw getm_pub.html

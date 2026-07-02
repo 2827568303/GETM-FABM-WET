@@ -1,0 +1,224 @@
+instances:
+  abiotic_water:
+    long_name: abiotic_process_in_water
+    model: wet/abiotic_water
+    parameters:
+      O2PerNH4W: 2.0
+      cExtSpIM: 0.05
+      cKPAdsOxW: 0.6
+      cRelPAdsAlW: 0.134
+      cRelPAdsDWW: 3.0e-05
+      cRelPAdsFeW: 0.0675
+      cThetaAer: 1.011
+      cThetaNitrW: 1.03
+      cVSetIM: -1.1
+      fAlDIMW: 0.01
+      fFeDIMW: 0.01
+      fRedMaxW: 0.9
+      hO2Nitr: 2.0
+      kNitrW: 0.3
+      kPSorpW: 0.05
+      kSiMinPaW: 0.03
+      diagnostics: true
+    initialization:
+      sNH4W: 0.05
+      sNO3W: 0.5
+      sPO4W: 0.1
+      sPAIMW: 0.0
+      sSiO2W: 3.5
+      sO2W: 13.0
+      sDIMW: 4.0
+      sSiPaW: 0.025
+  abiotic_sediment:
+    long_name: abiotic_process_in_sediment
+    model: wet/abiotic_sediment
+    parameters:
+      NO3PerCS: 1.0
+      O2PerNH4S: 2.0
+      bPorCorS: 0.737275
+      bPorS: 0.58
+      cDepthS: 0.1
+      cKPAdsOxS: 1.5
+      cRelPAdsAlS: 0.134
+      cRelPAdsDWS: 3.0e-05
+      cRelPAdsFeS: 0.06
+      cThetaNitrS: 1.03
+      cTurbDifO2: 5.0
+      coPO4Max: 1.4
+      fAlDIMS: 0.01
+      fDepthDifS: 0.5
+      fFeDIM: 0.04
+      fRedMaxS: 0.96
+      hNO3DenitS: 0.5
+      kNitrS: 1.2
+      kO2Dif: 0.00017
+      kPChemPO4: 0.03
+      kPSorpS: 0.03
+      kSiMinPaS: 0.03
+      nPOM: 1
+      nDOM: 1
+      hypsograph: true
+      diagnostics: true
+    initialization:
+      sNH4S: 0.04
+      sNO3S: 0.025
+      sPO4S: 0.02
+      sPAIMS: 2.0
+      sDIMS: 31700.0
+      sSiO2S: 0.1
+      sSiPaS: 14.0
+    coupling:
+      oxygen_pool_water: abiotic_water/sO2W
+      Trans_DPOM_sediment_update1: POM/tDTrans
+      Trans_CPOM_sediment_update1: POM/tCTrans
+      Trans_DDOM_sediment_update1: DOM/tDTrans
+      Trans_CDOM_sediment_update1: DOM/tCTrans
+  bot_pel_interface:
+    long_name: bot_pel_interface
+    model: wet/bot_pel_interface
+    parameters:
+      hypsograph: true
+  POM:
+    long_name: pom
+    model: wet/om_pool
+    parameters:
+      cExtSp: 0.15
+      cVSet: 0.3
+      qTrans: 1
+      cThetaMinW: 1.02
+      kDMinW: 0.001
+      kNMinW: 0.01
+      kPMinW: 0.01
+      hO2BOD: 1.0
+      hNO3DenitW: 1.0
+      NO3PerCW: 1.0
+      cThetaMinS: 1.02
+      kDMinS: 0.001
+      kNMinS: 0.01
+      kPMinS: 0.01
+      lTransPV: false
+      lPOMtoDOM: true
+      fRefrDWS: 0.1
+      fRefrNutS: 0.1
+      lRefrPV: true
+      lRefrpool: false
+      diagnostics: true
+    initialization:
+      sDW: 0.1
+      sNW: 0.01
+      sPW: 0.001
+      sCW: 0.04
+      sDS: 47.4
+      sNS: 0.6
+      sPS: 0.1
+      sCS: 18.96
+      sDS_PV: 47.4
+      sNS_PV: 0.6
+      sPS_PV: 0.1
+      sCS_PV: 18.96
+    coupling:
+      DW_transformation_water: DOM/sDW
+      N_transformation_water: DOM/sNW
+      P_transformation_water: DOM/sPW
+      C_transformation_water: DOM/sCW
+      DW_transformation_sediment: DOM/sDS
+      N_transformation_sediment: DOM/sNS
+      P_transformation_sediment: DOM/sPS
+      C_transformation_sediment: DOM/sCS
+      DW_refractory_sediment: humus/sDS
+      N_refractory_sediment: humus/sNS
+      P_refractory_sediment: humus/sPS
+      C_refractory_sediment: humus/sCS
+      oxygen_pool_water: abiotic_water/sO2W
+      NO3_pool_water: abiotic_water/sNO3W
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+  DOM:
+    long_name: dom
+    model: wet/om_pool
+    parameters:
+      cExtSp: 0.0
+      cVSet: 0.0
+      qTrans: 1
+      cThetaMinW: 1.07
+      kDMinW: 0.03
+      kNMinW: 0.01
+      kPMinW: 0.01
+      hO2BOD: 1.0
+      hNO3DenitW: 1.0
+      NO3PerCW: 1.0
+      cThetaMinS: 1.06
+      kDMinS: 0.001
+      kNMinS: 0.003
+      kPMinS: 0.003
+      lTransPV: false
+      lPOMtoDOM: false
+      lRefrPV: false
+      fRefrDWS: 0.0
+      fRefrNutS: 0.0
+      lRefrpool: false
+      lTransDWtarget: false
+      diagnostics: true
+    initialization:
+      sDW: 2.5
+      sNW: 0.01
+      sPW: 0.001
+      sCW: 1.0
+      sDS: 10.0
+      sNS: 0.06
+      sPS: 0.01
+      sCS: 4.0
+    coupling:
+      N_transformation_water: abiotic_water/sNH4W
+      P_transformation_water: abiotic_water/sPO4W
+      N_transformation_sediment: abiotic_sediment/sNH4S
+      P_transformation_sediment: abiotic_sediment/sPO4S
+      oxygen_pool_water: abiotic_water/sO2W
+      NO3_pool_water: abiotic_water/sNO3W
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+  humus:
+    long_name: humus
+    model: wet/om_pool
+    parameters:
+      cExtSp: 0.15
+      cVSet: 0.5
+      qTrans: 1
+      cThetaMinW: 1.02
+      kDMinW: 0.001
+      kNMinW: 0.01
+      kPMinW: 0.01
+      hO2BOD: 1.0
+      hNO3DenitW: 1.0
+      NO3PerCW: 1.0
+      cThetaMinS: 1.074
+      kDMinS: 5.0e-05
+      kNMinS: 5.0e-05
+      kPMinS: 5.0e-05
+      lTransPV: false
+      lPOMtoDOM: true
+      lRefrPV: false
+      fRefrDWS: 0.0
+      fRefrNutS: 0.0
+      lRefrpool: true
+      diagnostics: true
+    initialization:
+      sDS: 3719.0
+      sNS: 166.0
+      sPS: 16.0
+      sCS: 1487.6
+      sDS_PV: 3719.0
+      sNS_PV: 166.0
+      sPS_PV: 16.0
+      sCS_PV: 1487.6
+    coupling:
+      DW_transformation_water: DOM/sDW
+      N_transformation_water: DOM/sNW
+      P_transformation_water: DOM/sPW
+      C_transformation_water: DOM/sCW
+      DW_transformation_sediment: DOM/sDS
+      N_transformation_sediment: DOM/sNS
+      P_transformation_sediment: DOM/sPS
+      C_transformation_sediment: DOM/sCS
+      oxygen_pool_water: abiotic_water/sO2W
+      NO3_pool_water: abiotic_water/sNO3W
+      afOxySed: abiotic_sediment/afOxySed
+      bot_pel_conv: bot_pel_interface/bot_pel_conv

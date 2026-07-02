@@ -1,0 +1,2013 @@
+ ------------------------------------------------------------------------
+ getm: Started on  20260629 091458.931
+ ------------------------------------------------------------------------
+ GETM version: 2.5.0 ( branch)
+ GOTM version: 7.0.0 (unknown branch)
+ FABM version: unknown (unknown branch)
+ ------------------------------------------------------------------------
+ Compiler: GNU 13.3.0
+    Compiled for serial execution
+       without OpenMP thread capability
+    Fortran 95 compilation
+    Using DYNAMIC memory allocation
+    Using double precision
+    CARTESIAN
+    _FABM_
+ ------------------------------------------------------------------------
+ Initialising....
+ ------------------------------------------------------------------------
+    the run id is: LUOMAHU_WET
+    the title is:  Luomahu Lake GETM-FABM-WET
+    3D run - full (hotstart= F )
+    init_time
+        Time step:         30.000000000000000       seconds
+        Time format:               2
+        Start:          2020-01-01 00:00:00
+        Stop:           2020-01-01 00:05:00
+         ==>            0  day(s) and          300  seconds ==>           10  micro time steps
+    init_domain
+        Reading bathymetry and grid information ...
+        using NetCDF version: 4.9.2 of Mar 31 2024 08:09:36 $
+        using cartesian grid.
+        reading bathymetry: 
+            iextr (iextr_topo):           44 (          44 )
+            jextr (jextr_topo):           54 (          54 )
+            axes names:    x, y
+            mapping ill:ihl => ilg:ihg :            1 :          44 =>           1 :          44
+            mapping jll:jhl => jlg:jhg :            1 :          54 =>           1 :          54
+        checking for dx and dy
+            dx and dy will be calculated from axes information
+        reading/constructing coordinate variables: x, y
+            dx=    500.00000000000000      , dy=    500.00000000000000     
+        checking for additional variable(s): lonc, latc, convc 
+            lonc - OK
+            latc - OK
+            convc is not in the file
+        done - reading bathymetry and grid
+        Using sigma coordinates
+        calculating metrics
+        Assuming constant Coriolis parameter - lat =    0.0000000000000000     
+        Using constant bottom roughness
+        Dimensions:            1 :          44 ,           1 :          54 ,           0 :           5
+        # waterpoints =         1164  of         2376
+    init_meteo
+        Metforcing= T
+        Constant forcing is used:
+            tx     =    0.0000000000000000     
+            ty     =    0.0000000000000000     
+            swr    =    200.00000000000000     
+            shf    =    0.0000000000000000     
+        Albedo method =           1
+            Albedo according to Payne
+    init_rivers()
+        river_method=            1
+        river_data=   rivers.nc
+        river_format=            2
+        river_ramp=             -1
+        river_factor=    1.0000000000000000     
+        use_river_temp=  F
+        use_river_salt=  F
+        river_outflow_properties_follow_source_cell= T
+        read_river_info()
+               1                YIHE   26   12     2.6    -1.0    -1.0 inside
+               2              LUONAN   12   42     5.8    -1.0    -1.0 inside
+               3               DAYUN    7   32    13.9    -1.0    -1.0 inside
+               4           ZHANGSHAN   32   15     2.1    -1.0    -1.0 inside
+               5              YANGHE   35   28     1.7    -1.0    -1.0 inside
+            Number of unique rivers:            5
+            split:           1           1           1           1           1
+    init_2d
+        init_variables_2d
+        init_advection
+        Advection of depth-averaged velocities
+            full step splitting: u + v
+             upstream advection (first-order, monotone)
+             without diffusion
+        setting initial surface elevation to    0.00000000    
+        An_method=0 -> horizontal numerical diffusion not included
+        sealevel_check=0 --> NaN checks disabled
+        Open boundary= F
+    init_3d
+        splitting factor M:           10
+        init_variables_3d
+        init_advection_3d
+        Advection of horizontal 3D velocities
+            full step splitting: u + v + w
+             horizontal: upstream advection (first-order, monotone)
+                         without diffusion
+             vertical  : upstream advection (first-order, monotone)
+                         without iteration
+        Advection of TKE and eps
+            full step splitting: u + v + w
+             horizontal: upstream advection (first-order, monotone)
+                         without diffusion
+             vertical  : upstream advection (first-order, monotone)
+                         without iteration
+        ip_ramp=          -1
+        vel_check=           0
+        using sigma vertical coordinates
+        HCC check
+        init_temperature()
+            setting to constant value    5.00000000    
+            Advection of temperature
+            full step splitting: u + v + w
+             horizontal: upstream advection (first-order, monotone)
+                         without diffusion
+             vertical  : upstream advection (first-order, monotone)
+                         without iteration
+            setting attenuation coefficients to constant values:
+                Jerlov Type I (=case I): A=0.58, g1=0.35 , g2=23.0
+            temp_check=           0
+        init_eqstate()
+            linear equation of state
+                T0   =    10.000000000000000     
+                S0   =    35.000000000000000     
+                dtr0 =    2.0000000000000001E-004
+                dsr0 =    8.0000000000000004E-004
+        init_internal_pressure()
+            Blumber-Mellor scheme
+    init_turbulence_nml
+        done.
+    post_init_turbulence
+        allocation turbulence memory..
+        done.
+         
+        --------------------------------------------------------
+        You are using a one-equation model
+        with a parabolic prescribed length-scale.
+        The properties of this model are:
+         
+            Schmidt-number for k,          sig_k =   1.0000000000000000     
+            von Karman constant,           kappa =  0.40000000596046448     
+         
+            Value of the stability function
+            in the log-law,                   cm0 =  0.54769999999999996     
+            in shear-free turbulence,        cmsf =  0.54769999999999996     
+         
+            At the surface:
+            spatial decay rate (no shear), alpha =  -1.1179879434352886     
+            length-scale slope (no shear), L     =  0.40000000596046448     
+        --------------------------------------------------------
+         
+        background turbulent viscosity set to   0.0000000000000000     
+        background turbulent diffusivity set to   0.0000000000000000     
+    init_tridiagonal
+        init_getm_fabm()
+    init_gotm_fabm_yaml
+        Reading configuration from:
+            fabm.yaml
+        done.
+ Initializing abiotic_water...
+    model type: wet/abiotic_water
+    initialization succeeded.
+ Initializing abiotic_sediment...
+    model type: wet/abiotic_sediment
+    initialization succeeded.
+ Initializing bot_pel_interface...
+    model type: wet/bot_pel_interface
+    initialization succeeded.
+ Initializing sediment_exchange...
+    model type: wet/sediment_exchange
+    initialization succeeded.
+ Initializing burial...
+    model type: wet/burial
+    initialization succeeded.
+ Initializing POM...
+    model type: wet/om_pool
+    initialization succeeded.
+ Initializing humus...
+    model type: wet/om_pool
+    initialization succeeded.
+ Initializing DOM...
+    model type: wet/om_pool
+    initialization succeeded.
+ Initializing cyanobacteria...
+    model type: wet/phytoplankton
+    initialization succeeded.
+ Initializing greens...
+    model type: wet/phytoplankton
+    initialization succeeded.
+ Initializing zooplankton...
+    model type: wet/zooplankton
+    initialization succeeded.
+    post_init_gotm_fabm
+        FABM pelagic state variables:
+            abiotic_water_sDIMW  g/m3  abiotic_process_in_water inorganic matter
+            abiotic_water_sSiPaW  g/m3  abiotic_process_in_water particulate Si
+            abiotic_water_sPO4W  g/m3  abiotic_process_in_water phosphate
+            abiotic_water_sPAIMW  g/m3  abiotic_process_in_water IM-adsorbed P
+            abiotic_water_sNH4W  g/m3  abiotic_process_in_water ammonium
+            abiotic_water_sNO3W  g/m3  abiotic_process_in_water nitrate
+            abiotic_water_sSiO2W  g/m3  abiotic_process_in_water silica dioxide
+            abiotic_water_sO2W  g/m3  abiotic_process_in_water oxygen
+            POM_sDW  gDW/m3  particulate_organic_matter water column DW
+            POM_sPW  gP/m3  particulate_organic_matter water column P
+            POM_sNW  gN/m3  particulate_organic_matter water column N
+            POM_sCW  gC/m3  particulate_organic_matter water column C
+            POM_sDS_PV  gDW/m2  particulate_organic_matter sediment DW PV
+            POM_sPS_PV  gP/m2  particulate_organic_matter sediment P  PV
+            POM_sNS_PV  gN/m2  particulate_organic_matter sediment N  PV
+            POM_sCS_PV  gC/m2  particulate_organic_matter sediment C  PV
+            humus_sDW  gDW/m3  humus water column DW
+            humus_sPW  gP/m3  humus water column P
+            humus_sNW  gN/m3  humus water column N
+            humus_sCW  gC/m3  humus water column C
+            humus_sDS_PV  gDW/m2  humus sediment DW PV
+            humus_sPS_PV  gP/m2  humus sediment P  PV
+            humus_sNS_PV  gN/m2  humus sediment N  PV
+            humus_sCS_PV  gC/m2  humus sediment C  PV
+            DOM_sDW  gDW/m3  dissolved_organic_matter water column DW
+            DOM_sPW  gP/m3  dissolved_organic_matter water column P
+            DOM_sNW  gN/m3  dissolved_organic_matter water column N
+            DOM_sCW  gC/m3  dissolved_organic_matter water column C
+            DOM_sDS_PV  gDW/m2  dissolved_organic_matter sediment DW PV
+            DOM_sPS_PV  gP/m2  dissolved_organic_matter sediment P  PV
+            DOM_sNS_PV  gN/m2  dissolved_organic_matter sediment N  PV
+            DOM_sCS_PV  gC/m2  dissolved_organic_matter sediment C  PV
+            cyanobacteria_sDW  gDW/m3  cyanobacteria water column DW
+            cyanobacteria_sPW  gP/m3  cyanobacteria water column P
+            cyanobacteria_sNW  gN/m3  cyanobacteria water column N
+            cyanobacteria_sCW  gC/m3  cyanobacteria water column C
+            cyanobacteria_sDS_PV  gDW/m2  cyanobacteria sediment DW PV
+            cyanobacteria_sPS_PV  gP/m2  cyanobacteria sediment P  PV
+            cyanobacteria_sNS_PV  gN/m2  cyanobacteria sediment N  PV
+            cyanobacteria_sCS_PV  gC/m2  cyanobacteria sediment C  PV
+            greens_sDW  gDW/m3  greens water column DW
+            greens_sPW  gP/m3  greens water column P
+            greens_sNW  gN/m3  greens water column N
+            greens_sCW  gC/m3  greens water column C
+            greens_sDS_PV  gDW/m2  greens sediment DW PV
+            greens_sPS_PV  gP/m2  greens sediment P  PV
+            greens_sNS_PV  gN/m2  greens sediment N  PV
+            greens_sCS_PV  gC/m2  greens sediment C  PV
+            zooplankton_sD  gDW/m3  zooplankton DW
+            zooplankton_sP  gP/m3  zooplankton P
+            zooplankton_sN  gN/m3  zooplankton N
+            zooplankton_sC  gC/m3  zooplankton C
+        FABM bottom-bound state variables:
+            abiotic_sediment_sDIMS  g/m2  abiotic_process_in_sediment inorganic matter
+            abiotic_sediment_sSiPaS  g/m2  abiotic_process_in_sediment particulate Si
+            abiotic_sediment_sSiO2S  g/m2  abiotic_process_in_sediment dissolved SiO2
+            abiotic_sediment_sPO4S  g/m2  abiotic_process_in_sediment phosphate
+            abiotic_sediment_sPAIMS  g/m2  abiotic_process_in_sediment absorbed phosphate
+            abiotic_sediment_sNH4S  g/m2  abiotic_process_in_sediment ammonium
+            abiotic_sediment_sNO3S  g/m2  abiotic_process_in_sediment nitrate
+            POM_sDS  gDW/m2  particulate_organic_matter sediment DW
+            POM_sPS  gP/m2  particulate_organic_matter sediment P
+            POM_sNS  gN/m2  particulate_organic_matter sediment N
+            POM_sCS  gC/m2  particulate_organic_matter sediment C
+            humus_sDS  gDW/m2  humus sediment DW
+            humus_sPS  gP/m2  humus sediment P
+            humus_sNS  gN/m2  humus sediment N
+            humus_sCS  gC/m2  humus sediment C
+            DOM_sDS  gDW/m2  dissolved_organic_matter sediment DW
+            DOM_sPS  gP/m2  dissolved_organic_matter sediment P
+            DOM_sNS  gN/m2  dissolved_organic_matter sediment N
+            DOM_sCS  gC/m2  dissolved_organic_matter sediment C
+            cyanobacteria_sDS  gDW/m2  cyanobacteria sediment DW
+            cyanobacteria_sPS  gP/m2  cyanobacteria sediment P
+            cyanobacteria_sNS  gN/m2  cyanobacteria sediment N
+            cyanobacteria_sCS  gC/m2  cyanobacteria sediment C
+            greens_sDS  gDW/m2  greens sediment DW
+            greens_sPS  gP/m2  greens sediment P
+            greens_sNS  gN/m2  greens sediment N
+            greens_sCS  gC/m2  greens sediment C
+        FABM surface-bound state variables:
+        FABM diagnostic variables defined on the full model domain:
+            abiotic_water_sDIMW_sms  g/m3 s-1  abiotic_process_in_water inorganic matter sources-sinks
+            abiotic_water_sDIMW_w  m s-1  abiotic_process_in_water inorganic matter vertical velocity
+            abiotic_water_sSiPaW_sms  g/m3 s-1  abiotic_process_in_water particulate Si sources-sinks
+            abiotic_water_sSiPaW_w  m s-1  abiotic_process_in_water particulate Si vertical velocity
+            abiotic_water_sPO4W_sms  g/m3 s-1  abiotic_process_in_water phosphate sources-sinks
+            abiotic_water_sPO4W_w  m s-1  abiotic_process_in_water phosphate vertical velocity
+            abiotic_water_sPAIMW_sms  g/m3 s-1  abiotic_process_in_water IM-adsorbed P sources-sinks
+            abiotic_water_sPAIMW_w  m s-1  abiotic_process_in_water IM-adsorbed P vertical velocity
+            abiotic_water_sNH4W_sms  g/m3 s-1  abiotic_process_in_water ammonium sources-sinks
+            abiotic_water_sNH4W_w  m s-1  abiotic_process_in_water ammonium vertical velocity
+            abiotic_water_sNO3W_sms  g/m3 s-1  abiotic_process_in_water nitrate sources-sinks
+            abiotic_water_sNO3W_w  m s-1  abiotic_process_in_water nitrate vertical velocity
+            abiotic_water_sSiO2W_sms  g/m3 s-1  abiotic_process_in_water silica dioxide sources-sinks
+            abiotic_water_sSiO2W_w  m s-1  abiotic_process_in_water silica dioxide vertical velocity
+            abiotic_water_sO2W_sms  g/m3 s-1  abiotic_process_in_water oxygen sources-sinks
+            abiotic_water_sO2W_w  m s-1  abiotic_process_in_water oxygen vertical velocity
+            abiotic_water_extIM  -  abiotic_process_in_water extIM
+            abiotic_water_pO2Sat  pct  abiotic_process_in_water oxygen saturation
+            abiotic_water_BTdummy  gDW/m2/d  abiotic_process_in_water bioturbation dummy
+            abiotic_water_TMdummy  gDW/m2  abiotic_process_in_water total macrophyte dummy
+            abiotic_water_aDSubVegdummy  gDW/m2  abiotic_process_in_water dummy aDSubVeg
+            abiotic_water_aCovVegdummy  %  abiotic_process_in_water dummy aCovVeg
+            abiotic_water_afCovSurfVegdummy  -  abiotic_process_in_water dummy afCovSurfVeg
+            abiotic_water_chladummy  ug/L  abiotic_process_in_water dummy chlorophyl a
+            abiotic_water__attenuation_coefficient_of_photosynthetic_radiative_flux  m-1  abiotic_process_in_water light extinction contribution computed by get_light_extinction
+            abiotic_sediment_oxygen_pool_water_sms  g/m3 s-1  abiotic_process_in_sediment oxygen pool water sources-sinks
+            abiotic_sediment_oxygen_pool_water_w  m s-1  abiotic_process_in_sediment oxygen pool water vertical velocity
+            sediment_exchange_POM_D_in_water_1_sms  g/m3 s-1  sediment_exchange POM D1 sources-sinks
+            sediment_exchange_POM_D_in_water_1_w  m s-1  sediment_exchange POM D1 vertical velocity
+            sediment_exchange_POM_N_in_water_1_sms  g/m3 s-1  sediment_exchange POM N1 sources-sinks
+            sediment_exchange_POM_N_in_water_1_w  m s-1  sediment_exchange POM N1 vertical velocity
+            sediment_exchange_POM_P_in_water_1_sms  g/m3 s-1  sediment_exchange POM P1 sources-sinks
+            sediment_exchange_POM_P_in_water_1_w  m s-1  sediment_exchange POM P1 vertical velocity
+            sediment_exchange_POM_C_in_water_1_sms  g/m3 s-1  sediment_exchange POM C1 sources-sinks
+            sediment_exchange_POM_C_in_water_1_w  m s-1  sediment_exchange POM C1 vertical velocity
+            sediment_exchange_POM_D_in_sediment_1_PV_sms  g/m2 s-1  sediment_exchange POM D PV pelagic mirror1 sources-sinks
+            sediment_exchange_POM_D_in_sediment_1_PV_w  m s-1  sediment_exchange POM D PV pelagic mirror1 vertical velocity
+            sediment_exchange_POM_N_in_sediment_1_PV_sms  g/m2 s-1  sediment_exchange POM N PV pelagic mirror1 sources-sinks
+            sediment_exchange_POM_N_in_sediment_1_PV_w  m s-1  sediment_exchange POM N PV pelagic mirror1 vertical velocity
+            sediment_exchange_POM_P_in_sediment_1_PV_sms  g/m2 s-1  sediment_exchange POM P PV pelagic mirror1 sources-sinks
+            sediment_exchange_POM_P_in_sediment_1_PV_w  m s-1  sediment_exchange POM P PV pelagic mirror1 vertical velocity
+            sediment_exchange_POM_C_in_sediment_1_PV_sms  g/m2 s-1  sediment_exchange POM C PV pelagic mirror1 sources-sinks
+            sediment_exchange_POM_C_in_sediment_1_PV_w  m s-1  sediment_exchange POM C PV pelagic mirror1 vertical velocity
+            sediment_exchange_DOM_D_in_water_1_sms  g/m3 s-1  sediment_exchange DOM D1 sources-sinks
+            sediment_exchange_DOM_D_in_water_1_w  m s-1  sediment_exchange DOM D1 vertical velocity
+            sediment_exchange_DOM_N_in_water_1_sms  g/m3 s-1  sediment_exchange DOM N1 sources-sinks
+            sediment_exchange_DOM_N_in_water_1_w  m s-1  sediment_exchange DOM N1 vertical velocity
+            sediment_exchange_DOM_P_in_water_1_sms  g/m3 s-1  sediment_exchange DOM P1 sources-sinks
+            sediment_exchange_DOM_P_in_water_1_w  m s-1  sediment_exchange DOM P1 vertical velocity
+            sediment_exchange_DOM_C_in_water_1_sms  g/m3 s-1  sediment_exchange DOM C1 sources-sinks
+            sediment_exchange_DOM_C_in_water_1_w  m s-1  sediment_exchange DOM C1 vertical velocity
+            sediment_exchange_DOM_D_in_sediment_1_PV_sms  g/m2 s-1  sediment_exchange DOM D PV pelagic mirror1 sources-sinks
+            sediment_exchange_DOM_D_in_sediment_1_PV_w  m s-1  sediment_exchange DOM D PV pelagic mirror1 vertical velocity
+            sediment_exchange_DOM_N_in_sediment_1_PV_sms  g/m2 s-1  sediment_exchange DOM N PV pelagic mirror1 sources-sinks
+            sediment_exchange_DOM_N_in_sediment_1_PV_w  m s-1  sediment_exchange DOM N PV pelagic mirror1 vertical velocity
+            sediment_exchange_DOM_P_in_sediment_1_PV_sms  g/m2 s-1  sediment_exchange DOM P PV pelagic mirror1 sources-sinks
+            sediment_exchange_DOM_P_in_sediment_1_PV_w  m s-1  sediment_exchange DOM P PV pelagic mirror1 vertical velocity
+            sediment_exchange_DOM_C_in_sediment_1_PV_sms  g/m2 s-1  sediment_exchange DOM C PV pelagic mirror1 sources-sinks
+            sediment_exchange_DOM_C_in_sediment_1_PV_w  m s-1  sediment_exchange DOM C PV pelagic mirror1 vertical velocity
+            sediment_exchange_particulate_Si_in_water_sms  g/m2 s-1  sediment_exchange water particulate Si sources-sinks
+            sediment_exchange_particulate_Si_in_water_w  m s-1  sediment_exchange water particulate Si vertical velocity
+            sediment_exchange_SiO2_in_water_sms  g/m3 s-1  sediment_exchange water SiO2 sources-sinks
+            sediment_exchange_SiO2_in_water_w  m s-1  sediment_exchange water SiO2 vertical velocity
+            sediment_exchange_NH4_in_water_sms  g/m3 s-1  sediment_exchange water NH4 sources-sinks
+            sediment_exchange_NH4_in_water_w  m s-1  sediment_exchange water NH4 vertical velocity
+            sediment_exchange_NO3_in_water_sms  g/m3 s-1  sediment_exchange water NO3 sources-sinks
+            sediment_exchange_NO3_in_water_w  m s-1  sediment_exchange water NO3 vertical velocity
+            sediment_exchange_PO4_in_water_sms  g/m3 s-1  sediment_exchange water PO4 sources-sinks
+            sediment_exchange_PO4_in_water_w  m s-1  sediment_exchange water PO4 vertical velocity
+            sediment_exchange_inorg_pool_in_water_sms  g/m3 s-1  sediment_exchange inorganic matter pool in water sources-sinks
+            sediment_exchange_inorg_pool_in_water_w  m s-1  sediment_exchange inorganic matter pool in water vertical velocity
+            sediment_exchange_PAIM_in_water_sms  g/m3 s-1  sediment_exchange adsorbed phosphorus in water sources-sinks
+            sediment_exchange_PAIM_in_water_w  m s-1  sediment_exchange adsorbed phosphorus in water vertical velocity
+            burial_humus_DW_in_deep_sediment_PV_sms  g/m2 s-1  burial humus DW in deep sediment pelagic mirror sources-sinks
+            burial_humus_DW_in_deep_sediment_PV_w  m s-1  burial humus DW in deep sediment pelagic mirror vertical velocity
+            burial_humus_N_in_deep_sediment_PV_sms  g/m2 s-1  burial humus N in deep sediment pelagic mirror sources-sinks
+            burial_humus_N_in_deep_sediment_PV_w  m s-1  burial humus N in deep sediment pelagic mirror vertical velocity
+            burial_humus_P_in_deep_sediment_PV_sms  g/m2 s-1  burial humus P in deep sediment pelagic mirror sources-sinks
+            burial_humus_P_in_deep_sediment_PV_w  m s-1  burial humus P in deep sediment pelagic mirror vertical velocity
+            burial_humus_C_in_deep_sediment_PV_sms  g/m2 s-1  burial humus C in deep sediment pelagic mirror sources-sinks
+            burial_humus_C_in_deep_sediment_PV_w  m s-1  burial humus C in deep sediment pelagic mirror vertical velocity
+            burial_POM_D_1_PV_sms  g/m2 s-1  burial POM D PV group number 1 sources-sinks
+            burial_POM_D_1_PV_w  m s-1  burial POM D PV group number 1 vertical velocity
+            burial_POM_N_1_PV_sms  g/m2 s-1  burial POM N PV group number 1 sources-sinks
+            burial_POM_N_1_PV_w  m s-1  burial POM N PV group number 1 vertical velocity
+            burial_POM_P_1_PV_sms  g/m2 s-1  burial POM P PV group number 1 sources-sinks
+            burial_POM_P_1_PV_w  m s-1  burial POM P PV group number 1 vertical velocity
+            burial_POM_C_1_PV_sms  g/m2 s-1  burial POM C PV group number 1 sources-sinks
+            burial_POM_C_1_PV_w  m s-1  burial POM C PV group number 1 vertical velocity
+            burial_POM_D_2_PV_sms  g/m2 s-1  burial POM D PV group number 2 sources-sinks
+            burial_POM_D_2_PV_w  m s-1  burial POM D PV group number 2 vertical velocity
+            burial_POM_N_2_PV_sms  g/m2 s-1  burial POM N PV group number 2 sources-sinks
+            burial_POM_N_2_PV_w  m s-1  burial POM N PV group number 2 vertical velocity
+            burial_POM_P_2_PV_sms  g/m2 s-1  burial POM P PV group number 2 sources-sinks
+            burial_POM_P_2_PV_w  m s-1  burial POM P PV group number 2 vertical velocity
+            burial_POM_C_2_PV_sms  g/m2 s-1  burial POM C PV group number 2 sources-sinks
+            burial_POM_C_2_PV_w  m s-1  burial POM C PV group number 2 vertical velocity
+            burial_DOM_D_1_PV_sms  g/m2 s-1  burial DOM D PV group number1 sources-sinks
+            burial_DOM_D_1_PV_w  m s-1  burial DOM D PV group number1 vertical velocity
+            burial_DOM_N_1_PV_sms  g/m2 s-1  burial DOM N PV group number1 sources-sinks
+            burial_DOM_N_1_PV_w  m s-1  burial DOM N PV group number1 vertical velocity
+            burial_DOM_P_1_PV_sms  g/m2 s-1  burial DOM P PV group number1 sources-sinks
+            burial_DOM_P_1_PV_w  m s-1  burial DOM P PV group number1 vertical velocity
+            burial_DOM_C_1_PV_sms  g/m2 s-1  burial DOM C PV group number1 sources-sinks
+            burial_DOM_C_1_PV_w  m s-1  burial DOM C PV group number1 vertical velocity
+            POM_sDW_sms  gDW/m3 s-1  particulate_organic_matter water column DW sources-sinks
+            POM_sDW_w  m s-1  particulate_organic_matter water column DW vertical velocity
+            POM_sPW_sms  gP/m3 s-1  particulate_organic_matter water column P sources-sinks
+            POM_sPW_w  m s-1  particulate_organic_matter water column P vertical velocity
+            POM_sNW_sms  gN/m3 s-1  particulate_organic_matter water column N sources-sinks
+            POM_sNW_w  m s-1  particulate_organic_matter water column N vertical velocity
+            POM_sCW_sms  gC/m3 s-1  particulate_organic_matter water column C sources-sinks
+            POM_sCW_w  m s-1  particulate_organic_matter water column C vertical velocity
+            POM_sDS_PV_sms  gDW/m2 s-1  particulate_organic_matter sediment DW PV sources-sinks
+            POM_sDS_PV_w  m s-1  particulate_organic_matter sediment DW PV vertical velocity
+            POM_sPS_PV_sms  gP/m2 s-1  particulate_organic_matter sediment P  PV sources-sinks
+            POM_sPS_PV_w  m s-1  particulate_organic_matter sediment P  PV vertical velocity
+            POM_sNS_PV_sms  gN/m2 s-1  particulate_organic_matter sediment N  PV sources-sinks
+            POM_sNS_PV_w  m s-1  particulate_organic_matter sediment N  PV vertical velocity
+            POM_sCS_PV_sms  gC/m2 s-1  particulate_organic_matter sediment C  PV sources-sinks
+            POM_sCS_PV_w  m s-1  particulate_organic_matter sediment C  PV vertical velocity
+            POM_rPDW  -  particulate_organic_matter P/D ratio water
+            POM_rNDW  -  particulate_organic_matter N/D ratio water
+            POM_rCDW  -  particulate_organic_matter C/D ratio water
+            POM_wCMin  -  particulate_organic_matter C bio-transformation in water
+            POM_extinction  -  particulate_organic_matter extinction
+            POM_N_transformation_water_sms  g/m3 s-1  particulate_organic_matter N biotransformation target water sources-sinks
+            POM_N_transformation_water_w  m s-1  particulate_organic_matter N biotransformation target water vertical velocity
+            POM_P_transformation_water_sms  g/m3 s-1  particulate_organic_matter P biotransformation target water sources-sinks
+            POM_P_transformation_water_w  m s-1  particulate_organic_matter P biotransformation target water vertical velocity
+            POM_oxygen_pool_water_sms  g/m3 s-1  particulate_organic_matter oxygen_pool_water sources-sinks
+            POM_oxygen_pool_water_w  m s-1  particulate_organic_matter oxygen_pool_water vertical velocity
+            POM_NO3_pool_water_sms  g/m3 s-1  particulate_organic_matter NO3 pool water sources-sinks
+            POM_NO3_pool_water_w  m s-1  particulate_organic_matter NO3 pool water vertical velocity
+            POM__attenuation_coefficient_of_photosynthetic_radiative_flux  m-1  particulate_organic_matter light extinction contribution computed by get_light_extinction
+            humus_sDW_sms  gDW/m3 s-1  humus water column DW sources-sinks
+            humus_sDW_w  m s-1  humus water column DW vertical velocity
+            humus_sPW_sms  gP/m3 s-1  humus water column P sources-sinks
+            humus_sPW_w  m s-1  humus water column P vertical velocity
+            humus_sNW_sms  gN/m3 s-1  humus water column N sources-sinks
+            humus_sNW_w  m s-1  humus water column N vertical velocity
+            humus_sCW_sms  gC/m3 s-1  humus water column C sources-sinks
+            humus_sCW_w  m s-1  humus water column C vertical velocity
+            humus_sDS_PV_sms  gDW/m2 s-1  humus sediment DW PV sources-sinks
+            humus_sDS_PV_w  m s-1  humus sediment DW PV vertical velocity
+            humus_sPS_PV_sms  gP/m2 s-1  humus sediment P  PV sources-sinks
+            humus_sPS_PV_w  m s-1  humus sediment P  PV vertical velocity
+            humus_sNS_PV_sms  gN/m2 s-1  humus sediment N  PV sources-sinks
+            humus_sNS_PV_w  m s-1  humus sediment N  PV vertical velocity
+            humus_sCS_PV_sms  gC/m2 s-1  humus sediment C  PV sources-sinks
+            humus_sCS_PV_w  m s-1  humus sediment C  PV vertical velocity
+            humus_rPDW  -  humus P/D ratio water
+            humus_rNDW  -  humus N/D ratio water
+            humus_rCDW  -  humus C/D ratio water
+            humus_wCMin  -  humus C bio-transformation in water
+            humus_extinction  -  humus extinction
+            humus_N_transformation_water_sms  g/m3 s-1  humus N biotransformation target water sources-sinks
+            humus_N_transformation_water_w  m s-1  humus N biotransformation target water vertical velocity
+            humus_P_transformation_water_sms  g/m3 s-1  humus P biotransformation target water sources-sinks
+            humus_P_transformation_water_w  m s-1  humus P biotransformation target water vertical velocity
+            humus_oxygen_pool_water_sms  g/m3 s-1  humus oxygen_pool_water sources-sinks
+            humus_oxygen_pool_water_w  m s-1  humus oxygen_pool_water vertical velocity
+            humus_NO3_pool_water_sms  g/m3 s-1  humus NO3 pool water sources-sinks
+            humus_NO3_pool_water_w  m s-1  humus NO3 pool water vertical velocity
+            humus__attenuation_coefficient_of_photosynthetic_radiative_flux  m-1  humus light extinction contribution computed by get_light_extinction
+            DOM_sDW_sms  gDW/m3 s-1  dissolved_organic_matter water column DW sources-sinks
+            DOM_sDW_w  m s-1  dissolved_organic_matter water column DW vertical velocity
+            DOM_sPW_sms  gP/m3 s-1  dissolved_organic_matter water column P sources-sinks
+            DOM_sPW_w  m s-1  dissolved_organic_matter water column P vertical velocity
+            DOM_sNW_sms  gN/m3 s-1  dissolved_organic_matter water column N sources-sinks
+            DOM_sNW_w  m s-1  dissolved_organic_matter water column N vertical velocity
+            DOM_sCW_sms  gC/m3 s-1  dissolved_organic_matter water column C sources-sinks
+            DOM_sCW_w  m s-1  dissolved_organic_matter water column C vertical velocity
+            DOM_sDS_PV_sms  gDW/m2 s-1  dissolved_organic_matter sediment DW PV sources-sinks
+            DOM_sDS_PV_w  m s-1  dissolved_organic_matter sediment DW PV vertical velocity
+            DOM_sPS_PV_sms  gP/m2 s-1  dissolved_organic_matter sediment P  PV sources-sinks
+            DOM_sPS_PV_w  m s-1  dissolved_organic_matter sediment P  PV vertical velocity
+            DOM_sNS_PV_sms  gN/m2 s-1  dissolved_organic_matter sediment N  PV sources-sinks
+            DOM_sNS_PV_w  m s-1  dissolved_organic_matter sediment N  PV vertical velocity
+            DOM_sCS_PV_sms  gC/m2 s-1  dissolved_organic_matter sediment C  PV sources-sinks
+            DOM_sCS_PV_w  m s-1  dissolved_organic_matter sediment C  PV vertical velocity
+            DOM_rPDW  -  dissolved_organic_matter P/D ratio water
+            DOM_rNDW  -  dissolved_organic_matter N/D ratio water
+            DOM_rCDW  -  dissolved_organic_matter C/D ratio water
+            DOM_wCMin  -  dissolved_organic_matter C bio-transformation in water
+            DOM_extinction  -  dissolved_organic_matter extinction
+            DOM_N_transformation_water_sms  g/m3 s-1  dissolved_organic_matter N biotransformation target water sources-sinks
+            DOM_N_transformation_water_w  m s-1  dissolved_organic_matter N biotransformation target water vertical velocity
+            DOM_P_transformation_water_sms  g/m3 s-1  dissolved_organic_matter P biotransformation target water sources-sinks
+            DOM_P_transformation_water_w  m s-1  dissolved_organic_matter P biotransformation target water vertical velocity
+            DOM_oxygen_pool_water_sms  g/m3 s-1  dissolved_organic_matter oxygen_pool_water sources-sinks
+            DOM_oxygen_pool_water_w  m s-1  dissolved_organic_matter oxygen_pool_water vertical velocity
+            DOM_NO3_pool_water_sms  g/m3 s-1  dissolved_organic_matter NO3 pool water sources-sinks
+            DOM_NO3_pool_water_w  m s-1  dissolved_organic_matter NO3 pool water vertical velocity
+            DOM__attenuation_coefficient_of_photosynthetic_radiative_flux  m-1  dissolved_organic_matter light extinction contribution computed by get_light_extinction
+            cyanobacteria_sDW_sms  gDW/m3 s-1  cyanobacteria water column DW sources-sinks
+            cyanobacteria_sDW_w  m s-1  cyanobacteria water column DW vertical velocity
+            cyanobacteria_sPW_sms  gP/m3 s-1  cyanobacteria water column P sources-sinks
+            cyanobacteria_sPW_w  m s-1  cyanobacteria water column P vertical velocity
+            cyanobacteria_sNW_sms  gN/m3 s-1  cyanobacteria water column N sources-sinks
+            cyanobacteria_sNW_w  m s-1  cyanobacteria water column N vertical velocity
+            cyanobacteria_sCW_sms  gC/m3 s-1  cyanobacteria water column C sources-sinks
+            cyanobacteria_sCW_w  m s-1  cyanobacteria water column C vertical velocity
+            cyanobacteria_sDS_PV_sms  gDW/m2 s-1  cyanobacteria sediment DW PV sources-sinks
+            cyanobacteria_sDS_PV_w  m s-1  cyanobacteria sediment DW PV vertical velocity
+            cyanobacteria_sPS_PV_sms  gP/m2 s-1  cyanobacteria sediment P  PV sources-sinks
+            cyanobacteria_sPS_PV_w  m s-1  cyanobacteria sediment P  PV vertical velocity
+            cyanobacteria_sNS_PV_sms  gN/m2 s-1  cyanobacteria sediment N  PV sources-sinks
+            cyanobacteria_sNS_PV_w  m s-1  cyanobacteria sediment N  PV vertical velocity
+            cyanobacteria_sCS_PV_sms  gC/m2 s-1  cyanobacteria sediment C  PV sources-sinks
+            cyanobacteria_sCS_PV_w  m s-1  cyanobacteria sediment C  PV vertical velocity
+            cyanobacteria_oChla  mg/m3  cyanobacteria chlorophyll a
+            cyanobacteria_rPDW  -  cyanobacteria P/D ratio
+            cyanobacteria_rNDW  -  cyanobacteria N/D ratio
+            cyanobacteria_rCDW  -  cyanobacteria C/D ratio
+            cyanobacteria_ext  -  cyanobacteria phytoextinction factor
+            cyanobacteria_extinction  -  cyanobacteria extinction
+            cyanobacteria_aLLim  -  cyanobacteria light limitation factor
+            cyanobacteria_aNutLim  -  cyanobacteria nutrient limitation factor
+            cyanobacteria_aPLim  -  cyanobacteria P limitation factor
+            cyanobacteria_aNLim  -  cyanobacteria N limitation factor
+            cyanobacteria_Swim  m/s  cyanobacteria rate Swim speed
+            cyanobacteria_PO4_pool_water_sms  g/m3 s-1  cyanobacteria PO4 pool water sources-sinks
+            cyanobacteria_PO4_pool_water_w  m s-1  cyanobacteria PO4 pool water vertical velocity
+            cyanobacteria_NH4_pool_water_sms  g/m3 s-1  cyanobacteria NH4 pool water sources-sinks
+            cyanobacteria_NH4_pool_water_w  m s-1  cyanobacteria NH4 pool water vertical velocity
+            cyanobacteria_NO3_pool_water_sms  g/m3 s-1  cyanobacteria NO3 pool water sources-sinks
+            cyanobacteria_NO3_pool_water_w  m s-1  cyanobacteria NO3 pool water vertical velocity
+            cyanobacteria_oxygen_pool_water_sms  g/m3 s-1  cyanobacteria oxygen_pool_water) sources-sinks
+            cyanobacteria_oxygen_pool_water_w  m s-1  cyanobacteria oxygen_pool_water) vertical velocity
+            cyanobacteria_POM_DW_pool_water_sms  g/m3 s-1  cyanobacteria POM DW pool water sources-sinks
+            cyanobacteria_POM_DW_pool_water_w  m s-1  cyanobacteria POM DW pool water vertical velocity
+            cyanobacteria_POM_N_pool_water_sms  g/m3 s-1  cyanobacteria POM N pool water sources-sinks
+            cyanobacteria_POM_N_pool_water_w  m s-1  cyanobacteria POM N pool water vertical velocity
+            cyanobacteria_POM_P_pool_water_sms  g/m3 s-1  cyanobacteria POM P pool water sources-sinks
+            cyanobacteria_POM_P_pool_water_w  m s-1  cyanobacteria POM P pool water vertical velocity
+            cyanobacteria_POM_C_pool_water_sms  g/m3 s-1  cyanobacteria POM C pool water sources-sinks
+            cyanobacteria_POM_C_pool_water_w  m s-1  cyanobacteria POM C pool water vertical velocity
+            cyanobacteria_DOM_DW_pool_water_sms  g/m3 s-1  cyanobacteria DOM DW water sources-sinks
+            cyanobacteria_DOM_DW_pool_water_w  m s-1  cyanobacteria DOM DW water vertical velocity
+            cyanobacteria_DOM_N_pool_water_sms  g/m3 s-1  cyanobacteria DOM N water sources-sinks
+            cyanobacteria_DOM_N_pool_water_w  m s-1  cyanobacteria DOM N water vertical velocity
+            cyanobacteria_DOM_P_pool_water_sms  g/m3 s-1  cyanobacteria DOM P water sources-sinks
+            cyanobacteria_DOM_P_pool_water_w  m s-1  cyanobacteria DOM P water vertical velocity
+            cyanobacteria_DOM_C_pool_water_sms  g/m3 s-1  cyanobacteria DOM C water sources-sinks
+            cyanobacteria_DOM_C_pool_water_w  m s-1  cyanobacteria DOM C water vertical velocity
+            cyanobacteria_POM_DW_pool_sediment_PV_sms  g/m2 s-1  cyanobacteria POM DW pool in sediment pelagic mirror sources-sinks
+            cyanobacteria_POM_DW_pool_sediment_PV_w  m s-1  cyanobacteria POM DW pool in sediment pelagic mirror vertical velocity
+            cyanobacteria_POM_N_pool_sediment_PV_sms  g/m2 s-1  cyanobacteria POM N pool in sediment pelagic mirror sources-sinks
+            cyanobacteria_POM_N_pool_sediment_PV_w  m s-1  cyanobacteria POM N pool in sediment pelagic mirror vertical velocity
+            cyanobacteria_POM_P_pool_sediment_PV_sms  g/m2 s-1  cyanobacteria POM P pool in sediment pelagic mirror sources-sinks
+            cyanobacteria_POM_P_pool_sediment_PV_w  m s-1  cyanobacteria POM P pool in sediment pelagic mirror vertical velocity
+            cyanobacteria_POM_C_pool_sediment_PV_sms  g/m2 s-1  cyanobacteria POM C pool in sediment pelagic mirror sources-sinks
+            cyanobacteria_POM_C_pool_sediment_PV_w  m s-1  cyanobacteria POM C pool in sediment pelagic mirror vertical velocity
+            cyanobacteria_DOM_DW_pool_sediment_PV_sms  g/m2 s-1  cyanobacteria DOM DW in sediment pelagic mirror sources-sinks
+            cyanobacteria_DOM_DW_pool_sediment_PV_w  m s-1  cyanobacteria DOM DW in sediment pelagic mirror vertical velocity
+            cyanobacteria_DOM_N_pool_sediment_PV_sms  g/m2 s-1  cyanobacteria DOM N in sediment pelagic mirror sources-sinks
+            cyanobacteria_DOM_N_pool_sediment_PV_w  m s-1  cyanobacteria DOM N in sediment pelagic mirror vertical velocity
+            cyanobacteria_DOM_P_pool_sediment_PV_sms  g/m2 s-1  cyanobacteria DOM P in sediment pelagic mirror sources-sinks
+            cyanobacteria_DOM_P_pool_sediment_PV_w  m s-1  cyanobacteria DOM P in sediment pelagic mirror vertical velocity
+            cyanobacteria_DOM_C_pool_sediment_PV_sms  g/m2 s-1  cyanobacteria DOM C in sediment pelagic mirror sources-sinks
+            cyanobacteria_DOM_C_pool_sediment_PV_w  m s-1  cyanobacteria DOM C in sediment pelagic mirror vertical velocity
+            cyanobacteria_SiPa_pool_water_sms  g/m3 s-1  cyanobacteria SiPa pool water sources-sinks
+            cyanobacteria_SiPa_pool_water_w  m s-1  cyanobacteria SiPa pool water vertical velocity
+            cyanobacteria_SiO2_pool_water_sms  g/m3 s-1  cyanobacteria SiO2 pool water sources-sinks
+            cyanobacteria_SiO2_pool_water_w  m s-1  cyanobacteria SiO2 pool water vertical velocity
+            cyanobacteria__attenuation_coefficient_of_photosynthetic_radiative_flux  m-1  cyanobacteria light extinction contribution computed by get_light_extinction
+            greens_sDW_sms  gDW/m3 s-1  greens water column DW sources-sinks
+            greens_sDW_w  m s-1  greens water column DW vertical velocity
+            greens_sPW_sms  gP/m3 s-1  greens water column P sources-sinks
+            greens_sPW_w  m s-1  greens water column P vertical velocity
+            greens_sNW_sms  gN/m3 s-1  greens water column N sources-sinks
+            greens_sNW_w  m s-1  greens water column N vertical velocity
+            greens_sCW_sms  gC/m3 s-1  greens water column C sources-sinks
+            greens_sCW_w  m s-1  greens water column C vertical velocity
+            greens_sDS_PV_sms  gDW/m2 s-1  greens sediment DW PV sources-sinks
+            greens_sDS_PV_w  m s-1  greens sediment DW PV vertical velocity
+            greens_sPS_PV_sms  gP/m2 s-1  greens sediment P  PV sources-sinks
+            greens_sPS_PV_w  m s-1  greens sediment P  PV vertical velocity
+            greens_sNS_PV_sms  gN/m2 s-1  greens sediment N  PV sources-sinks
+            greens_sNS_PV_w  m s-1  greens sediment N  PV vertical velocity
+            greens_sCS_PV_sms  gC/m2 s-1  greens sediment C  PV sources-sinks
+            greens_sCS_PV_w  m s-1  greens sediment C  PV vertical velocity
+            greens_oChla  mg/m3  greens chlorophyll a
+            greens_rPDW  -  greens P/D ratio
+            greens_rNDW  -  greens N/D ratio
+            greens_rCDW  -  greens C/D ratio
+            greens_ext  -  greens phytoextinction factor
+            greens_extinction  -  greens extinction
+            greens_aLLim  -  greens light limitation factor
+            greens_aNutLim  -  greens nutrient limitation factor
+            greens_aPLim  -  greens P limitation factor
+            greens_aNLim  -  greens N limitation factor
+            greens_Swim  m/s  greens rate Swim speed
+            greens_PO4_pool_water_sms  g/m3 s-1  greens PO4 pool water sources-sinks
+            greens_PO4_pool_water_w  m s-1  greens PO4 pool water vertical velocity
+            greens_NH4_pool_water_sms  g/m3 s-1  greens NH4 pool water sources-sinks
+            greens_NH4_pool_water_w  m s-1  greens NH4 pool water vertical velocity
+            greens_NO3_pool_water_sms  g/m3 s-1  greens NO3 pool water sources-sinks
+            greens_NO3_pool_water_w  m s-1  greens NO3 pool water vertical velocity
+            greens_oxygen_pool_water_sms  g/m3 s-1  greens oxygen_pool_water) sources-sinks
+            greens_oxygen_pool_water_w  m s-1  greens oxygen_pool_water) vertical velocity
+            greens_POM_DW_pool_water_sms  g/m3 s-1  greens POM DW pool water sources-sinks
+            greens_POM_DW_pool_water_w  m s-1  greens POM DW pool water vertical velocity
+            greens_POM_N_pool_water_sms  g/m3 s-1  greens POM N pool water sources-sinks
+            greens_POM_N_pool_water_w  m s-1  greens POM N pool water vertical velocity
+            greens_POM_P_pool_water_sms  g/m3 s-1  greens POM P pool water sources-sinks
+            greens_POM_P_pool_water_w  m s-1  greens POM P pool water vertical velocity
+            greens_POM_C_pool_water_sms  g/m3 s-1  greens POM C pool water sources-sinks
+            greens_POM_C_pool_water_w  m s-1  greens POM C pool water vertical velocity
+            greens_DOM_DW_pool_water_sms  g/m3 s-1  greens DOM DW water sources-sinks
+            greens_DOM_DW_pool_water_w  m s-1  greens DOM DW water vertical velocity
+            greens_DOM_N_pool_water_sms  g/m3 s-1  greens DOM N water sources-sinks
+            greens_DOM_N_pool_water_w  m s-1  greens DOM N water vertical velocity
+            greens_DOM_P_pool_water_sms  g/m3 s-1  greens DOM P water sources-sinks
+            greens_DOM_P_pool_water_w  m s-1  greens DOM P water vertical velocity
+            greens_DOM_C_pool_water_sms  g/m3 s-1  greens DOM C water sources-sinks
+            greens_DOM_C_pool_water_w  m s-1  greens DOM C water vertical velocity
+            greens_POM_DW_pool_sediment_PV_sms  g/m2 s-1  greens POM DW pool in sediment pelagic mirror sources-sinks
+            greens_POM_DW_pool_sediment_PV_w  m s-1  greens POM DW pool in sediment pelagic mirror vertical velocity
+            greens_POM_N_pool_sediment_PV_sms  g/m2 s-1  greens POM N pool in sediment pelagic mirror sources-sinks
+            greens_POM_N_pool_sediment_PV_w  m s-1  greens POM N pool in sediment pelagic mirror vertical velocity
+            greens_POM_P_pool_sediment_PV_sms  g/m2 s-1  greens POM P pool in sediment pelagic mirror sources-sinks
+            greens_POM_P_pool_sediment_PV_w  m s-1  greens POM P pool in sediment pelagic mirror vertical velocity
+            greens_POM_C_pool_sediment_PV_sms  g/m2 s-1  greens POM C pool in sediment pelagic mirror sources-sinks
+            greens_POM_C_pool_sediment_PV_w  m s-1  greens POM C pool in sediment pelagic mirror vertical velocity
+            greens_DOM_DW_pool_sediment_PV_sms  g/m2 s-1  greens DOM DW in sediment pelagic mirror sources-sinks
+            greens_DOM_DW_pool_sediment_PV_w  m s-1  greens DOM DW in sediment pelagic mirror vertical velocity
+            greens_DOM_N_pool_sediment_PV_sms  g/m2 s-1  greens DOM N in sediment pelagic mirror sources-sinks
+            greens_DOM_N_pool_sediment_PV_w  m s-1  greens DOM N in sediment pelagic mirror vertical velocity
+            greens_DOM_P_pool_sediment_PV_sms  g/m2 s-1  greens DOM P in sediment pelagic mirror sources-sinks
+            greens_DOM_P_pool_sediment_PV_w  m s-1  greens DOM P in sediment pelagic mirror vertical velocity
+            greens_DOM_C_pool_sediment_PV_sms  g/m2 s-1  greens DOM C in sediment pelagic mirror sources-sinks
+            greens_DOM_C_pool_sediment_PV_w  m s-1  greens DOM C in sediment pelagic mirror vertical velocity
+            greens_SiPa_pool_water_sms  g/m3 s-1  greens SiPa pool water sources-sinks
+            greens_SiPa_pool_water_w  m s-1  greens SiPa pool water vertical velocity
+            greens_SiO2_pool_water_sms  g/m3 s-1  greens SiO2 pool water sources-sinks
+            greens_SiO2_pool_water_w  m s-1  greens SiO2 pool water vertical velocity
+            greens__attenuation_coefficient_of_photosynthetic_radiative_flux  m-1  greens light extinction contribution computed by get_light_extinction
+            zooplankton_sD_sms  gDW/m3 s-1  zooplankton DW sources-sinks
+            zooplankton_sD_w  m s-1  zooplankton DW vertical velocity
+            zooplankton_sP_sms  gP/m3 s-1  zooplankton P sources-sinks
+            zooplankton_sP_w  m s-1  zooplankton P vertical velocity
+            zooplankton_sN_sms  gN/m3 s-1  zooplankton N sources-sinks
+            zooplankton_sN_w  m s-1  zooplankton N vertical velocity
+            zooplankton_sC_sms  gC/m3 s-1  zooplankton C sources-sinks
+            zooplankton_sC_w  m s-1  zooplankton C vertical velocity
+            zooplankton_Prey_D_1_sms  g/m3 s-1  zooplankton prey D1 sources-sinks
+            zooplankton_Prey_D_1_w  m s-1  zooplankton prey D1 vertical velocity
+            zooplankton_Prey_N_1_sms  g/m3 s-1  zooplankton prey N1 sources-sinks
+            zooplankton_Prey_N_1_w  m s-1  zooplankton prey N1 vertical velocity
+            zooplankton_Prey_P_1_sms  g/m3 s-1  zooplankton prey P1 sources-sinks
+            zooplankton_Prey_P_1_w  m s-1  zooplankton prey P1 vertical velocity
+            zooplankton_Prey_C_1_sms  g/m3 s-1  zooplankton prey C1 sources-sinks
+            zooplankton_Prey_C_1_w  m s-1  zooplankton prey C1 vertical velocity
+            zooplankton_Prey_D_2_sms  g/m3 s-1  zooplankton prey D2 sources-sinks
+            zooplankton_Prey_D_2_w  m s-1  zooplankton prey D2 vertical velocity
+            zooplankton_Prey_N_2_sms  g/m3 s-1  zooplankton prey N2 sources-sinks
+            zooplankton_Prey_N_2_w  m s-1  zooplankton prey N2 vertical velocity
+            zooplankton_Prey_P_2_sms  g/m3 s-1  zooplankton prey P2 sources-sinks
+            zooplankton_Prey_P_2_w  m s-1  zooplankton prey P2 vertical velocity
+            zooplankton_Prey_C_2_sms  g/m3 s-1  zooplankton prey C2 sources-sinks
+            zooplankton_Prey_C_2_w  m s-1  zooplankton prey C2 vertical velocity
+            zooplankton_POM_DW_pool_water_sms  g/m3 s-1  zooplankton POM DW pool in water sources-sinks
+            zooplankton_POM_DW_pool_water_w  m s-1  zooplankton POM DW pool in water vertical velocity
+            zooplankton_POM_N_pool_water_sms  g/m3 s-1  zooplankton POM N pool in water sources-sinks
+            zooplankton_POM_N_pool_water_w  m s-1  zooplankton POM N pool in water vertical velocity
+            zooplankton_POM_P_pool_water_sms  g/m3 s-1  zooplankton POM P pool in water sources-sinks
+            zooplankton_POM_P_pool_water_w  m s-1  zooplankton POM P pool in water vertical velocity
+            zooplankton_POM_C_pool_water_sms  g/m3 s-1  zooplankton POM C pool in water sources-sinks
+            zooplankton_POM_C_pool_water_w  m s-1  zooplankton POM C pool in water vertical velocity
+            zooplankton_SiPa_pool_water_sms  g/m3 s-1  zooplankton particulate Si pool water sources-sinks
+            zooplankton_SiPa_pool_water_w  m s-1  zooplankton particulate Si pool water vertical velocity
+            zooplankton_NH4_pool_water_sms  g/m3 s-1  zooplankton NH4 pool in water sources-sinks
+            zooplankton_NH4_pool_water_w  m s-1  zooplankton NH4 pool in water vertical velocity
+            zooplankton_PO4_pool_water_sms  g/m3 s-1  zooplankton PO4 pool in water sources-sinks
+            zooplankton_PO4_pool_water_w  m s-1  zooplankton PO4 pool in water vertical velocity
+            zooplankton_DOM_DW_pool_water_sms  g/m3 s-1  zooplankton DOM DW in water sources-sinks
+            zooplankton_DOM_DW_pool_water_w  m s-1  zooplankton DOM DW in water vertical velocity
+            zooplankton_DOM_N_pool_water_sms  g/m3 s-1  zooplankton DOM N in water sources-sinks
+            zooplankton_DOM_N_pool_water_w  m s-1  zooplankton DOM N in water vertical velocity
+            zooplankton_DOM_P_pool_water_sms  g/m3 s-1  zooplankton DOM P in water sources-sinks
+            zooplankton_DOM_P_pool_water_w  m s-1  zooplankton DOM P in water vertical velocity
+            zooplankton_DOM_C_pool_water_sms  g/m3 s-1  zooplankton DOM C in water sources-sinks
+            zooplankton_DOM_C_pool_water_w  m s-1  zooplankton DOM C in water vertical velocity
+            zooplankton_SiO2_pool_water_sms  g/m3 s-1  zooplankton SiO2 in water sources-sinks
+            zooplankton_SiO2_pool_water_w  m s-1  zooplankton SiO2 in water vertical velocity
+            zooplankton_rPDZoo  gP/gDW  zooplankton P/D ratio
+            zooplankton_rNDZoo  gN/gDW  zooplankton N/D ratio
+            zooplankton_rCDZoo  gC/gDW  zooplankton C/D ratio
+            zero    zero
+            sediment_exchange_pom_model1_state1_sms  gDW/m3 s-1  sediment_exchange pom_model1 state variable 1 sources-sinks
+            sediment_exchange_pom_model1_state1_w  m s-1  sediment_exchange pom_model1 state variable 1 vertical velocity
+            sediment_exchange_pom_model1_state2_sms  gP/m3 s-1  sediment_exchange pom_model1 state variable 2 sources-sinks
+            sediment_exchange_pom_model1_state2_w  m s-1  sediment_exchange pom_model1 state variable 2 vertical velocity
+            sediment_exchange_pom_model1_state3_sms  gN/m3 s-1  sediment_exchange pom_model1 state variable 3 sources-sinks
+            sediment_exchange_pom_model1_state3_w  m s-1  sediment_exchange pom_model1 state variable 3 vertical velocity
+            sediment_exchange_pom_model1_state4_sms  gC/m3 s-1  sediment_exchange pom_model1 state variable 4 sources-sinks
+            sediment_exchange_pom_model1_state4_w  m s-1  sediment_exchange pom_model1 state variable 4 vertical velocity
+            sediment_exchange_pom_model1_state5_sms  gDW/m2 s-1  sediment_exchange pom_model1 state variable 5 sources-sinks
+            sediment_exchange_pom_model1_state5_w  m s-1  sediment_exchange pom_model1 state variable 5 vertical velocity
+            sediment_exchange_pom_model1_state6_sms  gP/m2 s-1  sediment_exchange pom_model1 state variable 6 sources-sinks
+            sediment_exchange_pom_model1_state6_w  m s-1  sediment_exchange pom_model1 state variable 6 vertical velocity
+            sediment_exchange_pom_model1_state7_sms  gN/m2 s-1  sediment_exchange pom_model1 state variable 7 sources-sinks
+            sediment_exchange_pom_model1_state7_w  m s-1  sediment_exchange pom_model1 state variable 7 vertical velocity
+            sediment_exchange_pom_model1_state8_sms  gC/m2 s-1  sediment_exchange pom_model1 state variable 8 sources-sinks
+            sediment_exchange_pom_model1_state8_w  m s-1  sediment_exchange pom_model1 state variable 8 vertical velocity
+            sediment_exchange_dom_model1_state1_sms  gDW/m3 s-1  sediment_exchange dom_model1 state variable 1 sources-sinks
+            sediment_exchange_dom_model1_state1_w  m s-1  sediment_exchange dom_model1 state variable 1 vertical velocity
+            sediment_exchange_dom_model1_state2_sms  gP/m3 s-1  sediment_exchange dom_model1 state variable 2 sources-sinks
+            sediment_exchange_dom_model1_state2_w  m s-1  sediment_exchange dom_model1 state variable 2 vertical velocity
+            sediment_exchange_dom_model1_state3_sms  gN/m3 s-1  sediment_exchange dom_model1 state variable 3 sources-sinks
+            sediment_exchange_dom_model1_state3_w  m s-1  sediment_exchange dom_model1 state variable 3 vertical velocity
+            sediment_exchange_dom_model1_state4_sms  gC/m3 s-1  sediment_exchange dom_model1 state variable 4 sources-sinks
+            sediment_exchange_dom_model1_state4_w  m s-1  sediment_exchange dom_model1 state variable 4 vertical velocity
+            sediment_exchange_dom_model1_state5_sms  gDW/m2 s-1  sediment_exchange dom_model1 state variable 5 sources-sinks
+            sediment_exchange_dom_model1_state5_w  m s-1  sediment_exchange dom_model1 state variable 5 vertical velocity
+            sediment_exchange_dom_model1_state6_sms  gP/m2 s-1  sediment_exchange dom_model1 state variable 6 sources-sinks
+            sediment_exchange_dom_model1_state6_w  m s-1  sediment_exchange dom_model1 state variable 6 vertical velocity
+            sediment_exchange_dom_model1_state7_sms  gN/m2 s-1  sediment_exchange dom_model1 state variable 7 sources-sinks
+            sediment_exchange_dom_model1_state7_w  m s-1  sediment_exchange dom_model1 state variable 7 vertical velocity
+            sediment_exchange_dom_model1_state8_sms  gC/m2 s-1  sediment_exchange dom_model1 state variable 8 sources-sinks
+            sediment_exchange_dom_model1_state8_w  m s-1  sediment_exchange dom_model1 state variable 8 vertical velocity
+            burial_POM_group1_state1_sms  gDW/m3 s-1  burial POM_group1 state variable 1 sources-sinks
+            burial_POM_group1_state1_w  m s-1  burial POM_group1 state variable 1 vertical velocity
+            burial_POM_group1_state2_sms  gP/m3 s-1  burial POM_group1 state variable 2 sources-sinks
+            burial_POM_group1_state2_w  m s-1  burial POM_group1 state variable 2 vertical velocity
+            burial_POM_group1_state3_sms  gN/m3 s-1  burial POM_group1 state variable 3 sources-sinks
+            burial_POM_group1_state3_w  m s-1  burial POM_group1 state variable 3 vertical velocity
+            burial_POM_group1_state4_sms  gC/m3 s-1  burial POM_group1 state variable 4 sources-sinks
+            burial_POM_group1_state4_w  m s-1  burial POM_group1 state variable 4 vertical velocity
+            burial_POM_group1_state5_sms  gDW/m2 s-1  burial POM_group1 state variable 5 sources-sinks
+            burial_POM_group1_state5_w  m s-1  burial POM_group1 state variable 5 vertical velocity
+            burial_POM_group1_state6_sms  gP/m2 s-1  burial POM_group1 state variable 6 sources-sinks
+            burial_POM_group1_state6_w  m s-1  burial POM_group1 state variable 6 vertical velocity
+            burial_POM_group1_state7_sms  gN/m2 s-1  burial POM_group1 state variable 7 sources-sinks
+            burial_POM_group1_state7_w  m s-1  burial POM_group1 state variable 7 vertical velocity
+            burial_POM_group1_state8_sms  gC/m2 s-1  burial POM_group1 state variable 8 sources-sinks
+            burial_POM_group1_state8_w  m s-1  burial POM_group1 state variable 8 vertical velocity
+            burial_POM_group2_state1_sms  gDW/m3 s-1  burial POM_group2 state variable 1 sources-sinks
+            burial_POM_group2_state1_w  m s-1  burial POM_group2 state variable 1 vertical velocity
+            burial_POM_group2_state2_sms  gP/m3 s-1  burial POM_group2 state variable 2 sources-sinks
+            burial_POM_group2_state2_w  m s-1  burial POM_group2 state variable 2 vertical velocity
+            burial_POM_group2_state3_sms  gN/m3 s-1  burial POM_group2 state variable 3 sources-sinks
+            burial_POM_group2_state3_w  m s-1  burial POM_group2 state variable 3 vertical velocity
+            burial_POM_group2_state4_sms  gC/m3 s-1  burial POM_group2 state variable 4 sources-sinks
+            burial_POM_group2_state4_w  m s-1  burial POM_group2 state variable 4 vertical velocity
+            burial_POM_group2_state5_sms  gDW/m2 s-1  burial POM_group2 state variable 5 sources-sinks
+            burial_POM_group2_state5_w  m s-1  burial POM_group2 state variable 5 vertical velocity
+            burial_POM_group2_state6_sms  gP/m2 s-1  burial POM_group2 state variable 6 sources-sinks
+            burial_POM_group2_state6_w  m s-1  burial POM_group2 state variable 6 vertical velocity
+            burial_POM_group2_state7_sms  gN/m2 s-1  burial POM_group2 state variable 7 sources-sinks
+            burial_POM_group2_state7_w  m s-1  burial POM_group2 state variable 7 vertical velocity
+            burial_POM_group2_state8_sms  gC/m2 s-1  burial POM_group2 state variable 8 sources-sinks
+            burial_POM_group2_state8_w  m s-1  burial POM_group2 state variable 8 vertical velocity
+            burial_DOM_group1_state1_sms  gDW/m3 s-1  burial DOM_group1 state variable 1 sources-sinks
+            burial_DOM_group1_state1_w  m s-1  burial DOM_group1 state variable 1 vertical velocity
+            burial_DOM_group1_state2_sms  gP/m3 s-1  burial DOM_group1 state variable 2 sources-sinks
+            burial_DOM_group1_state2_w  m s-1  burial DOM_group1 state variable 2 vertical velocity
+            burial_DOM_group1_state3_sms  gN/m3 s-1  burial DOM_group1 state variable 3 sources-sinks
+            burial_DOM_group1_state3_w  m s-1  burial DOM_group1 state variable 3 vertical velocity
+            burial_DOM_group1_state4_sms  gC/m3 s-1  burial DOM_group1 state variable 4 sources-sinks
+            burial_DOM_group1_state4_w  m s-1  burial DOM_group1 state variable 4 vertical velocity
+            burial_DOM_group1_state5_sms  gDW/m2 s-1  burial DOM_group1 state variable 5 sources-sinks
+            burial_DOM_group1_state5_w  m s-1  burial DOM_group1 state variable 5 vertical velocity
+            burial_DOM_group1_state6_sms  gP/m2 s-1  burial DOM_group1 state variable 6 sources-sinks
+            burial_DOM_group1_state6_w  m s-1  burial DOM_group1 state variable 6 vertical velocity
+            burial_DOM_group1_state7_sms  gN/m2 s-1  burial DOM_group1 state variable 7 sources-sinks
+            burial_DOM_group1_state7_w  m s-1  burial DOM_group1 state variable 7 vertical velocity
+            burial_DOM_group1_state8_sms  gC/m2 s-1  burial DOM_group1 state variable 8 sources-sinks
+            burial_DOM_group1_state8_w  m s-1  burial DOM_group1 state variable 8 vertical velocity
+            zooplankton_prey_model1_state1_sms  gDW/m3 s-1  zooplankton prey_model1 state variable 1 sources-sinks
+            zooplankton_prey_model1_state1_w  m s-1  zooplankton prey_model1 state variable 1 vertical velocity
+            zooplankton_prey_model1_state2_sms  gP/m3 s-1  zooplankton prey_model1 state variable 2 sources-sinks
+            zooplankton_prey_model1_state2_w  m s-1  zooplankton prey_model1 state variable 2 vertical velocity
+            zooplankton_prey_model1_state3_sms  gN/m3 s-1  zooplankton prey_model1 state variable 3 sources-sinks
+            zooplankton_prey_model1_state3_w  m s-1  zooplankton prey_model1 state variable 3 vertical velocity
+            zooplankton_prey_model1_state4_sms  gC/m3 s-1  zooplankton prey_model1 state variable 4 sources-sinks
+            zooplankton_prey_model1_state4_w  m s-1  zooplankton prey_model1 state variable 4 vertical velocity
+            zooplankton_prey_model1_state5_sms  gDW/m2 s-1  zooplankton prey_model1 state variable 5 sources-sinks
+            zooplankton_prey_model1_state5_w  m s-1  zooplankton prey_model1 state variable 5 vertical velocity
+            zooplankton_prey_model1_state6_sms  gP/m2 s-1  zooplankton prey_model1 state variable 6 sources-sinks
+            zooplankton_prey_model1_state6_w  m s-1  zooplankton prey_model1 state variable 6 vertical velocity
+            zooplankton_prey_model1_state7_sms  gN/m2 s-1  zooplankton prey_model1 state variable 7 sources-sinks
+            zooplankton_prey_model1_state7_w  m s-1  zooplankton prey_model1 state variable 7 vertical velocity
+            zooplankton_prey_model1_state8_sms  gC/m2 s-1  zooplankton prey_model1 state variable 8 sources-sinks
+            zooplankton_prey_model1_state8_w  m s-1  zooplankton prey_model1 state variable 8 vertical velocity
+            zooplankton_prey_model2_state1_sms  gDW/m3 s-1  zooplankton prey_model2 state variable 1 sources-sinks
+            zooplankton_prey_model2_state1_w  m s-1  zooplankton prey_model2 state variable 1 vertical velocity
+            zooplankton_prey_model2_state2_sms  gP/m3 s-1  zooplankton prey_model2 state variable 2 sources-sinks
+            zooplankton_prey_model2_state2_w  m s-1  zooplankton prey_model2 state variable 2 vertical velocity
+            zooplankton_prey_model2_state3_sms  gN/m3 s-1  zooplankton prey_model2 state variable 3 sources-sinks
+            zooplankton_prey_model2_state3_w  m s-1  zooplankton prey_model2 state variable 3 vertical velocity
+            zooplankton_prey_model2_state4_sms  gC/m3 s-1  zooplankton prey_model2 state variable 4 sources-sinks
+            zooplankton_prey_model2_state4_w  m s-1  zooplankton prey_model2 state variable 4 vertical velocity
+            zooplankton_prey_model2_state5_sms  gDW/m2 s-1  zooplankton prey_model2 state variable 5 sources-sinks
+            zooplankton_prey_model2_state5_w  m s-1  zooplankton prey_model2 state variable 5 vertical velocity
+            zooplankton_prey_model2_state6_sms  gP/m2 s-1  zooplankton prey_model2 state variable 6 sources-sinks
+            zooplankton_prey_model2_state6_w  m s-1  zooplankton prey_model2 state variable 6 vertical velocity
+            zooplankton_prey_model2_state7_sms  gN/m2 s-1  zooplankton prey_model2 state variable 7 sources-sinks
+            zooplankton_prey_model2_state7_w  m s-1  zooplankton prey_model2 state variable 7 vertical velocity
+            zooplankton_prey_model2_state8_sms  gC/m2 s-1  zooplankton prey_model2 state variable 8 sources-sinks
+            zooplankton_prey_model2_state8_w  m s-1  zooplankton prey_model2 state variable 8 vertical velocity
+            total_bioturbation  gDW/m3/d  total_bioturbation
+            total_macrophyte_biomass  gDW/m2  total_macrophyte_biomass
+            total_afCovSurfVeg  -  total_afCovSurfVeg
+            attenuation_coefficient_of_photosynthetic_radiative_flux  m-1  attenuation_coefficient_of_photosynthetic_radiative_flux
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin1    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin1
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin2    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin2
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin3    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin3
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin4    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin4
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin5    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin5
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin6    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin6
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin7    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin7
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin8    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin8
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin9    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin9
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin10    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin10
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin11    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin11
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin12    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin12
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin13    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin13
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin14    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin14
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin15    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin15
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin16    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin16
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin17    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin17
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin18    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin18
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin19    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin19
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin20    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin20
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin21    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin21
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin22    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin22
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin23    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin23
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin24    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin24
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin25    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin25
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_last    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator last
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_last_exact_mean    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator last_exact_mean
+            cyanobacteria_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_mean    cyanobacteria 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator mean
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin1    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin1
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin2    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin2
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin3    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin3
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin4    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin4
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin5    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin5
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin6    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin6
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin7    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin7
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin8    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin8
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin9    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin9
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin10    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin10
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin11    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin11
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin12    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin12
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin13    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin13
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin14    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin14
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin15    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin15
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin16    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin16
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin17    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin17
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin18    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin18
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin19    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin19
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin20    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin20
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin21    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin21
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin22    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin22
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin23    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin23
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin24    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin24
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_bin25    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator bin25
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_last    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator last
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_last_exact_mean    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator last_exact_mean
+            greens_86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator_mean    greens 86400_s_mean_downwelling_photosynthetic_radiative_flux_at_3600_s_resolution_calculator mean
+            total_wCMin  gC/m3/s  total_wCMin
+            wet_totC    wet_totC
+            wet_totSusPar    wet_totSusPar
+            wet_chla  ug/L  wet_chla
+            total_aCovVeg  %  total_aCovVeg
+            total_aDSubVeg  gDW/m2  total_aDSubVeg
+            wet_totN    wet_totN
+            wet_totP    wet_totP
+            wet_totP_calculator_result    wet_totP_calculator result
+            wet_totN_calculator_result    wet_totN_calculator result
+            wet_chla_calculator_result  ug/L  wet_chla_calculator result
+            wet_totSusPar_calculator_result    wet_totSusPar_calculator result
+            wet_totC_calculator_result    wet_totC_calculator result
+            total_wCMin_calculator_result  gC/m3/s  total_wCMin_calculator result
+            attenuation_coefficient_of_photosynthetic_radiative_flux_calculator_result  m-1  attenuation_coefficient_of_photosynthetic_radiative_flux_calculator result
+            zero_sms_tot_calculator_result   s-1  zero_sms_tot_calculator result
+            zero_w_tot_calculator_result  m s-1  zero_w_tot_calculator result
+            abiotic_water_sDIMW_sms_tot_calculator_result  g/m3 s-1  abiotic_process_in_water sDIMW_sms_tot_calculator result
+            abiotic_water_sDIMW_w_tot_calculator_result  m s-1  abiotic_process_in_water sDIMW_w_tot_calculator result
+            abiotic_water_sSiPaW_sms_tot_calculator_result  g/m3 s-1  abiotic_process_in_water sSiPaW_sms_tot_calculator result
+            abiotic_water_sSiPaW_w_tot_calculator_result  m s-1  abiotic_process_in_water sSiPaW_w_tot_calculator result
+            abiotic_water_sPO4W_sms_tot_calculator_result  g/m3 s-1  abiotic_process_in_water sPO4W_sms_tot_calculator result
+            abiotic_water_sPO4W_w_tot_calculator_result  m s-1  abiotic_process_in_water sPO4W_w_tot_calculator result
+            abiotic_water_sPAIMW_sms_tot_calculator_result  g/m3 s-1  abiotic_process_in_water sPAIMW_sms_tot_calculator result
+            abiotic_water_sPAIMW_w_tot_calculator_result  m s-1  abiotic_process_in_water sPAIMW_w_tot_calculator result
+            abiotic_water_sNH4W_sms_tot_calculator_result  g/m3 s-1  abiotic_process_in_water sNH4W_sms_tot_calculator result
+            abiotic_water_sNH4W_w_tot_calculator_result  m s-1  abiotic_process_in_water sNH4W_w_tot_calculator result
+            abiotic_water_sNO3W_sms_tot_calculator_result  g/m3 s-1  abiotic_process_in_water sNO3W_sms_tot_calculator result
+            abiotic_water_sNO3W_w_tot_calculator_result  m s-1  abiotic_process_in_water sNO3W_w_tot_calculator result
+            abiotic_water_sSiO2W_sms_tot_calculator_result  g/m3 s-1  abiotic_process_in_water sSiO2W_sms_tot_calculator result
+            abiotic_water_sSiO2W_w_tot_calculator_result  m s-1  abiotic_process_in_water sSiO2W_w_tot_calculator result
+            abiotic_water_sO2W_sms_tot_calculator_result  g/m3 s-1  abiotic_process_in_water sO2W_sms_tot_calculator result
+            abiotic_water_sO2W_w_tot_calculator_result  m s-1  abiotic_process_in_water sO2W_w_tot_calculator result
+            POM_sDW_sms_tot_calculator_result  gDW/m3 s-1  particulate_organic_matter sDW_sms_tot_calculator result
+            POM_sDW_w_tot_calculator_result  m s-1  particulate_organic_matter sDW_w_tot_calculator result
+            POM_sPW_sms_tot_calculator_result  gP/m3 s-1  particulate_organic_matter sPW_sms_tot_calculator result
+            POM_sPW_w_tot_calculator_result  m s-1  particulate_organic_matter sPW_w_tot_calculator result
+            POM_sNW_sms_tot_calculator_result  gN/m3 s-1  particulate_organic_matter sNW_sms_tot_calculator result
+            POM_sNW_w_tot_calculator_result  m s-1  particulate_organic_matter sNW_w_tot_calculator result
+            POM_sCW_sms_tot_calculator_result  gC/m3 s-1  particulate_organic_matter sCW_sms_tot_calculator result
+            POM_sCW_w_tot_calculator_result  m s-1  particulate_organic_matter sCW_w_tot_calculator result
+            POM_sDS_PV_sms_tot_calculator_result  gDW/m2 s-1  particulate_organic_matter sDS_PV_sms_tot_calculator result
+            POM_sDS_PV_w_tot_calculator_result  m s-1  particulate_organic_matter sDS_PV_w_tot_calculator result
+            POM_sPS_PV_sms_tot_calculator_result  gP/m2 s-1  particulate_organic_matter sPS_PV_sms_tot_calculator result
+            POM_sPS_PV_w_tot_calculator_result  m s-1  particulate_organic_matter sPS_PV_w_tot_calculator result
+            POM_sNS_PV_sms_tot_calculator_result  gN/m2 s-1  particulate_organic_matter sNS_PV_sms_tot_calculator result
+            POM_sNS_PV_w_tot_calculator_result  m s-1  particulate_organic_matter sNS_PV_w_tot_calculator result
+            POM_sCS_PV_sms_tot_calculator_result  gC/m2 s-1  particulate_organic_matter sCS_PV_sms_tot_calculator result
+            POM_sCS_PV_w_tot_calculator_result  m s-1  particulate_organic_matter sCS_PV_w_tot_calculator result
+            humus_sDW_sms_tot_calculator_result  gDW/m3 s-1  humus sDW_sms_tot_calculator result
+            humus_sDW_w_tot_calculator_result  m s-1  humus sDW_w_tot_calculator result
+            humus_sPW_sms_tot_calculator_result  gP/m3 s-1  humus sPW_sms_tot_calculator result
+            humus_sPW_w_tot_calculator_result  m s-1  humus sPW_w_tot_calculator result
+            humus_sNW_sms_tot_calculator_result  gN/m3 s-1  humus sNW_sms_tot_calculator result
+            humus_sNW_w_tot_calculator_result  m s-1  humus sNW_w_tot_calculator result
+            humus_sCW_sms_tot_calculator_result  gC/m3 s-1  humus sCW_sms_tot_calculator result
+            humus_sCW_w_tot_calculator_result  m s-1  humus sCW_w_tot_calculator result
+            humus_sDS_PV_sms_tot_calculator_result  gDW/m2 s-1  humus sDS_PV_sms_tot_calculator result
+            humus_sDS_PV_w_tot_calculator_result  m s-1  humus sDS_PV_w_tot_calculator result
+            humus_sPS_PV_sms_tot_calculator_result  gP/m2 s-1  humus sPS_PV_sms_tot_calculator result
+            humus_sPS_PV_w_tot_calculator_result  m s-1  humus sPS_PV_w_tot_calculator result
+            humus_sNS_PV_sms_tot_calculator_result  gN/m2 s-1  humus sNS_PV_sms_tot_calculator result
+            humus_sNS_PV_w_tot_calculator_result  m s-1  humus sNS_PV_w_tot_calculator result
+            humus_sCS_PV_sms_tot_calculator_result  gC/m2 s-1  humus sCS_PV_sms_tot_calculator result
+            humus_sCS_PV_w_tot_calculator_result  m s-1  humus sCS_PV_w_tot_calculator result
+            DOM_sDW_sms_tot_calculator_result  gDW/m3 s-1  dissolved_organic_matter sDW_sms_tot_calculator result
+            DOM_sDW_w_tot_calculator_result  m s-1  dissolved_organic_matter sDW_w_tot_calculator result
+            DOM_sPW_sms_tot_calculator_result  gP/m3 s-1  dissolved_organic_matter sPW_sms_tot_calculator result
+            DOM_sPW_w_tot_calculator_result  m s-1  dissolved_organic_matter sPW_w_tot_calculator result
+            DOM_sNW_sms_tot_calculator_result  gN/m3 s-1  dissolved_organic_matter sNW_sms_tot_calculator result
+            DOM_sNW_w_tot_calculator_result  m s-1  dissolved_organic_matter sNW_w_tot_calculator result
+            DOM_sCW_sms_tot_calculator_result  gC/m3 s-1  dissolved_organic_matter sCW_sms_tot_calculator result
+            DOM_sCW_w_tot_calculator_result  m s-1  dissolved_organic_matter sCW_w_tot_calculator result
+            DOM_sDS_PV_sms_tot_calculator_result  gDW/m2 s-1  dissolved_organic_matter sDS_PV_sms_tot_calculator result
+            DOM_sDS_PV_w_tot_calculator_result  m s-1  dissolved_organic_matter sDS_PV_w_tot_calculator result
+            DOM_sPS_PV_sms_tot_calculator_result  gP/m2 s-1  dissolved_organic_matter sPS_PV_sms_tot_calculator result
+            DOM_sPS_PV_w_tot_calculator_result  m s-1  dissolved_organic_matter sPS_PV_w_tot_calculator result
+            DOM_sNS_PV_sms_tot_calculator_result  gN/m2 s-1  dissolved_organic_matter sNS_PV_sms_tot_calculator result
+            DOM_sNS_PV_w_tot_calculator_result  m s-1  dissolved_organic_matter sNS_PV_w_tot_calculator result
+            DOM_sCS_PV_sms_tot_calculator_result  gC/m2 s-1  dissolved_organic_matter sCS_PV_sms_tot_calculator result
+            DOM_sCS_PV_w_tot_calculator_result  m s-1  dissolved_organic_matter sCS_PV_w_tot_calculator result
+            cyanobacteria_sDW_sms_tot_calculator_result  gDW/m3 s-1  cyanobacteria sDW_sms_tot_calculator result
+            cyanobacteria_sDW_w_tot_calculator_result  m s-1  cyanobacteria sDW_w_tot_calculator result
+            cyanobacteria_sPW_sms_tot_calculator_result  gP/m3 s-1  cyanobacteria sPW_sms_tot_calculator result
+            cyanobacteria_sPW_w_tot_calculator_result  m s-1  cyanobacteria sPW_w_tot_calculator result
+            cyanobacteria_sNW_sms_tot_calculator_result  gN/m3 s-1  cyanobacteria sNW_sms_tot_calculator result
+            cyanobacteria_sNW_w_tot_calculator_result  m s-1  cyanobacteria sNW_w_tot_calculator result
+            cyanobacteria_sCW_sms_tot_calculator_result  gC/m3 s-1  cyanobacteria sCW_sms_tot_calculator result
+            cyanobacteria_sCW_w_tot_calculator_result  m s-1  cyanobacteria sCW_w_tot_calculator result
+            cyanobacteria_sDS_PV_sms_tot_calculator_result  gDW/m2 s-1  cyanobacteria sDS_PV_sms_tot_calculator result
+            cyanobacteria_sDS_PV_w_tot_calculator_result  m s-1  cyanobacteria sDS_PV_w_tot_calculator result
+            cyanobacteria_sPS_PV_sms_tot_calculator_result  gP/m2 s-1  cyanobacteria sPS_PV_sms_tot_calculator result
+            cyanobacteria_sPS_PV_w_tot_calculator_result  m s-1  cyanobacteria sPS_PV_w_tot_calculator result
+            cyanobacteria_sNS_PV_sms_tot_calculator_result  gN/m2 s-1  cyanobacteria sNS_PV_sms_tot_calculator result
+            cyanobacteria_sNS_PV_w_tot_calculator_result  m s-1  cyanobacteria sNS_PV_w_tot_calculator result
+            cyanobacteria_sCS_PV_sms_tot_calculator_result  gC/m2 s-1  cyanobacteria sCS_PV_sms_tot_calculator result
+            cyanobacteria_sCS_PV_w_tot_calculator_result  m s-1  cyanobacteria sCS_PV_w_tot_calculator result
+            greens_sDW_sms_tot_calculator_result  gDW/m3 s-1  greens sDW_sms_tot_calculator result
+            greens_sDW_w_tot_calculator_result  m s-1  greens sDW_w_tot_calculator result
+            greens_sPW_sms_tot_calculator_result  gP/m3 s-1  greens sPW_sms_tot_calculator result
+            greens_sPW_w_tot_calculator_result  m s-1  greens sPW_w_tot_calculator result
+            greens_sNW_sms_tot_calculator_result  gN/m3 s-1  greens sNW_sms_tot_calculator result
+            greens_sNW_w_tot_calculator_result  m s-1  greens sNW_w_tot_calculator result
+            greens_sCW_sms_tot_calculator_result  gC/m3 s-1  greens sCW_sms_tot_calculator result
+            greens_sCW_w_tot_calculator_result  m s-1  greens sCW_w_tot_calculator result
+            greens_sDS_PV_sms_tot_calculator_result  gDW/m2 s-1  greens sDS_PV_sms_tot_calculator result
+            greens_sDS_PV_w_tot_calculator_result  m s-1  greens sDS_PV_w_tot_calculator result
+            greens_sPS_PV_sms_tot_calculator_result  gP/m2 s-1  greens sPS_PV_sms_tot_calculator result
+            greens_sPS_PV_w_tot_calculator_result  m s-1  greens sPS_PV_w_tot_calculator result
+            greens_sNS_PV_sms_tot_calculator_result  gN/m2 s-1  greens sNS_PV_sms_tot_calculator result
+            greens_sNS_PV_w_tot_calculator_result  m s-1  greens sNS_PV_w_tot_calculator result
+            greens_sCS_PV_sms_tot_calculator_result  gC/m2 s-1  greens sCS_PV_sms_tot_calculator result
+            greens_sCS_PV_w_tot_calculator_result  m s-1  greens sCS_PV_w_tot_calculator result
+            zooplankton_sD_sms_tot_calculator_result  gDW/m3 s-1  zooplankton sD_sms_tot_calculator result
+            zooplankton_sD_w_tot_calculator_result  m s-1  zooplankton sD_w_tot_calculator result
+            zooplankton_sP_sms_tot_calculator_result  gP/m3 s-1  zooplankton sP_sms_tot_calculator result
+            zooplankton_sP_w_tot_calculator_result  m s-1  zooplankton sP_w_tot_calculator result
+            zooplankton_sN_sms_tot_calculator_result  gN/m3 s-1  zooplankton sN_sms_tot_calculator result
+            zooplankton_sN_w_tot_calculator_result  m s-1  zooplankton sN_w_tot_calculator result
+            zooplankton_sC_sms_tot_calculator_result  gC/m3 s-1  zooplankton sC_sms_tot_calculator result
+            zooplankton_sC_w_tot_calculator_result  m s-1  zooplankton sC_w_tot_calculator result
+        FABM diagnostic variables defined on a horizontal slice of the model domain:
+            abiotic_water_sDIMW_sfl  g/m3 m s-1  abiotic_process_in_water inorganic matter surface flux
+            abiotic_water_sDIMW_bfl  g/m3 m s-1  abiotic_process_in_water inorganic matter bottom flux
+            abiotic_water_sSiPaW_sfl  g/m3 m s-1  abiotic_process_in_water particulate Si surface flux
+            abiotic_water_sSiPaW_bfl  g/m3 m s-1  abiotic_process_in_water particulate Si bottom flux
+            abiotic_water_sPO4W_sfl  g/m3 m s-1  abiotic_process_in_water phosphate surface flux
+            abiotic_water_sPO4W_bfl  g/m3 m s-1  abiotic_process_in_water phosphate bottom flux
+            abiotic_water_sPAIMW_sfl  g/m3 m s-1  abiotic_process_in_water IM-adsorbed P surface flux
+            abiotic_water_sPAIMW_bfl  g/m3 m s-1  abiotic_process_in_water IM-adsorbed P bottom flux
+            abiotic_water_sNH4W_sfl  g/m3 m s-1  abiotic_process_in_water ammonium surface flux
+            abiotic_water_sNH4W_bfl  g/m3 m s-1  abiotic_process_in_water ammonium bottom flux
+            abiotic_water_sNO3W_sfl  g/m3 m s-1  abiotic_process_in_water nitrate surface flux
+            abiotic_water_sNO3W_bfl  g/m3 m s-1  abiotic_process_in_water nitrate bottom flux
+            abiotic_water_sSiO2W_sfl  g/m3 m s-1  abiotic_process_in_water silica dioxide surface flux
+            abiotic_water_sSiO2W_bfl  g/m3 m s-1  abiotic_process_in_water silica dioxide bottom flux
+            abiotic_water_sO2W_sfl  g/m3 m s-1  abiotic_process_in_water oxygen surface flux
+            abiotic_water_sO2W_bfl  g/m3 m s-1  abiotic_process_in_water oxygen bottom flux
+            abiotic_water_wind  m/s  abiotic_process_in_water windspeed
+            abiotic_water_tO2Aer  g/m2/s  abiotic_process_in_water O2_reareation
+            abiotic_sediment_sDIMS_sms  g/m2 s-1  abiotic_process_in_sediment inorganic matter sources-sinks
+            abiotic_sediment_sSiPaS_sms  g/m2 s-1  abiotic_process_in_sediment particulate Si sources-sinks
+            abiotic_sediment_sSiO2S_sms  g/m2 s-1  abiotic_process_in_sediment dissolved SiO2 sources-sinks
+            abiotic_sediment_sPO4S_sms  g/m2 s-1  abiotic_process_in_sediment phosphate sources-sinks
+            abiotic_sediment_sPAIMS_sms  g/m2 s-1  abiotic_process_in_sediment absorbed phosphate sources-sinks
+            abiotic_sediment_sNH4S_sms  g/m2 s-1  abiotic_process_in_sediment ammonium sources-sinks
+            abiotic_sediment_sNO3S_sms  g/m2 s-1  abiotic_process_in_sediment nitrate sources-sinks
+            abiotic_sediment_oxygen_pool_water_sfl  g/m3 m s-1  abiotic_process_in_sediment oxygen pool water surface flux
+            abiotic_sediment_oxygen_pool_water_bfl  g/m3 m s-1  abiotic_process_in_sediment oxygen pool water bottom flux
+            abiotic_sediment_afOxySed  -  abiotic_process_in_sediment fraction of aerobic sediment
+            abiotic_sediment_aPEqIMS  -  abiotic_process_in_sediment equilibrium adsorbed PO4
+            abiotic_sediment_tDAbioO2S  g/m2/d  abiotic_process_in_sediment O2 consumption
+            abiotic_sediment_tDAbioIMS  g/m2/s  abiotic_process_in_sediment IM ROC
+            abiotic_sediment_bPorS  m3/m3  abiotic_process_in_sediment sediment porosity
+            abiotic_sediment_bPorCorS  m3/m3  abiotic_process_in_sediment sediment porosity corrected for tortuosity
+            abiotic_sediment_cDepthS  m  abiotic_process_in_sediment sediment depth
+            abiotic_sediment_fDepthDifS  m  abiotic_process_in_sediment diffusion distance as fraction of sediment depth
+            abiotic_sediment_tDPOMdummy  gDW/m2  abiotic_process_in_sediment dummy total sediment POM increase from biology
+            abiotic_sediment_bot_pel_conv  -  abiotic_process_in_sediment current conversion between m-2 and m-3
+            bot_pel_interface_bot_pel_conv  -  bot_pel_interface current conversion between m-2 and m-3
+            sediment_exchange_POM_D_in_water_1_sfl  g/m3 m s-1  sediment_exchange POM D1 surface flux
+            sediment_exchange_POM_D_in_water_1_bfl  g/m3 m s-1  sediment_exchange POM D1 bottom flux
+            sediment_exchange_POM_N_in_water_1_sfl  g/m3 m s-1  sediment_exchange POM N1 surface flux
+            sediment_exchange_POM_N_in_water_1_bfl  g/m3 m s-1  sediment_exchange POM N1 bottom flux
+            sediment_exchange_POM_P_in_water_1_sfl  g/m3 m s-1  sediment_exchange POM P1 surface flux
+            sediment_exchange_POM_P_in_water_1_bfl  g/m3 m s-1  sediment_exchange POM P1 bottom flux
+            sediment_exchange_POM_C_in_water_1_sfl  g/m3 m s-1  sediment_exchange POM C1 surface flux
+            sediment_exchange_POM_C_in_water_1_bfl  g/m3 m s-1  sediment_exchange POM C1 bottom flux
+            sediment_exchange_POM_D_in_sediment_1_sms  g/m2 s-1  sediment_exchange POM D1 sources-sinks
+            sediment_exchange_POM_N_in_sediment_1_sms  g/m2 s-1  sediment_exchange POM N1 sources-sinks
+            sediment_exchange_POM_P_in_sediment_1_sms  g/m2 s-1  sediment_exchange POM P1 sources-sinks
+            sediment_exchange_POM_C_in_sediment_1_sms  g/m2 s-1  sediment_exchange POM C1 sources-sinks
+            sediment_exchange_POM_D_in_sediment_1_PV_sfl  g/m2 m s-1  sediment_exchange POM D PV pelagic mirror1 surface flux
+            sediment_exchange_POM_D_in_sediment_1_PV_bfl  g/m2 m s-1  sediment_exchange POM D PV pelagic mirror1 bottom flux
+            sediment_exchange_POM_N_in_sediment_1_PV_sfl  g/m2 m s-1  sediment_exchange POM N PV pelagic mirror1 surface flux
+            sediment_exchange_POM_N_in_sediment_1_PV_bfl  g/m2 m s-1  sediment_exchange POM N PV pelagic mirror1 bottom flux
+            sediment_exchange_POM_P_in_sediment_1_PV_sfl  g/m2 m s-1  sediment_exchange POM P PV pelagic mirror1 surface flux
+            sediment_exchange_POM_P_in_sediment_1_PV_bfl  g/m2 m s-1  sediment_exchange POM P PV pelagic mirror1 bottom flux
+            sediment_exchange_POM_C_in_sediment_1_PV_sfl  g/m2 m s-1  sediment_exchange POM C PV pelagic mirror1 surface flux
+            sediment_exchange_POM_C_in_sediment_1_PV_bfl  g/m2 m s-1  sediment_exchange POM C PV pelagic mirror1 bottom flux
+            sediment_exchange_tDExchPOMS_1  g/m2/s  sediment_exchange ROC DPOM exchange 1
+            sediment_exchange_DOM_D_in_water_1_sfl  g/m3 m s-1  sediment_exchange DOM D1 surface flux
+            sediment_exchange_DOM_D_in_water_1_bfl  g/m3 m s-1  sediment_exchange DOM D1 bottom flux
+            sediment_exchange_DOM_N_in_water_1_sfl  g/m3 m s-1  sediment_exchange DOM N1 surface flux
+            sediment_exchange_DOM_N_in_water_1_bfl  g/m3 m s-1  sediment_exchange DOM N1 bottom flux
+            sediment_exchange_DOM_P_in_water_1_sfl  g/m3 m s-1  sediment_exchange DOM P1 surface flux
+            sediment_exchange_DOM_P_in_water_1_bfl  g/m3 m s-1  sediment_exchange DOM P1 bottom flux
+            sediment_exchange_DOM_C_in_water_1_sfl  g/m3 m s-1  sediment_exchange DOM C1 surface flux
+            sediment_exchange_DOM_C_in_water_1_bfl  g/m3 m s-1  sediment_exchange DOM C1 bottom flux
+            sediment_exchange_DOM_D_in_sediment_1_sms  g/m2 s-1  sediment_exchange DOM D1 sources-sinks
+            sediment_exchange_DOM_N_in_sediment_1_sms  g/m2 s-1  sediment_exchange DOM N1 sources-sinks
+            sediment_exchange_DOM_P_in_sediment_1_sms  g/m2 s-1  sediment_exchange DOM P1 sources-sinks
+            sediment_exchange_DOM_C_in_sediment_1_sms  g/m2 s-1  sediment_exchange DOM C1 sources-sinks
+            sediment_exchange_DOM_D_in_sediment_1_PV_sfl  g/m2 m s-1  sediment_exchange DOM D PV pelagic mirror1 surface flux
+            sediment_exchange_DOM_D_in_sediment_1_PV_bfl  g/m2 m s-1  sediment_exchange DOM D PV pelagic mirror1 bottom flux
+            sediment_exchange_DOM_N_in_sediment_1_PV_sfl  g/m2 m s-1  sediment_exchange DOM N PV pelagic mirror1 surface flux
+            sediment_exchange_DOM_N_in_sediment_1_PV_bfl  g/m2 m s-1  sediment_exchange DOM N PV pelagic mirror1 bottom flux
+            sediment_exchange_DOM_P_in_sediment_1_PV_sfl  g/m2 m s-1  sediment_exchange DOM P PV pelagic mirror1 surface flux
+            sediment_exchange_DOM_P_in_sediment_1_PV_bfl  g/m2 m s-1  sediment_exchange DOM P PV pelagic mirror1 bottom flux
+            sediment_exchange_DOM_C_in_sediment_1_PV_sfl  g/m2 m s-1  sediment_exchange DOM C PV pelagic mirror1 surface flux
+            sediment_exchange_DOM_C_in_sediment_1_PV_bfl  g/m2 m s-1  sediment_exchange DOM C PV pelagic mirror1 bottom flux
+            sediment_exchange_inorg_pool_in_sediment_sms  g/m2 s-1  sediment_exchange sediment inorganic matter sources-sinks
+            sediment_exchange_PO4_in_sediment_sms  g/m2 s-1  sediment_exchange sediment phosphate sources-sinks
+            sediment_exchange_PAIM_in_sediment_sms  g/m2 s-1  sediment_exchange sediment absorbed phosphate sources-sinks
+            sediment_exchange_NH4_in_sediment_sms  g/m2 s-1  sediment_exchange sediment ammonium sources-sinks
+            sediment_exchange_NO3_in_sediment_sms  g/m2 s-1  sediment_exchange sediment nitrate sources-sinks
+            sediment_exchange_particulate_Si_in_sediment_sms  g/m2 s-1  sediment_exchange sediment particulate Si sources-sinks
+            sediment_exchange_dissolved_Si_in_sediment_sms  g/m2 s-1  sediment_exchange sediment dissolved Si sources-sinks
+            sediment_exchange_particulate_Si_in_water_sfl  g/m2 m s-1  sediment_exchange water particulate Si surface flux
+            sediment_exchange_particulate_Si_in_water_bfl  g/m2 m s-1  sediment_exchange water particulate Si bottom flux
+            sediment_exchange_SiO2_in_water_sfl  g/m3 m s-1  sediment_exchange water SiO2 surface flux
+            sediment_exchange_SiO2_in_water_bfl  g/m3 m s-1  sediment_exchange water SiO2 bottom flux
+            sediment_exchange_NH4_in_water_sfl  g/m3 m s-1  sediment_exchange water NH4 surface flux
+            sediment_exchange_NH4_in_water_bfl  g/m3 m s-1  sediment_exchange water NH4 bottom flux
+            sediment_exchange_NO3_in_water_sfl  g/m3 m s-1  sediment_exchange water NO3 surface flux
+            sediment_exchange_NO3_in_water_bfl  g/m3 m s-1  sediment_exchange water NO3 bottom flux
+            sediment_exchange_PO4_in_water_sfl  g/m3 m s-1  sediment_exchange water PO4 surface flux
+            sediment_exchange_PO4_in_water_bfl  g/m3 m s-1  sediment_exchange water PO4 bottom flux
+            sediment_exchange_inorg_pool_in_water_sfl  g/m3 m s-1  sediment_exchange inorganic matter pool in water surface flux
+            sediment_exchange_inorg_pool_in_water_bfl  g/m3 m s-1  sediment_exchange inorganic matter pool in water bottom flux
+            sediment_exchange_PAIM_in_water_sfl  g/m3 m s-1  sediment_exchange adsorbed phosphorus in water surface flux
+            sediment_exchange_PAIM_in_water_bfl  g/m3 m s-1  sediment_exchange adsorbed phosphorus in water bottom flux
+            sediment_exchange_tDResusDead  -  sediment_exchange tDResusDead
+            sediment_exchange_aFunTauTmSet  -  sediment_exchange basic settling rate
+            sediment_exchange_tDAbioIMS  g/m2/s  sediment_exchange IM abiotic update
+            sediment_exchange_tDAbioTotPOMS  g/m2/s  sediment_exchange Total POM abiotic update
+            burial_NH4_pool_in_sediment_sms  g/m2 s-1  burial NH4 pool in sediment sources-sinks
+            burial_NO3_pool_in_sediment_sms  g/m2 s-1  burial NO3 pool in sediment sources-sinks
+            burial_PO4_pool_in_sediment_sms  g/m2 s-1  burial PO4 pool in sediment sources-sinks
+            burial_PAIM_in_sediment_sms  g/m2 s-1  burial adsorbed phosphorus in sediment sources-sinks
+            burial_inorg_pool_in_sediment_sms  g/m2 s-1  burial inorganic matter pool in sediment sources-sinks
+            burial_humus_DW_in_deep_sediment_sms  g/m2 s-1  burial humus DW in deep sediment sources-sinks
+            burial_humus_N_in_deep_sediment_sms  g/m2 s-1  burial humus N in deep sediment sources-sinks
+            burial_humus_P_in_deep_sediment_sms  g/m2 s-1  burial humus P in deep sediment sources-sinks
+            burial_humus_C_in_deep_sediment_sms  g/m2 s-1  burial humus C in deep sediment sources-sinks
+            burial_humus_DW_in_deep_sediment_PV_sfl  g/m2 m s-1  burial humus DW in deep sediment pelagic mirror surface flux
+            burial_humus_DW_in_deep_sediment_PV_bfl  g/m2 m s-1  burial humus DW in deep sediment pelagic mirror bottom flux
+            burial_humus_N_in_deep_sediment_PV_sfl  g/m2 m s-1  burial humus N in deep sediment pelagic mirror surface flux
+            burial_humus_N_in_deep_sediment_PV_bfl  g/m2 m s-1  burial humus N in deep sediment pelagic mirror bottom flux
+            burial_humus_P_in_deep_sediment_PV_sfl  g/m2 m s-1  burial humus P in deep sediment pelagic mirror surface flux
+            burial_humus_P_in_deep_sediment_PV_bfl  g/m2 m s-1  burial humus P in deep sediment pelagic mirror bottom flux
+            burial_humus_C_in_deep_sediment_PV_sfl  g/m2 m s-1  burial humus C in deep sediment pelagic mirror surface flux
+            burial_humus_C_in_deep_sediment_PV_bfl  g/m2 m s-1  burial humus C in deep sediment pelagic mirror bottom flux
+            burial_particulate_Si_in_sediment_sms  g/m2 s-1  burial Particulate Si in sediment sources-sinks
+            burial_POM_D_1_sms  g/m2 s-1  burial POM D 1 sources-sinks
+            burial_POM_N_1_sms  g/m2 s-1  burial POM N 1 sources-sinks
+            burial_POM_P_1_sms  g/m2 s-1  burial POM P 1 sources-sinks
+            burial_POM_C_1_sms  g/m2 s-1  burial POM C 1 sources-sinks
+            burial_POM_D_1_PV_sfl  g/m2 m s-1  burial POM D PV group number 1 surface flux
+            burial_POM_D_1_PV_bfl  g/m2 m s-1  burial POM D PV group number 1 bottom flux
+            burial_POM_N_1_PV_sfl  g/m2 m s-1  burial POM N PV group number 1 surface flux
+            burial_POM_N_1_PV_bfl  g/m2 m s-1  burial POM N PV group number 1 bottom flux
+            burial_POM_P_1_PV_sfl  g/m2 m s-1  burial POM P PV group number 1 surface flux
+            burial_POM_P_1_PV_bfl  g/m2 m s-1  burial POM P PV group number 1 bottom flux
+            burial_POM_C_1_PV_sfl  g/m2 m s-1  burial POM C PV group number 1 surface flux
+            burial_POM_C_1_PV_bfl  g/m2 m s-1  burial POM C PV group number 1 bottom flux
+            burial_POM_D_2_sms  g/m2 s-1  burial POM D 2 sources-sinks
+            burial_POM_N_2_sms  g/m2 s-1  burial POM N 2 sources-sinks
+            burial_POM_P_2_sms  g/m2 s-1  burial POM P 2 sources-sinks
+            burial_POM_C_2_sms  g/m2 s-1  burial POM C 2 sources-sinks
+            burial_POM_D_2_PV_sfl  g/m2 m s-1  burial POM D PV group number 2 surface flux
+            burial_POM_D_2_PV_bfl  g/m2 m s-1  burial POM D PV group number 2 bottom flux
+            burial_POM_N_2_PV_sfl  g/m2 m s-1  burial POM N PV group number 2 surface flux
+            burial_POM_N_2_PV_bfl  g/m2 m s-1  burial POM N PV group number 2 bottom flux
+            burial_POM_P_2_PV_sfl  g/m2 m s-1  burial POM P PV group number 2 surface flux
+            burial_POM_P_2_PV_bfl  g/m2 m s-1  burial POM P PV group number 2 bottom flux
+            burial_POM_C_2_PV_sfl  g/m2 m s-1  burial POM C PV group number 2 surface flux
+            burial_POM_C_2_PV_bfl  g/m2 m s-1  burial POM C PV group number 2 bottom flux
+            burial_DOM_D_1_sms  g/m2 s-1  burial DOM D 1 sources-sinks
+            burial_DOM_N_1_sms  g/m2 s-1  burial DOM N 1 sources-sinks
+            burial_DOM_P_1_sms  g/m2 s-1  burial DOM P 1 sources-sinks
+            burial_DOM_C_1_sms  g/m2 s-1  burial DOM C 1 sources-sinks
+            burial_DOM_D_1_PV_sfl  g/m2 m s-1  burial DOM D PV group number1 surface flux
+            burial_DOM_D_1_PV_bfl  g/m2 m s-1  burial DOM D PV group number1 bottom flux
+            burial_DOM_N_1_PV_sfl  g/m2 m s-1  burial DOM N PV group number1 surface flux
+            burial_DOM_N_1_PV_bfl  g/m2 m s-1  burial DOM N PV group number1 bottom flux
+            burial_DOM_P_1_PV_sfl  g/m2 m s-1  burial DOM P PV group number1 surface flux
+            burial_DOM_P_1_PV_bfl  g/m2 m s-1  burial DOM P PV group number1 bottom flux
+            burial_DOM_C_1_PV_sfl  g/m2 m s-1  burial DOM C PV group number1 surface flux
+            burial_DOM_C_1_PV_bfl  g/m2 m s-1  burial DOM C PV group number1 bottom flux
+            burial_VDeltaS  m  burial sediment turnover depth
+            POM_sDW_sfl  gDW/m3 m s-1  particulate_organic_matter water column DW surface flux
+            POM_sDW_bfl  gDW/m3 m s-1  particulate_organic_matter water column DW bottom flux
+            POM_sPW_sfl  gP/m3 m s-1  particulate_organic_matter water column P surface flux
+            POM_sPW_bfl  gP/m3 m s-1  particulate_organic_matter water column P bottom flux
+            POM_sNW_sfl  gN/m3 m s-1  particulate_organic_matter water column N surface flux
+            POM_sNW_bfl  gN/m3 m s-1  particulate_organic_matter water column N bottom flux
+            POM_sCW_sfl  gC/m3 m s-1  particulate_organic_matter water column C surface flux
+            POM_sCW_bfl  gC/m3 m s-1  particulate_organic_matter water column C bottom flux
+            POM_sDS_sms  gDW/m2 s-1  particulate_organic_matter sediment DW sources-sinks
+            POM_sPS_sms  gP/m2 s-1  particulate_organic_matter sediment P sources-sinks
+            POM_sNS_sms  gN/m2 s-1  particulate_organic_matter sediment N sources-sinks
+            POM_sCS_sms  gC/m2 s-1  particulate_organic_matter sediment C sources-sinks
+            POM_sDS_PV_sfl  gDW/m2 m s-1  particulate_organic_matter sediment DW PV surface flux
+            POM_sDS_PV_bfl  gDW/m2 m s-1  particulate_organic_matter sediment DW PV bottom flux
+            POM_sPS_PV_sfl  gP/m2 m s-1  particulate_organic_matter sediment P  PV surface flux
+            POM_sPS_PV_bfl  gP/m2 m s-1  particulate_organic_matter sediment P  PV bottom flux
+            POM_sNS_PV_sfl  gN/m2 m s-1  particulate_organic_matter sediment N  PV surface flux
+            POM_sNS_PV_bfl  gN/m2 m s-1  particulate_organic_matter sediment N  PV bottom flux
+            POM_sCS_PV_sfl  gC/m2 m s-1  particulate_organic_matter sediment C  PV surface flux
+            POM_sCS_PV_bfl  gC/m2 m s-1  particulate_organic_matter sediment C  PV bottom flux
+            POM_rPDS  -  particulate_organic_matter P/D ratio sediment
+            POM_rNDS  -  particulate_organic_matter N/D ratio sediment
+            POM_rCDS  -  particulate_organic_matter C/D ratio sediment
+            POM_tDPOMS  g/m2/s  particulate_organic_matter ROC DW OM pool in sediment
+            POM_tDTrans  g/m2/s  particulate_organic_matter rate DW biotrans. minus refraction
+            POM_tCTrans  g/m2/s  particulate_organic_matter rate C biotrans. minus refraction
+            POM_N_transformation_water_sfl  g/m3 m s-1  particulate_organic_matter N biotransformation target water surface flux
+            POM_N_transformation_water_bfl  g/m3 m s-1  particulate_organic_matter N biotransformation target water bottom flux
+            POM_P_transformation_water_sfl  g/m3 m s-1  particulate_organic_matter P biotransformation target water surface flux
+            POM_P_transformation_water_bfl  g/m3 m s-1  particulate_organic_matter P biotransformation target water bottom flux
+            POM_oxygen_pool_water_sfl  g/m3 m s-1  particulate_organic_matter oxygen_pool_water surface flux
+            POM_oxygen_pool_water_bfl  g/m3 m s-1  particulate_organic_matter oxygen_pool_water bottom flux
+            POM_NO3_pool_water_sfl  g/m3 m s-1  particulate_organic_matter NO3 pool water surface flux
+            POM_NO3_pool_water_bfl  g/m3 m s-1  particulate_organic_matter NO3 pool water bottom flux
+            POM_N_transformation_sediment_sms  g/m2 s-1  particulate_organic_matter N biotransformation target sediment sources-sinks
+            POM_P_transformation_sediment_sms  g/m2 s-1  particulate_organic_matter P biotransformation target sediment sources-sinks
+            humus_sDW_sfl  gDW/m3 m s-1  humus water column DW surface flux
+            humus_sDW_bfl  gDW/m3 m s-1  humus water column DW bottom flux
+            humus_sPW_sfl  gP/m3 m s-1  humus water column P surface flux
+            humus_sPW_bfl  gP/m3 m s-1  humus water column P bottom flux
+            humus_sNW_sfl  gN/m3 m s-1  humus water column N surface flux
+            humus_sNW_bfl  gN/m3 m s-1  humus water column N bottom flux
+            humus_sCW_sfl  gC/m3 m s-1  humus water column C surface flux
+            humus_sCW_bfl  gC/m3 m s-1  humus water column C bottom flux
+            humus_sDS_sms  gDW/m2 s-1  humus sediment DW sources-sinks
+            humus_sPS_sms  gP/m2 s-1  humus sediment P sources-sinks
+            humus_sNS_sms  gN/m2 s-1  humus sediment N sources-sinks
+            humus_sCS_sms  gC/m2 s-1  humus sediment C sources-sinks
+            humus_sDS_PV_sfl  gDW/m2 m s-1  humus sediment DW PV surface flux
+            humus_sDS_PV_bfl  gDW/m2 m s-1  humus sediment DW PV bottom flux
+            humus_sPS_PV_sfl  gP/m2 m s-1  humus sediment P  PV surface flux
+            humus_sPS_PV_bfl  gP/m2 m s-1  humus sediment P  PV bottom flux
+            humus_sNS_PV_sfl  gN/m2 m s-1  humus sediment N  PV surface flux
+            humus_sNS_PV_bfl  gN/m2 m s-1  humus sediment N  PV bottom flux
+            humus_sCS_PV_sfl  gC/m2 m s-1  humus sediment C  PV surface flux
+            humus_sCS_PV_bfl  gC/m2 m s-1  humus sediment C  PV bottom flux
+            humus_rPDS  -  humus P/D ratio sediment
+            humus_rNDS  -  humus N/D ratio sediment
+            humus_rCDS  -  humus C/D ratio sediment
+            humus_tDPOMS  g/m2/s  humus ROC DW OM pool in sediment
+            humus_tDTrans  g/m2/s  humus rate DW biotrans. minus refraction
+            humus_tCTrans  g/m2/s  humus rate C biotrans. minus refraction
+            humus_N_transformation_water_sfl  g/m3 m s-1  humus N biotransformation target water surface flux
+            humus_N_transformation_water_bfl  g/m3 m s-1  humus N biotransformation target water bottom flux
+            humus_P_transformation_water_sfl  g/m3 m s-1  humus P biotransformation target water surface flux
+            humus_P_transformation_water_bfl  g/m3 m s-1  humus P biotransformation target water bottom flux
+            humus_oxygen_pool_water_sfl  g/m3 m s-1  humus oxygen_pool_water surface flux
+            humus_oxygen_pool_water_bfl  g/m3 m s-1  humus oxygen_pool_water bottom flux
+            humus_NO3_pool_water_sfl  g/m3 m s-1  humus NO3 pool water surface flux
+            humus_NO3_pool_water_bfl  g/m3 m s-1  humus NO3 pool water bottom flux
+            humus_N_transformation_sediment_sms  g/m2 s-1  humus N biotransformation target sediment sources-sinks
+            humus_P_transformation_sediment_sms  g/m2 s-1  humus P biotransformation target sediment sources-sinks
+            DOM_sDW_sfl  gDW/m3 m s-1  dissolved_organic_matter water column DW surface flux
+            DOM_sDW_bfl  gDW/m3 m s-1  dissolved_organic_matter water column DW bottom flux
+            DOM_sPW_sfl  gP/m3 m s-1  dissolved_organic_matter water column P surface flux
+            DOM_sPW_bfl  gP/m3 m s-1  dissolved_organic_matter water column P bottom flux
+            DOM_sNW_sfl  gN/m3 m s-1  dissolved_organic_matter water column N surface flux
+            DOM_sNW_bfl  gN/m3 m s-1  dissolved_organic_matter water column N bottom flux
+            DOM_sCW_sfl  gC/m3 m s-1  dissolved_organic_matter water column C surface flux
+            DOM_sCW_bfl  gC/m3 m s-1  dissolved_organic_matter water column C bottom flux
+            DOM_sDS_sms  gDW/m2 s-1  dissolved_organic_matter sediment DW sources-sinks
+            DOM_sPS_sms  gP/m2 s-1  dissolved_organic_matter sediment P sources-sinks
+            DOM_sNS_sms  gN/m2 s-1  dissolved_organic_matter sediment N sources-sinks
+            DOM_sCS_sms  gC/m2 s-1  dissolved_organic_matter sediment C sources-sinks
+            DOM_sDS_PV_sfl  gDW/m2 m s-1  dissolved_organic_matter sediment DW PV surface flux
+            DOM_sDS_PV_bfl  gDW/m2 m s-1  dissolved_organic_matter sediment DW PV bottom flux
+            DOM_sPS_PV_sfl  gP/m2 m s-1  dissolved_organic_matter sediment P  PV surface flux
+            DOM_sPS_PV_bfl  gP/m2 m s-1  dissolved_organic_matter sediment P  PV bottom flux
+            DOM_sNS_PV_sfl  gN/m2 m s-1  dissolved_organic_matter sediment N  PV surface flux
+            DOM_sNS_PV_bfl  gN/m2 m s-1  dissolved_organic_matter sediment N  PV bottom flux
+            DOM_sCS_PV_sfl  gC/m2 m s-1  dissolved_organic_matter sediment C  PV surface flux
+            DOM_sCS_PV_bfl  gC/m2 m s-1  dissolved_organic_matter sediment C  PV bottom flux
+            DOM_rPDS  -  dissolved_organic_matter P/D ratio sediment
+            DOM_rNDS  -  dissolved_organic_matter N/D ratio sediment
+            DOM_rCDS  -  dissolved_organic_matter C/D ratio sediment
+            DOM_tDPOMS  g/m2/s  dissolved_organic_matter ROC DW OM pool in sediment
+            DOM_tDTrans  g/m2/s  dissolved_organic_matter rate DW biotrans. minus refraction
+            DOM_tCTrans  g/m2/s  dissolved_organic_matter rate C biotrans. minus refraction
+            DOM_N_transformation_water_sfl  g/m3 m s-1  dissolved_organic_matter N biotransformation target water surface flux
+            DOM_N_transformation_water_bfl  g/m3 m s-1  dissolved_organic_matter N biotransformation target water bottom flux
+            DOM_P_transformation_water_sfl  g/m3 m s-1  dissolved_organic_matter P biotransformation target water surface flux
+            DOM_P_transformation_water_bfl  g/m3 m s-1  dissolved_organic_matter P biotransformation target water bottom flux
+            DOM_oxygen_pool_water_sfl  g/m3 m s-1  dissolved_organic_matter oxygen_pool_water surface flux
+            DOM_oxygen_pool_water_bfl  g/m3 m s-1  dissolved_organic_matter oxygen_pool_water bottom flux
+            DOM_NO3_pool_water_sfl  g/m3 m s-1  dissolved_organic_matter NO3 pool water surface flux
+            DOM_NO3_pool_water_bfl  g/m3 m s-1  dissolved_organic_matter NO3 pool water bottom flux
+            DOM_N_transformation_sediment_sms  g/m2 s-1  dissolved_organic_matter N biotransformation target sediment sources-sinks
+            DOM_P_transformation_sediment_sms  g/m2 s-1  dissolved_organic_matter P biotransformation target sediment sources-sinks
+            cyanobacteria_sDW_sfl  gDW/m3 m s-1  cyanobacteria water column DW surface flux
+            cyanobacteria_sDW_bfl  gDW/m3 m s-1  cyanobacteria water column DW bottom flux
+            cyanobacteria_sPW_sfl  gP/m3 m s-1  cyanobacteria water column P surface flux
+            cyanobacteria_sPW_bfl  gP/m3 m s-1  cyanobacteria water column P bottom flux
+            cyanobacteria_sNW_sfl  gN/m3 m s-1  cyanobacteria water column N surface flux
+            cyanobacteria_sNW_bfl  gN/m3 m s-1  cyanobacteria water column N bottom flux
+            cyanobacteria_sCW_sfl  gC/m3 m s-1  cyanobacteria water column C surface flux
+            cyanobacteria_sCW_bfl  gC/m3 m s-1  cyanobacteria water column C bottom flux
+            cyanobacteria_sDS_sms  gDW/m2 s-1  cyanobacteria sediment DW sources-sinks
+            cyanobacteria_sPS_sms  gP/m2 s-1  cyanobacteria sediment P sources-sinks
+            cyanobacteria_sNS_sms  gN/m2 s-1  cyanobacteria sediment N sources-sinks
+            cyanobacteria_sCS_sms  gC/m2 s-1  cyanobacteria sediment C sources-sinks
+            cyanobacteria_sDS_PV_sfl  gDW/m2 m s-1  cyanobacteria sediment DW PV surface flux
+            cyanobacteria_sDS_PV_bfl  gDW/m2 m s-1  cyanobacteria sediment DW PV bottom flux
+            cyanobacteria_sPS_PV_sfl  gP/m2 m s-1  cyanobacteria sediment P  PV surface flux
+            cyanobacteria_sPS_PV_bfl  gP/m2 m s-1  cyanobacteria sediment P  PV bottom flux
+            cyanobacteria_sNS_PV_sfl  gN/m2 m s-1  cyanobacteria sediment N  PV surface flux
+            cyanobacteria_sNS_PV_bfl  gN/m2 m s-1  cyanobacteria sediment N  PV bottom flux
+            cyanobacteria_sCS_PV_sfl  gC/m2 m s-1  cyanobacteria sediment C  PV surface flux
+            cyanobacteria_sCS_PV_bfl  gC/m2 m s-1  cyanobacteria sediment C  PV bottom flux
+            cyanobacteria_rPDS  -  cyanobacteria rPDS
+            cyanobacteria_rNDS  -  cyanobacteria rNDS
+            cyanobacteria_rCDS  -  cyanobacteria rCDS
+            cyanobacteria_tDPOMS  g/m3/s  cyanobacteria rate DPOMS from mortality
+            cyanobacteria_PO4_pool_water_sfl  g/m3 m s-1  cyanobacteria PO4 pool water surface flux
+            cyanobacteria_PO4_pool_water_bfl  g/m3 m s-1  cyanobacteria PO4 pool water bottom flux
+            cyanobacteria_NH4_pool_water_sfl  g/m3 m s-1  cyanobacteria NH4 pool water surface flux
+            cyanobacteria_NH4_pool_water_bfl  g/m3 m s-1  cyanobacteria NH4 pool water bottom flux
+            cyanobacteria_NO3_pool_water_sfl  g/m3 m s-1  cyanobacteria NO3 pool water surface flux
+            cyanobacteria_NO3_pool_water_bfl  g/m3 m s-1  cyanobacteria NO3 pool water bottom flux
+            cyanobacteria_oxygen_pool_water_sfl  g/m3 m s-1  cyanobacteria oxygen_pool_water) surface flux
+            cyanobacteria_oxygen_pool_water_bfl  g/m3 m s-1  cyanobacteria oxygen_pool_water) bottom flux
+            cyanobacteria_POM_DW_pool_water_sfl  g/m3 m s-1  cyanobacteria POM DW pool water surface flux
+            cyanobacteria_POM_DW_pool_water_bfl  g/m3 m s-1  cyanobacteria POM DW pool water bottom flux
+            cyanobacteria_POM_N_pool_water_sfl  g/m3 m s-1  cyanobacteria POM N pool water surface flux
+            cyanobacteria_POM_N_pool_water_bfl  g/m3 m s-1  cyanobacteria POM N pool water bottom flux
+            cyanobacteria_POM_P_pool_water_sfl  g/m3 m s-1  cyanobacteria POM P pool water surface flux
+            cyanobacteria_POM_P_pool_water_bfl  g/m3 m s-1  cyanobacteria POM P pool water bottom flux
+            cyanobacteria_POM_C_pool_water_sfl  g/m3 m s-1  cyanobacteria POM C pool water surface flux
+            cyanobacteria_POM_C_pool_water_bfl  g/m3 m s-1  cyanobacteria POM C pool water bottom flux
+            cyanobacteria_DOM_DW_pool_water_sfl  g/m3 m s-1  cyanobacteria DOM DW water surface flux
+            cyanobacteria_DOM_DW_pool_water_bfl  g/m3 m s-1  cyanobacteria DOM DW water bottom flux
+            cyanobacteria_DOM_N_pool_water_sfl  g/m3 m s-1  cyanobacteria DOM N water surface flux
+            cyanobacteria_DOM_N_pool_water_bfl  g/m3 m s-1  cyanobacteria DOM N water bottom flux
+            cyanobacteria_DOM_P_pool_water_sfl  g/m3 m s-1  cyanobacteria DOM P water surface flux
+            cyanobacteria_DOM_P_pool_water_bfl  g/m3 m s-1  cyanobacteria DOM P water bottom flux
+            cyanobacteria_DOM_C_pool_water_sfl  g/m3 m s-1  cyanobacteria DOM C water surface flux
+            cyanobacteria_DOM_C_pool_water_bfl  g/m3 m s-1  cyanobacteria DOM C water bottom flux
+            cyanobacteria_PO4_pool_sediment_sms  g/m2 s-1  cyanobacteria PO4 pool in sediment sources-sinks
+            cyanobacteria_NH4_pool_sediment_sms  g/m2 s-1  cyanobacteria NH4 pool in sediment sources-sinks
+            cyanobacteria_POM_DW_pool_sediment_sms  g/m2 s-1  cyanobacteria POM DW pool in sediment sources-sinks
+            cyanobacteria_POM_N_pool_sediment_sms  g/m2 s-1  cyanobacteria POM N pool in sediment sources-sinks
+            cyanobacteria_POM_P_pool_sediment_sms  g/m2 s-1  cyanobacteria POM P pool in sediment sources-sinks
+            cyanobacteria_POM_C_pool_sediment_sms  g/m2 s-1  cyanobacteria POM C pool in sediment sources-sinks
+            cyanobacteria_POM_DW_pool_sediment_PV_sfl  g/m2 m s-1  cyanobacteria POM DW pool in sediment pelagic mirror surface flux
+            cyanobacteria_POM_DW_pool_sediment_PV_bfl  g/m2 m s-1  cyanobacteria POM DW pool in sediment pelagic mirror bottom flux
+            cyanobacteria_POM_N_pool_sediment_PV_sfl  g/m2 m s-1  cyanobacteria POM N pool in sediment pelagic mirror surface flux
+            cyanobacteria_POM_N_pool_sediment_PV_bfl  g/m2 m s-1  cyanobacteria POM N pool in sediment pelagic mirror bottom flux
+            cyanobacteria_POM_P_pool_sediment_PV_sfl  g/m2 m s-1  cyanobacteria POM P pool in sediment pelagic mirror surface flux
+            cyanobacteria_POM_P_pool_sediment_PV_bfl  g/m2 m s-1  cyanobacteria POM P pool in sediment pelagic mirror bottom flux
+            cyanobacteria_POM_C_pool_sediment_PV_sfl  g/m2 m s-1  cyanobacteria POM C pool in sediment pelagic mirror surface flux
+            cyanobacteria_POM_C_pool_sediment_PV_bfl  g/m2 m s-1  cyanobacteria POM C pool in sediment pelagic mirror bottom flux
+            cyanobacteria_DOM_DW_pool_sediment_sms  g/m2 s-1  cyanobacteria DOM DW in sediment sources-sinks
+            cyanobacteria_DOM_N_pool_sediment_sms  g/m2 s-1  cyanobacteria DOM N in sediment sources-sinks
+            cyanobacteria_DOM_P_pool_sediment_sms  g/m2 s-1  cyanobacteria DOM P in sediment sources-sinks
+            cyanobacteria_DOM_C_pool_sediment_sms  g/m2 s-1  cyanobacteria DOM C in sediment sources-sinks
+            cyanobacteria_DOM_DW_pool_sediment_PV_sfl  g/m2 m s-1  cyanobacteria DOM DW in sediment pelagic mirror surface flux
+            cyanobacteria_DOM_DW_pool_sediment_PV_bfl  g/m2 m s-1  cyanobacteria DOM DW in sediment pelagic mirror bottom flux
+            cyanobacteria_DOM_N_pool_sediment_PV_sfl  g/m2 m s-1  cyanobacteria DOM N in sediment pelagic mirror surface flux
+            cyanobacteria_DOM_N_pool_sediment_PV_bfl  g/m2 m s-1  cyanobacteria DOM N in sediment pelagic mirror bottom flux
+            cyanobacteria_DOM_P_pool_sediment_PV_sfl  g/m2 m s-1  cyanobacteria DOM P in sediment pelagic mirror surface flux
+            cyanobacteria_DOM_P_pool_sediment_PV_bfl  g/m2 m s-1  cyanobacteria DOM P in sediment pelagic mirror bottom flux
+            cyanobacteria_DOM_C_pool_sediment_PV_sfl  g/m2 m s-1  cyanobacteria DOM C in sediment pelagic mirror surface flux
+            cyanobacteria_DOM_C_pool_sediment_PV_bfl  g/m2 m s-1  cyanobacteria DOM C in sediment pelagic mirror bottom flux
+            cyanobacteria_SiPa_pool_water_sfl  g/m3 m s-1  cyanobacteria SiPa pool water surface flux
+            cyanobacteria_SiPa_pool_water_bfl  g/m3 m s-1  cyanobacteria SiPa pool water bottom flux
+            cyanobacteria_SiO2_pool_water_sfl  g/m3 m s-1  cyanobacteria SiO2 pool water surface flux
+            cyanobacteria_SiO2_pool_water_bfl  g/m3 m s-1  cyanobacteria SiO2 pool water bottom flux
+            cyanobacteria_SiPa_pool_sediment_sms  g/m2 s-1  cyanobacteria SiPa pool in sediment sources-sinks
+            cyanobacteria_SiO2_pool_sediment_sms  g/m2 s-1  cyanobacteria SiO2 in sediment sources-sinks
+            greens_sDW_sfl  gDW/m3 m s-1  greens water column DW surface flux
+            greens_sDW_bfl  gDW/m3 m s-1  greens water column DW bottom flux
+            greens_sPW_sfl  gP/m3 m s-1  greens water column P surface flux
+            greens_sPW_bfl  gP/m3 m s-1  greens water column P bottom flux
+            greens_sNW_sfl  gN/m3 m s-1  greens water column N surface flux
+            greens_sNW_bfl  gN/m3 m s-1  greens water column N bottom flux
+            greens_sCW_sfl  gC/m3 m s-1  greens water column C surface flux
+            greens_sCW_bfl  gC/m3 m s-1  greens water column C bottom flux
+            greens_sDS_sms  gDW/m2 s-1  greens sediment DW sources-sinks
+            greens_sPS_sms  gP/m2 s-1  greens sediment P sources-sinks
+            greens_sNS_sms  gN/m2 s-1  greens sediment N sources-sinks
+            greens_sCS_sms  gC/m2 s-1  greens sediment C sources-sinks
+            greens_sDS_PV_sfl  gDW/m2 m s-1  greens sediment DW PV surface flux
+            greens_sDS_PV_bfl  gDW/m2 m s-1  greens sediment DW PV bottom flux
+            greens_sPS_PV_sfl  gP/m2 m s-1  greens sediment P  PV surface flux
+            greens_sPS_PV_bfl  gP/m2 m s-1  greens sediment P  PV bottom flux
+            greens_sNS_PV_sfl  gN/m2 m s-1  greens sediment N  PV surface flux
+            greens_sNS_PV_bfl  gN/m2 m s-1  greens sediment N  PV bottom flux
+            greens_sCS_PV_sfl  gC/m2 m s-1  greens sediment C  PV surface flux
+            greens_sCS_PV_bfl  gC/m2 m s-1  greens sediment C  PV bottom flux
+            greens_rPDS  -  greens rPDS
+            greens_rNDS  -  greens rNDS
+            greens_rCDS  -  greens rCDS
+            greens_tDPOMS  g/m3/s  greens rate DPOMS from mortality
+            greens_PO4_pool_water_sfl  g/m3 m s-1  greens PO4 pool water surface flux
+            greens_PO4_pool_water_bfl  g/m3 m s-1  greens PO4 pool water bottom flux
+            greens_NH4_pool_water_sfl  g/m3 m s-1  greens NH4 pool water surface flux
+            greens_NH4_pool_water_bfl  g/m3 m s-1  greens NH4 pool water bottom flux
+            greens_NO3_pool_water_sfl  g/m3 m s-1  greens NO3 pool water surface flux
+            greens_NO3_pool_water_bfl  g/m3 m s-1  greens NO3 pool water bottom flux
+            greens_oxygen_pool_water_sfl  g/m3 m s-1  greens oxygen_pool_water) surface flux
+            greens_oxygen_pool_water_bfl  g/m3 m s-1  greens oxygen_pool_water) bottom flux
+            greens_POM_DW_pool_water_sfl  g/m3 m s-1  greens POM DW pool water surface flux
+            greens_POM_DW_pool_water_bfl  g/m3 m s-1  greens POM DW pool water bottom flux
+            greens_POM_N_pool_water_sfl  g/m3 m s-1  greens POM N pool water surface flux
+            greens_POM_N_pool_water_bfl  g/m3 m s-1  greens POM N pool water bottom flux
+            greens_POM_P_pool_water_sfl  g/m3 m s-1  greens POM P pool water surface flux
+            greens_POM_P_pool_water_bfl  g/m3 m s-1  greens POM P pool water bottom flux
+            greens_POM_C_pool_water_sfl  g/m3 m s-1  greens POM C pool water surface flux
+            greens_POM_C_pool_water_bfl  g/m3 m s-1  greens POM C pool water bottom flux
+            greens_DOM_DW_pool_water_sfl  g/m3 m s-1  greens DOM DW water surface flux
+            greens_DOM_DW_pool_water_bfl  g/m3 m s-1  greens DOM DW water bottom flux
+            greens_DOM_N_pool_water_sfl  g/m3 m s-1  greens DOM N water surface flux
+            greens_DOM_N_pool_water_bfl  g/m3 m s-1  greens DOM N water bottom flux
+            greens_DOM_P_pool_water_sfl  g/m3 m s-1  greens DOM P water surface flux
+            greens_DOM_P_pool_water_bfl  g/m3 m s-1  greens DOM P water bottom flux
+            greens_DOM_C_pool_water_sfl  g/m3 m s-1  greens DOM C water surface flux
+            greens_DOM_C_pool_water_bfl  g/m3 m s-1  greens DOM C water bottom flux
+            greens_PO4_pool_sediment_sms  g/m2 s-1  greens PO4 pool in sediment sources-sinks
+            greens_NH4_pool_sediment_sms  g/m2 s-1  greens NH4 pool in sediment sources-sinks
+            greens_POM_DW_pool_sediment_sms  g/m2 s-1  greens POM DW pool in sediment sources-sinks
+            greens_POM_N_pool_sediment_sms  g/m2 s-1  greens POM N pool in sediment sources-sinks
+            greens_POM_P_pool_sediment_sms  g/m2 s-1  greens POM P pool in sediment sources-sinks
+            greens_POM_C_pool_sediment_sms  g/m2 s-1  greens POM C pool in sediment sources-sinks
+            greens_POM_DW_pool_sediment_PV_sfl  g/m2 m s-1  greens POM DW pool in sediment pelagic mirror surface flux
+            greens_POM_DW_pool_sediment_PV_bfl  g/m2 m s-1  greens POM DW pool in sediment pelagic mirror bottom flux
+            greens_POM_N_pool_sediment_PV_sfl  g/m2 m s-1  greens POM N pool in sediment pelagic mirror surface flux
+            greens_POM_N_pool_sediment_PV_bfl  g/m2 m s-1  greens POM N pool in sediment pelagic mirror bottom flux
+            greens_POM_P_pool_sediment_PV_sfl  g/m2 m s-1  greens POM P pool in sediment pelagic mirror surface flux
+            greens_POM_P_pool_sediment_PV_bfl  g/m2 m s-1  greens POM P pool in sediment pelagic mirror bottom flux
+            greens_POM_C_pool_sediment_PV_sfl  g/m2 m s-1  greens POM C pool in sediment pelagic mirror surface flux
+            greens_POM_C_pool_sediment_PV_bfl  g/m2 m s-1  greens POM C pool in sediment pelagic mirror bottom flux
+            greens_DOM_DW_pool_sediment_sms  g/m2 s-1  greens DOM DW in sediment sources-sinks
+            greens_DOM_N_pool_sediment_sms  g/m2 s-1  greens DOM N in sediment sources-sinks
+            greens_DOM_P_pool_sediment_sms  g/m2 s-1  greens DOM P in sediment sources-sinks
+            greens_DOM_C_pool_sediment_sms  g/m2 s-1  greens DOM C in sediment sources-sinks
+            greens_DOM_DW_pool_sediment_PV_sfl  g/m2 m s-1  greens DOM DW in sediment pelagic mirror surface flux
+            greens_DOM_DW_pool_sediment_PV_bfl  g/m2 m s-1  greens DOM DW in sediment pelagic mirror bottom flux
+            greens_DOM_N_pool_sediment_PV_sfl  g/m2 m s-1  greens DOM N in sediment pelagic mirror surface flux
+            greens_DOM_N_pool_sediment_PV_bfl  g/m2 m s-1  greens DOM N in sediment pelagic mirror bottom flux
+            greens_DOM_P_pool_sediment_PV_sfl  g/m2 m s-1  greens DOM P in sediment pelagic mirror surface flux
+            greens_DOM_P_pool_sediment_PV_bfl  g/m2 m s-1  greens DOM P in sediment pelagic mirror bottom flux
+            greens_DOM_C_pool_sediment_PV_sfl  g/m2 m s-1  greens DOM C in sediment pelagic mirror surface flux
+            greens_DOM_C_pool_sediment_PV_bfl  g/m2 m s-1  greens DOM C in sediment pelagic mirror bottom flux
+            greens_SiPa_pool_water_sfl  g/m3 m s-1  greens SiPa pool water surface flux
+            greens_SiPa_pool_water_bfl  g/m3 m s-1  greens SiPa pool water bottom flux
+            greens_SiO2_pool_water_sfl  g/m3 m s-1  greens SiO2 pool water surface flux
+            greens_SiO2_pool_water_bfl  g/m3 m s-1  greens SiO2 pool water bottom flux
+            greens_SiPa_pool_sediment_sms  g/m2 s-1  greens SiPa pool in sediment sources-sinks
+            greens_SiO2_pool_sediment_sms  g/m2 s-1  greens SiO2 in sediment sources-sinks
+            zooplankton_sD_sfl  gDW/m3 m s-1  zooplankton DW surface flux
+            zooplankton_sD_bfl  gDW/m3 m s-1  zooplankton DW bottom flux
+            zooplankton_sP_sfl  gP/m3 m s-1  zooplankton P surface flux
+            zooplankton_sP_bfl  gP/m3 m s-1  zooplankton P bottom flux
+            zooplankton_sN_sfl  gN/m3 m s-1  zooplankton N surface flux
+            zooplankton_sN_bfl  gN/m3 m s-1  zooplankton N bottom flux
+            zooplankton_sC_sfl  gC/m3 m s-1  zooplankton C surface flux
+            zooplankton_sC_bfl  gC/m3 m s-1  zooplankton C bottom flux
+            zooplankton_Prey_D_1_sfl  g/m3 m s-1  zooplankton prey D1 surface flux
+            zooplankton_Prey_D_1_bfl  g/m3 m s-1  zooplankton prey D1 bottom flux
+            zooplankton_Prey_N_1_sfl  g/m3 m s-1  zooplankton prey N1 surface flux
+            zooplankton_Prey_N_1_bfl  g/m3 m s-1  zooplankton prey N1 bottom flux
+            zooplankton_Prey_P_1_sfl  g/m3 m s-1  zooplankton prey P1 surface flux
+            zooplankton_Prey_P_1_bfl  g/m3 m s-1  zooplankton prey P1 bottom flux
+            zooplankton_Prey_C_1_sfl  g/m3 m s-1  zooplankton prey C1 surface flux
+            zooplankton_Prey_C_1_bfl  g/m3 m s-1  zooplankton prey C1 bottom flux
+            zooplankton_Prey_D_2_sfl  g/m3 m s-1  zooplankton prey D2 surface flux
+            zooplankton_Prey_D_2_bfl  g/m3 m s-1  zooplankton prey D2 bottom flux
+            zooplankton_Prey_N_2_sfl  g/m3 m s-1  zooplankton prey N2 surface flux
+            zooplankton_Prey_N_2_bfl  g/m3 m s-1  zooplankton prey N2 bottom flux
+            zooplankton_Prey_P_2_sfl  g/m3 m s-1  zooplankton prey P2 surface flux
+            zooplankton_Prey_P_2_bfl  g/m3 m s-1  zooplankton prey P2 bottom flux
+            zooplankton_Prey_C_2_sfl  g/m3 m s-1  zooplankton prey C2 surface flux
+            zooplankton_Prey_C_2_bfl  g/m3 m s-1  zooplankton prey C2 bottom flux
+            zooplankton_POM_DW_pool_water_sfl  g/m3 m s-1  zooplankton POM DW pool in water surface flux
+            zooplankton_POM_DW_pool_water_bfl  g/m3 m s-1  zooplankton POM DW pool in water bottom flux
+            zooplankton_POM_N_pool_water_sfl  g/m3 m s-1  zooplankton POM N pool in water surface flux
+            zooplankton_POM_N_pool_water_bfl  g/m3 m s-1  zooplankton POM N pool in water bottom flux
+            zooplankton_POM_P_pool_water_sfl  g/m3 m s-1  zooplankton POM P pool in water surface flux
+            zooplankton_POM_P_pool_water_bfl  g/m3 m s-1  zooplankton POM P pool in water bottom flux
+            zooplankton_POM_C_pool_water_sfl  g/m3 m s-1  zooplankton POM C pool in water surface flux
+            zooplankton_POM_C_pool_water_bfl  g/m3 m s-1  zooplankton POM C pool in water bottom flux
+            zooplankton_SiPa_pool_water_sfl  g/m3 m s-1  zooplankton particulate Si pool water surface flux
+            zooplankton_SiPa_pool_water_bfl  g/m3 m s-1  zooplankton particulate Si pool water bottom flux
+            zooplankton_NH4_pool_water_sfl  g/m3 m s-1  zooplankton NH4 pool in water surface flux
+            zooplankton_NH4_pool_water_bfl  g/m3 m s-1  zooplankton NH4 pool in water bottom flux
+            zooplankton_PO4_pool_water_sfl  g/m3 m s-1  zooplankton PO4 pool in water surface flux
+            zooplankton_PO4_pool_water_bfl  g/m3 m s-1  zooplankton PO4 pool in water bottom flux
+            zooplankton_DOM_DW_pool_water_sfl  g/m3 m s-1  zooplankton DOM DW in water surface flux
+            zooplankton_DOM_DW_pool_water_bfl  g/m3 m s-1  zooplankton DOM DW in water bottom flux
+            zooplankton_DOM_N_pool_water_sfl  g/m3 m s-1  zooplankton DOM N in water surface flux
+            zooplankton_DOM_N_pool_water_bfl  g/m3 m s-1  zooplankton DOM N in water bottom flux
+            zooplankton_DOM_P_pool_water_sfl  g/m3 m s-1  zooplankton DOM P in water surface flux
+            zooplankton_DOM_P_pool_water_bfl  g/m3 m s-1  zooplankton DOM P in water bottom flux
+            zooplankton_DOM_C_pool_water_sfl  g/m3 m s-1  zooplankton DOM C in water surface flux
+            zooplankton_DOM_C_pool_water_bfl  g/m3 m s-1  zooplankton DOM C in water bottom flux
+            zooplankton_SiO2_pool_water_sfl  g/m3 m s-1  zooplankton SiO2 in water surface flux
+            zooplankton_SiO2_pool_water_bfl  g/m3 m s-1  zooplankton SiO2 in water bottom flux
+            zero_hz    zero_hz
+            sediment_exchange_pom_model1_state1_sfl  gDW/m3 m s-1  sediment_exchange pom_model1 state variable 1 surface flux
+            sediment_exchange_pom_model1_state1_bfl  gDW/m3 m s-1  sediment_exchange pom_model1 state variable 1 bottom flux
+            sediment_exchange_pom_model1_state2_sfl  gP/m3 m s-1  sediment_exchange pom_model1 state variable 2 surface flux
+            sediment_exchange_pom_model1_state2_bfl  gP/m3 m s-1  sediment_exchange pom_model1 state variable 2 bottom flux
+            sediment_exchange_pom_model1_state3_sfl  gN/m3 m s-1  sediment_exchange pom_model1 state variable 3 surface flux
+            sediment_exchange_pom_model1_state3_bfl  gN/m3 m s-1  sediment_exchange pom_model1 state variable 3 bottom flux
+            sediment_exchange_pom_model1_state4_sfl  gC/m3 m s-1  sediment_exchange pom_model1 state variable 4 surface flux
+            sediment_exchange_pom_model1_state4_bfl  gC/m3 m s-1  sediment_exchange pom_model1 state variable 4 bottom flux
+            sediment_exchange_pom_model1_state5_sfl  gDW/m2 m s-1  sediment_exchange pom_model1 state variable 5 surface flux
+            sediment_exchange_pom_model1_state5_bfl  gDW/m2 m s-1  sediment_exchange pom_model1 state variable 5 bottom flux
+            sediment_exchange_pom_model1_state6_sfl  gP/m2 m s-1  sediment_exchange pom_model1 state variable 6 surface flux
+            sediment_exchange_pom_model1_state6_bfl  gP/m2 m s-1  sediment_exchange pom_model1 state variable 6 bottom flux
+            sediment_exchange_pom_model1_state7_sfl  gN/m2 m s-1  sediment_exchange pom_model1 state variable 7 surface flux
+            sediment_exchange_pom_model1_state7_bfl  gN/m2 m s-1  sediment_exchange pom_model1 state variable 7 bottom flux
+            sediment_exchange_pom_model1_state8_sfl  gC/m2 m s-1  sediment_exchange pom_model1 state variable 8 surface flux
+            sediment_exchange_pom_model1_state8_bfl  gC/m2 m s-1  sediment_exchange pom_model1 state variable 8 bottom flux
+            sediment_exchange_pom_model1_bottom_state1_sms  gDW/m2 s-1  sediment_exchange pom_model1 bottom state variable 1 sources-sinks
+            sediment_exchange_pom_model1_bottom_state2_sms  gP/m2 s-1  sediment_exchange pom_model1 bottom state variable 2 sources-sinks
+            sediment_exchange_pom_model1_bottom_state3_sms  gN/m2 s-1  sediment_exchange pom_model1 bottom state variable 3 sources-sinks
+            sediment_exchange_pom_model1_bottom_state4_sms  gC/m2 s-1  sediment_exchange pom_model1 bottom state variable 4 sources-sinks
+            sediment_exchange_dom_model1_state1_sfl  gDW/m3 m s-1  sediment_exchange dom_model1 state variable 1 surface flux
+            sediment_exchange_dom_model1_state1_bfl  gDW/m3 m s-1  sediment_exchange dom_model1 state variable 1 bottom flux
+            sediment_exchange_dom_model1_state2_sfl  gP/m3 m s-1  sediment_exchange dom_model1 state variable 2 surface flux
+            sediment_exchange_dom_model1_state2_bfl  gP/m3 m s-1  sediment_exchange dom_model1 state variable 2 bottom flux
+            sediment_exchange_dom_model1_state3_sfl  gN/m3 m s-1  sediment_exchange dom_model1 state variable 3 surface flux
+            sediment_exchange_dom_model1_state3_bfl  gN/m3 m s-1  sediment_exchange dom_model1 state variable 3 bottom flux
+            sediment_exchange_dom_model1_state4_sfl  gC/m3 m s-1  sediment_exchange dom_model1 state variable 4 surface flux
+            sediment_exchange_dom_model1_state4_bfl  gC/m3 m s-1  sediment_exchange dom_model1 state variable 4 bottom flux
+            sediment_exchange_dom_model1_state5_sfl  gDW/m2 m s-1  sediment_exchange dom_model1 state variable 5 surface flux
+            sediment_exchange_dom_model1_state5_bfl  gDW/m2 m s-1  sediment_exchange dom_model1 state variable 5 bottom flux
+            sediment_exchange_dom_model1_state6_sfl  gP/m2 m s-1  sediment_exchange dom_model1 state variable 6 surface flux
+            sediment_exchange_dom_model1_state6_bfl  gP/m2 m s-1  sediment_exchange dom_model1 state variable 6 bottom flux
+            sediment_exchange_dom_model1_state7_sfl  gN/m2 m s-1  sediment_exchange dom_model1 state variable 7 surface flux
+            sediment_exchange_dom_model1_state7_bfl  gN/m2 m s-1  sediment_exchange dom_model1 state variable 7 bottom flux
+            sediment_exchange_dom_model1_state8_sfl  gC/m2 m s-1  sediment_exchange dom_model1 state variable 8 surface flux
+            sediment_exchange_dom_model1_state8_bfl  gC/m2 m s-1  sediment_exchange dom_model1 state variable 8 bottom flux
+            sediment_exchange_dom_model1_bottom_state1_sms  gDW/m2 s-1  sediment_exchange dom_model1 bottom state variable 1 sources-sinks
+            sediment_exchange_dom_model1_bottom_state2_sms  gP/m2 s-1  sediment_exchange dom_model1 bottom state variable 2 sources-sinks
+            sediment_exchange_dom_model1_bottom_state3_sms  gN/m2 s-1  sediment_exchange dom_model1 bottom state variable 3 sources-sinks
+            sediment_exchange_dom_model1_bottom_state4_sms  gC/m2 s-1  sediment_exchange dom_model1 bottom state variable 4 sources-sinks
+            burial_POM_group1_state1_sfl  gDW/m3 m s-1  burial POM_group1 state variable 1 surface flux
+            burial_POM_group1_state1_bfl  gDW/m3 m s-1  burial POM_group1 state variable 1 bottom flux
+            burial_POM_group1_state2_sfl  gP/m3 m s-1  burial POM_group1 state variable 2 surface flux
+            burial_POM_group1_state2_bfl  gP/m3 m s-1  burial POM_group1 state variable 2 bottom flux
+            burial_POM_group1_state3_sfl  gN/m3 m s-1  burial POM_group1 state variable 3 surface flux
+            burial_POM_group1_state3_bfl  gN/m3 m s-1  burial POM_group1 state variable 3 bottom flux
+            burial_POM_group1_state4_sfl  gC/m3 m s-1  burial POM_group1 state variable 4 surface flux
+            burial_POM_group1_state4_bfl  gC/m3 m s-1  burial POM_group1 state variable 4 bottom flux
+            burial_POM_group1_state5_sfl  gDW/m2 m s-1  burial POM_group1 state variable 5 surface flux
+            burial_POM_group1_state5_bfl  gDW/m2 m s-1  burial POM_group1 state variable 5 bottom flux
+            burial_POM_group1_state6_sfl  gP/m2 m s-1  burial POM_group1 state variable 6 surface flux
+            burial_POM_group1_state6_bfl  gP/m2 m s-1  burial POM_group1 state variable 6 bottom flux
+            burial_POM_group1_state7_sfl  gN/m2 m s-1  burial POM_group1 state variable 7 surface flux
+            burial_POM_group1_state7_bfl  gN/m2 m s-1  burial POM_group1 state variable 7 bottom flux
+            burial_POM_group1_state8_sfl  gC/m2 m s-1  burial POM_group1 state variable 8 surface flux
+            burial_POM_group1_state8_bfl  gC/m2 m s-1  burial POM_group1 state variable 8 bottom flux
+            burial_POM_group1_bottom_state1_sms  gDW/m2 s-1  burial POM_group1 bottom state variable 1 sources-sinks
+            burial_POM_group1_bottom_state2_sms  gP/m2 s-1  burial POM_group1 bottom state variable 2 sources-sinks
+            burial_POM_group1_bottom_state3_sms  gN/m2 s-1  burial POM_group1 bottom state variable 3 sources-sinks
+            burial_POM_group1_bottom_state4_sms  gC/m2 s-1  burial POM_group1 bottom state variable 4 sources-sinks
+            burial_POM_group2_state1_sfl  gDW/m3 m s-1  burial POM_group2 state variable 1 surface flux
+            burial_POM_group2_state1_bfl  gDW/m3 m s-1  burial POM_group2 state variable 1 bottom flux
+            burial_POM_group2_state2_sfl  gP/m3 m s-1  burial POM_group2 state variable 2 surface flux
+            burial_POM_group2_state2_bfl  gP/m3 m s-1  burial POM_group2 state variable 2 bottom flux
+            burial_POM_group2_state3_sfl  gN/m3 m s-1  burial POM_group2 state variable 3 surface flux
+            burial_POM_group2_state3_bfl  gN/m3 m s-1  burial POM_group2 state variable 3 bottom flux
+            burial_POM_group2_state4_sfl  gC/m3 m s-1  burial POM_group2 state variable 4 surface flux
+            burial_POM_group2_state4_bfl  gC/m3 m s-1  burial POM_group2 state variable 4 bottom flux
+            burial_POM_group2_state5_sfl  gDW/m2 m s-1  burial POM_group2 state variable 5 surface flux
+            burial_POM_group2_state5_bfl  gDW/m2 m s-1  burial POM_group2 state variable 5 bottom flux
+            burial_POM_group2_state6_sfl  gP/m2 m s-1  burial POM_group2 state variable 6 surface flux
+            burial_POM_group2_state6_bfl  gP/m2 m s-1  burial POM_group2 state variable 6 bottom flux
+            burial_POM_group2_state7_sfl  gN/m2 m s-1  burial POM_group2 state variable 7 surface flux
+            burial_POM_group2_state7_bfl  gN/m2 m s-1  burial POM_group2 state variable 7 bottom flux
+            burial_POM_group2_state8_sfl  gC/m2 m s-1  burial POM_group2 state variable 8 surface flux
+            burial_POM_group2_state8_bfl  gC/m2 m s-1  burial POM_group2 state variable 8 bottom flux
+            burial_POM_group2_bottom_state1_sms  gDW/m2 s-1  burial POM_group2 bottom state variable 1 sources-sinks
+            burial_POM_group2_bottom_state2_sms  gP/m2 s-1  burial POM_group2 bottom state variable 2 sources-sinks
+            burial_POM_group2_bottom_state3_sms  gN/m2 s-1  burial POM_group2 bottom state variable 3 sources-sinks
+            burial_POM_group2_bottom_state4_sms  gC/m2 s-1  burial POM_group2 bottom state variable 4 sources-sinks
+            burial_DOM_group1_state1_sfl  gDW/m3 m s-1  burial DOM_group1 state variable 1 surface flux
+            burial_DOM_group1_state1_bfl  gDW/m3 m s-1  burial DOM_group1 state variable 1 bottom flux
+            burial_DOM_group1_state2_sfl  gP/m3 m s-1  burial DOM_group1 state variable 2 surface flux
+            burial_DOM_group1_state2_bfl  gP/m3 m s-1  burial DOM_group1 state variable 2 bottom flux
+            burial_DOM_group1_state3_sfl  gN/m3 m s-1  burial DOM_group1 state variable 3 surface flux
+            burial_DOM_group1_state3_bfl  gN/m3 m s-1  burial DOM_group1 state variable 3 bottom flux
+            burial_DOM_group1_state4_sfl  gC/m3 m s-1  burial DOM_group1 state variable 4 surface flux
+            burial_DOM_group1_state4_bfl  gC/m3 m s-1  burial DOM_group1 state variable 4 bottom flux
+            burial_DOM_group1_state5_sfl  gDW/m2 m s-1  burial DOM_group1 state variable 5 surface flux
+            burial_DOM_group1_state5_bfl  gDW/m2 m s-1  burial DOM_group1 state variable 5 bottom flux
+            burial_DOM_group1_state6_sfl  gP/m2 m s-1  burial DOM_group1 state variable 6 surface flux
+            burial_DOM_group1_state6_bfl  gP/m2 m s-1  burial DOM_group1 state variable 6 bottom flux
+            burial_DOM_group1_state7_sfl  gN/m2 m s-1  burial DOM_group1 state variable 7 surface flux
+            burial_DOM_group1_state7_bfl  gN/m2 m s-1  burial DOM_group1 state variable 7 bottom flux
+            burial_DOM_group1_state8_sfl  gC/m2 m s-1  burial DOM_group1 state variable 8 surface flux
+            burial_DOM_group1_state8_bfl  gC/m2 m s-1  burial DOM_group1 state variable 8 bottom flux
+            burial_DOM_group1_bottom_state1_sms  gDW/m2 s-1  burial DOM_group1 bottom state variable 1 sources-sinks
+            burial_DOM_group1_bottom_state2_sms  gP/m2 s-1  burial DOM_group1 bottom state variable 2 sources-sinks
+            burial_DOM_group1_bottom_state3_sms  gN/m2 s-1  burial DOM_group1 bottom state variable 3 sources-sinks
+            burial_DOM_group1_bottom_state4_sms  gC/m2 s-1  burial DOM_group1 bottom state variable 4 sources-sinks
+            zooplankton_prey_model1_state1_sfl  gDW/m3 m s-1  zooplankton prey_model1 state variable 1 surface flux
+            zooplankton_prey_model1_state1_bfl  gDW/m3 m s-1  zooplankton prey_model1 state variable 1 bottom flux
+            zooplankton_prey_model1_state2_sfl  gP/m3 m s-1  zooplankton prey_model1 state variable 2 surface flux
+            zooplankton_prey_model1_state2_bfl  gP/m3 m s-1  zooplankton prey_model1 state variable 2 bottom flux
+            zooplankton_prey_model1_state3_sfl  gN/m3 m s-1  zooplankton prey_model1 state variable 3 surface flux
+            zooplankton_prey_model1_state3_bfl  gN/m3 m s-1  zooplankton prey_model1 state variable 3 bottom flux
+            zooplankton_prey_model1_state4_sfl  gC/m3 m s-1  zooplankton prey_model1 state variable 4 surface flux
+            zooplankton_prey_model1_state4_bfl  gC/m3 m s-1  zooplankton prey_model1 state variable 4 bottom flux
+            zooplankton_prey_model1_state5_sfl  gDW/m2 m s-1  zooplankton prey_model1 state variable 5 surface flux
+            zooplankton_prey_model1_state5_bfl  gDW/m2 m s-1  zooplankton prey_model1 state variable 5 bottom flux
+            zooplankton_prey_model1_state6_sfl  gP/m2 m s-1  zooplankton prey_model1 state variable 6 surface flux
+            zooplankton_prey_model1_state6_bfl  gP/m2 m s-1  zooplankton prey_model1 state variable 6 bottom flux
+            zooplankton_prey_model1_state7_sfl  gN/m2 m s-1  zooplankton prey_model1 state variable 7 surface flux
+            zooplankton_prey_model1_state7_bfl  gN/m2 m s-1  zooplankton prey_model1 state variable 7 bottom flux
+            zooplankton_prey_model1_state8_sfl  gC/m2 m s-1  zooplankton prey_model1 state variable 8 surface flux
+            zooplankton_prey_model1_state8_bfl  gC/m2 m s-1  zooplankton prey_model1 state variable 8 bottom flux
+            zooplankton_prey_model1_bottom_state1_sms  gDW/m2 s-1  zooplankton prey_model1 bottom state variable 1 sources-sinks
+            zooplankton_prey_model1_bottom_state2_sms  gP/m2 s-1  zooplankton prey_model1 bottom state variable 2 sources-sinks
+            zooplankton_prey_model1_bottom_state3_sms  gN/m2 s-1  zooplankton prey_model1 bottom state variable 3 sources-sinks
+            zooplankton_prey_model1_bottom_state4_sms  gC/m2 s-1  zooplankton prey_model1 bottom state variable 4 sources-sinks
+            zooplankton_prey_model2_state1_sfl  gDW/m3 m s-1  zooplankton prey_model2 state variable 1 surface flux
+            zooplankton_prey_model2_state1_bfl  gDW/m3 m s-1  zooplankton prey_model2 state variable 1 bottom flux
+            zooplankton_prey_model2_state2_sfl  gP/m3 m s-1  zooplankton prey_model2 state variable 2 surface flux
+            zooplankton_prey_model2_state2_bfl  gP/m3 m s-1  zooplankton prey_model2 state variable 2 bottom flux
+            zooplankton_prey_model2_state3_sfl  gN/m3 m s-1  zooplankton prey_model2 state variable 3 surface flux
+            zooplankton_prey_model2_state3_bfl  gN/m3 m s-1  zooplankton prey_model2 state variable 3 bottom flux
+            zooplankton_prey_model2_state4_sfl  gC/m3 m s-1  zooplankton prey_model2 state variable 4 surface flux
+            zooplankton_prey_model2_state4_bfl  gC/m3 m s-1  zooplankton prey_model2 state variable 4 bottom flux
+            zooplankton_prey_model2_state5_sfl  gDW/m2 m s-1  zooplankton prey_model2 state variable 5 surface flux
+            zooplankton_prey_model2_state5_bfl  gDW/m2 m s-1  zooplankton prey_model2 state variable 5 bottom flux
+            zooplankton_prey_model2_state6_sfl  gP/m2 m s-1  zooplankton prey_model2 state variable 6 surface flux
+            zooplankton_prey_model2_state6_bfl  gP/m2 m s-1  zooplankton prey_model2 state variable 6 bottom flux
+            zooplankton_prey_model2_state7_sfl  gN/m2 m s-1  zooplankton prey_model2 state variable 7 surface flux
+            zooplankton_prey_model2_state7_bfl  gN/m2 m s-1  zooplankton prey_model2 state variable 7 bottom flux
+            zooplankton_prey_model2_state8_sfl  gC/m2 m s-1  zooplankton prey_model2 state variable 8 surface flux
+            zooplankton_prey_model2_state8_bfl  gC/m2 m s-1  zooplankton prey_model2 state variable 8 bottom flux
+            zooplankton_prey_model2_bottom_state1_sms  gDW/m2 s-1  zooplankton prey_model2 bottom state variable 1 sources-sinks
+            zooplankton_prey_model2_bottom_state2_sms  gP/m2 s-1  zooplankton prey_model2 bottom state variable 2 sources-sinks
+            zooplankton_prey_model2_bottom_state3_sms  gN/m2 s-1  zooplankton prey_model2 bottom state variable 3 sources-sinks
+            zooplankton_prey_model2_bottom_state4_sms  gC/m2 s-1  zooplankton prey_model2 bottom state variable 4 sources-sinks
+            total_tDPOMbio_at_interfaces  gDW/m2/s m  total_tDPOMbio_at_interfaces
+            total_tDPOMbio_at_bottom  gDW/m2/s m  total_tDPOMbio_at_bottom
+            total_tDPOMbio_at_bottom_calculator_result  gDW/m2/s m  total_tDPOMbio_at_bottom_calculator result
+            total_tDPOMbio_at_interfaces_calculator_result  gDW/m2/s m  total_tDPOMbio_at_interfaces_calculator result
+            zero_sfl_tot_calculator_result   m s-1  zero_sfl_tot_calculator result
+            zero_bfl_tot_calculator_result   m s-1  zero_bfl_tot_calculator result
+            zero_hz_sms_tot_calculator_result   s-1  zero_hz_sms_tot_calculator result
+            abiotic_water_sDIMW_sfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sDIMW_sfl_tot_calculator result
+            abiotic_water_sDIMW_bfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sDIMW_bfl_tot_calculator result
+            abiotic_water_sSiPaW_sfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sSiPaW_sfl_tot_calculator result
+            abiotic_water_sSiPaW_bfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sSiPaW_bfl_tot_calculator result
+            abiotic_water_sPO4W_sfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sPO4W_sfl_tot_calculator result
+            abiotic_water_sPO4W_bfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sPO4W_bfl_tot_calculator result
+            abiotic_water_sPAIMW_sfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sPAIMW_sfl_tot_calculator result
+            abiotic_water_sPAIMW_bfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sPAIMW_bfl_tot_calculator result
+            abiotic_water_sNH4W_sfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sNH4W_sfl_tot_calculator result
+            abiotic_water_sNH4W_bfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sNH4W_bfl_tot_calculator result
+            abiotic_water_sNO3W_sfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sNO3W_sfl_tot_calculator result
+            abiotic_water_sNO3W_bfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sNO3W_bfl_tot_calculator result
+            abiotic_water_sSiO2W_sfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sSiO2W_sfl_tot_calculator result
+            abiotic_water_sSiO2W_bfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sSiO2W_bfl_tot_calculator result
+            abiotic_water_sO2W_sfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sO2W_sfl_tot_calculator result
+            abiotic_water_sO2W_bfl_tot_calculator_result  g/m3 m s-1  abiotic_process_in_water sO2W_bfl_tot_calculator result
+            abiotic_sediment_sDIMS_sms_tot_calculator_result  g/m2 s-1  abiotic_process_in_sediment sDIMS_sms_tot_calculator result
+            abiotic_sediment_sSiPaS_sms_tot_calculator_result  g/m2 s-1  abiotic_process_in_sediment sSiPaS_sms_tot_calculator result
+            abiotic_sediment_sSiO2S_sms_tot_calculator_result  g/m2 s-1  abiotic_process_in_sediment sSiO2S_sms_tot_calculator result
+            abiotic_sediment_sPO4S_sms_tot_calculator_result  g/m2 s-1  abiotic_process_in_sediment sPO4S_sms_tot_calculator result
+            abiotic_sediment_sPAIMS_sms_tot_calculator_result  g/m2 s-1  abiotic_process_in_sediment sPAIMS_sms_tot_calculator result
+            abiotic_sediment_sNH4S_sms_tot_calculator_result  g/m2 s-1  abiotic_process_in_sediment sNH4S_sms_tot_calculator result
+            abiotic_sediment_sNO3S_sms_tot_calculator_result  g/m2 s-1  abiotic_process_in_sediment sNO3S_sms_tot_calculator result
+            POM_sDW_sfl_tot_calculator_result  gDW/m3 m s-1  particulate_organic_matter sDW_sfl_tot_calculator result
+            POM_sDW_bfl_tot_calculator_result  gDW/m3 m s-1  particulate_organic_matter sDW_bfl_tot_calculator result
+            POM_sPW_sfl_tot_calculator_result  gP/m3 m s-1  particulate_organic_matter sPW_sfl_tot_calculator result
+            POM_sPW_bfl_tot_calculator_result  gP/m3 m s-1  particulate_organic_matter sPW_bfl_tot_calculator result
+            POM_sNW_sfl_tot_calculator_result  gN/m3 m s-1  particulate_organic_matter sNW_sfl_tot_calculator result
+            POM_sNW_bfl_tot_calculator_result  gN/m3 m s-1  particulate_organic_matter sNW_bfl_tot_calculator result
+            POM_sCW_sfl_tot_calculator_result  gC/m3 m s-1  particulate_organic_matter sCW_sfl_tot_calculator result
+            POM_sCW_bfl_tot_calculator_result  gC/m3 m s-1  particulate_organic_matter sCW_bfl_tot_calculator result
+            POM_sDS_sms_tot_calculator_result  gDW/m2 s-1  particulate_organic_matter sDS_sms_tot_calculator result
+            POM_sPS_sms_tot_calculator_result  gP/m2 s-1  particulate_organic_matter sPS_sms_tot_calculator result
+            POM_sNS_sms_tot_calculator_result  gN/m2 s-1  particulate_organic_matter sNS_sms_tot_calculator result
+            POM_sCS_sms_tot_calculator_result  gC/m2 s-1  particulate_organic_matter sCS_sms_tot_calculator result
+            POM_sDS_PV_sfl_tot_calculator_result  gDW/m2 m s-1  particulate_organic_matter sDS_PV_sfl_tot_calculator result
+            POM_sDS_PV_bfl_tot_calculator_result  gDW/m2 m s-1  particulate_organic_matter sDS_PV_bfl_tot_calculator result
+            POM_sPS_PV_sfl_tot_calculator_result  gP/m2 m s-1  particulate_organic_matter sPS_PV_sfl_tot_calculator result
+            POM_sPS_PV_bfl_tot_calculator_result  gP/m2 m s-1  particulate_organic_matter sPS_PV_bfl_tot_calculator result
+            POM_sNS_PV_sfl_tot_calculator_result  gN/m2 m s-1  particulate_organic_matter sNS_PV_sfl_tot_calculator result
+            POM_sNS_PV_bfl_tot_calculator_result  gN/m2 m s-1  particulate_organic_matter sNS_PV_bfl_tot_calculator result
+            POM_sCS_PV_sfl_tot_calculator_result  gC/m2 m s-1  particulate_organic_matter sCS_PV_sfl_tot_calculator result
+            POM_sCS_PV_bfl_tot_calculator_result  gC/m2 m s-1  particulate_organic_matter sCS_PV_bfl_tot_calculator result
+            humus_sDW_sfl_tot_calculator_result  gDW/m3 m s-1  humus sDW_sfl_tot_calculator result
+            humus_sDW_bfl_tot_calculator_result  gDW/m3 m s-1  humus sDW_bfl_tot_calculator result
+            humus_sPW_sfl_tot_calculator_result  gP/m3 m s-1  humus sPW_sfl_tot_calculator result
+            humus_sPW_bfl_tot_calculator_result  gP/m3 m s-1  humus sPW_bfl_tot_calculator result
+            humus_sNW_sfl_tot_calculator_result  gN/m3 m s-1  humus sNW_sfl_tot_calculator result
+            humus_sNW_bfl_tot_calculator_result  gN/m3 m s-1  humus sNW_bfl_tot_calculator result
+            humus_sCW_sfl_tot_calculator_result  gC/m3 m s-1  humus sCW_sfl_tot_calculator result
+            humus_sCW_bfl_tot_calculator_result  gC/m3 m s-1  humus sCW_bfl_tot_calculator result
+            humus_sDS_sms_tot_calculator_result  gDW/m2 s-1  humus sDS_sms_tot_calculator result
+            humus_sPS_sms_tot_calculator_result  gP/m2 s-1  humus sPS_sms_tot_calculator result
+            humus_sNS_sms_tot_calculator_result  gN/m2 s-1  humus sNS_sms_tot_calculator result
+            humus_sCS_sms_tot_calculator_result  gC/m2 s-1  humus sCS_sms_tot_calculator result
+            humus_sDS_PV_sfl_tot_calculator_result  gDW/m2 m s-1  humus sDS_PV_sfl_tot_calculator result
+            humus_sDS_PV_bfl_tot_calculator_result  gDW/m2 m s-1  humus sDS_PV_bfl_tot_calculator result
+            humus_sPS_PV_sfl_tot_calculator_result  gP/m2 m s-1  humus sPS_PV_sfl_tot_calculator result
+            humus_sPS_PV_bfl_tot_calculator_result  gP/m2 m s-1  humus sPS_PV_bfl_tot_calculator result
+            humus_sNS_PV_sfl_tot_calculator_result  gN/m2 m s-1  humus sNS_PV_sfl_tot_calculator result
+            humus_sNS_PV_bfl_tot_calculator_result  gN/m2 m s-1  humus sNS_PV_bfl_tot_calculator result
+            humus_sCS_PV_sfl_tot_calculator_result  gC/m2 m s-1  humus sCS_PV_sfl_tot_calculator result
+            humus_sCS_PV_bfl_tot_calculator_result  gC/m2 m s-1  humus sCS_PV_bfl_tot_calculator result
+            DOM_sDW_sfl_tot_calculator_result  gDW/m3 m s-1  dissolved_organic_matter sDW_sfl_tot_calculator result
+            DOM_sDW_bfl_tot_calculator_result  gDW/m3 m s-1  dissolved_organic_matter sDW_bfl_tot_calculator result
+            DOM_sPW_sfl_tot_calculator_result  gP/m3 m s-1  dissolved_organic_matter sPW_sfl_tot_calculator result
+            DOM_sPW_bfl_tot_calculator_result  gP/m3 m s-1  dissolved_organic_matter sPW_bfl_tot_calculator result
+            DOM_sNW_sfl_tot_calculator_result  gN/m3 m s-1  dissolved_organic_matter sNW_sfl_tot_calculator result
+            DOM_sNW_bfl_tot_calculator_result  gN/m3 m s-1  dissolved_organic_matter sNW_bfl_tot_calculator result
+            DOM_sCW_sfl_tot_calculator_result  gC/m3 m s-1  dissolved_organic_matter sCW_sfl_tot_calculator result
+            DOM_sCW_bfl_tot_calculator_result  gC/m3 m s-1  dissolved_organic_matter sCW_bfl_tot_calculator result
+            DOM_sDS_sms_tot_calculator_result  gDW/m2 s-1  dissolved_organic_matter sDS_sms_tot_calculator result
+            DOM_sPS_sms_tot_calculator_result  gP/m2 s-1  dissolved_organic_matter sPS_sms_tot_calculator result
+            DOM_sNS_sms_tot_calculator_result  gN/m2 s-1  dissolved_organic_matter sNS_sms_tot_calculator result
+            DOM_sCS_sms_tot_calculator_result  gC/m2 s-1  dissolved_organic_matter sCS_sms_tot_calculator result
+            DOM_sDS_PV_sfl_tot_calculator_result  gDW/m2 m s-1  dissolved_organic_matter sDS_PV_sfl_tot_calculator result
+            DOM_sDS_PV_bfl_tot_calculator_result  gDW/m2 m s-1  dissolved_organic_matter sDS_PV_bfl_tot_calculator result
+            DOM_sPS_PV_sfl_tot_calculator_result  gP/m2 m s-1  dissolved_organic_matter sPS_PV_sfl_tot_calculator result
+            DOM_sPS_PV_bfl_tot_calculator_result  gP/m2 m s-1  dissolved_organic_matter sPS_PV_bfl_tot_calculator result
+            DOM_sNS_PV_sfl_tot_calculator_result  gN/m2 m s-1  dissolved_organic_matter sNS_PV_sfl_tot_calculator result
+            DOM_sNS_PV_bfl_tot_calculator_result  gN/m2 m s-1  dissolved_organic_matter sNS_PV_bfl_tot_calculator result
+            DOM_sCS_PV_sfl_tot_calculator_result  gC/m2 m s-1  dissolved_organic_matter sCS_PV_sfl_tot_calculator result
+            DOM_sCS_PV_bfl_tot_calculator_result  gC/m2 m s-1  dissolved_organic_matter sCS_PV_bfl_tot_calculator result
+            cyanobacteria_sDW_sfl_tot_calculator_result  gDW/m3 m s-1  cyanobacteria sDW_sfl_tot_calculator result
+            cyanobacteria_sDW_bfl_tot_calculator_result  gDW/m3 m s-1  cyanobacteria sDW_bfl_tot_calculator result
+            cyanobacteria_sPW_sfl_tot_calculator_result  gP/m3 m s-1  cyanobacteria sPW_sfl_tot_calculator result
+            cyanobacteria_sPW_bfl_tot_calculator_result  gP/m3 m s-1  cyanobacteria sPW_bfl_tot_calculator result
+            cyanobacteria_sNW_sfl_tot_calculator_result  gN/m3 m s-1  cyanobacteria sNW_sfl_tot_calculator result
+            cyanobacteria_sNW_bfl_tot_calculator_result  gN/m3 m s-1  cyanobacteria sNW_bfl_tot_calculator result
+            cyanobacteria_sCW_sfl_tot_calculator_result  gC/m3 m s-1  cyanobacteria sCW_sfl_tot_calculator result
+            cyanobacteria_sCW_bfl_tot_calculator_result  gC/m3 m s-1  cyanobacteria sCW_bfl_tot_calculator result
+            cyanobacteria_sDS_sms_tot_calculator_result  gDW/m2 s-1  cyanobacteria sDS_sms_tot_calculator result
+            cyanobacteria_sPS_sms_tot_calculator_result  gP/m2 s-1  cyanobacteria sPS_sms_tot_calculator result
+            cyanobacteria_sNS_sms_tot_calculator_result  gN/m2 s-1  cyanobacteria sNS_sms_tot_calculator result
+            cyanobacteria_sCS_sms_tot_calculator_result  gC/m2 s-1  cyanobacteria sCS_sms_tot_calculator result
+            cyanobacteria_sDS_PV_sfl_tot_calculator_result  gDW/m2 m s-1  cyanobacteria sDS_PV_sfl_tot_calculator result
+            cyanobacteria_sDS_PV_bfl_tot_calculator_result  gDW/m2 m s-1  cyanobacteria sDS_PV_bfl_tot_calculator result
+            cyanobacteria_sPS_PV_sfl_tot_calculator_result  gP/m2 m s-1  cyanobacteria sPS_PV_sfl_tot_calculator result
+            cyanobacteria_sPS_PV_bfl_tot_calculator_result  gP/m2 m s-1  cyanobacteria sPS_PV_bfl_tot_calculator result
+            cyanobacteria_sNS_PV_sfl_tot_calculator_result  gN/m2 m s-1  cyanobacteria sNS_PV_sfl_tot_calculator result
+            cyanobacteria_sNS_PV_bfl_tot_calculator_result  gN/m2 m s-1  cyanobacteria sNS_PV_bfl_tot_calculator result
+            cyanobacteria_sCS_PV_sfl_tot_calculator_result  gC/m2 m s-1  cyanobacteria sCS_PV_sfl_tot_calculator result
+            cyanobacteria_sCS_PV_bfl_tot_calculator_result  gC/m2 m s-1  cyanobacteria sCS_PV_bfl_tot_calculator result
+            greens_sDW_sfl_tot_calculator_result  gDW/m3 m s-1  greens sDW_sfl_tot_calculator result
+            greens_sDW_bfl_tot_calculator_result  gDW/m3 m s-1  greens sDW_bfl_tot_calculator result
+            greens_sPW_sfl_tot_calculator_result  gP/m3 m s-1  greens sPW_sfl_tot_calculator result
+            greens_sPW_bfl_tot_calculator_result  gP/m3 m s-1  greens sPW_bfl_tot_calculator result
+            greens_sNW_sfl_tot_calculator_result  gN/m3 m s-1  greens sNW_sfl_tot_calculator result
+            greens_sNW_bfl_tot_calculator_result  gN/m3 m s-1  greens sNW_bfl_tot_calculator result
+            greens_sCW_sfl_tot_calculator_result  gC/m3 m s-1  greens sCW_sfl_tot_calculator result
+            greens_sCW_bfl_tot_calculator_result  gC/m3 m s-1  greens sCW_bfl_tot_calculator result
+            greens_sDS_sms_tot_calculator_result  gDW/m2 s-1  greens sDS_sms_tot_calculator result
+            greens_sPS_sms_tot_calculator_result  gP/m2 s-1  greens sPS_sms_tot_calculator result
+            greens_sNS_sms_tot_calculator_result  gN/m2 s-1  greens sNS_sms_tot_calculator result
+            greens_sCS_sms_tot_calculator_result  gC/m2 s-1  greens sCS_sms_tot_calculator result
+            greens_sDS_PV_sfl_tot_calculator_result  gDW/m2 m s-1  greens sDS_PV_sfl_tot_calculator result
+            greens_sDS_PV_bfl_tot_calculator_result  gDW/m2 m s-1  greens sDS_PV_bfl_tot_calculator result
+            greens_sPS_PV_sfl_tot_calculator_result  gP/m2 m s-1  greens sPS_PV_sfl_tot_calculator result
+            greens_sPS_PV_bfl_tot_calculator_result  gP/m2 m s-1  greens sPS_PV_bfl_tot_calculator result
+            greens_sNS_PV_sfl_tot_calculator_result  gN/m2 m s-1  greens sNS_PV_sfl_tot_calculator result
+            greens_sNS_PV_bfl_tot_calculator_result  gN/m2 m s-1  greens sNS_PV_bfl_tot_calculator result
+            greens_sCS_PV_sfl_tot_calculator_result  gC/m2 m s-1  greens sCS_PV_sfl_tot_calculator result
+            greens_sCS_PV_bfl_tot_calculator_result  gC/m2 m s-1  greens sCS_PV_bfl_tot_calculator result
+            zooplankton_sD_sfl_tot_calculator_result  gDW/m3 m s-1  zooplankton sD_sfl_tot_calculator result
+            zooplankton_sD_bfl_tot_calculator_result  gDW/m3 m s-1  zooplankton sD_bfl_tot_calculator result
+            zooplankton_sP_sfl_tot_calculator_result  gP/m3 m s-1  zooplankton sP_sfl_tot_calculator result
+            zooplankton_sP_bfl_tot_calculator_result  gP/m3 m s-1  zooplankton sP_bfl_tot_calculator result
+            zooplankton_sN_sfl_tot_calculator_result  gN/m3 m s-1  zooplankton sN_sfl_tot_calculator result
+            zooplankton_sN_bfl_tot_calculator_result  gN/m3 m s-1  zooplankton sN_bfl_tot_calculator result
+            zooplankton_sC_sfl_tot_calculator_result  gC/m3 m s-1  zooplankton sC_sfl_tot_calculator result
+            zooplankton_sC_bfl_tot_calculator_result  gC/m3 m s-1  zooplankton sC_bfl_tot_calculator result
+        Using Eulerian solver
+        Using euler_forward()
+        done.
+        Advection of FABM variables
+            full step splitting: u + v + w
+             horizontal: TVD-Superbee advection (second-order, monotone)
+                         without diffusion
+             vertical  : TVD-Superbee advection (second-order, monotone)
+                         without iteration
+        FABM input and forcing ...
+            no file with FABM surface fluxes specified in getm_fabm.inp
+            initial biogeochemical fields from namelists - fabm.yaml
+    init_rivers_fabm()
+    init_register_all_variables()
+    do_register_all_variables()
+        register_domain_variables()
+        register_meteo_variables()
+        register_2d_variables()
+        register_3d_variables()
+        register_fabm_variables()
+        register_processed_variables()
+    init_output
+        save_nuh T
+        save_num T
+        save_tke T
+        keeping velocities on calculation grid
+        2D results: ./LUOMAHU_WET.2d.nc
+        First=           1  step=         120  sync_2d=          120
+        3D results: ./LUOMAHU_WET.3d.nc
+        First=           1  step=         120  sync_3d=          120
+    postinit_2d
+    postinit_3d
+    init_input
+        init_river_input
+            init_river_input_ncdf
+                YIHE: POM_sNW
+                LUONAN: POM_sNW
+                DAYUN: POM_sNW
+                ZHANGSHAN: POM_sNW
+                YANGHE: POM_sNW
+            River offset time    0.0000000000000000     
+            2020-01-01 00:00:00: reading river data ....            2
+    finalize_register_all_variables()
+    finalize_register_meteo_variables()
+    finalize_register_processed_variables()
+ Processing output category /:
+   - lonc
+   - latc
+   - bathymetry
+   - z
+   - D
+   - hn
+   - temp
+   - salt
+   - zc
+   - abiotic_water_sDIMW
+   - abiotic_water_sSiPaW
+   - abiotic_water_sPO4W
+   - abiotic_water_sPAIMW
+   - abiotic_water_sNH4W
+   - abiotic_water_sNO3W
+   - abiotic_water_sSiO2W
+   - abiotic_water_sO2W
+   - abiotic_water_extIM
+   - abiotic_water_pO2Sat
+   - total_bioturbation
+   - total_macrophyte_biomass
+   - total_afCovSurfVeg
+   - total_aCovVeg
+   - total_aDSubVeg
+   - abiotic_water_wind
+   - abiotic_water_tO2Aer
+   - POM_sDW
+   - POM_sPW
+   - POM_sNW
+   - POM_sCW
+   - POM_sDS_PV
+   - POM_sPS_PV
+   - POM_sNS_PV
+   - POM_sCS_PV
+   - POM_sDS
+   - POM_sPS
+   - POM_sNS
+   - POM_sCS
+   - POM_rPDW
+   - POM_rNDW
+   - POM_rCDW
+   - POM_wCMin
+   - POM_extinction
+   - POM_rPDS
+   - POM_rNDS
+   - POM_rCDS
+   - POM_tDPOMS
+   - POM_tDTrans
+   - POM_tCTrans
+   - humus_sDW
+   - humus_sPW
+   - humus_sNW
+   - humus_sCW
+   - humus_sDS_PV
+   - humus_sPS_PV
+   - humus_sNS_PV
+   - humus_sCS_PV
+   - humus_sDS
+   - humus_sPS
+   - humus_sNS
+   - humus_sCS
+   - humus_rPDW
+   - humus_rNDW
+   - humus_rCDW
+   - humus_wCMin
+   - humus_extinction
+   - humus_rPDS
+   - humus_rNDS
+   - humus_rCDS
+   - humus_tDPOMS
+   - humus_tDTrans
+   - humus_tCTrans
+   - DOM_sDW
+   - DOM_sPW
+   - DOM_sNW
+   - DOM_sCW
+   - DOM_sDS_PV
+   - DOM_sPS_PV
+   - DOM_sNS_PV
+   - DOM_sCS_PV
+   - DOM_sDS
+   - DOM_sPS
+   - DOM_sNS
+   - DOM_sCS
+   - DOM_rPDW
+   - DOM_rNDW
+   - DOM_rCDW
+   - DOM_wCMin
+   - DOM_extinction
+   - DOM_rPDS
+   - DOM_rNDS
+   - DOM_rCDS
+   - DOM_tDPOMS
+   - DOM_tDTrans
+   - DOM_tCTrans
+   - cyanobacteria_sDW
+   - cyanobacteria_sPW
+   - cyanobacteria_sNW
+   - cyanobacteria_sCW
+   - cyanobacteria_sDS_PV
+   - cyanobacteria_sPS_PV
+   - cyanobacteria_sNS_PV
+   - cyanobacteria_sCS_PV
+   - cyanobacteria_sDS
+   - cyanobacteria_sPS
+   - cyanobacteria_sNS
+   - cyanobacteria_sCS
+   - cyanobacteria_oChla
+   - cyanobacteria_rPDW
+   - cyanobacteria_rNDW
+   - cyanobacteria_rCDW
+   - cyanobacteria_ext
+   - cyanobacteria_extinction
+   - cyanobacteria_aLLim
+   - cyanobacteria_aNutLim
+   - cyanobacteria_aPLim
+   - cyanobacteria_aNLim
+   - cyanobacteria_Swim
+   - cyanobacteria_rPDS
+   - cyanobacteria_rNDS
+   - cyanobacteria_rCDS
+   - cyanobacteria_tDPOMS
+   - greens_sDW
+   - greens_sPW
+   - greens_sNW
+   - greens_sCW
+   - greens_sDS_PV
+   - greens_sPS_PV
+   - greens_sNS_PV
+   - greens_sCS_PV
+   - greens_sDS
+   - greens_sPS
+   - greens_sNS
+   - greens_sCS
+   - greens_oChla
+   - greens_rPDW
+   - greens_rNDW
+   - greens_rCDW
+   - greens_ext
+   - greens_extinction
+   - greens_aLLim
+   - greens_aNutLim
+   - greens_aPLim
+   - greens_aNLim
+   - greens_Swim
+   - greens_rPDS
+   - greens_rNDS
+   - greens_rCDS
+   - greens_tDPOMS
+   - zooplankton_sD
+   - zooplankton_sP
+   - zooplankton_sN
+   - zooplankton_sC
+   - zooplankton_rPDZoo
+   - zooplankton_rNDZoo
+   - zooplankton_rCDZoo
+   - abiotic_sediment_sDIMS
+   - abiotic_sediment_sSiPaS
+   - abiotic_sediment_sSiO2S
+   - abiotic_sediment_sPO4S
+   - abiotic_sediment_sPAIMS
+   - abiotic_sediment_sNH4S
+   - abiotic_sediment_sNO3S
+   - abiotic_sediment_afOxySed
+   - abiotic_sediment_aPEqIMS
+   - abiotic_sediment_tDAbioO2S
+   - abiotic_sediment_tDPOMdummy
+   - sediment_exchange_tDExchPOMS_1
+   - sediment_exchange_tDResusDead
+   - sediment_exchange_aFunTauTmSet
+   - sediment_exchange_tDAbioIMS
+   - sediment_exchange_tDAbioTotPOMS
+   - burial_VDeltaS
+   - attenuation_coefficient_of_photosynthetic_radiative_flux
+   - total_wCMin
+   - wet_totC
+   - wet_totSusPar
+   - wet_chla
+   - wet_totN
+   - wet_totP
+   - total_tDPOMbio_at_interfaces
+   - total_tDPOMbio_at_bottom
+ ------------------------------------------------------------------------
+    integrating....
+ ------------------------------------------------------------------------
+ ------------------------------------------------------------------------
+ Cleaning up....
+ ------------------------------------------------------------------------
+        YIHE:     2.4209999084472658E-003 10^6 m3
+        LUONAN:     1.5000000000000000E-003 10^6 m3
+        DAYUN:    -1.9600587844848631E-003 10^6 m3
+        ZHANGSHAN:    -9.8002939224243156E-004 10^6 m3
+        YANGHE:    -3.2667646408081054E-004 10^6 m3
+    clean_input
+ ------------------------------------------------------------------------
+    getm: Completed on 20260629 091459.569
+    Memory used (global 2D and 3D arrays):
+        2D:          612  kbytes
+        3D:         3229  kbytes
+    Total CPU-time was:      0.472885013      seconds
+    Number of time steps:            10
+    Number of calc-points:         1164
+    CPU-time/calc-point:      4.06258587E-05  seconds
+    Sim-time/CPU-time:        634.40369643699387     
+ ------------------------------------------------------------------------
+    GETM timers in seconds (           1000000000  tics per second)
+                                 wall      #sysclocks     % of total
+     Timername                time (s)        calls       clocked time
+  initialize                    0.39              2         62.45
+  bottom_friction               0.00              2          0.01
+  momentum                      0.00             20          0.05
+  uv_depths                     0.00              2          0.00
+   sum uv_advect                0.00             22          0.17
+   sum uv_diffusion             0.00             22          0.08
+  depth_update                  0.00             22          0.05
+  sealevel                      0.00             20          0.01
+  gotm                          0.00              2          0.15
+  uv_advect_3d                  0.00              2          0.16
+  uv_diffusion_3d               0.00              2          0.03
+  vv_momentum_3d                0.00              2          0.04
+  uu_momentum_3d                0.00              2          0.05
+  ww_momentum_3d                0.00              2          0.00
+  ss_nn                         0.00              4          0.06
+  bottom_friction_3d            0.00              2          0.01
+  stresses_3d                   0.00              2          0.01
+  slow_terms                    0.00              2          0.01
+  slow_bottom_friction          0.00              2          0.01
+  do_temperature                0.00              2          0.08
+  do_salinity                   0.00              0          0.00
+  coordinates                   0.00              4          0.10
+  do_internal_pressure          0.00              2          0.02
+  start_macro                   0.00              4          0.05
+  eq_state                      0.00              4          0.05
+  calc_mean_fields              0.00              0          0.00
+  do_meteo                      0.00             22          0.01
+  getm_fabm                     0.22              2         36.23
+  integrate_2d other            0.00             40          0.33
+  integrate_3d other            0.00             12          0.03
+  do_input                      0.00             20          0.00
+  do_output                     0.00             22          0.00
+  output_manager_save           0.00             40          0.02
+  do_output_processing          0.00             20          0.00
+   sum do_advection             0.00            334          0.68
+   sum do_advection_3d          0.01             58          1.24
+   sum check_3d_fields          0.00              0          0.00
+  numerical mixing analysi      0.00              0          0.00
+   advection getm_fabm          0.01              2          1.00
+              TIMERS SUM        0.62            796        100.00
+ ------------------------------------------------------------------------
+    Copyright (C) Karsten Bolding and Hans Burchard.
+    under the General Public License (GPL) - http://www.gnu.org 
+ ------------------------------------------------------------------------

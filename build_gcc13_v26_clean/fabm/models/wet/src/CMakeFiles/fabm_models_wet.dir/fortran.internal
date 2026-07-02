@@ -1,0 +1,18 @@
+# The fortran modules provided by this target.
+provides
+ wet_abiotic_sediment.mod
+ wet_abiotic_water.mod
+ wet_bivalves.mod
+ wet_bot_pel_interface.mod
+ wet_burial.mod
+ wet_fish.mod
+ wet_fish_pclake.mod
+ wet_macrophytes.mod
+ wet_model_library.mod
+ wet_om_pool.mod
+ wet_phytoplankton.mod
+ wet_sediment_exchange.mod
+ wet_utility.mod
+ wet_version.mod
+ wet_zoobenthos.mod
+ wet_zooplankton.mod

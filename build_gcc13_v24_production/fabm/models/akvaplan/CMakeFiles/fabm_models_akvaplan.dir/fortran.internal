@@ -1,0 +1,7 @@
+# The fortran modules provided by this target.
+provides
+ akvaplan_antiparasitic.mod
+ akvaplan_model_library.mod
+ akvaplan_plume_injection.mod
+ akvaplan_tracer.mod
+ akvaplan_tracer_sed.mod

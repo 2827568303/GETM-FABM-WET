@@ -1,0 +1,203 @@
+# Test if fish_pclake is supported
+# This configuration uses fish_pclake instead of fish to avoid time_step dependency
+
+include:
+  - $HOME/getm-fabm-wet/fabm-master/src/models/wet/wet.yaml
+
+instance:
+  # Abiotic (non-living)
+  abiotic_water:
+    model: wet/abiotic_water
+    path: $HOME/getm-fabm-wet/wet-master/src/models/wet/abiotic_water.yaml
+  
+  abiotic_sediment:
+    model: wet/abiotic_sediment
+    path: $HOME/getm-fabm-wet/wet-master/src/models/wet/abiotic_sediment.yaml
+
+  # Primary producers (phytoplankton)
+  cyanobacteria:
+    model: wet/phytoplankton
+    path: $HOME/getm-fabm-wet/wet-master/src/models/wet/phytoplankton.yaml
+    p1: 20.0         # pIc0 - initial chlorophyll-specific photosynthesis rate
+    p2: 0.1          # m - mortality loss rate
+    p3: 0.1          # r - respiration loss rate
+    p4: 0.03         # o - exudation loss rate
+    p5: 0.05         # u - microzooplankton grazing rate
+    p6: 0.02         # g - macrograzing loss rate
+    p7: 0.05         # s - sedimentation loss rate
+    p8: 1.0e-5       # v - resuspension rate
+    p9: 0.25         # X - optimal light parameter
+    p10: 0.1         # alpha - PAR adaptation
+    p11: 0.0         # R - temperature function minimum
+    p12: 0.0         # Q - slope of temperature function
+    p13: 0.027       # beta - temperature optimum deviation
+    p14: 0.2         # I_opt - light optimum
+    p15: 0.0         # I_inhib - light inhibition threshold
+    p16: 0.0         # vV - maximal resuspension velocity
+    p17: 0.0         # K_PO4 - half-saturation phosphate concentration
+    p18: 0.0         # C - half-saturation inorganic carbon
+    p19: 0.0         # N - half-saturation nitrogen
+    p20: 0.0         # Si - half-saturation silicate
+    p21: 0.2         # Y - C:Chl-a ratio
+    pMax: 0.3        # maximum growth rate
+    group: cyanobacteria
+  
+  diatoms:
+    model: wet/phytoplankton
+    path: $HOME/getm-fabm-wet/wet-master/src/models/wet/phytoplankton.yaml
+    p1: 15.0
+    p2: 0.1
+    p3: 0.15
+    p4: 0.03
+    p5: 0.05
+    p6: 0.02
+    p7: 0.15
+    p8: 1.0e-5
+    p9: 0.3
+    p10: 0.1
+    p11: 0.0
+    p12: 0.0
+    p13: 0.027
+    p14: 0.2
+    p15: 0.0
+    p16: 0.0
+    p17: 0.0
+    p18: 0.0
+    p19: 0.0
+    p20: 0.1
+    p21: 0.2
+    pMax: 0.2
+    group: diatoms
+  
+  greens:
+    model: wet/phytoplankton
+    path: $HOME/getm-fabm-wet/wet-master/src/models/wet/phytoplankton.yaml
+    p1: 25.0
+    p2: 0.1
+    p3: 0.12
+    p4: 0.04
+    p5: 0.06
+    p6: 0.02
+    p7: 0.08
+    p8: 1.0e-5
+    p9: 0.25
+    p10: 0.1
+    p11: 0.0
+    p12: 0.0
+    p13: 0.027
+    p14: 0.25
+    p15: 0.0
+    p16: 0.0
+    p17: 0.0
+    p18: 0.0
+    p19: 0.0
+    p20: 0.0
+    p21: 0.2
+    pMax: 0.4
+    group: greens
+
+  # Primary consumers (zooplankton)
+  cladocerans:
+    model: wet/zooplankton
+    path: $HOME/getm-fabm-wet/wet-master/src/models/wet/zooplankton.yaml
+    p1: 0.8           # r - maximum growth rate
+    p2: 0.08          # m - mortality
+    p3: 0.05          # gamma - ingestion rate
+    p4: 0.6           # X - assimilation efficiency
+    p5: 0.5           # beta - respiration loss
+    p6: 0.3           # p - preference for edible algae
+    p7: 0.2           # h - half-saturation food concentration
+    group: cladocerans
+
+  copepods:
+    model: wet/zooplankton
+    path: $HOME/getm-fabm-wet/wet-master/src/models/wet/zooplankton.yaml
+    p1: 0.5
+    p2: 0.05
+    p3: 0.03
+    p4: 0.6
+    p5: 0.4
+    p6: 0.4
+    p7: 0.15
+    group: copepods
+
+  # Secondary producers (macrophytes)
+  macrophytes:
+    model: wet/macrophytes
+    path: $HOME/getm-fabm-wet/wet-master/src/models/wet/macrophytes.yaml
+    p1: 0.1           # r - growth rate
+    p2: 0.01          # m - mortality rate
+    p3: 0.05          # gamma - respiration rate
+    p4: 0.1           # pSed - sedimentation rate
+    p5: 0.05          # u - resuspension rate
+    p6: 0.5           # K_N - half-saturation nitrogen
+    p7: 0.01          # K_P - half-saturation phosphorus
+    p8: 0.3           # X - light adaptation
+    p9: 0.0           # d_sub - submerged depth
+    p10: 0.5          # C_lw - leaf weight factor
+    p11: 0.8          # Y - C:DW ratio
+    p12: 1.0          # cov0 - initial cover
+
+  # Benthos
+  zoobenthos:
+    model: wet/zoobenthos
+    path: $HOME/getm-fabm-wet/wet-master/src/models/wet/zoobenthos.yaml
+    p1: 0.05          # r - growth rate
+    p2: 0.01          # m - mortality rate
+    p3: 0.03          # gamma - respiration rate
+    p4: 0.4           # X - assimilation efficiency
+    p5: 0.3           # beta - respiration loss
+    p6: 0.2           # p - preference
+    p7: 0.15          # h - half-saturation
+    p8: 0.02          # sedimentation
+    p9: 0.01          # resuspension
+    p10: 0.5          # Y - C:DW ratio
+
+  # Fish using fish_pclake (no time_step dependency!)
+  JuFish:
+    model: wet/fish_pclake
+    path: $HOME/getm-fabm-wet/wet-master/src/models/wet/fish_pclake.yaml
+    p1: 0.01          # r - maximum growth rate
+    p2: 0.001         # m - mortality rate
+    p3: 0.3           # gamma - respiration rate
+    p4: 0.5           # X - assimilation efficiency
+    p5: 0.3           # beta - temperature loss
+    p6: 0.8           # p - preference factor
+    p7: 0.5           # h - half-saturation food
+    p8: 0.0           # sedimentation
+    p9: 0.0           # resuspension
+    p10: 0.4          # Y - C:DW ratio
+    fish_group: Juvenile_fish
+    qTrans: 0         # vertical migration: 0=off, 1=on
+
+  AdFish:
+    model: wet/fish_pclake
+    path: $HOME/getm-fabm-wet/wet-master/src/models/wet/fish_pclake.yaml
+    p1: 0.005
+    p2: 0.0005
+    p3: 0.2
+    p4: 0.5
+    p5: 0.3
+    p6: 0.7
+    p7: 0.8
+    p8: 0.0
+    p9: 0.0
+    p10: 0.5
+    fish_group: Adult_fish
+    qTrans: 0
+
+  PiscFish:
+    model: wet/fish_pclake
+    path: $HOME/getm-fabm-wet/wet-master/src/models/wet/fish_pclake.yaml
+    p1: 0.003
+    p2: 0.0003
+    p3: 0.15
+    p4: 0.5
+    p5: 0.3
+    p6: 0.6
+    p7: 1.0
+    p8: 0.0
+    p9: 0.0
+    p10: 0.6
+    fish_group: Piscivorous_fish
+    qTrans: 0

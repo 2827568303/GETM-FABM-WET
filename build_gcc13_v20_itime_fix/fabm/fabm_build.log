@@ -1,0 +1,69 @@
+[  2%] Built target yaml
+[  9%] Built target fabm_base
+[ 10%] Built target fabm_models_hzg
+[ 10%] Built target fabm_models_klimacampus
+[ 13%] Built target fabm_models_iow
+[ 15%] Built target fabm_models_metu
+[ 15%] Built target fabm_models_msi
+[ 18%] Built target fabm_models_au
+[ 22%] Built target fabm_models_bb
+[ 40%] Built target fabm_models_aed
+[ 45%] Built target fabm_models_gotm
+[ 48%] Built target fabm_models_jrc
+[ 57%] Built target fabm_models_examples
+[ 59%] Built target fabm_models_pml
+[ 63%] Built target fabm_models_selma
+[ 68%] Built target fabm_models_su
+[ 76%] Built target fabm_models_niva
+[ 80%] Built target fabm_models_akvaplan
+[ 81%] Building Fortran object models/wet/src/CMakeFiles/fabm_models_wet.dir/fish.F90.o
+[ 82%] Building Fortran object models/wet/src/CMakeFiles/fabm_models_wet.dir/om_pool.F90.o
+[ 94%] Built target fabm_models_wet
+[ 95%] Building Fortran object CMakeFiles/fabm.dir/fabm.F90.o
+[ 95%] Linking Fortran static library libfabm.a
+[100%] Built target fabm
+[  7%] Built target fabm_base
+[  9%] Built target yaml
+[ 27%] Built target fabm_models_aed
+[ 28%] Built target fabm_models_hzg
+[ 31%] Built target fabm_models_iow
+[ 31%] Built target fabm_models_klimacampus
+[ 32%] Built target fabm_models_metu
+[ 33%] Built target fabm_models_msi
+[ 36%] Built target fabm_models_au
+[ 40%] Built target fabm_models_bb
+[ 50%] Built target fabm_models_examples
+[ 54%] Built target fabm_models_gotm
+[ 57%] Built target fabm_models_jrc
+[ 59%] Built target fabm_models_pml
+[ 63%] Built target fabm_models_selma
+[ 68%] Built target fabm_models_su
+[ 76%] Built target fabm_models_niva
+[ 80%] Built target fabm_models_akvaplan
+[ 94%] Built target fabm_models_wet
+[100%] Built target fabm
+Install the project...
+-- Install configuration: "Debug"
+-- Installing: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/lib/libfabm.a
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_builtin_models.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_config.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_config_types.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_coupling.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_driver.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_expressions.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_library.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_parameters.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_particle.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_properties.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_schedule.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_standard_variables.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_types.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_version.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_yaml.mod
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm.h
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_version.h
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/include/fabm_driver.h
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/cmake/fabmConfig.cmake
+-- Up-to-date: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v20_itime_fix/fabm/cmake/fabmConfig-debug.cmake

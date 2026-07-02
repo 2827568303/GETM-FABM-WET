@@ -1,0 +1,6 @@
+# The fortran modules provided by this target.
+provides
+ yaml.mod
+ yaml_settings.mod
+ yaml_types.mod
+ yaml_version.mod

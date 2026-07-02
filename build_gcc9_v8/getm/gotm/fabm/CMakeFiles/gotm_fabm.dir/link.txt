@@ -1,0 +1,2 @@
+/usr/bin/ar qc libgotm_fabm.a CMakeFiles/gotm_fabm.dir/gotm_fabm.F90.o CMakeFiles/gotm_fabm.dir/gotm_fabm_manipulation.F90.o
+/usr/bin/ranlib libgotm_fabm.a

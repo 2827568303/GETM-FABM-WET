@@ -1,0 +1,5 @@
+# The fortran modules provided by this target.
+provides
+ advection.mod
+ m2d.mod
+ variables_2d.mod

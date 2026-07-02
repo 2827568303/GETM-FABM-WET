@@ -1,0 +1,31 @@
+instances:
+  abiotic_water:
+    long_name: abiotic_process_in_water
+    model: wet/abiotic_water
+    parameters:
+      O2PerNH4W: 2.0
+      cExtSpIM: 0.05
+      cKPAdsOxW: 0.6
+      cRelPAdsAlW: 0.134
+      cRelPAdsDWW: 3.0e-05
+      cRelPAdsFeW: 0.0675
+      cThetaAer: 1.011
+      cThetaNitrW: 1.03
+      cVSetIM: -1.1
+      fAlDIMW: 0.01
+      fFeDIMW: 0.01
+      fRedMaxW: 0.9
+      hO2Nitr: 2.0
+      kNitrW: 0.3
+      kPSorpW: 0.05
+      kSiMinPaW: 0.03
+      diagnostics: true
+    initialization:
+      sNH4W: 0.05
+      sNO3W: 0.5
+      sPO4W: 0.1
+      sPAIMW: 0.0
+      sSiO2W: 3.5
+      sO2W: 13.0
+      sDIMW: 4.0
+      sSiPaW: 0.025

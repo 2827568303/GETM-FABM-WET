@@ -1,0 +1,1 @@
+/usr/bin/gfortran-13  -ffree-line-length-none -g -fcheck=all -fbacktrace -U_GOTM_FABM_NML_ CMakeFiles/test_time.dir/test_time.F90.o -o test_time  ../util/libutil.a ../extern/flexout/extern/yaml/libyaml.a 

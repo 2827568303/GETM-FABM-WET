@@ -1,0 +1,22 @@
+=== STDOUT ===
+[  2%] Built target yaml
+[  9%] Built target util
+[ 21%] Built target futils
+[ 25%] Built target domain
+[ 26%] Built target field_manager
+[ 32%] Built target 2d
+[ 34%] Built target gotm_fabm
+[ 37%] Built target meteo
+[ 43%] Built target output_manager
+[ 56%] Built target turbulence
+[ 75%] Built target 3d
+[ 78%] Built target output
+[ 90%] Built target ncdf
+[ 96%] Built target input
+[ 98%] Built target getm
+[100%] Built target getm_exe
+Install the project...
+-- Install configuration: "Release"
+-- Installing: /mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc9_v3/bin/getm_cartesian
+
+=== STDERR ===

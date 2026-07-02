@@ -1,0 +1,9 @@
+# The fortran modules provided by this target.
+provides
+ su_algae.mod
+ su_bacteria.mod
+ su_light_cycle.mod
+ su_mixo.mod
+ su_model_library.mod
+ su_npz.mod
+ su_pools.mod

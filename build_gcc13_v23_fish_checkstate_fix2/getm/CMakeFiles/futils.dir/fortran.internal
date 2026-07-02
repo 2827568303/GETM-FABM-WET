@@ -1,0 +1,11 @@
+# The fortran modules provided by this target.
+provides
+ exceptions.mod
+ getm_config.mod
+ getm_timers.mod
+ getm_version.mod
+ grid_interpol.mod
+ halo_zones.mod
+ kurt_parallel.mod
+ parameters.mod
+ time.mod

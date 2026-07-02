@@ -1,0 +1,21 @@
+# 编译输出 
+*.exe 
+*.dll 
+*.pdb 
+*.obj 
+*.o 
+*.a 
+*.so 
+build/ 
+Build/ 
+# 大数据文件 
+*.nc 
+*.h5 
+*.npz 
+*.mat 
+# 编辑器缓存 
+__pycache__/ 
+*.pyc 
+.vscode/ 
+.idea/ 
+*.swp 

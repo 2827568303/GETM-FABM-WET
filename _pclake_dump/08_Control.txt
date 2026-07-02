@@ -1,0 +1,52 @@
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+																										
+	Set0	Set1	Set2	Set3																						
+iRuniD	0	1	2	3																						
+iIntType	3	3	3	3																						
+iStateSet	3	3	3	3																						
+iParamSet	0	1	2	3																						
+iInitAuxilSet	0	0	0	0																						
+iAuxilset	0	0	0	0																						
+iCalibType	0	0	0	0																						
+iCalibMaxIter	50	50	50	50																			Set0	Set1	Set2	Set3
+dReady	20	0	0	0																		Para_sets	WDS	WDS	defult	defult
+dIntStep	0.001	0.001	0.001	0.001																		_hDVegGras_	50	50	50	50
+dIntAccuracy	0.0001	0.0001	0.0001	0.0001																		_kDAssGras_	0.025	0.05	0.1	0.12
+dRepStart	0	0	0	0																		_fDAssGras_	0.4	0.4	0.4	0.4
+dRepStep	4	4	4	4																						
+dAvgStep	1	1	1	1																						
+dAvgStart	24	24	24	24																						
+dAvgStartWithinYear	150	150	150	150																			42.63		选用Set1的参数	
+dAvgEndWithinYear	210	210	210	210																			36.41			
+dSensitivityFactor	0.01	0.01	0.01	0.01																			38.96			
+dCalibScale	0.05	0.05	0.05	0.05																			44.65			
+dCalibAccuracy	0.001	0.001	0.001	0.001																			42.61			
+iGccCompiler	c:\rtools\gcc-4.6.3																						51.94			
+iFilesDATM	DATM\PCLakePLUS_20200828\																						53.57			
