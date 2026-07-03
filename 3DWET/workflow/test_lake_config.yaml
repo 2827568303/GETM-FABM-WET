@@ -1,0 +1,74 @@
+# 测试湖泊 - 小网格快速验证工作流
+lake:
+  name: "TestLake"
+  description: "小网格测试湖泊（验证工作流）"
+  latitude: 30.0
+  longitude: 120.0
+  elevation: 100.0
+
+grid:
+  nx: 10
+  ny: 4
+  dx: 500.0
+  dy: 500.0
+
+shape:
+  mode: "oval"
+  width_profile: "cosine"
+  width_ratio: 0.9
+
+bathymetry:
+  avg_depth: 3.5
+  max_depth: 5.0
+  min_depth: 1.0
+  depth_profile: "center_deep"
+
+rivers:
+  - name: "INFL1"
+    position: "west"
+    type: "inflow"
+    base_flow: 2.0
+    seasonal_amplitude: 0.4
+    wet_season: [120, 300]
+    water_quality:
+      temp: 15.0
+      nh4: 0.20
+      no3: 1.5
+      po4: 0.05
+      doc: 5.0
+      poc: 2.0
+
+  - name: "OUTFL"
+    position: "east"
+    type: "outflow"
+    base_flow: null
+    water_quality:
+      temp: 15.0
+      nh4: 0.10
+      no3: 1.2
+      po4: 0.04
+      doc: 5.0
+      poc: 2.0
+
+meteo:
+  mode: "synthetic"
+  start_date: "2020-01-01"
+  n_days: 30
+  climate:
+    avg_temp: 18.0
+    temp_amplitude: 7.5
+    temp_peak_day: 170
+    annual_precip: 1200
+    annual_evap: 1100
+    wet_season: [120, 300]
+    wet_season_precip_ratio: 0.75
+    avg_wind_speed: 2.0
+    wind_direction: "monsoon"
+    avg_cloud_cover: 0.5
+    avg_humidity: 70
+
+ecology:
+  macrophytes:
+    enabled: true
+    depth_range: [1.0, 2.5]
+    initial_biomass: 30.0

@@ -1,0 +1,38 @@
+# TestLake case配置 - 验证build_case和run_model模块
+case:
+  name: "TestLake"
+  run_id: "TESTLAKE"
+  description: "小网格测试湖泊（验证完整工作流）"
+  start_date: "2020-01-01 00:00:00"
+  end_date: "2020-01-30 00:00:00"
+
+data:
+  data_dir: "./TestLake_data"
+
+grid:
+  nx: 10
+  ny: 4
+  kdum: 10
+  maxdepth: 6.0
+  crit_depth: 0.3
+  min_depth: 0.1
+
+run:
+  timestep: 30.0
+  n_threads: 4
+  filter_warnings: true
+
+initial_conditions:
+  preset: "eutrophic"
+
+numerics:
+  ode_method: 10
+  repair_state: true
+  shade: true
+  fwf_method: 2
+  calc_salt: false
+
+output:
+  freq_2d: 1440
+  freq_3d: 1440
+  fabm_daily: true

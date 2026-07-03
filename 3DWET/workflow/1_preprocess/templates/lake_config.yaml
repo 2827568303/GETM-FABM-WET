@@ -1,0 +1,124 @@
+# ====================================================================
+# 湖泊配置文件模板 (Lake Configuration Template)
+# ====================================================================
+# 用途：定义湖泊的物理特征、网格、河流、气象等基本信息
+#       前处理模块读取此文件，自动生成4个输入数据文件：
+#         bathymetry.nc, meteo.nc, rivers.nc, fabm_init.nc
+#
+# 使用方法：
+#   1. 复制此模板：cp lake_config.yaml my_lake.yaml
+#   2. 根据你的湖泊修改参数
+#   3. 运行：python workflow/1_preprocess/preprocess.py my_lake.yaml
+# ====================================================================
+
+# --- 湖泊基本信息 ---
+lake:
+  name: "MyLake"                    # 湖泊名称（用于输出文件命名）
+  description: "示例湖泊配置"        # 描述
+  latitude: 30.0                    # 中心纬度（度）
+  longitude: 120.0                  # 中心经度（度）
+  elevation: 100.0                  # 海拔(m)，影响气压
+
+# --- 网格设置 ---
+grid:
+  nx: 20                            # x方向(东西)网格数
+  ny: 10                            # y方向(南北)网格数
+  dx: 500.0                         # x方向网格尺寸(m)
+  dy: 500.0                         # y方向网格尺寸(m)
+  # 总面积 = nx*ny*dx*dy，实际水域面积取决于lake_shape
+
+# --- 湖泊形状 ---
+# 三种形状模式可选：rectangle/oval/custom
+shape:
+  mode: "oval"                      # rectangle: 矩形 | oval: 椭圆 | custom: 自定义(需提供mask_file)
+  # oval模式参数（长椭圆形，适合长条状湖泊）
+  width_profile: "cosine"           # 宽度剖面：cosine(两端窄中间宽) | uniform(均匀)
+  width_ratio: 0.9                  # 中间宽度/最大宽度(0-1)，越大越接近椭圆
+  # custom模式参数
+  # mask_file: "lake_mask.npy"      # 自定义水域掩膜(NY×NX的bool数组)
+
+# --- 水深设置 ---
+bathymetry:
+  avg_depth: 3.5                    # 平均水深(m)
+  max_depth: 7.0                    # 最大水深(m)
+  min_depth: 1.0                    # 最小水深(m)
+  depth_profile: "center_deep"      # center_deep: 中间深两端浅 | uniform: 均匀 | east_deep: 东端深
+  # 自定义水深文件（可选）
+  # depth_file: "bathy_data.npy"    # NY×NX的水深数据
+
+# --- 河流设置 ---
+# 支持任意数量河流，每条河流需指定位置和流量
+rivers:
+  # 入流河流（流量为正）
+  - name: "INFLOW_1"
+    position: "north"               # north/south/east/west 或 [i, j](1-based)
+    type: "inflow"
+    base_flow: 2.0                  # 平均流量(m³/s)
+    seasonal_amplitude: 0.4         # 季节变幅(0-1)，0=恒定，1=±100%
+    wet_season: [120, 300]          # 雨季起止日(儒略日)，影响季节变化
+    water_quality:
+      temp: 15.0                    # 水温(°C，可加seasonal: true启用季节变化)
+      nh4: 0.20                     # 铵氮(g/m³)
+      no3: 1.5                      # 硝氮(g/m³)
+      po4: 0.05                     # 磷酸盐(g/m³)
+      doc: 5.0                      # 溶解有机碳(g/m³)
+      poc: 2.0                      # 颗粒有机碳(g/m³)
+
+  - name: "INFLOW_2"
+    position: "west"
+    type: "inflow"
+    base_flow: 3.0
+    seasonal_amplitude: 0.4
+    wet_season: [120, 300]
+    water_quality:
+      temp: 15.0
+      nh4: 0.30
+      no3: 2.0
+      po4: 0.08
+      doc: 8.0
+      poc: 3.0
+
+  # 出流河流（流量为负，由水量平衡自动计算）
+  - name: "OUTFLOW_1"
+    position: "east"
+    type: "outflow"
+    base_flow: null                 # null=由水量平衡自动计算
+    water_quality:
+      temp: 15.0
+      nh4: 0.10
+      no3: 1.2
+      po4: 0.04
+      doc: 5.0
+      poc: 2.0
+
+# --- 气象设置 ---
+# 三种气象模式：synthetic(合成) | file(外部文件) | reference(参考湖泊)
+meteo:
+  mode: "synthetic"                 # synthetic: 根据气候参数合成 | file: 从NetCDF文件读取
+  start_date: "2020-01-01"
+  n_days: 366                       # 模拟天数(含起始日)
+
+  # synthetic模式参数
+  climate:
+    avg_temp: 18.0                  # 年平均气温(°C)
+    temp_amplitude: 7.5             # 温度年变幅(°C，峰值偏离平均值)
+    temp_peak_day: 170              # 最热月儒略日(约6月20日)
+    annual_precip: 1200             # 年降水总量(mm)
+    annual_evap: 1100               # 年蒸发总量(mm)
+    wet_season: [120, 300]          # 雨季起止日(儒略日)
+    wet_season_precip_ratio: 0.75   # 雨季降水占全年比例
+    avg_wind_speed: 2.0             # 平均风速(m/s)
+    wind_direction: "monsoon"       # monsoon: 季风 | constant: 恒定 | variable: 变化
+    avg_cloud_cover: 0.5            # 平均云量(0-1)
+    avg_humidity: 70                # 平均相对湿度(%)
+
+  # file模式参数（从外部NetCDF文件读取）
+  # file_path: "observed_meteo.nc"
+
+# --- 生态初始化场 ---
+# 沉水植物等需要空间分布的变量
+ecology:
+  macrophytes:
+    enabled: true
+    depth_range: [1.0, 2.5]         # 分布水深范围(m)，在此范围内的网格设置沉水植物
+    initial_biomass: 30.0           # 初始生物量(gDW/m²)

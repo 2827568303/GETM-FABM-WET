@@ -1,0 +1,90 @@
+# ====================================================================
+# Case配置文件模板 (Case Configuration Template)
+# ====================================================================
+# 用途：定义模型运行参数、初始条件、输出设置等
+#       模型构建模块读取此文件，自动生成完整case目录：
+#         getm.inp, fabm.yaml, gotm_fabm.yaml, gotmturb.nml,
+#         output.yaml, getm_fabm.inp + 复制输入数据文件
+#
+# 使用方法：
+#   1. 复制此模板：cp case_config.yaml my_case.yaml
+#   2. 修改参数（特别是data_dir指向前处理输出）
+#   3. 运行：python workflow/2_build_case/build_case.py my_case.yaml
+# ====================================================================
+
+# --- Case基本信息 ---
+case:
+  name: "MyCase"                     # case名称（用于目录命名和输出文件前缀）
+  run_id: "MYLAKE"                   # GETM运行ID（输出文件前缀，大写无空格）
+  description: "示例case配置"         # 描述
+  start_date: "2020-01-01 00:00:00"  # 起始时间
+  end_date: "2020-12-31 00:00:00"    # 结束时间
+
+# --- 数据文件路径 ---
+# 指向前处理模块生成的数据目录
+data:
+  data_dir: "./my_lake_data"         # 前处理输出目录（含bathymetry.nc等）
+  # 也可以单独指定每个文件（覆盖data_dir）
+  # bathymetry: "./data/bathymetry.nc"
+  # meteo: "./data/meteo.nc"
+  # rivers: "./data/rivers.nc"
+  # fabm_init: "./data/fabm_init.nc"
+
+# --- 网格信息（必须与前处理一致）---
+grid:
+  nx: 20                             # x方向网格数
+  ny: 10                             # y方向网格数
+  kdum: 10                           # sigma层数
+  maxdepth: 8.0                      # 最大水深(m)，需≥湖泊实际最大水深+1m余量
+  crit_depth: 0.3                    # 浅水临界深度(m)，建议0.3
+  min_depth: 0.1                     # 最小水深(m)
+
+# --- 运行参数 ---
+run:
+  timestep: 30.0                     # 时间步(s)，必须30s防止数值不稳定
+  n_threads: 8                       # OpenMP线程数
+  filter_warnings: true              # 过滤Patankar "small pi"警告（必须true）
+
+# --- 初始条件 ---
+# 三种预设：mesotrophic(中营养) | eutrophic(富营养) | hypereutrophic(重富营养)
+# 或自定义：custom
+initial_conditions:
+  preset: "eutrophic"                # 预设方案
+
+  # custom模式参数（preset=custom时使用）
+  custom:
+    # 营养盐
+    sNH4W: 0.30                      # 铵氮(g/m³)
+    sNO3W: 1.0                       # 硝氮(g/m³)
+    sPO4W: 0.06                      # 磷酸盐(g/m³)
+    sO2W: 10.0                       # 溶解氧(g/m³)
+    sSiO2W: 3.5                      # 硅(g/m³)
+    # 浮游植物(3群)
+    diatoms_sDW: 0.30                # 硅藻(gDW/m³)
+    greens_sDW: 0.20                 # 绿藻(gDW/m³)
+    cyanobacteria_sDW: 0.30          # 蓝藻(gDW/m³)
+    # 浮游动物(2群)
+    cladocerans_sD: 0.30             # 枝角类(gDW/m³)
+    copepods_sD: 0.30                # 桡足类(gDW/m³)
+    # 鱼类(3功能群)
+    JuFish_sD: 0.15                  # 幼鱼(gDW/m³)
+    AdFish_sD: 0.40                  # 成鱼(gDW/m³)
+    PiscFish_sD: 0.05                # 凶猛鱼(gDW/m³)
+    # 其他
+    zoobenthos_sD: 0.40              # 底栖动物(gDW/m²)
+    POM_sDW: 5.0                     # 颗粒有机物(g/m³)
+    DOM_sDW: 10.0                    # 溶解有机物(g/m³)
+
+# --- 数值参数 ---
+numerics:
+  ode_method: 10                     # 10=Patankar保正(推荐，与QWET一致)
+  repair_state: true                 # 修复负值(必须true)
+  shade: true                        # 生物自遮光反馈(必须true)
+  fwf_method: 2                      # 淡水通量方法(2=从文件读取)
+  calc_salt: false                   # 计算盐度(false=淡水湖)
+
+# --- 输出设置 ---
+output:
+  freq_2d: 1440                      # 2D输出频率(步数，1440=每12小时)
+  freq_3d: 1440                      # 3D输出频率(步数，1440=每12小时)
+  fabm_daily: true                   # FABM日输出(true=每日)

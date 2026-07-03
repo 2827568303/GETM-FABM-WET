@@ -1,114 +1,75 @@
-# ============================================
-# 3DWET 项目 .gitignore
-# ============================================
+# ==========================================================
+# GETM-FABM-WET .gitignore
+# ==========================================================
 
-# ========== 编译输出 ==========
-# 构建目录（所有历史和当前 build 目录）
-build/
-build_*/
-install/
-install_*/
-bin/
+# ----- Sensitive files (NEVER commit) -----
+3DWET/Git 仓库.txt
+**/Git 仓库.txt
+*.token
+*.pat
+.env
+.env.local
 
-# 例外：3DWET/scripts/build/ 存放的是编译脚本（非编译产物），需纳入版本控制
-!3DWET/scripts/build/
-
-# Fortran/C 编译产物
-*.o
-*.obj
-*.a
-*.so
-*.dll
-*.exe
-*.pdb
-*.mod
-*.smod
-
-# CMake 产物
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-Makefile
-!3DWET/src/**/Makefile
-!3DWET/scripts/**/Makefile
-install_manifest.txt
-*.cmake
-!3DWET/src/**/CMakeLists.txt
-!3DWET/src/**/cmake/*.cmake
-
-# ========== 大数据文件 ==========
-# NetCDF 数据文件（地形、气象、河流、输出等）
-*.nc
-*.nc3
-*.nc4
-*.h5
-*.hdf5
-
-# 其他数据格式
-*.npz
-*.mat
-*.grd
-*.p2d
-*.tif
-*.tiff
-
-# WET 测试数据大文件
-3DWET/src/wet/testcases/lake_bryrup_obm/meteo_file.dat
-3DWET/src/wet/testcases/lake_bryrup_obm/inflow_chem*.dat
-
-# 例外：保留必要的配置模板数据
-!3DWET/cases/**/topo.cdl
-!3DWET/cases/**/topo.dat
-!3DWET/cases/**/riverinfo.dat
-!3DWET/cases/**/meteo_input.txt
-
-# ========== 运行日志 ==========
-*.log
-*.out
-*.err
-run_logs/
-run_*.log
-
-# ========== 备份文件 ==========
-*.bak
-*.bak_*
-*.backup
-*.orig
-*~
-*.save
-
-# ========== Python 缓存 ==========
+# ----- Python caches -----
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
 *.egg-info/
-dist/
-build/lib/
+*.so
 
-# ========== 编辑器/IDE ==========
+# ----- Large model output files (>100MB, GitHub limit) -----
+# GETM/FABM output NetCDF files
+*.2d.nc
+*.3d.nc
+LUOMA_EFDC_HYD.*.nc
+TESTLAKE.*.nc
+output.nc
+output_*.nc
+
+# ----- Backup directories (40+ GB total) -----
+backup_*/
+backup_*/
+**/backup_*/
+
+# ----- Model run logs -----
+run.log
+run_*.log
+*.log
+
+# ----- Large intermediate files -----
+# meteo.nc often >100MB (ERA5 data)
+meteo.nc
+meteo_*.nc
+
+# Bathymetry/rivers backup versions
+bathymetry_orig.nc
+bathymetry_before_fix.nc
+bathymetry_1pass.nc
+bathymetry_1pass_smooth.nc
+bathymetry.nc.scheme_*
+bathymetry.nc.backup
+rivers_orig.nc
+rivers.nc.backup
+
+# ----- IDE / Editor -----
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-.project
-.settings/
-
-# ========== 系统文件 ==========
 .DS_Store
 Thumbs.db
+
+# ----- Build artifacts -----
+3DWET/build/
+3DWET/install/
+*.exe
+*.o
+*.mod
+*.a
+
+# ----- OS junk -----
 desktop.ini
-ehthumbs.db
-
-# ========== 临时文件 ==========
-tmp/
-temp/
 *.tmp
-*.temp
-
-# ========== Excel 临时文件 ==========
-~$*.xls
-~$*.xlsx
-~$*.xlsm
+*.bak
