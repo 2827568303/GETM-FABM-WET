@@ -1,58 +1,105 @@
 # ==========================================================
 # GETM-FABM-WET .gitignore
+# 目标：仓库 = 「拿到就能重跑模型 + 复现案例」所需的全部材料
+#   ✅ 收：源码、CMake 构建脚本、GUI、文档、案例配置、案例输入数据、现成可执行程序
+#   ❌ 排：编译中间产物、模型输出（单文件可达数十 GB）、运行日志、临时/备份文件
 # ==========================================================
 
-# ----- Sensitive files (NEVER commit) -----
-3DWET/Git 仓库.txt
+# ----- 敏感信息（绝不入仓）-----
+Git 仓库.txt
 **/Git 仓库.txt
 *.token
 *.pat
 .env
 .env.local
+*.key
+*.pem
 
-# ----- Python caches -----
+# ----- Python 缓存 -----
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
 *.egg-info/
-*.so
+.eggs/
+.venv/
+venv/
+.ipynb_checkpoints/
 
-# ----- Large model output files (>100MB, GitHub limit) -----
-# GETM/FABM output NetCDF files
-*.2d.nc
-*.3d.nc
-LUOMA_EFDC_HYD.*.nc
-TESTLAKE.*.nc
+# ==========================================================
+# 1) 编译产物 / CMake 中间文件（都能从 src/ 重新构建）
+# ==========================================================
+# 注意：这里必须写成相对于仓库根的确定路径。裸写 `build/` 会连
+# scripts/build/（一堆有用的构建脚本）一起误伤，且被排除的目录无法用 ! 反向恢复。
+/3DWET/build/
+/3DWET/build-win/
+/3DWET/install/
+/3DWET/install-win/
+/build/
+/build-*/
+/install*/
+# scripts/build/ 下的一级脚本保留，但其子目录是历史 CMake 构建产物（已被误入仓）
+/3DWET/scripts/build/*/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+*.cmake
+*.o
+*.obj
+*.mod
+*.smod
+*.a
+*.lib
+*.pdb
+*.ilk
+*.gcno
+*.gcda
+
+# 现成的可执行程序保留（Windows 下重编译成本高，便于直接跑模型），
+# 只排除历史/中间版本
+bin/*_old_*
+bin/*_backup*
+
+# ==========================================================
+# 2) 模型运行输出 —— 体积主犯，一律排除
+#    output.yaml → output.nc；getm.inp 的 step_2d/3d → *.2d.nc / *.3d.nc
+# ==========================================================
 output.nc
 output_*.nc
+*.2d.nc
+*.3d.nc
+*.1d.nc
+*.mean.nc
+*.restart.nc
+*.rst
+hotstart.nc
+hotstart_out.nc
+# 注意：含斜杠的规则会被锚定到 .gitignore 所在目录（本文件在仓库根），
+# 所以必须写全路径前缀（或用 **/ 通配），否则匹配不到 3DWET/... 下的文件。
+**/case/*/output/
+**/case/_fish_probe/
+**/case/_dc_verify/
+**/case/_out_probe/
+**/case/_probe*/
+**/case/_test*/
+**/case/_tmp*/
 
-# ----- Backup directories (40+ GB total) -----
-backup_*/
-backup_*/
-**/backup_*/
+# ---- 上游样例/试验数据里的超大原始文件（超 GitHub 100MB 上限，且不参与本项目的案例） ----
+/3DWET/src/wet/testcases/lake_bryrup_obm/meteo_file.dat
+/3DWET/src/wet/testcases/**/*.dat
+/3DWET/src/wet/testcases/**/*.bin
 
-# ----- Model run logs -----
-run.log
-run_*.log
+# ==========================================================
+# 4) 运行日志与临时状态（每次运行都会重写）
+# ==========================================================
 *.log
+*.tmp
+*.temp
+monitor_log.txt
 
-# ----- Large intermediate files -----
-# meteo.nc often >100MB (ERA5 data)
-meteo.nc
-meteo_*.nc
-
-# Bathymetry/rivers backup versions
-bathymetry_orig.nc
-bathymetry_before_fix.nc
-bathymetry_1pass.nc
-bathymetry_1pass_smooth.nc
-bathymetry.nc.scheme_*
-bathymetry.nc.backup
-rivers_orig.nc
-rivers.nc.backup
-
-# ----- IDE / Editor -----
+# ==========================================================
+# 5) Web GUI / 编辑器 / 操作系统运行时状态
+# ==========================================================
+.workbuddy/
 .vscode/
 .idea/
 *.swp
@@ -60,16 +107,19 @@ rivers.nc.backup
 *~
 .DS_Store
 Thumbs.db
-
-# ----- Build artifacts -----
-3DWET/build/
-3DWET/install/
-*.exe
-*.o
-*.mod
-*.a
-
-# ----- OS junk -----
 desktop.ini
-*.tmp
+/3DWET/app/server_debug.log
+/3DWET/app/server_restart.log
+**/app/*.log
+**/app/.active_case.json
+**/app/.module_selection.json
+**/app/.picker_result.json
+**/app/.picker_debug.log
+
+# ==========================================================
+# 6) 备份与草稿版本（保留最新正式版即可）
+# ==========================================================
 *.bak
+*.bak~
+*.orig
+.bak/

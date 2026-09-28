@@ -18,6 +18,8 @@ add_library(fabm_models_wet OBJECT
             zooplankton.F90
             bot_pel_interface.F90
             bivalves.F90
+            inorganic_carbon.F90
+            methane.F90
            )
 
 add_dependencies(fabm_models_wet fabm_base)

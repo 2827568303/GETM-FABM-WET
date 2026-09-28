@@ -1,0 +1,187 @@
+# 3DWET 鱼类（食物网顶层）标准实例块 —— 源自 WET 上游参考配置
+# src/wet/testcases/fabm-wet.yaml，已按本机 src/wet/src/fish.F90 校正：
+#   删除源码中不存在的 prey_suffix1/2 参数（正确名 PLANprey_suffixN /
+#   BENprey_suffixN，但 FABM 的 yaml 解析器不支持引号空串，故直接省略取默认空值）。
+# 由 GUI / 脚本按需注入案例的 fabm.yaml。
+# JuFish   幼鱼（浮游食性）：捕食浮游动物 PLANprey1/2
+# AdFish   成鱼（底栖食性）：捕食底栖动物 BENTprey1，并扰动沉积物
+# PiscFish 食鱼性鱼：捕食 JuFish/AdFish (PISCprey1/2)
+instances:
+  JuFish:
+    long_name: juvenile planktivorous fish
+    model: wet/fish
+    parameters:
+      cClearPlan1: 0.18
+      cClearPlan2: 0.24
+      cDFiIn: 0.005
+      cDFiMin: 0.0001
+      cMaxLight: 40.0
+      cMinLight: 1.0
+      cMinO2: 2.0
+      cNDRef: 0.1
+      cPDRef: 0.022
+      cCDRef: 0.4
+      cRelVegPlan: 0.0
+      cSigTmFish: 10.0
+      cTmOptFish: 25.0
+      cVswim: 10.0
+      fDAssFi: 0.4
+      fDBone: 0.35
+      fDRespActFi: 1.0
+      fDissEgesFish: 0.25
+      fDissMortFish: 0.1
+      fFiDOMW: 0.5
+      fGutOccPlan1: 1.0
+      fGutOccPlan2: 1.0
+      fPBone: 0.5
+      hDVegGrowth: 0.015
+      kDConsMax: 0.25
+      kDRespFi: 0.01
+      kMigrFish: 0.001
+      kMortFi: 0.001
+      lNutMeth: false
+      lVegOpt: false
+      nPLAN: 2
+      qOPT: 0
+      qODB: 1
+      qStage: 0
+      qTrans: 2
+      diagnostics: true
+    initialization:
+      sD: 0.25
+      sP: 0.0055
+      sN: 0.025
+      sC: 0.1
+    coupling:
+      PLANprey1: copepods
+      PLANprey2: cladocerans
+      POM_DW_pool_water: POM/sDW
+      POM_N_pool_water: POM/sNW
+      POM_P_pool_water: POM/sPW
+      POM_C_pool_water: POM/sCW
+      NH4_pool_water: abiotic_water/sNH4W
+      PO4_pool_water: abiotic_water/sPO4W
+      DOM_DW_pool_water: DOM/sDW
+      DOM_N_pool_water: DOM/sNW
+      DOM_P_pool_water: DOM/sPW
+      DOM_C_pool_water: DOM/sCW
+      oxygen_pool_water: abiotic_water/sO2W
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+  AdFish:
+    long_name: adult benthivorous fish
+    model: wet/fish
+    parameters:
+      cClearBent1: 0.06
+      cDFiIn: 0.005
+      cDFiMin: 0.0001
+      cMaxLight: 40.0
+      cMinLight: 1.0
+      cMinO2: 2.0
+      cNDRef: 0.1
+      cPDRef: 0.022
+      cCDRef: 0.4
+      cRelVegBent: 0.009
+      cSigTmFish: 10.0
+      cTmOptFish: 25.0
+      cVswim: 10.0
+      fDAssFi: 0.4
+      fDBone: 0.35
+      fDRespActFi: 1.0
+      fDissEgesFish: 0.25
+      fDissMortFish: 0.1
+      fFiDOMW: 0.5
+      fGutOccBent1: 1.0
+      fPBone: 0.5
+      hDVegGrowth: 0.015
+      kDConsMax: 0.25
+      kDRespFi: 0.01
+      kMigrFish: 0.001
+      kMortFi: 0.001
+      kTurbFish: 1.0
+      lNutMeth: false
+      lVegOpt: false
+      nBEN: 1
+      qOPT: 0
+      qODB: 1
+      qStage: 0
+      qTrans: 2
+      diagnostics: true
+    initialization:
+      sD: 1.0
+      sP: 0.022
+      sN: 0.1
+      sC: 0.4
+    coupling:
+      BENTprey1: zoobenthos
+      POM_DW_pool_water: POM/sDW
+      POM_N_pool_water: POM/sNW
+      POM_P_pool_water: POM/sPW
+      POM_C_pool_water: POM/sCW
+      NH4_pool_water: abiotic_water/sNH4W
+      PO4_pool_water: abiotic_water/sPO4W
+      DOM_DW_pool_water: DOM/sDW
+      DOM_N_pool_water: DOM/sNW
+      DOM_P_pool_water: DOM/sPW
+      DOM_C_pool_water: DOM/sCW
+      oxygen_pool_water: abiotic_water/sO2W
+      bot_pel_conv: bot_pel_interface/bot_pel_conv
+  PiscFish:
+    long_name: piscivorous fish
+    model: wet/fish
+    parameters:
+      cClearPisc1: 0.021
+      cClearPisc2: 0.021
+      cDFiIn: 0.005
+      cDFiMin: 0.0001
+      cMaxLight: 40.0
+      cMinLight: 1.0
+      cMinO2: 2.0
+      cNDRef: 0.1
+      cPDRef: 0.022
+      cCDRef: 0.4
+      cRelVegPlan: 0.0
+      cSigTmFish: 10.0
+      cTmOptFish: 25.0
+      cVswim: 10.0
+      fDAssFi: 0.4
+      fDBone: 0.35
+      fDRespActFi: 1.0
+      fDissEgesFish: 0.25
+      fDissMortFish: 0.1
+      fFiDOMW: 0.5
+      fGutOccPisc1: 1.0
+      fGutOccPisc2: 1.0
+      fPBone: 0.5
+      hDVegGrowth: 0.015
+      kDConsMax: 0.25
+      kDRespFi: 0.01
+      kMigrFish: 0.001
+      kMortFi: 0.001
+      lNutMeth: false
+      lVegOpt: false
+      nPISC: 2
+      qOPT: 0
+      qODB: 1
+      qStage: 0
+      qTrans: 2
+      diagnostics: false
+    initialization:
+      sD: 0.07
+      sP: 0.00154
+      sN: 0.007
+      sC: 0.049
+    coupling:
+      PISCprey1: JuFish
+      PISCprey2: AdFish
+      POM_DW_pool_water: POM/sDW
+      POM_N_pool_water: POM/sNW
+      POM_P_pool_water: POM/sPW
+      POM_C_pool_water: POM/sCW
+      NH4_pool_water: abiotic_water/sNH4W
+      PO4_pool_water: abiotic_water/sPO4W
+      DOM_DW_pool_water: DOM/sDW
+      DOM_N_pool_water: DOM/sNW
+      DOM_P_pool_water: DOM/sPW
+      DOM_C_pool_water: DOM/sCW
+      oxygen_pool_water: abiotic_water/sO2W
+      bot_pel_conv: bot_pel_interface/bot_pel_conv

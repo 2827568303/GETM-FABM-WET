@@ -1,1 +1,0 @@
-/usr/bin/gfortran-9  -ffree-line-length-none -O2 CMakeFiles/test_bulk.dir/test_bulk.F90.o -o test_bulk  ../util/libutil.a ../airsea/libairsea.a -linput_manager ../extern/flexout/extern/yaml/libyaml.a 

@@ -1,2 +1,0 @@
-/usr/bin/ar qc libairsea_driver.a CMakeFiles/airsea_driver.dir/airsea.F90.o
-/usr/bin/ranlib libairsea_driver.a

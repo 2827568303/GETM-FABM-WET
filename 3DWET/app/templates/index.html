@@ -3,1477 +3,1218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GETM-FABM-WET 生态水动力模型系统</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-            background: #f5f7fa;
-            color: #1f2937;
-            line-height: 1.6;
-            overflow: hidden;
-            height: 100vh;
-        }
-        .app-layout {
-            display: flex;
-            height: 100vh;
-        }
-        .sidebar {
-            width: 220px;
-            background: linear-gradient(180deg, #1e3a5f 0%, #2d5a87 100%);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-        }
-        .sidebar-header {
-            padding: 20px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .sidebar-header h1 {
-            font-size: 16px;
-            font-weight: 600;
-            line-height: 1.4;
-        }
-        .sidebar-header p {
-            font-size: 12px;
-            opacity: 0.7;
-            margin-top: 4px;
-        }
-        .nav-menu {
-            flex: 1;
-            padding: 12px 0;
-            overflow-y: auto;
-        }
-        .nav-item {
-            padding: 12px 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 14px;
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-            color: rgba(255,255,255,0.8);
-        }
-        .nav-item:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-        .nav-item.active {
-            background: rgba(255,255,255,0.15);
-            color: white;
-            border-left-color: #60a5fa;
-        }
-        .nav-item .nav-icon {
-            width: 20px;
-            text-align: center;
-            font-size: 16px;
-        }
-        .sidebar-footer {
-            padding: 12px 16px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            font-size: 12px;
-            opacity: 0.6;
-        }
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .topbar {
-            height: 56px;
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            flex-shrink: 0;
-        }
-        .topbar-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .topbar-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1f2937;
-        }
-        .project-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #6b7280;
-        }
-        .project-name {
-            color: #2d5a87;
-            font-weight: 500;
-        }
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .btn {
-            padding: 8px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: white;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.2s;
-            color: #374151;
-        }
-        .btn:hover {
-            background: #f9fafb;
-            border-color: #9ca3af;
-        }
-        .btn-primary {
-            background: #2d5a87;
-            color: white;
-            border-color: #2d5a87;
-        }
-        .btn-primary:hover {
-            background: #1e3a5f;
-            border-color: #1e3a5f;
-        }
-        .btn-success {
-            background: #059669;
-            color: white;
-            border-color: #059669;
-        }
-        .btn-success:hover {
-            background: #047857;
-            border-color: #047857;
-        }
-        .btn-danger {
-            background: #dc2626;
-            color: white;
-            border-color: #dc2626;
-        }
-        .btn-danger:hover {
-            background: #b91c1c;
-            border-color: #b91c1c;
-        }
-        .btn-sm {
-            padding: 5px 12px;
-            font-size: 12px;
-        }
-        .content-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 24px;
-        }
-        .page {
-            display: none;
-        }
-        .page.active {
-            display: block;
-        }
-        .page-header {
-            margin-bottom: 24px;
-        }
-        .page-title {
-            font-size: 22px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 4px;
-        }
-        .page-desc {
-            font-size: 14px;
-            color: #6b7280;
-        }
-        .card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .card-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px;
-        }
-        .form-item {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .form-label {
-            font-size: 13px;
-            font-weight: 500;
-            color: #374151;
-        }
-        .form-label .unit {
-            color: #9ca3af;
-            font-weight: 400;
-            margin-left: 4px;
-        }
-        .form-input {
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 13px;
-            transition: border-color 0.2s;
-        }
-        .form-input:focus {
-            outline: none;
-            border-color: #2d5a87;
-            box-shadow: 0 0 0 3px rgba(45,90,135,0.1);
-        }
-        .form-select {
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 13px;
-            background: white;
-            cursor: pointer;
-        }
-        .form-select:focus {
-            outline: none;
-            border-color: #2d5a87;
-        }
-        .switch-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        .switch-item:last-child {
-            border-bottom: none;
-        }
-        .switch-label {
-            font-size: 14px;
-            color: #374151;
-        }
-        .switch {
-            position: relative;
-            width: 44px;
-            height: 24px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #d1d5db;
-            transition: 0.3s;
-            border-radius: 24px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #2d5a87;
-        }
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
-        .project-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
-        }
-        .project-card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .project-card:hover {
-            border-color: #2d5a87;
-            box-shadow: 0 4px 12px rgba(45,90,135,0.1);
-        }
-        .project-card-icon {
-            width: 40px;
-            height: 40px;
-            background: #eff6ff;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            margin-bottom: 12px;
-        }
-        .project-card-name {
-            font-size: 15px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 4px;
-        }
-        .project-card-date {
-            font-size: 12px;
-            color: #9ca3af;
-        }
-        .new-project-card {
-            border: 2px dashed #d1d5db;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 120px;
-            color: #9ca3af;
-        }
-        .new-project-card:hover {
-            border-color: #2d5a87;
-            color: #2d5a87;
-            background: #f9fafb;
-        }
-        .new-project-card .plus-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-overlay.show {
-            display: flex;
-        }
-        .modal {
-            background: white;
-            border-radius: 10px;
-            padding: 24px;
-            width: 90%;
-            max-width: 480px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-        }
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #1f2937;
-        }
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-top: 24px;
-        }
-        .log-panel {
-            background: #1a1a2e;
-            color: #e0e0e0;
-            padding: 16px;
-            border-radius: 8px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 12px;
-            height: 400px;
-            overflow-y: auto;
-            line-height: 1.6;
-        }
-        .log-line {
-            padding: 2px 0;
-        }
-        .log-info { color: #60a5fa; }
-        .log-error { color: #f87171; }
-        .log-warn { color: #fbbf24; }
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        .status-idle { background: #f3f4f6; color: #6b7280; }
-        .status-running { background: #dbeafe; color: #1e40af; }
-        .status-completed { background: #d1fae5; color: #065f46; }
-        .status-failed { background: #fee2e2; color: #991b1b; }
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-        .status-running .status-dot {
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-        .run-controls {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        .progress-bar-container {
-            flex: 1;
-            height: 8px;
-            background: #e5e7eb;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #2d5a87, #60a5fa);
-            width: 0%;
-            transition: width 0.3s;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #9ca3af;
-        }
-        .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-        .empty-state-text {
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-        .empty-state-hint {
-            font-size: 13px;
-            color: #d1d5db;
-        }
-        .chart-container {
-            position: relative;
-            height: 300px;
-        }
-        .two-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        @media (max-width: 1000px) {
-            .two-col { grid-template-columns: 1fr; }
-        }
-        .viewer-container {
-            width: 100%;
-            height: calc(100vh - 180px);
-            background: #0a1628;
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-        }
-        #three-canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-        .viewer-controls {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            background: rgba(255,255,255,0.95);
-            border-radius: 8px;
-            padding: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 10;
-            min-width: 200px;
-        }
-        .viewer-controls h4 {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #1f2937;
-        }
-        .viewer-controls .form-item {
-            margin-bottom: 8px;
-        }
-        .viewer-legend {
-            position: absolute;
-            bottom: 16px;
-            right: 16px;
-            background: rgba(255,255,255,0.95);
-            border-radius: 8px;
-            padding: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 10;
-            min-width: 180px;
-        }
-        .legend-title {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #1f2937;
-        }
-        .legend-bar {
-            height: 12px;
-            border-radius: 4px;
-            background: linear-gradient(to right, #313695, #4575b4, #74add1, #abd9e9, #e0f3f8, #ffffbf, #fee090, #fdae61, #f46d43, #d73027, #a50026);
-            margin-bottom: 6px;
-        }
-        .legend-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: #6b7280;
-        }
-        .step-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 24px;
-        }
-        .step-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #9ca3af;
-        }
-        .step-item.active {
-            color: #2d5a87;
-            font-weight: 600;
-        }
-        .step-item.completed {
-            color: #059669;
-        }
-        .step-number {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 600;
-            color: #9ca3af;
-        }
-        .step-item.active .step-number {
-            background: #2d5a87;
-            color: white;
-        }
-        .step-item.completed .step-number {
-            background: #059669;
-            color: white;
-        }
-        .step-line {
-            flex: 1;
-            height: 2px;
-            background: #e5e7eb;
-            max-width: 40px;
-        }
-        .step-item.completed + .step-line {
-            background: #059669;
-        }
-    </style>
+    <title>3DWET 生态水动力模型系统</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=11">
+    <link rel="stylesheet" href="/static/vendor/leaflet.css">
+    <!-- Vendored locally so the GUI works fully offline; CDN used only as fallback. -->
+    <script src="/static/vendor/chart.umd.min.js"></script>
+    <script src="/static/vendor/plotly-2.35.2.min.js" charset="utf-8"></script>
+    <script src="/static/vendor/leaflet.js"></script>
+    <script>
+    (function () {
+        function need(global, url) {
+            if (typeof window[global] !== 'undefined') return;
+            var s = document.createElement('script');
+            s.src = url; s.async = false; document.head.appendChild(s);
+        }
+        need('Chart', 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js');
+        need('Plotly', 'https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js');
+        need('L', 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js');
+    })();
+    </script>
+    <script src="/static/js/calibration_metrics.js?v=1"></script>
+    <script src="/static/js/viz3d.js?v=4"></script>
+    <script src="/static/js/preprocess.js?v=5"></script>
 </head>
 <body>
-    <div class="app-layout">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h1>GETM-FABM-WET</h1>
-                <p>生态水动力模型系统 v1.0</p>
-            </div>
-            <div class="nav-menu">
-                <div class="nav-item active" data-page="projects">
-                    <span class="nav-icon">📁</span>
-                    <span>项目管理</span>
-                </div>
-                <div class="nav-item" data-page="preprocess">
-                    <span class="nav-icon">⚙️</span>
-                    <span>前处理配置</span>
-                </div>
-                <div class="nav-item" data-page="run">
-                    <span class="nav-icon">▶️</span>
-                    <span>运行控制</span>
-                </div>
-                <div class="nav-item" data-page="postprocess">
-                    <span class="nav-icon">📊</span>
-                    <span>后处理分析</span>
-                </div>
-                <div class="nav-item" data-page="viewer3d">
-                    <span class="nav-icon">🌊</span>
-                    <span>3D 可视化</span>
-                </div>
-            </div>
-            <div class="sidebar-footer">
-                GETM 2.5.0 + FABM + WET
-            </div>
+<div class="app-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>🌊 3DWET Studio</h1>
+            <p>生态水动力模型平台</p>
         </div>
+        <div class="nav-menu">
+            <div class="nav-section">总览</div>
+            <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span>仪表盘</div>
+            <div class="nav-item" data-page="cases"><span class="nav-icon">📁</span>案例管理</div>
 
-        <div class="main-content">
-            <div class="topbar">
-                <div class="topbar-left">
-                    <span class="topbar-title" id="topbar-title">项目管理</span>
-                    <div class="project-info">
-                        <span>当前项目：</span>
-                        <span class="project-name" id="current-project">未选择</span>
-                    </div>
-                </div>
-                <div class="topbar-right">
-                    <button class="btn btn-sm" onclick="saveProject()" id="btn-save" style="display:none;">💾 保存项目</button>
-                </div>
-            </div>
+            <div class="nav-section">前处理</div>
+            <div class="nav-item" data-page="preprocess"><span class="nav-icon">🛠️</span>前处理</div>
+            <div class="nav-item" data-page="input"><span class="nav-icon">📥</span>输入数据</div>
+            <div class="nav-item" data-page="modules"><span class="nav-icon">🧩</span>模块配置</div>
+            <div class="nav-item" data-page="parameters"><span class="nav-icon">⚙️</span>参数编辑</div>
+            <div class="nav-item" data-page="initial"><span class="nav-icon">🧪</span>初始条件</div>
+            <div class="nav-item" data-page="time"><span class="nav-icon">⏱️</span>时间设置</div>
 
-            <div class="content-area">
-                <div class="page active" id="page-projects">
-                    <div class="page-header">
-                        <h2 class="page-title">项目管理</h2>
-                        <p class="page-desc">创建或打开模型项目，开始你的生态水动力模拟</p>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">我的项目</div>
-                        <div class="project-list" id="project-list">
-                        </div>
-                    </div>
-                </div>
+            <div class="nav-section">运行</div>
+            <div class="nav-item" data-page="run"><span class="nav-icon">▶️</span>运行控制</div>
 
-                <div class="page" id="page-preprocess">
-                    <div class="page-header">
-                        <h2 class="page-title">前处理配置</h2>
-                        <p class="page-desc">配置水动力、生态参数及初始条件</p>
-                    </div>
-                    <div class="step-indicator">
-                        <div class="step-item active" data-step="1">
-                            <span class="step-number">1</span>
-                            <span>水动力设置</span>
-                        </div>
-                        <div class="step-line"></div>
-                        <div class="step-item" data-step="2">
-                            <span class="step-number">2</span>
-                            <span>生态模块</span>
-                        </div>
-                        <div class="step-line"></div>
-                        <div class="step-item" data-step="3">
-                            <span class="step-number">3</span>
-                            <span>初始条件</span>
-                        </div>
-                        <div class="step-line"></div>
-                        <div class="step-item" data-step="4">
-                            <span class="step-number">4</span>
-                            <span>输出设置</span>
-                        </div>
-                    </div>
-                    <div class="card" id="step-hydro">
-                        <div class="card-title">水动力设置</div>
-                        <div class="form-grid">
-                            <div class="form-item">
-                                <label class="form-label">网格 X 方向格数</label>
-                                <input type="number" class="form-input" id="cfg-grid-nx" value="25">
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">网格 Y 方向格数</label>
-                                <input type="number" class="form-input" id="cfg-grid-ny" value="25">
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">X 方向步长 <span class="unit">(m)</span></label>
-                                <input type="number" class="form-input" id="cfg-dx" value="100">
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">Y 方向步长 <span class="unit">(m)</span></label>
-                                <input type="number" class="form-input" id="cfg-dy" value="100">
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">平均水深 <span class="unit">(m)</span></label>
-                                <input type="number" class="form-input" id="cfg-depth" value="10" step="0.1">
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">垂直层数</label>
-                                <input type="number" class="form-input" id="cfg-nlev" value="5">
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">时间步长 <span class="unit">(秒)</span></label>
-                                <input type="number" class="form-input" id="cfg-timestep" value="300">
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">开始时间</label>
-                                <input type="datetime-local" class="form-input" id="cfg-start">
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">结束时间</label>
-                                <input type="datetime-local" class="form-input" id="cfg-end">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">生态模块选择</div>
-                        <div class="switch-item">
-                            <span class="switch-label">浮游植物 (Phytoplankton)</span>
-                            <label class="switch">
-                                <input type="checkbox" id="mod-phytoplankton" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="switch-item">
-                            <span class="switch-label">浮游动物 (Zooplankton)</span>
-                            <label class="switch">
-                                <input type="checkbox" id="mod-zooplankton" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="switch-item">
-                            <span class="switch-label">鱼类 (Fish)</span>
-                            <label class="switch">
-                                <input type="checkbox" id="mod-fish">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="switch-item">
-                            <span class="switch-label">沉水植物 (Macrophytes)</span>
-                            <label class="switch">
-                                <input type="checkbox" id="mod-macrophytes">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="switch-item">
-                            <span class="switch-label">底栖生物 (Zoobenthos)</span>
-                            <label class="switch">
-                                <input type="checkbox" id="mod-zoobenthos">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">营养盐初始条件</div>
-                        <div class="form-grid">
-                            <div class="form-item">
-                                <label class="form-label">溶解氧 <span class="unit">(mg/L)</span></label>
-                                <input type="number" class="form-input" id="init-o2" value="8.0" step="0.1">
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">氨氮 NH4 <span class="unit">(mg N/L)</span></label>
-                                <input type="number" class="form-input" id="init-nh4" value="0.05" step="0.01">
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">硝酸盐 NO3 <span class="unit">(mg N/L)</span></label>
-                                <input type="number" class="form-input" id="init-no3" value="0.5" step="0.1">
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">磷酸盐 PO4 <span class="unit">(mg P/L)</span></label>
-                                <input type="number" class="form-input" id="init-po4" value="0.02" step="0.01">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">输出设置</div>
-                        <div class="form-grid">
-                            <div class="form-item">
-                                <label class="form-label">输出间隔 <span class="unit">(秒)</span></label>
-                                <input type="number" class="form-input" id="out-dt" value="3600">
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">保存 2D 结果</label>
-                                <label class="switch" style="margin-top:4px;">
-                                    <input type="checkbox" id="out-save2d" checked>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">保存 3D 结果</label>
-                                <label class="switch" style="margin-top:4px;">
-                                    <input type="checkbox" id="out-save3d" checked>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="nav-section">后处理</div>
+            <div class="nav-item" data-page="map"><span class="nav-icon">🌐</span>地图视图</div>
+            <div class="nav-item" data-page="viz2d"><span class="nav-icon">🗺️</span>2D 可视化</div>
+            <div class="nav-item" data-page="viz3d"><span class="nav-icon">🧊</span>3D 可视化</div>
+            <div class="nav-item" data-page="vheat"><span class="nav-icon">🔥</span>垂向热图</div>
+            <div class="nav-item" data-page="timeseries"><span class="nav-icon">📈</span>时间序列</div>
 
-                <div class="page" id="page-run">
-                    <div class="page-header">
-                        <h2 class="page-title">运行控制</h2>
-                        <p class="page-desc">启动模型模拟，实时查看运行状态</p>
-                    </div>
-                    <div class="card">
-                        <div class="run-controls">
-                            <button class="btn btn-success" id="btn-start-run" onclick="startRun()">▶ 开始运行</button>
-                            <button class="btn btn-danger" id="btn-stop-run" onclick="stopRun()" style="display:none;">⏹ 停止运行</button>
-                            <span class="status-badge status-idle" id="run-status">
-                                <span class="status-dot"></span>
-                                <span>就绪</span>
-                            </span>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar" id="progress-bar"></div>
-                            </div>
-                        </div>
-                        <div class="card-title">运行日志</div>
-                        <div class="log-panel" id="log-panel">
-                            <div class="log-line">等待模型运行...</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="page" id="page-postprocess">
-                    <div class="page-header">
-                        <h2 class="page-title">后处理分析</h2>
-                        <p class="page-desc">查看模拟结果的时间序列和空间分布</p>
-                    </div>
-                    <div id="postprocess-content">
-                        <div class="empty-state">
-                            <div class="empty-state-icon">📊</div>
-                            <div class="empty-state-text">暂无结果数据</div>
-                            <div class="empty-state-hint">请先运行模型生成结果</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="page" id="page-viewer3d">
-                    <div class="page-header">
-                        <h2 class="page-title">3D 可视化</h2>
-                        <p class="page-desc">三维湖泊地形与水质变量可视化</p>
-                    </div>
-                    <div class="viewer-container">
-                        <canvas id="three-canvas"></canvas>
-                        <div class="viewer-controls">
-                            <h4>显示设置</h4>
-                            <div class="form-item">
-                                <label class="form-label">变量选择</label>
-                                <select class="form-select" id="viewer-var" onchange="update3DViewer()">
-                                    <option value="temp">温度 (°C)</option>
-                                    <option value="wet_totC">总有机碳 (gC/m³)</option>
-                                    <option value="wet_totN">总氮 (gN/m³)</option>
-                                    <option value="wet_totP">总磷 (gP/m³)</option>
-                                    <option value="wet_chla">叶绿素 a (μg/L)</option>
-                                </select>
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">时间步</label>
-                                <input type="range" class="form-input" id="viewer-time" min="0" value="0" oninput="update3DViewer()">
-                            </div>
-                            <div class="form-item">
-                                <label class="form-label">显示模式</label>
-                                <select class="form-select" id="viewer-mode" onchange="update3DViewer()">
-                                    <option value="volume">体渲染</option>
-                                    <option value="slice">切片显示</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="viewer-legend">
-                            <div class="legend-title" id="legend-title">温度</div>
-                            <div class="legend-bar"></div>
-                            <div class="legend-labels">
-                                <span id="legend-min">低</span>
-                                <span id="legend-max">高</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="nav-section">率定</div>
+            <div class="nav-item" data-page="calibrate"><span class="nav-icon">🎯</span>率定分析</div>
+            <div class="nav-item" data-page="autocal"><span class="nav-icon">🔄</span>自动率定</div>
+        </div>
+        <div class="sidebar-footer">
+            <div id="footer-status">状态: 就绪</div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="new-project-modal">
-        <div class="modal">
-            <div class="modal-title">新建项目</div>
-            <div class="form-item">
-                <label class="form-label">项目名称</label>
-                <input type="text" class="form-input" id="new-project-name" placeholder="请输入项目名称" value="新建湖泊模拟">
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-title" id="page-title">仪表盘</div>
+                <span class="case-badge" id="case-badge" style="display:none;">未加载案例</span>
             </div>
-            <div class="modal-footer">
-                <button class="btn" onclick="closeModal('new-project-modal')">取消</button>
-                <button class="btn btn-primary" onclick="createProject()">创建</button>
+            <div class="topbar-right">
+                <span id="run-status-display"><span class="status-dot idle"></span>空闲</span>
             </div>
         </div>
-    </div>
 
-    <script>
-        const state = {
-            currentProject: null,
-            currentConfig: null,
-            results: null,
-            runPolling: null,
-        };
+        <!-- Global output.yaml warning banner -->
+        <div id="output-warning-banner" style="display:none;background:#fef3c7;border-left:4px solid #f59e0b;padding:10px 16px;font-size:13px;color:#92400e;"></div>
 
-        const pages = ['projects', 'preprocess', 'run', 'postprocess', 'viewer3d'];
-        const pageTitles = {
-            projects: '项目管理',
-            preprocess: '前处理配置',
-            run: '运行控制',
-            postprocess: '后处理分析',
-            viewer3d: '3D 可视化',
-        };
-
-        function navigate(page) {
-            pages.forEach(p => {
-                document.getElementById('page-' + p).classList.toggle('active', p === page);
-            });
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.toggle('active', item.dataset.page === page);
-            });
-            document.getElementById('topbar-title').textContent = pageTitles[page];
-
-            if (page === 'postprocess') {
-                loadResults();
-            }
-            if (page === 'viewer3d') {
-                init3DViewer();
-            }
-        }
-
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => navigate(item.dataset.page));
-        });
-
-        function openModal(id) {
-            document.getElementById(id).classList.add('show');
-        }
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('show');
-        }
-
-        async function loadProjects() {
-            try {
-                const res = await fetch('/api/projects/list');
-                const projects = await res.json();
-                const listEl = document.getElementById('project-list');
-                listEl.innerHTML = '';
-
-                const newCard = document.createElement('div');
-                newCard.className = 'project-card new-project-card';
-                newCard.onclick = () => openModal('new-project-modal');
-                newCard.innerHTML = `
-                    <div class="plus-icon">+</div>
-                    <div>新建项目</div>
-                `;
-                listEl.appendChild(newCard);
-
-                projects.forEach(p => {
-                    const card = document.createElement('div');
-                    card.className = 'project-card';
-                    card.onclick = () => openProject(p.id);
-                    card.innerHTML = `
-                        <div class="project-card-icon">🌊</div>
-                        <div class="project-card-name">${p.name}</div>
-                        <div class="project-card-date">${p.created_at ? new Date(p.created_at).toLocaleString('zh-CN') : ''}</div>
-                    `;
-                    listEl.appendChild(card);
-                });
-            } catch (e) {
-                console.error('加载项目列表失败', e);
-            }
-        }
-
-        async function createProject() {
-            const name = document.getElementById('new-project-name').value.trim();
-            if (!name) {
-                alert('请输入项目名称');
-                return;
-            }
-            try {
-                const res = await fetch('/api/projects/create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name }),
-                });
-                const data = await res.json();
-                if (data.success) {
-                    closeModal('new-project-modal');
-                    await openProject(data.project_id);
-                    loadProjects();
-                }
-            } catch (e) {
-                alert('创建项目失败: ' + e.message);
-            }
-        }
-
-        async function openProject(projectId) {
-            try {
-                const res = await fetch('/api/projects/open', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ project_id: projectId }),
-                });
-                const data = await res.json();
-                if (data.success) {
-                    state.currentProject = projectId;
-                    state.currentConfig = data.config;
-                    document.getElementById('current-project').textContent = data.config.name;
-                    document.getElementById('btn-save').style.display = 'inline-block';
-                    loadConfigToForm(data.config);
-                    navigate('preprocess');
-                }
-            } catch (e) {
-                alert('打开项目失败: ' + e.message);
-            }
-        }
-
-        function loadConfigToForm(config) {
-            const h = config.hydro || {};
-            const e = config.ecology || {};
-            const n = e.nutrients || {};
-            const o = config.output || {};
-
-            document.getElementById('cfg-grid-nx').value = h.grid_nx || 25;
-            document.getElementById('cfg-grid-ny').value = h.grid_ny || 25;
-            document.getElementById('cfg-dx').value = h.dx || 100;
-            document.getElementById('cfg-dy').value = h.dy || 100;
-            document.getElementById('cfg-depth').value = h.depth || 10;
-            document.getElementById('cfg-nlev').value = h.nlev || 5;
-            document.getElementById('cfg-timestep').value = h.timestep || 300;
-
-            if (h.start_date) {
-                document.getElementById('cfg-start').value = h.start_date.replace(' ', 'T');
-            }
-            if (h.end_date) {
-                document.getElementById('cfg-end').value = h.end_date.replace(' ', 'T');
-            }
-
-            const mods = e.modules || {};
-            document.getElementById('mod-phytoplankton').checked = mods.phytoplankton !== false;
-            document.getElementById('mod-zooplankton').checked = mods.zooplankton !== false;
-            document.getElementById('mod-fish').checked = !!mods.fish;
-            document.getElementById('mod-macrophytes').checked = !!mods.macrophytes;
-            document.getElementById('mod-zoobenthos').checked = !!mods.zoobenthos;
-
-            document.getElementById('init-o2').value = n.O2_initial || 8.0;
-            document.getElementById('init-nh4').value = n.NH4_initial || 0.05;
-            document.getElementById('init-no3').value = n.NO3_initial || 0.5;
-            document.getElementById('init-po4').value = n.PO4_initial || 0.02;
-
-            document.getElementById('out-dt').value = o.out_dt || 3600;
-            document.getElementById('out-save2d').checked = o.save2d !== false;
-            document.getElementById('out-save3d').checked = o.save3d !== false;
-        }
-
-        function collectConfigFromForm() {
-            if (!state.currentConfig) state.currentConfig = {};
-            const startVal = document.getElementById('cfg-start').value;
-            const endVal = document.getElementById('cfg-end').value;
-
-            state.currentConfig.hydro = {
-                grid_nx: parseInt(document.getElementById('cfg-grid-nx').value) || 25,
-                grid_ny: parseInt(document.getElementById('cfg-grid-ny').value) || 25,
-                dx: parseFloat(document.getElementById('cfg-dx').value) || 100,
-                dy: parseFloat(document.getElementById('cfg-dy').value) || 100,
-                depth: parseFloat(document.getElementById('cfg-depth').value) || 10,
-                nlev: parseInt(document.getElementById('cfg-nlev').value) || 5,
-                timestep: parseInt(document.getElementById('cfg-timestep').value) || 300,
-                start_date: startVal ? startVal.replace('T', ' ') : '2000-01-01 00:00:00',
-                end_date: endVal ? endVal.replace('T', ' ') : '2000-01-02 00:00:00',
-            };
-            state.currentConfig.ecology = {
-                model: 'wet',
-                modules: {
-                    phytoplankton: document.getElementById('mod-phytoplankton').checked,
-                    zooplankton: document.getElementById('mod-zooplankton').checked,
-                    fish: document.getElementById('mod-fish').checked,
-                    macrophytes: document.getElementById('mod-macrophytes').checked,
-                    zoobenthos: document.getElementById('mod-zoobenthos').checked,
-                },
-                nutrients: {
-                    O2_initial: parseFloat(document.getElementById('init-o2').value) || 8.0,
-                    NH4_initial: parseFloat(document.getElementById('init-nh4').value) || 0.05,
-                    NO3_initial: parseFloat(document.getElementById('init-no3').value) || 0.5,
-                    PO4_initial: parseFloat(document.getElementById('init-po4').value) || 0.02,
-                }
-            };
-            state.currentConfig.output = {
-                out_dt: parseInt(document.getElementById('out-dt').value) || 3600,
-                save2d: document.getElementById('out-save2d').checked,
-                save3d: document.getElementById('out-save3d').checked,
-            };
-            return state.currentConfig;
-        }
-
-        async function saveProject() {
-            if (!state.currentProject) {
-                alert('请先创建或打开项目');
-                return;
-            }
-            const config = collectConfigFromForm();
-            try {
-                const res = await fetch('/api/projects/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ project_id: state.currentProject, config }),
-                });
-                const data = await res.json();
-                if (data.success) {
-                    alert('项目已保存');
-                }
-            } catch (e) {
-                alert('保存失败: ' + e.message);
-            }
-        }
-
-        async function startRun() {
-            try {
-                const res = await fetch('/api/run/start', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({}),
-                });
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById('btn-start-run').style.display = 'none';
-                    document.getElementById('btn-stop-run').style.display = 'inline-block';
-                    document.getElementById('run-status').className = 'status-badge status-running';
-                    document.getElementById('run-status').querySelector('span:last-child').textContent = '运行中';
-                    document.getElementById('log-panel').innerHTML = '';
-                    startLogPolling();
-                } else {
-                    alert('启动失败: ' + data.error);
-                }
-            } catch (e) {
-                alert('启动失败: ' + e.message);
-            }
-        }
-
-        async function stopRun() {
-            try {
-                await fetch('/api/run/stop', { method: 'POST' });
-                stopLogPolling();
-                updateRunStatus('stopped');
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        function startLogPolling() {
-            if (state.runPolling) return;
-            state.runPolling = setInterval(pollRunStatus, 1000);
-        }
-        function stopLogPolling() {
-            if (state.runPolling) {
-                clearInterval(state.runPolling);
-                state.runPolling = null;
-            }
-        }
-
-        async function pollRunStatus() {
-            try {
-                const res = await fetch('/api/run/status');
-                const data = await res.json();
-                updateLogPanel(data.logs);
-                if (data.status !== 'running') {
-                    stopLogPolling();
-                    updateRunStatus(data.status);
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        function updateLogPanel(logs) {
-            const panel = document.getElementById('log-panel');
-            const currentLines = panel.children.length;
-            if (logs.length > currentLines) {
-                for (let i = currentLines; i < logs.length; i++) {
-                    const line = document.createElement('div');
-                    line.className = 'log-line';
-                    let text = logs[i];
-                    if (text.includes('[INFO]') || text.includes('info')) {
-                        line.classList.add('log-info');
-                    } else if (text.includes('[ERROR]') || text.includes('FATAL') || text.includes('Error')) {
-                        line.classList.add('log-error');
-                    } else if (text.includes('[WARN]') || text.includes('warning')) {
-                        line.classList.add('log-warn');
-                    }
-                    line.textContent = text;
-                    panel.appendChild(line);
-                }
-                panel.scrollTop = panel.scrollHeight;
-            }
-        }
-
-        function updateRunStatus(status) {
-            const badge = document.getElementById('run-status');
-            const textSpan = badge.querySelector('span:last-child');
-            badge.className = 'status-badge';
-            if (status === 'running') {
-                badge.classList.add('status-running');
-                textSpan.textContent = '运行中';
-                document.getElementById('btn-start-run').style.display = 'none';
-                document.getElementById('btn-stop-run').style.display = 'inline-block';
-            } else if (status === 'completed') {
-                badge.classList.add('status-completed');
-                textSpan.textContent = '已完成';
-                document.getElementById('btn-start-run').style.display = 'inline-block';
-                document.getElementById('btn-stop-run').style.display = 'none';
-                document.getElementById('progress-bar').style.width = '100%';
-            } else if (status === 'failed') {
-                badge.classList.add('status-failed');
-                textSpan.textContent = '失败';
-                document.getElementById('btn-start-run').style.display = 'inline-block';
-                document.getElementById('btn-stop-run').style.display = 'none';
-            } else {
-                badge.classList.add('status-idle');
-                textSpan.textContent = '就绪';
-                document.getElementById('btn-start-run').style.display = 'inline-block';
-                document.getElementById('btn-stop-run').style.display = 'none';
-            }
-        }
-
-        async function loadResults() {
-            try {
-                const res = await fetch('/api/results');
-                const data = await res.json();
-                if (data.error) {
-                    document.getElementById('postprocess-content').innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">📊</div>
-                            <div class="empty-state-text">暂无结果数据</div>
-                            <div class="empty-state-hint">${data.error}</div>
+        <div class="content-area">
+            <!-- Dashboard -->
+            <div class="page active" id="page-dashboard">
+                <div class="page-header">
+                    <div class="page-title">模型仪表盘</div>
+                    <div class="page-desc">关键状态变量总览与模型运行状态</div>
+                </div>
+                <div class="grid-4" id="dashboard-stats">
+                    <div class="stat-card"><div class="stat-label">水域格数</div><div class="stat-value" id="stat-water">-</div></div>
+                    <div class="stat-card"><div class="stat-label">垂向层数</div><div class="stat-value" id="stat-nlev">-</div></div>
+                    <div class="stat-card"><div class="stat-label">生态模块</div><div class="stat-value" id="stat-modules">-</div></div>
+                    <div class="stat-card"><div class="stat-label">输出时步</div><div class="stat-value" id="stat-timesteps">-</div></div>
+                </div>
+                <div class="grid-2" style="margin-top:16px;">
+                    <div class="card">
+                        <div class="card-title">🌡️ 主要状态变量（最新时步表层均值）</div>
+                        <div id="dashboard-vars" class="empty-state"><div class="icon">📊</div>加载案例并运行模型后显示</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🗺️ 状态变量空间分布（mini-heatmap）</div>
+                        <div id="dashboard-mini-heatmaps" class="empty-state"><div class="icon">🗺️</div>加载案例并运行模型后显示</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">📋 快速操作</div>
+                        <div style="display:flex;flex-direction:column;gap:10px;">
+                            <button class="btn btn-success" onclick="navigate('preprocess')">🛠️ 新建模型（前处理）</button>
+                            <button class="btn btn-primary" onclick="navigate('cases')">📁 选择/加载案例</button>
+                            <button class="btn" onclick="navigate('parameters')">⚙️ 编辑模型参数</button>
+                            <button class="btn" onclick="navigate('time')">⏱️ 设置运行时间</button>
+                            <button class="btn btn-success" onclick="navigate('run')">▶️ 运行模型</button>
+                            <button class="btn" onclick="navigate('viz2d')">🗺️ 查看2D结果</button>
+                            <button class="btn" onclick="navigate('timeseries')">📈 提取时间序列</button>
                         </div>
-                    `;
-                    return;
-                }
-                state.results = data;
-                renderPostprocess(data);
-            } catch (e) {
-                document.getElementById('postprocess-content').innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">⚠️</div>
-                        <div class="empty-state-text">加载失败</div>
-                        <div class="empty-state-hint">${e.message}</div>
                     </div>
-                `;
-            }
-        }
+                </div>
+            </div>
 
-        function renderPostprocess(data) {
-            const container = document.getElementById('postprocess-content');
-            container.innerHTML = `
-                <div class="two-col">
-                    <div class="card">
-                        <div class="card-title">溶解氧</div>
-                        <div class="chart-container"><canvas id="chart-o2"></canvas></div>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">叶绿素 a</div>
-                        <div class="chart-container"><canvas id="chart-chla"></canvas></div>
-                    </div>
+            <!-- Case Management -->
+            <div class="page" id="page-cases">
+                <div class="page-header">
+                    <div class="page-title">案例管理</div>
+                    <div class="page-desc">选择要配置和运行的模型案例</div>
                 </div>
-                <div class="two-col">
-                    <div class="card">
-                        <div class="card-title">氨氮 NH4</div>
-                        <div class="chart-container"><canvas id="chart-nh4"></canvas></div>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">硝酸盐 NO3</div>
-                        <div class="chart-container"><canvas id="chart-no3"></canvas></div>
-                    </div>
+                <div style="margin-bottom:16px;display:flex;gap:10px;">
+                    <button class="btn btn-success" onclick="navigate('preprocess')">➕ 新建模型</button>
+                    <span style="font-size:12px;color:var(--text-muted);align-self:center;">从湖泊边界 + 底部高程 shapefile 生成新案例</span>
                 </div>
-                <div class="two-col">
-                    <div class="card">
-                        <div class="card-title">总氮 wet_totN</div>
-                        <div class="chart-container"><canvas id="chart-totn"></canvas></div>
+                <div class="card" style="margin-bottom:16px;">
+                    <div class="card-title">📂 按路径打开案例（任意位置）</div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <input class="form-input" id="open-case-path" style="flex:1;min-width:260px;" placeholder="输入案例目录绝对路径，如 D:\\mycases\\LakeX（须含 getm.inp 或 bathymetry.nc）">
+                        <button class="btn btn-primary" onclick="pickCaseFolder()">📁 选择文件夹…</button>
+                        <button class="btn" onclick="toggleDirBrowser(true)" title="不弹窗，直接在页面里逐级浏览本机目录">📂 浏览目录</button>
+                        <button class="btn" onclick="openCaseByPath()">打开</button>
                     </div>
-                    <div class="card">
-                        <div class="card-title">总磷 wet_totP</div>
-                        <div class="chart-container"><canvas id="chart-totp"></canvas></div>
+                    <div id="pick-folder-status" class="pp-status" style="display:none;"></div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">
+                        点击「选择文件夹」会弹出本机文件夹选择窗口，选好后自动填入并打开；也可直接粘贴路径后点「打开」。
+                        打开后自动加入下方案例列表，下次可直接点击「加载」。在下方案例列表上<b>单击右键</b>可快速打开所在文件夹或重新选择目录。
+                    </div>
+                    <div class="dir-browser" id="dir-browser" style="display:none;margin-top:10px;">
+                        <div class="db-bar">
+                            <button class="btn btn-sm" onclick="dirBrowserUp()">⬆ 上级</button>
+                            <input class="form-input" id="db-path" readonly>
+                            <button class="btn btn-sm btn-primary" onclick="dirBrowserUse()">✅ 使用此目录</button>
+                            <button class="btn btn-sm" onclick="toggleDirBrowser()">✕ 收起</button>
+                        </div>
+                        <div class="db-list" id="db-list"></div>
+                        <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">
+                            双击文件夹进入下一级；点「使用此目录」会把上方路径填好并打开案例。
+                        </div>
                     </div>
                 </div>
                 <div class="card">
-                    <div class="card-title">浮游动物</div>
-                    <div class="chart-container"><canvas id="chart-zoo"></canvas></div>
+                    <div class="card-title">可用案例 <span style="font-size:11px;color:var(--text-muted);font-weight:400;">（右键行可打开所在文件夹 / 重新选择目录）</span></div>
+                    <table class="data-table" id="case-table">
+                        <thead><tr><th>案例名称</th><th>地形</th><th>FABM</th><th>气象</th><th>河流</th><th>2D结果</th><th>3D结果</th><th>操作</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
-            `;
+            </div>
 
-            const colors = ['#2d5a87', '#e74c3c', '#27ae60', '#f39c12', '#8e44ad'];
-            const timeLabels = (data.time?.values || []).map((_, i) => '第' + (i + 1) + '步');
+            <!-- Pre-process (shapefile → grid → bathymetry) -->
+            <div class="page" id="page-preprocess">
+                <div class="page-header">
+                    <div class="page-title">前处理</div>
+                    <div class="page-desc">从湖泊边界 + 底部高程 shapefile 生成 bathymetry.nc，创建新案例</div>
+                </div>
+                <div class="pp-tabs">
+                    <div class="pp-tab active" data-pp-tab="engines">0. 模型模块</div>
+                    <div class="pp-tab" data-pp-tab="boundary">1. 湖泊边界</div>
+                    <div class="pp-tab" data-pp-tab="bathymetry">2. 底部高程</div>
+                    <div class="pp-tab" data-pp-tab="grid">3. 网格生成</div>
+                    <div class="pp-tab" data-pp-tab="save">4. 插值与保存</div>
+                </div>
 
-            function makeChart(id, varName) {
-                const ts = data.timeseries[varName];
-                if (!ts) return;
-                const ctx = document.getElementById(id).getContext('2d');
-                let datasets = [];
-                if (ts.type === '3d_center') {
-                    const n = Math.min(ts.nlevels, 5);
-                    for (let i = 0; i < n; i++) {
-                        datasets.push({
-                            label: '第' + (i + 1) + '层',
-                            data: ts.values.map(r => r[i]),
-                            borderColor: colors[i % colors.length],
-                            backgroundColor: 'transparent',
-                            tension: 0.3,
-                            pointRadius: 2,
-                        });
-                    }
-                } else {
-                    datasets.push({
-                        label: ts.long_name,
-                        data: ts.values,
-                        borderColor: colors[0],
-                        backgroundColor: colors[0] + '20',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 2,
-                    });
-                }
-                new Chart(ctx, {
-                    type: 'line',
-                    data: { labels: timeLabels, datasets },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: datasets.length > 1, position: 'right' } },
-                        scales: { x: { ticks: { maxTicksLimit: 10 } } },
-                    }
-                });
-            }
+                <!-- Tab 0: 模型模块（新建模型之前先选） -->
+                <div class="pp-tab-content active" id="pp-tab-engines">
+                    <div class="card">
+                        <div class="card-title">🧩 模型模块组合（新建模型时启用哪些模块）</div>
+                        <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.7;">
+                            在这里决定这个<b>新模型</b>要包含哪些功能模块；设置会保存为默认组合，稍后在「输入数据 → 一键构建」时自动应用。
+                            已加载案例时可随时回到「模块配置」页修改该案例的模块。
+                        </div>
+                        <div id="pp-engines-badge" style="margin-bottom:8px;"></div>
+                        <div class="grid-3" id="pp-engines-container"></div>
+                        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                            <button class="btn btn-primary" onclick="loadEngines()">🔄 重新读取</button>
+                            <button class="btn btn-success" onclick="navigate('modules')">🧩 前往模块配置页</button>
+                            <span id="pp-engines-status" style="font-size:11px;color:var(--text-muted);"></span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">📋 模块选择说明</div>
+                        <div class="format-help-card">
+                            <div style="margin-bottom:6px;"><b>🌊 水动力（GETM 三维流动）</b> —— 必选内核，提供水位、流速、水温与环流。</div>
+                            <div style="margin-bottom:6px;"><b>🦠 水质生态（FABM-WET 食物网）</b> —— 关闭后模型只跑物理水动力，不计算藻类/营养盐/ DO 等。</div>
+                            <div><b>🌫️ 温室气体（CO₂/CH₄）</b> —— 启用后新增无机碳与甲烷状态变量并闭合碳循环；首次启用会自动编译模型程序。</div>
+                        </div>
+                    </div>
+                </div>
 
-            const findVar = (kw) => Object.keys(data.timeseries).find(k => k.toLowerCase().includes(kw.toLowerCase()));
+                <!-- Tab 1: Boundary -->
+                <div class="pp-tab-content" id="pp-tab-boundary">
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-title">📁 上传湖泊边界 shapefile</div>
+                            <div class="format-help-card">
+                                <div style="font-weight:600;margin-bottom:4px;">格式要求</div>
+                                <div>· 几何类型: <strong>Polygon</strong>（多边形）</div>
+                                <div>· 必需文件: <code>.shp</code> + <code>.shx</code> + <code>.dbf</code></div>
+                                <div>· 推荐带 <code>.prj</code> 投影文件（UTM 或 WGS84 经纬度）</div>
+                                <div>· 第一个多边形的外环即湖岸线</div>
+                                <div>· CRS 不明时后端按经纬度处理</div>
+                            </div>
+                            <div class="form-group" style="margin-top:12px;">
+                                <label class="form-label">选择 shapefile 组件（同时选 .shp/.shx/.dbf/.prj）</label>
+                                <input type="file" id="pp-boundary-files" class="form-input" multiple accept=".shp,.shx,.dbf,.prj">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">数据坐标系（自动检测不准时手动指定）</label>
+                                <select id="pp-boundary-crs" class="form-input">
+                                    <option value="auto">自动检测（默认）</option>
+                                    <option value="wgs84_ll">WGS84 经纬度 (EPSG:4326)</option>
+                                    <option value="cgcs2000_ll">CGCS2000 经纬度 (EPSG:4490)</option>
+                                    <option value="utm47n">WGS84 / UTM 47N</option>
+                                    <option value="utm48n">WGS84 / UTM 48N</option>
+                                    <option value="cgcs2000_gk102">CGCS2000 高斯3°带 CM102°</option>
+                                    <option value="cgcs2000_gk105">CGCS2000 高斯3°带 CM105°</option>
+                                    <option value="beijing54_gk102">北京54 高斯3°带 CM102°</option>
+                                    <option value="beijing54_gk105">北京54 高斯3°带 CM105°</option>
+                                    <option value="xian80_gk102">西安80 高斯3°带 CM102°</option>
+                                    <option value="xian80_gk105">西安80 高斯3°带 CM105°</option>
+                                    <option value="epsg">自定义 EPSG 代码…</option>
+                                </select>
+                                <input type="text" id="pp-boundary-epsg" class="form-input" placeholder="EPSG 代码，例如 4326" style="display:none;margin-top:6px;">
+                            </div>
+                            <button class="btn btn-primary" onclick="uploadBoundary()">上传边界</button>
+                            <div id="pp-boundary-status" class="pp-status"></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">🗺️ 边界预览</div>
+                            <div class="pp-canvas-wrap">
+                                <canvas id="pp-boundary-canvas" width="500" height="400"></canvas>
+                            </div>
+                            <div id="pp-boundary-info" class="pp-info-panel">上传后显示边界信息</div>
+                        </div>
+                    </div>
+                </div>
 
-            makeChart('chart-o2', findVar('O2W') || '');
-            makeChart('chart-chla', findVar('wet_chla') || '');
-            makeChart('chart-nh4', findVar('NH4W') || '');
-            makeChart('chart-no3', findVar('NO3W') || '');
-            makeChart('chart-totn', 'wet_totN');
-            makeChart('chart-totp', 'wet_totP');
-            makeChart('chart-zoo', findVar('zooplankton_rPDZoo') || '');
-        }
+                <!-- Tab 2: Bathymetry -->
+                <div class="pp-tab-content" id="pp-tab-bathymetry">
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-title">📊 上传底部高程 shapefile</div>
+                            <div class="format-help-card">
+                                <div style="font-weight:600;margin-bottom:4px;">格式要求</div>
+                                <div>· 几何类型: <strong>Point</strong>（散点测深）或 <strong>Polygon</strong>（等深区）</div>
+                                <div>· 必需文件: <code>.shp</code> + <code>.shx</code> + <code>.dbf</code></div>
+                                <div>· 属性表中必须有一个数值字段表示水深(m)，正值=水深</div>
+                                <div>· Point: 后端用 scipy.griddata 插值到网格</div>
+                                <div>· Polygon: 网格中心落在哪个多边形就取该 depth</div>
+                                <div>· 坐标系不一致时：在下方选择真实坐标系即可自动转换对齐</div>
+                            </div>
+                            <div class="form-group" style="margin-top:12px;">
+                                <label class="form-label">水深字段名（留空后端自动猜测）</label>
+                                <input type="text" id="pp-depth-field" class="form-input" placeholder="例如: depth / ELEV / Z / 水深">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">数据坐标系（与边界不一致时选择真实坐标系，自动转换对齐）</label>
+                                <select id="pp-bathy-crs" class="form-input">
+                                    <option value="auto">与边界相同（默认，不转换）</option>
+                                    <option value="wgs84_ll">WGS84 经纬度 (EPSG:4326)</option>
+                                    <option value="cgcs2000_ll">CGCS2000 经纬度 (EPSG:4490)</option>
+                                    <option value="utm47n">WGS84 / UTM 47N</option>
+                                    <option value="utm48n">WGS84 / UTM 48N</option>
+                                    <option value="cgcs2000_gk102">CGCS2000 高斯3°带 CM102°</option>
+                                    <option value="cgcs2000_gk105">CGCS2000 高斯3°带 CM105°</option>
+                                    <option value="beijing54_gk102">北京54 高斯3°带 CM102°</option>
+                                    <option value="beijing54_gk105">北京54 高斯3°带 CM105°</option>
+                                    <option value="xian80_gk102">西安80 高斯3°带 CM102°</option>
+                                    <option value="xian80_gk105">西安80 高斯3°带 CM105°</option>
+                                    <option value="epsg">自定义 EPSG 代码…</option>
+                                </select>
+                                <input type="text" id="pp-bathy-epsg" class="form-input" placeholder="EPSG 代码，例如 32648" style="display:none;margin-top:6px;">
+                                <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
+                                    标准坐标系之间精确重投影；边界为地方坐标系时按包围盒中心自动平移拟合对齐
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">选择 shapefile 组件</label>
+                                <input type="file" id="pp-bathy-files" class="form-input" multiple accept=".shp,.shx,.dbf,.prj">
+                            </div>
+                            <button class="btn btn-primary" onclick="uploadBathymetry()">上传高程</button>
+                            <div id="pp-bathy-status" class="pp-status"></div>
 
-        let threeScene, threeCamera, threeRenderer, threeControls;
-        let lakeMesh, waterMesh;
-        let threeInitialized = false;
+                            <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px;">
+                                <div class="card-title" style="padding:0;margin-bottom:8px;">📄 或：用文本格式（CSV / TXT / .dat）导入水深</div>
+                                <div class="format-help-card" style="margin-bottom:8px;">
+                                    <div style="font-weight:600;margin-bottom:4px;">为什么还需要 .nc？</div>
+                                    <div>GETM 的地形读取只实现了 NetCDF 分支（<code>read_topo_file.F90</code> 中 ASCII 直接报错），
+                                        所以最终必须生成 <code>bathymetry.nc</code>——但<strong>你提供的可以是纯文本</strong>，
+                                        系统自动转换。</div>
+                                    <div style="margin-top:6px;">列顺序/表头（三列）: <code>x, y, depth</code> 或 <code>lon, lat, depth</code>；
+                                        分隔符支持逗号、Tab、空格、分号；<code>#</code> 开头为注释。</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">坐标类型</label>
+                                    <select id="pp-bathy-xyz-crs" class="form-input">
+                                        <option value="auto">自动识别（|x|≤360 视为经纬度）</option>
+                                        <option value="geographic">经纬度（度）</option>
+                                        <option value="projected">投影平面坐标（米）</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="file" id="pp-bathy-xyz-file" class="form-input" accept=".csv,.txt,.dat,.xyz">
+                                </div>
+                                <button class="btn" onclick="uploadBathymetryXyz()">📤 导入文本文件</button>
+                            </div>
 
-        function init3DViewer() {
-            if (threeInitialized) return;
-            threeInitialized = true;
+                            <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px;">
+                                <div class="card-title" style="padding:0;margin-bottom:8px;">📉 或：从深度-面积曲线（hypsograph）生成湖泊</div>
+                                <div class="format-help-card" style="margin-bottom:8px;">
+                                    <div>与 QWET/GOTM 的 <code>hypsograph.dat</code> 相同格式：每行 <code>z  面积</code>，
+                                        z = 距湖底的高度(m)，面积 = 该高度处的湖面面积(m²)。
+                                        系统按面积等效半径生成一个圆形湖泊（边界 + 测深点），随后照常走“网格生成 → 插值”。</div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group"><label class="form-label">中心经度（可选）</label>
+                                        <input class="form-input" id="pp-hyp-lon" placeholder="如 102.7"></div>
+                                    <div class="form-group"><label class="form-label">中心纬度（可选）</label>
+                                        <input class="form-input" id="pp-hyp-lat" placeholder="如 24.8"></div>
+                                </div>
+                                <div class="form-group">
+                                    <input type="file" id="pp-hyp-file" class="form-input" accept=".dat,.txt,.csv">
+                                </div>
+                                <button class="btn" onclick="uploadHypsograph()">📤 从曲线生成</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">🗺️ 高程预览</div>
+                            <div class="pp-canvas-wrap">
+                                <canvas id="pp-bathy-canvas" width="500" height="400"></canvas>
+                            </div>
+                            <div id="pp-bathy-info" class="pp-info-panel">上传后显示高程信息</div>
+                        </div>
+                    </div>
+                </div>
 
-            const canvas = document.getElementById('three-canvas');
-            const container = canvas.parentElement;
-            const w = container.clientWidth;
-            const h = container.clientHeight;
+                <!-- Tab 3: Grid -->
+                <div class="pp-tab-content" id="pp-tab-grid">
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-title">📐 网格参数</div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">dx (米)</label>
+                                    <input type="number" id="pp-dx" class="form-input" value="100" min="1" step="1">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">dy (米)</label>
+                                    <input type="number" id="pp-dy" class="form-input" value="100" min="1" step="1">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">nx（列，留空自动）</label>
+                                    <input type="number" id="pp-nx" class="form-input" placeholder="自动">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">ny（行，留空自动）</label>
+                                    <input type="number" id="pp-ny" class="form-input" placeholder="自动">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="generateGrid()">生成网格</button>
+                            <div id="pp-grid-status" class="pp-status"></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">🗺️ 网格预览（蓝色=水域，灰色=陆地）</div>
+                            <div class="pp-canvas-wrap">
+                                <canvas id="pp-grid-canvas" width="500" height="400"></canvas>
+                            </div>
+                            <div id="pp-grid-info" class="pp-info-panel">生成后显示网格统计</div>
+                        </div>
+                    </div>
+                </div>
 
-            threeScene = new THREE.Scene();
-            threeScene.background = new THREE.Color(0x0a1628);
+                <!-- Tab 4: Save -->
+                <div class="pp-tab-content" id="pp-tab-save">
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-title">💾 插值并保存 bathymetry.nc</div>
+                            <div class="form-group">
+                                <label class="form-label">插值方法（仅 Point 几何生效）</label>
+                                <select id="pp-method" class="form-select">
+                                    <option value="linear">linear（线性插值，推荐）</option>
+                                    <option value="nearest">nearest（最近邻）</option>
+                                </select>
+                            </div>
+                            <button class="btn" onclick="interpolateDepth()">插值水深</button>
+                            <div id="pp-interp-status" class="pp-status"></div>
+                            <hr style="border-color:var(--border);margin:16px 0;">
+                            <div class="form-group">
+                                <label class="form-label">新案例名（将在 case/ 下创建）</label>
+                                <input type="text" id="pp-case-name" class="form-input" placeholder="例如: MyLake">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">湖泊显示名（写入 bathymetry.nc 标题，可留空）</label>
+                                <input type="text" id="pp-lake-name" class="form-input" placeholder="例如: 某湖">
+                            </div>
+                            <button class="btn btn-success" onclick="saveBathymetry()">保存 bathymetry.nc 并加载案例</button>
+                            <div id="pp-save-status" class="pp-status"></div>
+                            <hr style="border-color:var(--border);margin:16px 0;">
+                            <div class="card-title" style="font-size:13px;">🏞️ 河流标记（入流/出流位置）</div>
+                            <div style="font-size:11px;color:var(--text-muted);margin:4px 0 8px;">
+                                插值后，在右侧图中滚轮缩放、拖拽平移；开启标记模式后点击水域格点添加河流。
+                                方向由流量数据正负决定（正=入流，负=出流），此处只标位置。
+                            </div>
+                            <div style="display:flex;gap:8px;margin-bottom:8px;">
+                                <button class="btn" id="pp-river-mode-btn" onclick="toggleRiverMarkMode()">🖱️ 标记模式: 关</button>
+                                <button class="btn" onclick="resetDepthView()">🔄 复位视图</button>
+                            </div>
+                            <div id="pp-river-list" style="max-height:140px;overflow-y:auto;font-size:12px;"></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">🗺️ 水深预览（滚轮缩放 / 拖拽平移）</div>
+                            <div class="pp-canvas-wrap">
+                                <canvas id="pp-depth-canvas" width="500" height="400"></canvas>
+                            </div>
+                            <div id="pp-depth-info" class="pp-info-panel">插值后显示水深分布</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            threeCamera = new THREE.PerspectiveCamera(60, w / h, 0.1, 10000);
-            threeCamera.position.set(800, 600, 800);
+            <!-- Input Data -->
+            <div class="page" id="page-input">
+                <div class="page-header">
+                    <div class="page-title">输入数据</div>
+                    <div class="page-desc">录入气象/河流时间序列数据，一键构建完整可运行案例</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📁 输入文件清单</div>
+                    <table class="data-table" id="input-files-table">
+                        <thead><tr><th>文件</th><th>状态</th><th>大小</th><th>修改时间</th><th>变量数</th><th>说明</th><th>操作</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="grid-2" style="margin-top:16px;">
+                    <div class="card">
+                        <div class="card-title">🌦️ 气象强迫数据（meteo.nc）</div>
+                        <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">
+                            CSV 列（别名自动识别）: <code>date,u10,v10,slp,t2,rh,tcc,precip,evap</code>。
+                            单位: 风速 m/s、气压 hPa、气温 ℃、湿度/云量 0-1（或 %）、降雨/蒸发 mm/day。站点数据将广播到全湖网格。
+                        </div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+                            <button class="btn" onclick="downloadMeteoTemplate()">⬇️ 下载 CSV 模板</button>
+                            <input type="file" id="meteo-csv-file" class="form-input" style="max-width:280px;" accept=".csv,.txt">
+                            <button class="btn btn-primary" onclick="uploadMeteoCsv()">📤 上传 CSV</button>
+                            <button class="btn btn-success" onclick="saveMeteoNc()">💾 生成 meteo.nc</button>
+                        </div>
+                        <div id="meteo-upload-status" class="pp-status"></div>
+                        <div id="meteo-preview" style="margin-top:8px;"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🏞️ 河流数据（rivers.nc + riverinfo.dat）</div>
+                        <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">
+                            CSV 列: <code>date,Q,temp,nh4,no3,po4</code>。Q 单位 m³/s，<strong>正值=入流、负值=出流</strong>；营养盐 g/m³（列缺失用默认值填充）。
+                            河流位置来自前处理标记，也可在下方手动添加。
+                        </div>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:flex-end;">
+                            <div><label class="form-label" style="font-size:11px;">河名(英文)</label>
+                                <input type="text" id="river-add-name" class="form-input" style="width:120px;" placeholder="PANLONG"></div>
+                            <div><label class="form-label" style="font-size:11px;">i 列号</label>
+                                <input type="number" id="river-add-i" class="form-input" style="width:70px;" min="1"></div>
+                            <div><label class="form-label" style="font-size:11px;">j 行号</label>
+                                <input type="number" id="river-add-j" class="form-input" style="width:70px;" min="1"></div>
+                            <button class="btn" onclick="addRiverManually()">➕ 添加河流</button>
+                        </div>
+                        <div id="river-list-panel"></div>
+                        <button class="btn btn-success" style="margin-top:8px;" onclick="saveRiversNc()">💾 生成 rivers.nc + riverinfo.dat</button>
+                        <div id="rivers-save-status" class="pp-status"></div>
+                        <div id="river-series-panel" style="display:none;margin-top:12px;border:1px solid var(--border);border-radius:6px;padding:10px;background:var(--bg-secondary);">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+                                <strong style="font-size:13px;">📈 <span id="river-series-title"></span> 输入数据时间序列</strong>
+                                <select id="river-series-var" class="form-input" style="width:auto;padding:3px 6px;font-size:12px;" onchange="drawRiverSeries()"></select>
+                                <button class="btn btn-sm" style="margin-left:auto;" onclick="$('river-series-panel').style.display='none'">收起</button>
+                            </div>
+                            <div style="position:relative;height:260px;"><canvas id="river-series-chart"></canvas></div>
+                            <div id="river-series-status" style="font-size:11px;color:var(--text-muted);margin-top:4px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="margin-top:16px;">
+                    <div class="card-title">🏗️ 构建完整案例（getm.inp / fabm.yaml 等 9 个文件）</div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.7;">
+                        配齐气象/河流数据后，设定模拟时段，一键生成全部配置文件，案例即可运行。重复构建会覆盖配置文件（数据文件保留）。
+                        <br>模块的启用状态取自「模块配置」页所选组合；水质/水位初值请在
+                        <a href="#" onclick="navigate('initial');return false;" style="color:var(--accent-light);"><b>🧪 初始条件</b></a>
+                        页设置（预设构建时一并写入，之后可随时改）。
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">开始时间</label>
+                            <input type="text" id="build-start" class="form-input" placeholder="2020-01-01 00:00:00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">结束时间</label>
+                            <input type="text" id="build-stop" class="form-input" placeholder="2020-12-30 00:00:00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">时间步长 (秒)</label>
+                            <input type="number" id="build-dt" class="form-input" value="15" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">垂向层数</label>
+                            <input type="number" id="build-nlev" class="form-input" value="10" min="1">
+                        </div>
+                        <div class="form-group" style="align-self:flex-end;">
+                            <button class="btn btn-success" onclick="buildCase()">🏗️ 一键构建</button>
+                        </div>
+                    </div>
+                    <div id="build-status" class="pp-status"></div>
+                </div>
+                <div class="card" style="margin-top:16px;">
+                    <div class="card-title">📊 数据概览</div>
+                    <div id="input-overview" class="empty-state"><div class="icon">📂</div>请先加载案例</div>
+                </div>
+            </div>
 
-            threeRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-            threeRenderer.setSize(w, h);
-            threeRenderer.setPixelRatio(window.devicePixelRatio);
+            <!-- Modules -->
+            <div class="page" id="page-modules">
+                <div class="page-header">
+                    <div class="page-title">模块配置</div>
+                    <div class="page-desc">启用/禁用模型引擎与生态模块，查看模块分类和参数数量</div>
+                </div>
+                <div class="card" style="margin-bottom:16px;">
+                    <div class="card-title">🚀 功能模块（引擎）</div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.7;">
+                        <b>未加载案例也能选</b>：此时设置会保存为「新建模型默认模块组合」，之后在前处理/输入数据里「一键构建」时自动应用。
+                        已加载案例时，勾选会直接写入该案例的 <code>getm.inp</code> 与 <code>fabm.yaml</code>。
+                        <span id="modules-source-badge" style="margin-left:6px;"></span>
+                    </div>
+                    <div class="grid-3" id="engines-container"></div>
+                    <div id="modules-warning" style="margin-top:10px;"></div>
+                </div>
+                <div class="card" style="margin-bottom:16px;">
+                    <div class="card-title">🧩 FABM 生态模块清单</div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex:2;">
+                            <label class="form-label">搜索模块</label>
+                            <input class="form-input" id="module-search" placeholder="输入模块名，如 cyanobacteria / 温室气体" oninput="filterModuleCards()">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label">显示</label>
+                            <select class="form-select" id="module-show" onchange="renderModuleCards()">
+                                <option value="all">全部</option>
+                                <option value="enabled">仅已启用</option>
+                                <option value="disabled">仅已禁用</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="modules-container" class="empty-state"><div class="icon">🧩</div>加载案例后显示模块列表</div>
+            </div>
 
-            threeControls = new THREE.OrbitControls(threeCamera, threeRenderer.domElement);
-            threeControls.enableDamping = true;
-            threeControls.dampingFactor = 0.05;
+            <!-- Parameters -->
+            <div class="page" id="page-parameters">
+                <div class="page-header">
+                    <div class="page-title">参数编辑</div>
+                    <div class="page-desc">查看和修改 FABM 生态模块参数，修改后自动保存</div>
+                </div>
+                <div class="card">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">选择模块</label>
+                            <select class="form-select" id="param-module-select" onchange="loadModuleParams()"></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">搜索参数</label>
+                            <input class="form-input" id="param-search" placeholder="输入参数名搜索..." oninput="filterParams()">
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title" id="param-module-title">参数列表</div>
+                    <div id="params-list" style="max-height:500px;overflow-y:auto;"></div>
+                </div>
+            </div>
 
-            const ambient = new THREE.AmbientLight(0xffffff, 0.5);
-            threeScene.add(ambient);
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            dirLight.position.set(500, 800, 500);
-            threeScene.add(dirLight);
+            <!-- Time Settings -->
+            <div class="page" id="page-time">
+                <div class="page-header">
+                    <div class="page-title">时间设置</div>
+                    <div class="page-desc">配置时间步长、运行周期和冷/热启动</div>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title">⏱️ 时间步长与周期</div>
+                        <div class="form-group">
+                            <label class="form-label">开始时间</label>
+                            <input class="form-input" id="time-start" type="text" placeholder="2000-01-01 00:00:00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">结束时间</label>
+                            <input class="form-input" id="time-stop" type="text" placeholder="2000-12-31 00:00:00">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">时间步长 (秒)</label>
+                                <input class="form-input" id="time-dt" type="number">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">2D输出步长 (步)</label>
+                                <input class="form-input" id="time-step2d" type="number">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveTimeSettings()">💾 保存时间设置</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🔥 冷启动 / 热启动</div>
+                        <div class="form-group">
+                            <label class="form-label">启动方式</label>
+                            <div style="display:flex;gap:20px;align-items:center;margin-top:6px;">
+                                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                                    <input type="radio" name="hotstart" value="0" checked onchange="toggleHotstart(false)"> 冷启动
+                                </label>
+                                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                                    <input type="radio" name="hotstart" value="1" onchange="toggleHotstart(true)"> 热启动
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group" id="hotstart-file-group" style="display:none;">
+                            <label class="form-label">热启动文件</label>
+                            <input class="form-input" id="hotstart-file" placeholder="hotstart.nc">
+                        </div>
+                        <button class="btn btn-primary" onclick="saveHotstart()">💾 保存启动设置</button>
+                        <div style="margin-top:16px;padding:12px;background:var(--bg-tertiary);border-radius:6px;font-size:12px;color:var(--text-secondary);">
+                            <strong>说明：</strong><br>
+                            • 冷启动：从初始条件开始运行（首次运行使用）<br>
+                            • 热启动：从之前的运行结果继续（需提供 hotstart 文件）<br>
+                            • 热启动可用于延长模拟时间或做情景分析
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📤 输出配置 (output.yaml)</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">时间单位</label>
+                            <select class="form-input" id="output-time-unit">
+                                <option value="day">day (天)</option>
+                                <option value="hour">hour (小时)</option>
+                                <option value="second">second (秒)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">时间步长</label>
+                            <input class="form-input" id="output-time-step" type="number" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">sync_interval（必须 ≥ 1）</label>
+                            <input class="form-input" id="output-sync-interval" type="number" min="1" value="1">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveOutputConfig()">💾 保存输出配置</button>
+                    <div style="margin-top:8px;font-size:11px;color:var(--text-muted);">
+                        sync_interval=0 会导致输出文件 time 维度为 0，所有模拟结果丢失。建议设为 1（每个时间步同步）。
+                    </div>
 
-            createLakeModel();
+                    <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px;">
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            <strong style="font-size:13px;">🧾 输出变量订阅</strong>
+                            <button class="btn btn-sm" onclick="applyOutputPreset('minimal')">精简（仅水动力）</button>
+                            <button class="btn btn-sm" onclick="applyOutputPreset('standard')">标准（水动力+关键生态）</button>
+                            <button class="btn btn-sm btn-danger" onclick="applyOutputPreset('all')">全部（source: *）</button>
+                            <button class="btn btn-sm btn-success" style="margin-left:auto;" onclick="saveOutputSubscription()">💾 保存订阅</button>
+                        </div>
+                        <div style="font-size:11px;color:var(--text-muted);margin:6px 0 8px;">
+                            FABM 按“模块分类”订阅：<code>模块名/*</code>。默认 <code>source: *</code> 会写出模型注册的每一个变量
+                            （滇池 362 天实测 <strong>17.9 GB</strong>），请按需勾选。
+                        </div>
+                        <div id="output-modules" style="display:flex;flex-wrap:wrap;gap:6px 14px;max-height:190px;overflow-y:auto;"></div>
+                        <div id="output-estimate" style="margin-top:10px;"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📊 运行预估</div>
+                    <div id="run-estimate" class="empty-state"><div class="icon">⏱️</div>加载案例后显示预估</div>
+                </div>
+            </div>
 
-            window.addEventListener('resize', onWindowResize);
-            animate3D();
-        }
+            <!-- Initial Conditions -->
+            <div class="page" id="page-initial">
+                <div class="page-header">
+                    <div class="page-title">初始条件</div>
+                    <div class="page-desc">设置初始水位、水温与各类水质变量的初始状态（冷启动初值）</div>
+                </div>
+                <div id="ic-loading" class="empty-state"><div class="icon">🧪</div>加载案例后显示初始条件</div>
+                <div id="ic-body" style="display:none;">
+                    <!-- 1. 水量 / 水位 -->
+                    <div class="ic-section open" id="ic-sec-hydro">
+                        <div class="ic-head" onclick="toggleIcSection('hydro')">
+                            <span class="caret">▶</span>💧 初始水位与水温
+                        </div>
+                        <div class="ic-body">
+                            <div class="ic-grid">
+                                <div class="ic-field">
+                                    <label>初始水位 <em>（相对地形基准，m）</em></label>
+                                    <input class="form-input" type="number" step="0.001" id="ic-elev">
+                                </div>
+                                <div class="ic-field">
+                                    <label>湖面绝对高程 <em>（m, 如滇池 1884）</em></label>
+                                    <input class="form-input" type="number" step="0.1" id="ic-surface-abs">
+                                </div>
+                                <div class="ic-field">
+                                    <label>地形基准面绝对高程 <em>（m）</em></label>
+                                    <input class="form-input" type="number" step="0.1" id="ic-datum-abs">
+                                </div>
+                                <div class="ic-field">
+                                    <label>初始水温 <em>（℃）</em></label>
+                                    <input class="form-input" type="number" step="0.1" id="ic-temp">
+                                </div>
+                            </div>
+                            <div id="ic-geo-info" style="font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.7;"></div>
+                            <div style="font-size:11px;color:var(--info);margin-top:6px;line-height:1.7;">
+                                💡 <b>水位怎么填？</b> GETM 的 <code>m2d/elev_const</code> 是「相对地形零点」的水面高度，和
+                                <code>bathymetry.nc</code> 用同一个零点。若你的地形文件是滇池那种「相对 1884 m 基准面的水深」，
+                                则湖面就在 1884 m，<b>elev_const 填 0</b>；填 1884 会把水面抬到 3788 m。
+                                用上面的「湖面绝对高程 − 地形基准面绝对高程」两栏也能自动算出 elev_const。
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 2. 营养状态 -->
+                    <div class="ic-section open" id="ic-sec-trophic">
+                        <div class="ic-head" onclick="toggleIcSection('trophic')">
+                            <span class="caret">▶</span>🌱 营养状态预设（一键填充水质初值）
+                        </div>
+                        <div class="ic-body">
+                            <div class="trophic-pick" id="ic-trophic-pick"></div>
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.7;">
+                                选择一个营养状态，下方「水质初始条件」里各变量会自动填入该状态的标准初值，之后再可单独微调。
+                                同时用于生成 <code>fabm_init.nc</code>（沉水植物生物量随水深分布）。
+                            </div>
+                            <div class="ic-grid" style="margin-top:10px;">
+                                <div class="ic-field">
+                                    <label>沉水植物生物量上限 <em>gDW/m²</em></label>
+                                    <input class="form-input" type="number" step="0.5" id="ic-macro-sd">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 3. 水质初始条件 -->
+                    <div class="ic-section" id="ic-sec-wq">
+                        <div class="ic-head" onclick="toggleIcSection('wq')">
+                            <span class="caret">▶</span>🧫 水质初始条件（按模块，单位 g/m³）
+                        </div>
+                        <div class="ic-body">
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center;">
+                                <input class="form-input" id="ic-wq-search" style="max-width:280px;" placeholder="搜索变量，如 NH4 / O2 / 藻" oninput="renderIcWaterQuality()">
+                                <button class="btn btn-sm" onclick="applyTrophicToFields()">↩ 按当前营养状态回填</button>
+                                <button class="btn btn-sm btn-primary" onclick="applyPresetToFields()">📐 套用预设数值</button>
+                            </div>
+                            <div id="ic-wq-modules"></div>
+                        </div>
+                    </div>
+                    <!-- 4. 保存 -->
+                    <div class="card">
+                        <div class="card-title">💾 应用初始条件</div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                            <button class="btn btn-success" onclick="saveInitConditions()">💾 保存到案例</button>
+                            <button class="btn" onclick="loadInitConditions()">🔄 重新读取</button>
+                            <span id="ic-save-status" style="font-size:11px;color:var(--text-muted);"></span>
+                        </div>
+                        <div style="margin-top:8px;font-size:11px;color:var(--text-muted);line-height:1.7;">
+                            保存会写入 <code>getm.inp</code>（m2d/elev_const、temp/temp_const）、<code>fabm.yaml</code>（各模块 initialization）
+                            与 <code>fabm_init.nc</code>（沉水植物）。修改后若想让模型使用新初值，请保持<b>冷启动</b>。
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        function createLakeModel() {
-            const nx = 25, ny = 25;
-            const dx = 40, dy = 40;
-            const depth = 50;
+            <!-- Run Control -->
+            <div class="page" id="page-run">
+                <div class="page-header">
+                    <div class="page-title">运行控制</div>
+                    <div class="page-desc">启动/停止模型，查看运行日志和进度</div>
+                </div>
+                <div class="grid-4" id="run-stats">
+                    <div class="stat-card"><div class="stat-label">状态</div><div class="stat-value" id="run-stat-status" style="font-size:16px;">空闲</div></div>
+                    <div class="stat-card"><div class="stat-label">进度</div><div class="stat-value" id="run-stat-progress">0%</div></div>
+                    <div class="stat-card"><div class="stat-label">已用时间</div><div class="stat-value" id="run-stat-elapsed">0s</div></div>
+                    <div class="stat-card"><div class="stat-label">预计剩余</div><div class="stat-value" id="run-stat-eta">-</div></div>
+                </div>
+                <div class="card" style="margin-top:16px;">
+                    <div class="progress-bar"><div class="progress-fill" id="run-progress-fill" style="width:0%"></div></div>
+                    <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--text-secondary);">
+                        <span id="run-step-info">未开始</span>
+                        <span id="run-percent">0%</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">
+                        运行控制
+                        <span style="margin-left:auto;display:flex;gap:8px;">
+                            <button class="btn btn-sm" onclick="runPreflightCheck()">🩺 运行前体检</button>
+                            <button class="btn btn-success btn-sm" id="btn-start-run" onclick="startRun()">▶️ 开始运行</button>
+                            <button class="btn btn-danger btn-sm" id="btn-stop-run" onclick="stopRun()" disabled>⏹️ 停止</button>
+                        </span>
+                    </div>
+                    <div id="run-check-panel" style="display:none;margin-bottom:10px;"></div>
+                    <div class="log-panel" id="run-log"></div>
+                </div>
+            </div>
 
-            const bathyGeo = new THREE.PlaneGeometry(nx * dx, ny * dy, nx - 1, ny - 1);
-            bathyGeo.rotateX(-Math.PI / 2);
+            <!-- Map view (Leaflet + model grid overlay) -->
+            <div class="page" id="page-map">
+                <div class="page-header">
+                    <div class="page-title">地图视图</div>
+                    <div class="page-desc">在真实底图上查看模型网格与水深，点击网格提取该点时间序列</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">
+                        🌐 湖泊与模型网格
+                        <span style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+                            <select class="form-select" id="map-layer" style="width:auto;min-width:150px;" onchange="updateMapLayer()">
+                                <option value="depth">图层: 水深</option>
+                                <option value="result">图层: 结果场</option>
+                            </select>
+                            <select class="form-select" id="map-field-var" style="width:auto;min-width:170px;display:none;" onchange="updateMapLayer()"></select>
+                            <button class="btn btn-sm" onclick="loadMapGrid()">🔄 刷新</button>
+                        </span>
+                    </div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">
+                        底图需要联网（OpenStreetMap 瓦片）；离网时网格仍会绘制，只是没有底图。
+                    </div>
+                    <div id="map-container" style="width:100%;height:520px;border:1px solid var(--border);border-radius:6px;overflow:hidden;"></div>
+                    <div id="map-status" style="margin-top:8px;font-size:12px;color:var(--text-secondary);">进入本页会自动加载当前案例的网格；切换案例后请重新进入或点“刷新”</div>
+                    <div id="map-picked" style="margin-top:6px;font-size:12px;"></div>
+                </div>
+            </div>
 
-            const pos = bathyGeo.attributes.position;
-            for (let i = 0; i < pos.count; i++) {
-                const x = pos.getX(i);
-                const y = pos.getZ(i);
-                const cx = (nx - 1) * dx / 2;
-                const cy = (ny - 1) * dy / 2;
-                const dist = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
-                const maxDist = Math.min(cx, cy);
-                let d = depth * (1 - (dist / maxDist) ** 2);
-                d = Math.max(2, Math.min(depth, d));
-                pos.setY(i, -d);
-            }
-            bathyGeo.computeVertexNormals();
+            <!-- 2D Visualization -->
+            <div class="page" id="page-viz2d">
+                <div class="page-header">
+                    <div class="page-title">2D 可视化</div>
+                    <div class="page-desc">平面空间分布可视化，支持所有输出变量</div>
+                </div>
+                <div class="viz-container">
+                    <div class="viz-controls">
+                        <label>变量:</label>
+                        <select id="viz2d-var" onchange="onViz2dVarChange()"></select>
+                        <label>时步:</label>
+                        <input type="range" class="time-slider" id="viz2d-time" min="0" max="0" value="0" oninput="updateViz2d()">
+                        <span id="viz2d-time-label">0</span>
+                        <label>垂向层:</label>
+                        <select id="viz2d-level" onchange="updateViz2d()"></select>
+                        <span style="margin-left:8px;color:var(--text-muted);">|</span>
+                        <label>工具:</label>
+                        <div class="btn-group" id="viz2d-tools">
+                            <button class="btn btn-sm active" data-tool="inspect" onclick="setViz2dTool('inspect')">🔍 查看</button>
+                            <button class="btn btn-sm" data-tool="cell" onclick="setViz2dTool('cell')">📍 单格时序</button>
+                            <button class="btn btn-sm" data-tool="polygon" onclick="setViz2dTool('polygon')">✏️ 绘制区域</button>
+                            <button class="btn btn-sm" data-tool="calibpt" onclick="setViz2dTool('calibpt')">🎯 添加率定点</button>
+                        </div>
+                        <button class="btn btn-sm" id="viz2d-clear-poly" style="display:none;" onclick="clearViz2dPolygon()">清除多边形</button>
+                        <button class="btn btn-sm btn-success" id="viz2d-submit-poly" style="display:none;" onclick="submitViz2dPolygon()">提交区域时序</button>
+                    </div>
+                    <canvas id="viz2d-canvas" class="viz-canvas" width="800" height="500" style="cursor:crosshair;"></canvas>
+                    <div style="padding:10px;">
+                        <div class="colorbar" id="viz2d-colorbar"></div>
+                        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary);">
+                            <span id="viz2d-min">-</span><span id="viz2d-max">-</span>
+                        </div>
+                        <div id="viz2d-info" style="margin-top:8px;font-size:12px;color:var(--text-secondary);"></div>
+                        <div id="viz2d-coord" style="margin-top:4px;font-size:11px;color:var(--text-muted);"></div>
+                    </div>
+                </div>
+                <!-- Cell time series modal -->
+                <div class="modal" id="modal-cell-ts">
+                    <div class="modal-backdrop" onclick="closeModal('modal-cell-ts')"></div>
+                    <div class="modal-content" style="max-width:700px;">
+                        <div class="modal-header"><h3 id="cell-ts-title">单格时间序列</h3><button onclick="closeModal('modal-cell-ts')">×</button></div>
+                        <div class="modal-body">
+                            <div class="chart-container" style="height:300px;"><canvas id="cell-ts-chart"></canvas></div>
+                            <div id="cell-ts-stats" style="margin-top:8px;font-size:12px;color:var(--text-secondary);"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Add calibration point modal (linked from viz2d calibpt tool) -->
+                <div class="modal" id="modal-add-calib">
+                    <div class="modal-backdrop" onclick="closeModal('modal-add-calib')"></div>
+                    <div class="modal-content">
+                        <div class="modal-header"><h3>添加率定点位</h3><button onclick="closeModal('modal-add-calib')">×</button></div>
+                        <div class="modal-body">
+                            <div class="form-group"><label class="form-label">点位名称</label><input class="form-input" id="calib-add-name" placeholder="如：湖心点A"></div>
+                            <div class="form-row">
+                                <div class="form-group"><label class="form-label">网格 i</label><input class="form-input" id="calib-add-i" type="number" readonly></div>
+                                <div class="form-group"><label class="form-label">网格 j</label><input class="form-input" id="calib-add-j" type="number" readonly></div>
+                            </div>
+                            <div class="form-group"><label class="form-label">率定变量（可多选）</label><input class="form-input" id="calib-add-vars" placeholder="如: temp, abiotic_water_sO2W, wet_chla" value="temp"></div>
+                            <button class="btn btn-primary" onclick="confirmAddCalibPoint()">💾 确认添加</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            const bathyMat = new THREE.MeshStandardMaterial({
-                color: 0x8b7355,
-                roughness: 0.8,
-                side: THREE.DoubleSide,
-            });
-            const bottom = new THREE.Mesh(bathyGeo, bathyMat);
-            threeScene.add(bottom);
+            <!-- 3D Visualization -->
+            <div class="page" id="page-viz3d">
+                <div class="page-header">
+                    <div class="page-title">3D 可视化</div>
+                    <div class="page-desc">垂向剖面、三维结构、Plotly 体渲染</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🧊 3D 立体水体</div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">变量</label><select class="form-select" id="viz3d-iso-var" onchange="updateViz3dIso()"></select></div>
+                        <div class="form-group"><label class="form-label">时步</label><input class="form-input" id="viz3d-iso-time" type="number" value="0" min="0" onchange="updateViz3dIso()"></div>
+                        <div class="form-group"><label class="form-label">渲染方式</label>
+                            <select class="form-select" id="viz3d-iso-render" onchange="updateViz3dIso()">
+                                <option value="waterbody" selected>立体水体（湖底+分层+剖面墙）</option>
+                                <option value="isosurface">等值面 (isosurface)</option>
+                                <option value="cloud">点云 (scatter3d)</option>
+                                <option value="surface2d">2D 场作为 3D 表面</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label class="form-label">质量</label>
+                            <select class="form-select" id="viz3d-iso-quality" onchange="updateViz3dIso()">
+                                <option value="16">低 (更快)</option>
+                                <option value="26" selected>中</option>
+                                <option value="34">高 (更精细)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">选定层（-1=最上层）</label><input class="form-input" id="viz3d-iso-layer" type="number" value="-1" min="-1" onchange="updateViz3dIso()"></div>
+                        <div class="form-group"><label class="form-label">垂向放大</label>
+                            <select class="form-select" id="viz3d-iso-ve" onchange="updateViz3dIso()">
+                                <option value="1">1× (真实比例)</option>
+                                <option value="20">20×</option>
+                                <option value="50">50×</option>
+                                <option value="100" selected>100×</option>
+                                <option value="200">200×</option>
+                                <option value="400">400×</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label class="form-label">分层显示</label>
+                            <label style="display:flex;align-items:center;gap:6px;height:34px;">
+                                <input type="checkbox" id="viz3d-iso-stack" checked onchange="updateViz3dIso()" style="width:auto;">
+                                <span style="font-size:12px;">叠层看内部结构</span>
+                            </label>
+                        </div>
+                        <div class="form-group"><label class="form-label">层（仅2D表面）</label><input class="form-input" id="viz3d-iso-level" type="number" value="0" min="0" onchange="updateViz3dIso()"></div>
+                        <button class="btn btn-primary" onclick="updateViz3dIso()">🔄 刷新</button>
+                    </div>
+                    <div class="hint" style="margin:0 0 8px 2px;color:var(--text-muted);font-size:12px;">鼠标左键拖动旋转、滚轮缩放、右键平移。立体水体 = 湖底地形 + 逐层半透明分层面（可看到温跃层/分层）+ 四周水体剖面墙；垂向放大用于弥补水深（米级）相对湖面（公里级）过小的问题。</div>
+                    <div id="viz3d-plotly" style="width:100%;height:520px;background:var(--bg-primary);border:1px solid var(--border);border-radius:6px;"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title">📏 垂向剖面（指定点位）</div>
+                        <div class="form-row">
+                            <div class="form-group"><label class="form-label">变量</label><select class="form-select" id="viz3d-var" onchange="updateViz3d()"></select></div>
+                            <div class="form-group"><label class="form-label">X (i)</label><input class="form-input" id="viz3d-i" type="number" value="12" onchange="updateViz3d()"></div>
+                            <div class="form-group"><label class="form-label">Y (j)</label><input class="form-input" id="viz3d-j" type="number" value="10" onchange="updateViz3d()"></div>
+                            <div class="form-group"><label class="form-label">时步</label><input class="form-input" id="viz3d-time" type="number" value="0" onchange="updateViz3d()"></div>
+                            <div class="form-group"><label class="form-label">对应日期</label><div class="form-hint" id="viz3d-time-label">-</div></div>
+                        </div>
+                        <div class="chart-container"><canvas id="viz3d-profile-chart"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🗺️ 垂向平均平面分布</div>
+                        <div class="form-row">
+                            <div class="form-group"><label class="form-label">变量</label><select class="form-select" id="viz3d-avg-var" onchange="updateViz3dAvg()"></select></div>
+                            <div class="form-group"><label class="form-label">时步</label><input class="form-input" id="viz3d-avg-time" type="number" value="0" onchange="updateViz3dAvg()"></div>
+                        </div>
+                        <canvas id="viz3d-avg-canvas" class="viz-canvas" width="400" height="300"></canvas>
+                        <div class="colorbar" id="viz3d-colorbar"></div>
+                    </div>
+                </div>
+            </div>
 
-            const waterGeo = new THREE.PlaneGeometry(nx * dx, ny * dy, nx - 1, ny - 1);
-            waterGeo.rotateX(-Math.PI / 2);
-            const waterMat = new THREE.MeshStandardMaterial({
-                color: 0x4da6ff,
-                transparent: true,
-                opacity: 0.6,
-                side: THREE.DoubleSide,
-                roughness: 0.1,
-                metalness: 0.1,
-            });
-            waterMesh = new THREE.Mesh(waterGeo, waterMat);
-            waterMesh.position.y = 0;
-            threeScene.add(waterMesh);
+            <!-- Vertical heatmap -->
+            <div class="page" id="page-vheat">
+                <div class="page-header">
+                    <div class="page-title">垂向热图</div>
+                    <div class="page-desc">点位 / 区域 / 全湖平均的垂向结构随时间变化（层 × 时间 热图）</div>
+                </div>
+                <div class="card">
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">变量</label><select class="form-select" id="vheat-var"></select></div>
+                        <div class="form-group"><label class="form-label">范围</label>
+                            <select class="form-select" id="vheat-scope" onchange="toggleVHeatScope()">
+                                <option value="point" selected>单格点</option>
+                                <option value="region">区域平均</option>
+                                <option value="lake">全湖平均</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="vheat-point-group"><label class="form-label">X (i)</label><input class="form-input" id="vheat-i" type="number" value="12"></div>
+                        <div class="form-group" id="vheat-point-group2"><label class="form-label">Y (j)</label><input class="form-input" id="vheat-j" type="number" value="10"></div>
+                        <div class="form-group" id="vheat-region-group" style="display:none;"><label class="form-label">区域 (i1,i2,j1,j2)</label><input class="form-input" id="vheat-region" value="5,18,3,16"></div>
+                        <div class="form-group"><label class="form-label">纵轴</label>
+                            <select class="form-select" id="vheat-axis" onchange="updateVHeat()">
+                                <option value="sigma" selected>σ 坐标（顶=水面）</option>
+                                <option value="depth">真实深度 (m)</option>
+                                <option value="level">层号</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-primary" onclick="updateVHeat()">🔥 生成垂向热图</button></div>
+                    </div>
+                    <div class="hint" style="margin:0 0 8px 2px;color:var(--text-muted);font-size:12px;">纵轴为垂向层（顶部=水面，向下为 sigma 增大 / 深度增加），横轴为时间，颜色为变量值。对每个格点直接看其垂向演化，温跃层、分层、底层缺氧等结构一目了然。鼠标悬停可读数值，可框选缩放，工具栏可导出 PNG。</div>
+                    <div id="vheat-plotly" style="width:100%;height:440px;background:var(--bg-primary);border:1px solid var(--border);border-radius:6px;"></div>
+                    <div id="vheat-meta" style="color:var(--text-muted);font-size:12px;margin-top:8px;"></div>
+                </div>
+            </div>
 
-            const edgeGeo = new THREE.EdgesGeometry(bathyGeo);
-            const edgeMat = new THREE.LineBasicMaterial({ color: 0x3d5a80, opacity: 0.3, transparent: true });
-            const edges = new THREE.LineSegments(edgeGeo, edgeMat);
-            threeScene.add(edges);
+            <!-- Time Series -->
+            <div class="page" id="page-timeseries">
+                <div class="page-header">
+                    <div class="page-title">时间序列提取</div>
+                    <div class="page-desc">提取单格、区域或全湖平均的时间序列</div>
+                </div>
+                <div class="card">
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">变量</label><select class="form-select" id="ts-var"></select></div>
+                        <div class="form-group">
+                            <label class="form-label">提取方式</label>
+                            <select class="form-select" id="ts-mode" onchange="toggleTsMode()">
+                                <option value="point">单格点</option>
+                                <option value="region">区域平均</option>
+                                <option value="lake">全湖平均</option>
+                                <option value="layer">每一层</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="ts-layer-scope-group" style="display:none;">
+                            <label class="form-label">范围（每一层）</label>
+                            <select class="form-select" id="ts-layer-scope" onchange="toggleTsMode()">
+                                <option value="point">点位</option>
+                                <option value="region">区域</option>
+                                <option value="lake">全湖</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="ts-point-group"><label class="form-label">X (i)</label><input class="form-input" id="ts-i" type="number" value="12"></div>
+                        <div class="form-group" id="ts-point-group2"><label class="form-label">Y (j)</label><input class="form-input" id="ts-j" type="number" value="10"></div>
+                        <div class="form-group" id="ts-region-group" style="display:none;"><label class="form-label">区域 (i1,i2,j1,j2)</label><input class="form-input" id="ts-region" value="5,18,3,16"></div>
+                        <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-primary" onclick="extractTimeseries()">📈 提取</button></div>
+                    </div>
+                    <div class="hint" style="margin:0 0 4px 2px;color:var(--text-muted);font-size:12px;">"每一层"：对所选范围按层分别提取时间序列（每层一条曲线，色阶由表至底）。仅对含垂向层的 4D 变量有效。</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">时间序列图</div>
+                    <div class="chart-container large"><canvas id="ts-chart"></canvas></div>
+                </div>
+                <div class="card" id="ts-heatmap-card" style="display:none;">
+                    <div class="card-title" id="ts-heatmap-title">垂向热图（层 × 时间）</div>
+                    <div id="ts-heatmap" style="width:100%;height:400px;background:var(--bg-primary);border:1px solid var(--border);border-radius:6px;"></div>
+                </div>
+            </div>
 
-            const grid = new THREE.GridHelper(nx * dx, nx, 0x1e3a5f, 0x1e3a5f);
-            grid.position.y = -depth - 5;
-            grid.material.opacity = 0.2;
-            grid.material.transparent = true;
-            threeScene.add(grid);
+            <!-- Calibration -->
+            <div class="page" id="page-calibrate">
+                <div class="page-header">
+                    <div class="page-title">率定分析</div>
+                    <div class="page-desc">设置率定点位，输入实测数据，对比模拟-实测结果</div>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title">🎯 率定点位</div>
+                        <button class="btn btn-primary btn-sm" onclick="showAddPointModal()" style="margin-bottom:10px;">➕ 添加点位</button>
+                        <table class="data-table" id="cal-points-table">
+                            <thead><tr><th>名称</th><th>位置(i,j)</th><th>率定变量</th><th>操作</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">📊 实测-模拟对比</div>
+                        <div class="form-row">
+                            <div class="form-group"><label class="form-label">选择点位</label><select class="form-select" id="cal-point-select" onchange="updateCalComparison()"></select></div>
+                            <div class="form-group"><label class="form-label">变量</label><select class="form-select" id="cal-var-select" onchange="updateCalComparison()"></select></div>
+                            <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-sm" onclick="showScatterModal()">🔬 散点图(1:1)</button></div>
+                        </div>
+                        <div class="chart-container" style="height:280px;"><canvas id="cal-chart"></canvas></div>
+                        <div id="cal-stats" style="margin-top:10px;font-size:12px;"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📝 实测数据输入</div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">点位</label><select class="form-select" id="cal-data-point"></select></div>
+                        <div class="form-group"><label class="form-label">变量</label><select class="form-select" id="cal-data-var"></select></div>
+                        <div class="form-group"><label class="form-label">默认变量(若文件未含)</label><input class="form-input" id="cal-data-default-var" placeholder="temp" value="temp"></div>
+                        <div class="form-group" style="flex:2;"><label class="form-label">上传 CSV/XLSX 文件 (列: time, value[, variable])</label><input type="file" id="cal-data-file" accept=".csv,.xlsx,.xls"></div>
+                        <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-primary" onclick="uploadCalData()">📤 上传</button></div>
+                    </div>
+                    <div style="margin-top:10px;font-size:12px;color:var(--text-secondary);">
+                        或手动输入 JSON: <input class="form-input" id="cal-data-values" placeholder='[{"time":"2000-01-01","value":15}]' style="margin-top:4px;">
+                        <button class="btn btn-sm" onclick="saveCalData()" style="margin-left:6px;">💾 保存JSON</button>
+                    </div>
+                </div>
+            </div>
 
-            const boxGeo = new THREE.BoxGeometry(nx * dx, 2, ny * dy);
-            const boxEdges = new THREE.EdgesGeometry(boxGeo);
-            const boxLines = new THREE.LineSegments(boxEdges, new THREE.LineBasicMaterial({ color: 0x60a5fa, opacity: 0.5, transparent: true }));
-            boxLines.position.y = 1;
-            threeScene.add(boxLines);
+            <!-- Auto Calibration -->
+            <div class="page" id="page-autocal">
+                <div class="page-header">
+                    <div class="page-title">自动率定</div>
+                    <div class="page-desc">配置自动率定参数，支持 parsac / PEST / 贝叶斯方法</div>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title">⚙️ 率定配置</div>
+                        <div class="form-group">
+                            <label class="form-label">率定方法</label>
+                            <select class="form-select" id="ac-method">
+                                <option value="parsac">parsac (GLUE/蒙特卡洛)</option>
+                                <option value="pest">PEST (梯度优化)</option>
+                                <option value="bayesian">贝叶斯 (MCMC)</option>
+                                <option value="sensitivity">敏感性分析</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">目标函数</label>
+                            <select class="form-select" id="ac-objective">
+                                <option value="rmse">RMSE (均方根误差)</option>
+                                <option value="nse">NSE (Nash-Sutcliffe效率)</option>
+                                <option value="r2">R² (决定系数)</option>
+                                <option value="mae">MAE (平均绝对误差)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">迭代次数</label>
+                            <input class="form-input" id="ac-iterations" type="number" value="100">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">率定点位</label>
+                            <select class="form-select" id="ac-points" multiple style="height:80px;"></select>
+                        </div>
+                        <button class="btn btn-success" onclick="startAutoCal()">🚀 开始自动率定</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🎚️ 率定参数选择</div>
+                        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">选择需要率定的参数并设置范围</div>
+                        <div id="ac-params-list" style="max-height:350px;overflow-y:auto;"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📈 率定进度与结果</div>
+                    <div id="ac-progress" class="empty-state"><div class="icon">🔄</div>配置参数后开始自动率定</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-            update3DViewer();
-        }
+<!-- Modal: Add Calibration Point -->
+<div class="modal-overlay" id="modal-add-point">
+    <div class="modal">
+        <div class="modal-title">添加率定点位</div>
+        <div class="form-group"><label class="form-label">点位名称</label><input class="form-input" id="new-point-name" placeholder="如 湖心站"></div>
+        <div class="form-row">
+            <div class="form-group"><label class="form-label">X (i)</label><input class="form-input" id="new-point-i" type="number" value="12"></div>
+            <div class="form-group"><label class="form-label">Y (j)</label><input class="form-input" id="new-point-j" type="number" value="10"></div>
+        </div>
+        <div class="form-group"><label class="form-label">率定变量 (逗号分隔)</label><input class="form-input" id="new-point-vars" placeholder="temp, chla, NO3, PO4"></div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+            <button class="btn" onclick="closeModal('modal-add-point')">取消</button>
+            <button class="btn btn-primary" onclick="addCalPoint()">添加</button>
+        </div>
+    </div>
+</div>
 
-        function update3DViewer() {
-            if (!threeInitialized) return;
-            const varName = document.getElementById('viewer-var').value;
-            const legendTitle = document.getElementById('viewer-var').options[document.getElementById('viewer-var').selectedIndex].text;
-            document.getElementById('legend-title').textContent = legendTitle;
-        }
+<!-- Modal: Save Case As -->
+<div class="modal-overlay" id="modal-save-as">
+    <div class="modal">
+        <div class="modal-title">案例另存为</div>
+        <div id="save-as-source" style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;word-break:break-all;"></div>
+        <div class="form-group"><label class="form-label">目标目录（绝对路径，须不存在或为空目录）</label>
+            <input class="form-input" id="save-as-dest" placeholder="如 D:\mycases\LakeX_backup"></div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;">
+            <input type="checkbox" id="save-as-include-results"> 包含模拟结果文件（*.3d.nc / output.nc 等，可能达数 GB、耗时数分钟）
+        </label>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+            <button class="btn" onclick="closeModal('modal-save-as')">取消</button>
+            <button class="btn btn-primary" id="save-as-confirm-btn" onclick="confirmSaveAs()">保存</button>
+        </div>
+    </div>
+</div>
 
-        function onWindowResize() {
-            const canvas = document.getElementById('three-canvas');
-            const container = canvas.parentElement;
-            const w = container.clientWidth;
-            const h = container.clientHeight;
-            threeCamera.aspect = w / h;
-            threeCamera.updateProjectionMatrix();
-            threeRenderer.setSize(w, h);
-        }
+<!-- Modal: Scatter Plot (Observed vs Simulated, 1:1 line) -->
+<div class="modal-overlay" id="modal-scatter">
+    <div class="modal">
+        <div class="modal-title">实测 vs 模拟散点图 (1:1 参考线)</div>
+        <div id="scatter-meta" style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;"></div>
+        <div id="scatter-plot" style="width:100%;height:380px;"></div>
+        <div id="scatter-metrics" style="margin-top:10px;"></div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+            <button class="btn" onclick="closeModal('modal-scatter')">关闭</button>
+        </div>
+    </div>
+</div>
 
-        function animate3D() {
-            requestAnimationFrame(animate3D);
-            threeControls.update();
-            threeRenderer.render(threeScene, threeCamera);
-        }
+<!-- Right-click context menu for the case table -->
+<div id="case-ctx-menu" class="ctx-menu" style="display:none;">
+    <div class="ctx-menu-title" id="case-ctx-title">案例</div>
+    <div class="ctx-item" onclick="ctxAction('explore')">📂 在资源管理器中打开</div>
+    <div class="ctx-item" onclick="ctxAction('pick', true)">📁 选择此目录的上级目录</div>
+    <div class="ctx-item" onclick="ctxAction('pick', false)">🔄 重新选择其他案例目录</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item" onclick="ctxAction('load')">✅ 加载此案例</div>
+    <div class="ctx-item" onclick="ctxAction('saveas')">💾 另存为…</div>
+</div>
 
-        loadProjects();
-    </script>
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script src="/static/js/app.js?v=19"></script>
 </body>
 </html>

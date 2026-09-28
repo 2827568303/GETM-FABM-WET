@@ -1,0 +1,15 @@
+{
+  "method": "parsac",
+  "parameters": [
+    {
+      "max": 0.1,
+      "min": 0.005,
+      "module": "POM",
+      "param": "kDMinW"
+    }
+  ],
+  "n_iterations": 3,
+  "objective_function": "rmse",
+  "job_id": "20260917_170729_68c75f",
+  "started_at": "2026-09-17T17:07:29.867289"
+}

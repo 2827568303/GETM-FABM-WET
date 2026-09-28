@@ -1,1 +1,0 @@
-/usr/bin/gfortran  -ffree-line-length-none -O0 -g CMakeFiles/test_time.dir/test_time.F90.o -o test_time  ../util/libutil.a ../extern/flexout/extern/yaml/libyaml.a 

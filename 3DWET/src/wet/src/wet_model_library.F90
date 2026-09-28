@@ -22,6 +22,8 @@ module wet_model_library
    use wet_sediment_exchange
    use wet_bot_pel_interface
    use wet_bivalves
+   use wet_inorganic_carbon
+   use wet_methane
 
    implicit none
 
@@ -60,7 +62,9 @@ contains
          case ('zoobenthos');             allocate(type_wet_zoobenthos::model);
          case ('burial');                 allocate(type_wet_burial::model);
          case ('sediment_exchange');      allocate(type_wet_sediment_exchange::model);
-         case ('bot_pel_interface');      allocate(type_wet_bot_pel_interface::model);    
+         case ('bot_pel_interface');      allocate(type_wet_bot_pel_interface::model);
+         case ('inorganic_carbon');       allocate(type_wet_inorganic_carbon::model);
+         case ('methane');                allocate(type_wet_methane::model);
          case default
             call self%type_base_model_factory%create(name,model)
        end select

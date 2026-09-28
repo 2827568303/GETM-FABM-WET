@@ -1,1 +1,0 @@
-/usr/bin/gfortran-13  -ffree-line-length-none -O0 -g -fcheck=all -fbacktrace -U_GOTM_FABM_NML_ CMakeFiles/test_airsea.dir/test_airsea.F90.o -o test_airsea  ../util/libutil.a ../airsea/libairsea.a -linput_manager ../extern/flexout/extern/yaml/libyaml.a 

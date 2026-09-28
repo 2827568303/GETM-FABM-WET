@@ -1,2 +1,0 @@
-/usr/bin/ar qc libgotm_fabm_io.a CMakeFiles/gotm_fabm_io.dir/gotm_fabm_input.F90.o
-/usr/bin/ranlib libgotm_fabm_io.a

@@ -1,5 +1,0 @@
-# The fortran modules provided by this target.
-provides
- initialise.mod
- integration.mod
- register_all_variables.mod

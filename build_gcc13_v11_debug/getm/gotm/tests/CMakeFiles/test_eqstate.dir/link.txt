@@ -1,1 +1,0 @@
-/usr/bin/gfortran-13  -ffree-line-length-none -O0 -g -fcheck=all -fbacktrace -U_GOTM_FABM_NML_ CMakeFiles/test_eqstate.dir/test_eqstate.F90.o -o test_eqstate  ../util/libutil.a ../extern/flexout/extern/yaml/libyaml.a 

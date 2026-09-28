@@ -199,7 +199,7 @@ subroutine initialize(self,configunit)
    call self%register_state_variable(self%id_sDFi,  'sD',      'gDW/m3',  'DW',                                      initial_value= 0.5_rk,  minimum=self%cDFiMin,                   no_river_dilution=.TRUE.,  no_precipitation_dilution=.TRUE.)
    call self%register_state_variable(self%id_sPFi,  'sP',      'gP/m3',   'P',                                       initial_value= 0.011_rk,minimum=self%cDFiMin * self%cPDRef,     no_river_dilution=.TRUE.,  no_precipitation_dilution=.TRUE.)
    call self%register_state_variable(self%id_sNFi,  'sN',      'gN/m3',   'N',                                       initial_value= 0.05_rk, minimum=self%cDFiMin * self%cNDRef,     no_river_dilution=.TRUE.,  no_precipitation_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sCFi,  'sC',      'gN/m3',   'C',                                       initial_value= 0.05_rk, minimum=self%cDFiMin * self%cCDRef,     no_river_dilution=.TRUE.,  no_precipitation_dilution=.TRUE.)
+   call self%register_state_variable(self%id_sCFi,  'sC',      'gC/m3',   'C',                                       initial_value= 0.05_rk, minimum=self%cDFiMin * self%cCDRef,     no_river_dilution=.TRUE.,  no_precipitation_dilution=.TRUE.)
    call self%register_state_variable(self%id_fVul,  'fVul',    '-',       'biomass fraction vulnerable to predation',initial_value= 1.0_rk,  minimum=0.0_rk,                         no_river_dilution=.TRUE.,  no_precipitation_dilution=.TRUE.)
    if (self%qStage > 0) then
 	   call self%register_state_variable(self%id_sFRes, 'sFRes',   'gDW/m3',  'reserve fraction of biomass',         initial_value= 0.0_rk,  minimum=0.0_rk,                         no_river_dilution=.TRUE.,  no_precipitation_dilution=.TRUE.)

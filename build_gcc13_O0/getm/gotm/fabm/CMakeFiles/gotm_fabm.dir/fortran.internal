@@ -1,4 +1,0 @@
-# The fortran modules provided by this target.
-provides
- gotm_fabm.mod
- gotm_fabm_manipulation.mod

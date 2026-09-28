@@ -1,1 +1,0 @@
-/mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc9_v8/bin/getm_cartesian

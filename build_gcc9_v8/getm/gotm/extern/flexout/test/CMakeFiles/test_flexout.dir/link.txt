@@ -1,1 +1,0 @@
-/usr/bin/gfortran-9  -ffree-line-length-none -O1 -U_GOTM_FABM_NML_ CMakeFiles/test_flexout.dir/test_flexout.F90.o -o test_flexout  ../src/liboutput_manager.a ../extern/yaml/libyaml.a ../src/libfield_manager.a -L/usr/lib/x86_64-linux-gnu -lnetcdff -Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -Wl,-z,relro -Wl,-z,now -lnetcdf -lnetcdf -lm 

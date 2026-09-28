@@ -1,5 +1,5 @@
 &getm_fabm_nml
- fabm_init_method   =  2,
+ fabm_init_method   =  1,
  fabm_init_file    =  'fabm_init.nc',
  fabm_init_format  =  2,
  fabm_field_no     =  1,

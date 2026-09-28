@@ -1,2 +1,0 @@
-/usr/bin/ar qc libyaml.a CMakeFiles/yaml.dir/yaml_version.F90.o CMakeFiles/yaml.dir/yaml_types.F90.o CMakeFiles/yaml.dir/yaml_settings.F90.o CMakeFiles/yaml.dir/yaml.F90.o
-/usr/bin/ranlib libyaml.a

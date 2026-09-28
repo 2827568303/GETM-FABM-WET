@@ -1,2 +1,0 @@
-/usr/bin/ar qc libfield_manager.a CMakeFiles/field_manager.dir/field_manager.F90.o
-/usr/bin/ranlib libfield_manager.a

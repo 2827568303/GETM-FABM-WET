@@ -1,1 +1,0 @@
-/usr/bin/gfortran-13  -ffree-line-length-none -O1 -U_GOTM_FABM_NML_ CMakeFiles/test_albedo.dir/test_albedo.F90.o -o test_albedo  ../util/libutil.a ../airsea/libairsea.a -linput_manager ../extern/flexout/extern/yaml/libyaml.a 

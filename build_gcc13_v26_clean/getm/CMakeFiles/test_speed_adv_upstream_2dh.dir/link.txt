@@ -1,1 +1,0 @@
-/usr/bin/gfortran-13  -ffree-line-length-none -O2 -U_GOTM_FABM_NML_ CMakeFiles/test_speed_adv_upstream_2dh.dir/2d/test_speed_adv_upstream_2dh.F90.o -o test_speed_adv_upstream_2dh 

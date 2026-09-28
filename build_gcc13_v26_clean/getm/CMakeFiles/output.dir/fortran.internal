@@ -1,8 +1,0 @@
-# The fortran modules provided by this target.
-provides
- ascii_out.mod
- diagnostic_variables.mod
- ncdf_out.mod
- nesting.mod
- output.mod
- output_processing.mod

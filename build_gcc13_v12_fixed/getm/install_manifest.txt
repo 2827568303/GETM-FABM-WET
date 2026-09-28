@@ -1,1 +1,0 @@
-/mnt/c/Users/dinod/Desktop/GETM-FABM-WET/install_gcc13_v12_fixed/bin/getm_cartesian
