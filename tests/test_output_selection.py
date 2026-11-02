@@ -34,6 +34,14 @@ def output(path, variables, records=2, start=0):
                 variable[:] = 1
 
 
+def test_weekly_ecology_file_is_a_3d_candidate(tmp_path):
+    weekly = tmp_path / 'ext_wq.nc'
+    output(weekly, ['abiotic_water_sNH4W'], records=1)
+    files = load_function()(tmp_path)
+    assert files['3d'] == weekly
+    assert weekly in files['3d_candidates']
+
+
 def test_primary_ecology_is_preferred_but_legacy_velocity_accessible(tmp_path):
     primary = tmp_path / 'output/output.nc'
     legacy = tmp_path / 'output/lake.3d.nc'

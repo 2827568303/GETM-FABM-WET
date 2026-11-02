@@ -1363,10 +1363,14 @@ def find_output_files(case_path, var_name=None):
     cands = {"2d": [], "3d": []}
     discovered = list(case.glob("*.2d.nc")) + list(case.glob("*.3d.nc")) + \
                  list((case / "output").glob("*.2d.nc")) + list((case / "output").glob("*.3d.nc"))
+    for folder in (case, case / "output"):
+        extra = folder / "ext_wq.nc"
+        if extra.is_file():
+            discovered.append(extra)
     for f in discovered:
         if ".2d.nc" in f.name:
             cands["2d"].append(f)
-        elif ".3d.nc" in f.name:
+        elif ".3d.nc" in f.name or f.name == "ext_wq.nc":
             cands["3d"].append(f)
     primary = [case / 'output.nc', case / 'output' / 'output.nc']
     revision_paths = [*discovered, *primary]
@@ -1573,9 +1577,25 @@ def _get_2d_field_from_dataset(ds, var_name, timestep=0, level=0,
 
 def get_2d_field(nc_path, var_name, timestep=0, level=0, depth_average=False, include_bathymetry=True):
     """Extract one 2D field with a single hyperslab read from NetCDF."""
+    from result_slice_cache import lookup as _slice_lookup, store as _slice_store
+    cache_key = None
+    try:
+        stat = Path(nc_path).stat()
+        cache_key = (str(Path(nc_path).resolve()), int(stat.st_mtime_ns), int(stat.st_size),
+                     str(var_name), int(timestep), int(level), bool(depth_average),
+                     bool(include_bathymetry))
+    except (OSError, TypeError, ValueError):
+        cache_key = None
+    if cache_key is not None:
+        cached = _slice_lookup(cache_key)
+        if cached is not None:
+            return cached
     with nc_open(nc_path) as ds:
-        return _get_2d_field_from_dataset(ds, var_name, timestep, level,
-                                          depth_average, include_bathymetry)
+        result = _get_2d_field_from_dataset(ds, var_name, timestep, level,
+                                            depth_average, include_bathymetry)
+    if cache_key is not None and result is not None:
+        _slice_store(cache_key, result)
+    return result
 
 
 def get_2d_fields(nc_path, var_name, timesteps, level=0, depth_average=False,

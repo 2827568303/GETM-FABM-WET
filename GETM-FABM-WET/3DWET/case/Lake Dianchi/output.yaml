@@ -12,7 +12,7 @@ output:
       - source: D
       - source: hn
       - source: z
-      - source: abiotic_water/sO2W
+      - source: abiotic_water_sO2W
 ext_wq:
    time_unit: day
    time_step: 7

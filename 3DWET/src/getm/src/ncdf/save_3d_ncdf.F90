@@ -47,7 +47,8 @@
    use variables_3d, only: cc3d
 #endif
 #ifdef _FABM_
-   use getm_fabm,only: model,fabm_pel,fabm_ben,fabm_diag,fabm_diag_hz
+    use getm_fabm,only: model,fabm_pel,fabm_ben,fabm_diag,fabm_diag_hz
+    use output, only: save_fabm_native
 #endif
    use parameters,   only: g,rho_0
    use m3d, only: calc_temp,calc_salt
@@ -432,7 +433,7 @@
 #endif
 
 #ifdef _FABM_
-    if (allocated(fabm_pel)) then
+    if (save_fabm_native .and. allocated(fabm_pel) .and. allocated(fabm_ids)) then
       start(1) = 1
       start(2) = 1
       start(3) = 1

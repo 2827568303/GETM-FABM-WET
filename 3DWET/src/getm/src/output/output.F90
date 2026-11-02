@@ -38,6 +38,9 @@
    logical                             :: save_2d=.true.
    logical                             :: save_meteo=.false.
    logical                             :: save_3d=.true.
+   ! Ecology belongs in flexout (output.nc / ext_wq.nc). Writing every FABM
+   ! state into the native 3D file made one Dianchi day about 65 MB.
+   logical                             :: save_fabm_native=.false.
    logical                             :: save_mean=.false.
    logical                             :: save_vel=.true.
    logical                             :: destag=.false.
@@ -101,7 +104,7 @@
    namelist /io_spec/ &
              out_fmt,hotin_fmt,hotout_fmt, &
              in_dir,out_dir, save_metrics, save_masks, &
-             save_2d,save_3d,save_vel,destag, &
+             save_2d,save_3d,save_fabm_native,save_vel,destag, &
              save_strho,save_s,save_t,save_rho,save_rad, &
              save_turb,save_tke,save_eps,save_num,save_nuh, &
              save_ss_nn,save_taub, &

@@ -94,13 +94,17 @@ function resultVariablePriority(variable) {
     if (name==='ho2bod' || name.startsWith('ho2bod_')) return 2;
     // Rank only variables present in the actual results inventory. Names below
     // are output fields; model parameters and derived quantities are not added.
-    if (/^(elev|z|depth|water_depth|d|temp|temperature|u|v|w|uu|vv|ww)$/.test(name)) return 0;
+    if (/^(elev|z|depth|water_depth|d|temp|temperature|salt|salinity|u|v|w|uu|vv|ww)$/.test(name)) return 0;
+    if (/(^|[_-])s?o2w$/.test(name) || /abiotic_water_so2w$/.test(name)
+        || /(dissolved oxygen|溶解氧)/.test(`${name} ${label}`)) return 0;
+    // Chlorophyll, nutrients, organic matter and COD are loaded when chosen.
     if (/^(wet_)?(totn|totp|totnwater|totpwater|chla|total_chla|tot_chla|totsuspar)$/.test(name)
-        || /^wet_(totn|totp|chla)_calculator_result$/.test(name)) return 1;
-    if (/(^|[_-])s?(o2|nh4|no3|po4|tn|tp)w$/.test(name) || /abiotic_water_s(o2|nh4|no3|po4)w$/.test(name)) return 1;
+        || /^wet_(totn|totp|chla)_calculator_result$/.test(name)) return 2;
+    if (/(^|[_-])s?(nh4|no3|po4|tn|tp)w$/.test(name) || /abiotic_water_s(nh4|no3|po4)w$/.test(name)) return 2;
+    if (/(^|[_-])cod($|[_-])|化学需氧量/.test(`${name} ${label}`)) return 2;
     if ((/(^|[_-])bod($|[_-])|biochemical oxygen demand|生化需氧量/.test(`${name} ${label}`)) && !name.startsWith('ho2bod')) return 1;
-    if (/(dissolved oxygen|溶解氧|(^|[_-])ph($|[_-])|酸碱度|(^|[_-])cod($|[_-])|化学需氧量)/.test(`${name} ${label}`)) return 1;
-    if (/(^|[_-])(nh4|no3|po4|tn|tp)([_-]|$)|氨氮|硝酸盐|磷酸盐|总氮|总磷/.test(`${name} ${label}`)) return 1;
+    if (/(^|[_-])ph($|[_-])|酸碱度/.test(`${name} ${label}`)) return 1;
+    if (/(^|[_-])(nh4|no3|po4|tn|tp)([_-]|$)|氨氮|硝酸盐|磷酸盐|总氮|总磷/.test(`${name} ${label}`)) return 2;
     if (/total suspended|总悬浮|totsuspar/.test(`${name} ${label}`)) return 1;
     const biomass=/_sd(?:_pv)?$/.test(name) || /biomass|生物量|干重/.test(label);
     if (/(fish|jufish|adfish|piscfish|鱼类)/.test(`${name} ${label}`) && biomass) return 1;
