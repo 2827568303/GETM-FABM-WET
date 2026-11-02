@@ -409,6 +409,127 @@ def merge_case_rank_outputs(case, n, *, reference_name="bathymetry.nc"):
     return merged
 
 
+_NONFINITE_RE = re.compile(r"Non-finite value of FABM state variable\s+(\S+)")
+_RANK_FILE_RE = re.compile(r"\.(\d{4})\.(?:stdout|stderr)$", re.IGNORECASE)
+_PRTE_RANK_RE = re.compile(r"Process name:\s*\[[^,\]]+,\s*(\d+)\]")
+_STEP_RE = re.compile(r"\bn=\s*(\d+)")
+_MODEL_STAMP_RE = re.compile(r"(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2})")
+
+
+def _read_text(path):
+    try:
+        return Path(path).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+
+
+def _model_time_at_step(case, step):
+    """Map a printed GETM step count to the model clock in getm.inp."""
+    text = _read_text(Path(case) / "getm.inp")
+    timestep = re.search(r"(?im)^\s*timestep\s*=\s*([0-9]+(?:\.[0-9]*)?)", text)
+    start = re.search(r"(?im)^\s*start\s*=\s*'([^']+)'", text)
+    if timestep is None or start is None:
+        return None
+    from datetime import datetime, timedelta
+    raw = start.group(1).strip()
+    origin = None
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d"):
+        try:
+            origin = datetime.strptime(raw, fmt)
+            break
+        except ValueError:
+            continue
+    if origin is None:
+        return None
+    return origin + timedelta(seconds=float(timestep.group(1)) * int(step))
+
+
+def describe_mpi_solver_failure(case):
+    """Name the FABM variable, MPI rank and model date when a run stops."""
+    case = Path(case)
+    variable = None
+    rank = None
+    for path in sorted(case.glob("*")):
+        if not path.is_file() or _RANK_FILE_RE.search(path.name) is None:
+            continue
+        match = _NONFINITE_RE.search(_read_text(path))
+        if match is None:
+            continue
+        variable = match.group(1).rstrip(".,;")
+        rank = int(_RANK_FILE_RE.search(path.name).group(1))
+        break
+    log_rank = _PRTE_RANK_RE.search(_read_text(case / "model_run.log"))
+    if log_rank is not None:
+        rank = int(log_rank.group(1))
+    step = None
+    logged_date = None
+    if rank is not None:
+        for path in sorted(case.glob(f"*.{rank:04d}.*")):
+            text = _read_text(path)
+            steps = _STEP_RE.findall(text)
+            if steps:
+                step = int(steps[-1])
+            stamps = _MODEL_STAMP_RE.findall(text)
+            if stamps:
+                logged_date = stamps[-1].replace("T", " ")
+    if variable is None and rank is None and step is None:
+        return None
+    model_time = _model_time_at_step(case, step) if step is not None else None
+    parts = []
+    if variable:
+        parts.append(f"FABM 状态变量 {variable} 变为非有限值")
+    else:
+        parts.append("求解器报告了数值失败")
+    if rank is not None:
+        parts.append(f"rank {rank}")
+    if model_time is not None:
+        parts.append(model_time.strftime("模型时间 %Y-%m-%d %H:%M:%S"))
+    elif logged_date:
+        parts.append(f"模型日期 {logged_date}")
+    if step is not None:
+        parts.append(f"n={step}")
+    return "，".join(parts)
+
+
+def salvage_mpi_outputs(case, n, destination, *, reference_name="bathymetry.nc"):
+    """Publish a failed or stopped MPI run into a visible case directory.
+
+    A complete rank family is merged onto the reference grid. If that cannot
+    be done, the per-rank NetCDF files are copied so they stay loadable.
+    """
+    case = Path(case)
+    destination = Path(destination)
+    destination.mkdir(parents=True, exist_ok=True)
+    warning = None
+    merged_paths = []
+    try:
+        merged_paths = list(merge_case_rank_outputs(case, n, reference_name=reference_name))
+    except Exception as error:
+        warning = str(error)
+        merged_paths = []
+    published = []
+    for path in merged_paths:
+        path = Path(path)
+        if not path.is_file():
+            continue
+        target = destination / path.name
+        if target.exists():
+            target.unlink()
+        shutil.copy2(path, target)
+        published.append(target)
+    shards = []
+    if not published:
+        for shard in sorted(case.glob("*.????.nc")):
+            if re.fullmatch(r".+\.\d{4}\.nc", shard.name) is None:
+                continue
+            target = destination / shard.name
+            if target.exists():
+                target.unlink()
+            shutil.copy2(shard, target)
+            shards.append(target)
+    return {"merged": published, "shards": shards, "warning": warning}
+
+
 def prepare_mpi_case(source, *, msg_method=3, process_count=1, disable_hotstart=False):
     """Create a disposable run copy and configure GETM parallel namelists there."""
     source = Path(source).resolve()

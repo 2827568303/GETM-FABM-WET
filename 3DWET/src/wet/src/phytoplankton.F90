@@ -428,14 +428,22 @@ subroutine do(self,_ARGUMENTS_DO_)
              !------------------------------------------------------------------------------------------------------!
              aVNUptMaxCr = max(0.0_rk,self%cVNUptMax * uFunTm * (self%cNDMax - rNDW) /(self%cNDMax - self%cNDMin))  ! maximum specific N uptake rate, corrected for N/D ratio
              ahNUpt = aVNUptMaxCr / self%cAffNUpt                                                                   ! half-sat. N for uptake
-             aVNUpt = (sNO3W + sNH4W) * aVNUptMaxCr /(ahNUpt + sNO3W + sNH4W)                                       ! current specific N uptake rate
+             if (aVNUptMaxCr > 0.0_rk .and. (sNH4W + sNO3W) > 0.0_rk) then                                          !
+                aVNUpt = (sNO3W + sNH4W) * aVNUptMaxCr /(ahNUpt + sNO3W + sNH4W)                                    ! current specific N uptake rate
+             else                                                                                                   ! zero DIN or zero capacity is 0/0
+                aVNUpt = 0.0_rk                                                                                     !
+             end if                                                                                                 !
              wNUpt = aVNUpt * sDW                                                                                   ! absolute N uptake rate
              wNFix = aNFix * sDW                                                                                    ! absolute N fixation rate
              !::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!
              ! 3.2.2 Phosphorous                                                                                    !
              !------------------------------------------------------------------------------------------------------!
              aVPUptMaxCr = max(0.0_rk,self%cVPUptMax * uFunTm *(self%cPDMax - rPDW)/(self%cPDMax - self%cPDMin))    ! maximum specific P uptake rate, corrected for P/D ratio
-             aVPUpt = sPO4W * aVPUptMaxCr /(aVPUptMaxCr / self%cAffPUpt + sPO4W)                                    ! realized specific P uptake rate
+             if (aVPUptMaxCr > 0.0_rk .and. sPO4W > 0.0_rk) then                                                     !
+                aVPUpt = sPO4W * aVPUptMaxCr /(aVPUptMaxCr / self%cAffPUpt + sPO4W)                                 ! realized specific P uptake rate
+             else                                                                                                   ! zero PO4 or quota at the cap is 0/0
+                aVPUpt = 0.0_rk                                                                                     !
+             end if                                                                                                 !
              wPUpt = aVPUpt * sDW                                                                                   ! absolute P uptake rate
    !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%!
    ! 4. calculate respiration, excretion and mortality                                                              !
@@ -476,7 +484,11 @@ subroutine do(self,_ARGUMENTS_DO_)
            !::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!
            ! 5.2.2 nitrogen                                                                                         !
            !--------------------------------------------------------------------------------------------------------!
-           afNH4Upt = sNH4W*sNO3W/((ahNUpt+sNH4W)*(ahNUpt+sNO3W)) + sNH4W*ahNUpt/((sNH4W+sNO3W)*(ahNUpt+sNO3W))     ! fraction of N uptake taken as ammonia
+           if ((sNH4W + sNO3W) > 0.0_rk .and. (ahNUpt + sNH4W) > 0.0_rk .and. (ahNUpt + sNO3W) > 0.0_rk) then       !
+              afNH4Upt = sNH4W*sNO3W/((ahNUpt+sNH4W)*(ahNUpt+sNO3W)) + sNH4W*ahNUpt/((sNH4W+sNO3W)*(ahNUpt+sNO3W))  ! fraction of N uptake taken as ammonia
+           else                                                                                                     ! empty DIN makes the WASP fraction 0/0
+              afNH4Upt = 0.0_rk                                                                                     !
+           end if                                                                                                   !
            wNUptNH4 = afNH4Upt * wNUpt                                                                              ! absolute ammonia uptake
            wNMortNH4W = self%fDissMort * wNMortW                                                                    ! fraction of mortality N released as ammonia
            wNNH4W = wNExcrW + wNMortNH4W - wNUptNH4                                                                 ! total flux of ammonia to the water column

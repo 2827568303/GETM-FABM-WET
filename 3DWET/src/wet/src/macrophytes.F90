@@ -500,13 +500,21 @@ subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
            !--------------------------------------------------------------------------------------------------------!
            ahNUptVeg = aVNUptMaxCrVeg / self%cAffNUptVeg                                                            ! half-sat. 'constant' for N uptake
            if (.NOT. self%lEmpUpt) then                                                                             !
-              aVNUptVegW = oNDissW * aVNUptMaxCrVeg / (ahNUptVeg + oNDissW)                                         ! N uptake RATE by subm AND floating parts
+              if (aVNUptMaxCrVeg > 0.0_rk .and. oNDissW > 0.0_rk) then                                              ! zero DIN or zero capacity is 0/0
+                 aVNUptVegW = oNDissW * aVNUptMaxCrVeg / (ahNUptVeg + oNDissW)                                      ! N uptake RATE by subm AND floating parts
+              else                                                                                                  !
+                 aVNUptVegW = 0.0_rk                                                                                !
+              end if                                                                                                !
               tNUptVegW = aVNUptVegW * (aDSubVeg + aDFloatVeg)                                                      ! N uptake from water (by shoots)
               aVNUptVegS = oNDissS * aVNUptMaxCrVeg / (ahNUptVeg + oNDissS)                                         ! N uptake RATE of roots
               tNUptVegS = aVNUptVegS * aDRootVeg                                                                    ! N uptake from pore water (by roots)
            else                                                                                                     !
               aVNUptVegW = 0.0_rk                                                                                   ! N uptake RATE by subm AND floating parts
-              tNUptVegW = (1.0_rk - afNUptVegS) * aVNUptMaxCrVeg * oNDissW / (ahNUptVeg + oNDissW) * sDVeg          ! N uptake from water (by shoots)
+              if (aVNUptMaxCrVeg > 0.0_rk .and. oNDissW > 0.0_rk) then                                              ! zero DIN or zero capacity is 0/0
+                 tNUptVegW = (1.0_rk - afNUptVegS) * aVNUptMaxCrVeg * oNDissW / (ahNUptVeg + oNDissW) * sDVeg       ! N uptake from water (by shoots)
+              else                                                                                                  !
+                 tNUptVegW = 0.0_rk                                                                                 !
+              end if                                                                                                !
               aVNUptVegS = 0.0                                                                                      ! N uptake RATE of roots
               tNUptVegS = afNUptVegS * aVNUptMaxCrVeg * oNDissS / (ahNUptVeg + oNDissS) * sDVeg                     ! N uptake from pore water (by roots)
            endif                                                                                                    !
@@ -516,15 +524,27 @@ subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
            !--------------------------------------------------------------------------------------------------------!
            ahPUptVeg = aVPUptMaxCrVeg / self%cAffPUptVeg                                                            ! half-sat. 'constant' for P uptake
            if (.NOT. self%lEmpUpt) then                                                                             !
-              aVPUptVegW = sPO4W * aVPUptMaxCrVeg / (ahPUptVeg + sPO4W)                                             ! P uptake RATE by subm AND floating parts
+              if (aVPUptMaxCrVeg > 0.0_rk .and. sPO4W > 0.0_rk) then                                                ! zero PO4 or quota at the cap is 0/0
+                 aVPUptVegW = sPO4W * aVPUptMaxCrVeg / (ahPUptVeg + sPO4W)                                          ! P uptake RATE by subm AND floating parts
+              else                                                                                                  !
+                 aVPUptVegW = 0.0_rk                                                                                !
+              end if                                                                                                !
               aVPUptVegS = oPO4S * aVPUptMaxCrVeg / (ahPUptVeg + oPO4S + NearZero)                                  ! P uptake rate by roots
               tPUptVegW = aVPUptVegW * (aDSubVeg + aDFloatVeg)                                                      ! P uptake from water
               tPUptVegS = aVPUptVegS * aDRootVeg                                                                    ! P uptake from pore water (by root fraction)
            else                                                                                                     !               
               aVPUptVegW = 0.0_rk                                                                                   ! P uptake RATE by subm AND floating parts
               aVPUptVegS = 0.0_rk                                                                                   ! P uptake rate by roots
-              tPUptVegW = (1.0 - afPUptVegS) * aVPUptMaxCrVeg * sPO4W / (ahPUptVeg + sPO4W) * sDVeg                 ! P uptake from water
-              tPUptVegS = afPUptVegS * aVPUptMaxCrVeg * oPO4S / (ahPUptVeg + oPO4S) * sDVeg                         ! P uptake from pore water (by root fraction)
+              if (aVPUptMaxCrVeg > 0.0_rk .and. sPO4W > 0.0_rk) then                                                ! zero PO4 or quota at the cap is 0/0
+                 tPUptVegW = (1.0 - afPUptVegS) * aVPUptMaxCrVeg * sPO4W / (ahPUptVeg + sPO4W) * sDVeg              ! P uptake from water
+              else                                                                                                  !
+                 tPUptVegW = 0.0_rk                                                                                 !
+              end if                                                                                                !
+              if (aVPUptMaxCrVeg > 0.0_rk .and. oPO4S > 0.0_rk) then                                                ! zero pore-water PO4 or quota cap is 0/0
+                 tPUptVegS = afPUptVegS * aVPUptMaxCrVeg * oPO4S / (ahPUptVeg + oPO4S) * sDVeg                      ! P uptake from pore water (by root fraction)
+              else                                                                                                  !
+                 tPUptVegS = 0.0_rk                                                                                 !
+              end if                                                                                                !
            endif                                                                                                    !
            tPUptVeg = tPUptVegW + tPUptVegS                                                                         ! total P uptake macrophytes
    !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%!

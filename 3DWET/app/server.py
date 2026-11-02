@@ -2549,7 +2549,9 @@ def run_model_thread(case_path, exe_path, threads=None):
 def run_mpi_model_thread(case_path, launcher, solver, process_count, runtime_dirs=None):
     """Run an MPI executable group and publish results only after rank merge."""
     global run_process, run_status, run_logs, run_case_path, run_config
-    from mpi_runner import MpiRun, merge_case_rank_outputs, prepare_mpi_case
+    from mpi_runner import (MpiRun, describe_mpi_solver_failure,
+                            merge_case_rank_outputs, prepare_mpi_case,
+                            salvage_mpi_outputs)
     original_case = Path(case_path).resolve()
     case = None
     runner = None
@@ -2701,7 +2703,14 @@ def run_mpi_model_thread(case_path, launcher, solver, process_count, runtime_dir
         # outputs. Only a launch that never started stepping falls back.
         returncode = getattr(run_process, "returncode", None)
         never_started = runner is None or run_process is None or returncode not in (0, None)
-        if run_status != "stopped" and never_started and not saw_step and elapsed < 180:
+        diagnosed = False
+        if case is not None:
+            chunks = []
+            for path in [case / "model_run.log", *case.glob("*.stdout"), *case.glob("*.stderr")]:
+                if path.is_file():
+                    chunks.append(path.read_text(encoding="utf-8", errors="replace")[-20000:])
+            diagnosed = log_has_solver_failure("\n".join(chunks))
+        if run_status != "stopped" and never_started and not saw_step and not diagnosed and elapsed < 180:
             run_logs.append(f"[WARN] MPI 没有开始步进（{error}），改用 1 个线程。")
             if isinstance(run_config, dict):
                 run_config["omp_threads"] = 1
@@ -2721,6 +2730,9 @@ def run_mpi_model_thread(case_path, launcher, solver, process_count, runtime_dir
             run_model_thread(original_case, serial_exe, 1)
         elif run_status != "stopped":
             run_status = "failed"
+            detail = describe_mpi_solver_failure(case) if case is not None else None
+            if detail:
+                run_logs.append(f"[ERROR] {detail}")
             run_logs.append(f"[ERROR] MPI run failed: {error}")
     finally:
         if isinstance(run_config, dict) and run_config.get("solver_mode", "").startswith("MPI"):
@@ -2734,6 +2746,19 @@ def run_mpi_model_thread(case_path, launcher, solver, process_count, runtime_dir
             if run_status == "completed":
                 shutil.rmtree(case, ignore_errors=True)
             else:
+                try:
+                    saved = salvage_mpi_outputs(case, process_count, original_case / "output")
+                    names = [path.name for path in saved["merged"]] + [path.name for path in saved["shards"]]
+                    if names:
+                        run_logs.append("[INFO] 失败前的输出已保存到 output/：" + ", ".join(names))
+                    elif saved["warning"]:
+                        run_logs.append(f"[WARN] 无法保存失败前的 MPI 输出: {saved['warning']}")
+                    if run_status == "stopped":
+                        detail = describe_mpi_solver_failure(case)
+                        if detail:
+                            run_logs.append(f"[ERROR] {detail}")
+                except Exception as error:
+                    run_logs.append(f"[WARN] 无法保存失败前的 MPI 输出: {error}")
                 try:
                     shutil.copy2(case / "model_run.log", original_case / "model_run.mpi.log")
                     for pattern in ("*.stdout", "*.stderr"):

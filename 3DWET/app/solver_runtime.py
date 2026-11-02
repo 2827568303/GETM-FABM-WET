@@ -27,6 +27,7 @@ def log_has_solver_failure(log):
     """Recognize failures without treating 'NaN checks disabled' as an error."""
     return bool(re.search(
         r'(?im)^\s*STOP\s+[1-9]\d*\b|'
+        r'Non-finite value of FABM state variable\s+\S+|'
         r'^\s*Error:\s*state variable\s+\d+\s+is zero and has negative derivative!|'
           r'\b(?:fatal_error|FATAL GETM ERROR|FATAL ERROR|out-of-bound values encountered|'
         r'IEEE_INVALID(?:_FLAG)?|IEEE_DIVIDE_BY_ZERO(?:_FLAG)?|Floating invalid|forrtl:)'
