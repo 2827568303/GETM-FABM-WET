@@ -1,0 +1,6 @@
+﻿[js]      0 diag51 ready
+[js]      0 ready (ExitProcess blocked)
+pid 50124
+[js]   2427 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8
+form hwnds ['0x1780f32']
+form thread id 50124

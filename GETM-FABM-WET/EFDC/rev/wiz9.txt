@@ -1,0 +1,14 @@
+﻿[js]      1 diag51 ready
+[js]      0 diag98 ready
+[js]      0 ready (ExitProcess blocked)
+pid 32720
+[js]   3126 BEFORE hwnd=0x2ac81252 title="Activation Wizard" style=0x6c80000 vis=0
+[js]   3135 AFTER  vis=1 style=0x16c80000
+[js]   3135 children(5): ThunderRT6Frame,ThunderRT6CommandButton,ThunderRT6CheckBox,ThunderRT6Frame,ThunderRT6TextBox
+t=6s [('0x2ac81252', 1, 643, 489)]
+saved t=6
+[js]   9690 ExitProcess(0) blocked; sleeping forever on tid=33500
+t=10s [('0x2ac81252', 1, 643, 489)]
+saved t=10
+t=14s [('0x2ac81252', 1, 643, 489)]
+saved t=14

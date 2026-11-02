@@ -1,0 +1,42 @@
+﻿[js]      0 diag6 ready
+pid 34892
+[  1.00] CPU  12.4%
+[js]   1317 WSASEND dump err Error: access violation accessing 0xe0
+[  2.01] CPU   7.8%
+[js]   2306 SEND [109B] from System.ni.dll+0x21bf84: CONNECT www.eems-analytics.info:443 HTTP/1.1\r\nHost: www.eems-analytics.info\r\nProxy-Connection: Keep-Alive\r\n\r\n
+[js]   2308 SEND [125B] from System.ni.dll+0x21bf84: ....x...t..j.@Oy`L'.P.w .:Rx..r<A.......Y......\n.......5./...?.........www.eems-analytics.info.\n.................#...........
+[js]   3004 SEND [79B] from System.ni.dll+0x21bf84: CONNECT www.eems-analytics.info:443 HTTP/1.1\r\nHost: www.eems-analytics.info\r\n\r\n
+[js]   3004 SEND [125B] from System.ni.dll+0x21bf84: ....x...t..j.@P../. ..5....)1...'*..\r...P.]....\n.......5./...?.........www.eems-analytics.info.\n.................#...........
+[  3.02] CPU   7.8%
+[  4.03] CPU   3.1%
+[  5.04] CPU   0.0%
+[  6.04] CPU   0.0%
+[  7.05] CPU   0.0%
+[  8.06] CPU   0.0%
+[  9.07] CPU   0.0%
+[ 10.07] CPU   0.0%
+[ 11.07] CPU   0.0%
+[ 12.07] CPU   0.0%
+[ 13.08] CPU   0.0%
+[ 14.09] CPU   0.0%
+[ 15.09] CPU   0.0%
+[ 16.09] CPU   0.0%
+[ 17.10] CPU   0.0%
+[ 18.11] CPU   0.0%
+[ 19.12] CPU   0.0%
+[ 20.13] CPU   0.0%
+[ 21.13] CPU   0.0%
+[ 22.14] CPU   0.0%
+[ 23.14] CPU   0.0%
+[ 24.15] CPU   0.0%
+[ 25.16] CPU   0.0%
+[ 26.16] CPU   0.0%
+[ 27.17] CPU   0.0%
+[ 28.17] CPU   0.0%
+[ 29.18] CPU   0.0%
+[ 30.19] CPU   0.0%
+[ 31.20] CPU   0.0%
+[ 32.20] CPU   0.0%
+[ 33.21] CPU   0.0%
+[ 34.22] CPU   0.0%
+done; leaving process alive

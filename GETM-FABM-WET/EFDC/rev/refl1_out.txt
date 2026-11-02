@@ -1,0 +1,6 @@
+﻿===== EFDC 商业版8.4\DSILIC0.dll =====
+DSILIC0, Version=1.0.0.1, Culture=neutral, PublicKeyToken=null
+types: 0
+===== EFDC 商业版8.4\DSILIC1.dll =====
+DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null
+types: 0

@@ -228,9 +228,11 @@ subroutine initialize(self,configunit)
        call self%register_diagnostic_variable(self%id_tDSed,       'tDSed',          'g/m3/s','rate DW sedimentation',                output=output_instantaneous, domain=domain_bottom, source=source_do_bottom   )
        call self%register_diagnostic_variable(self%id_tPSed,       'tPSed',          'g/m3/s','rate P sedimentation',                 output=output_instantaneous, domain=domain_bottom, source=source_do_bottom   )
        call self%register_diagnostic_variable(self%id_tNSed,       'tNSed',          'g/m3/s','rate N sedimentation',                 output=output_instantaneous, domain=domain_bottom, source=source_do_bottom   )
+       call self%register_diagnostic_variable(self%id_tCSed,       'tCSed',          'g/m3/s','rate C sedimentation',                 output=output_instantaneous, domain=domain_bottom, source=source_do_bottom   )
        call self%register_diagnostic_variable(self%id_tDResus,     'tDResus',        'g/m3/s','rate DW resuspension',                 output=output_instantaneous, domain=domain_bottom, source=source_do_bottom   )
        call self%register_diagnostic_variable(self%id_tPResus,     'tPResus',        'g/m3/s','rate P resuspension',                  output=output_instantaneous, domain=domain_bottom, source=source_do_bottom   )
        call self%register_diagnostic_variable(self%id_tNResus,     'tNResus',        'g/m3/s','rate N resuspension',                  output=output_instantaneous, domain=domain_bottom, source=source_do_bottom   )
+       call self%register_diagnostic_variable(self%id_tCResus,     'tCResus',        'g/m3/s','rate C resuspension',                  output=output_instantaneous, domain=domain_bottom, source=source_do_bottom   )
        call self%register_diagnostic_variable(self%id_tDDOMS,      'tDDOMS',         'g/m3/s','rate DDOMS from mortality',            output=output_instantaneous, domain=domain_bottom, source=source_do_bottom   )
        call self%register_diagnostic_variable(self%id_tNMortNH4S,  'tNMortNH4S',     'g/m3/s','rate HN4S from mortality',             output=output_instantaneous, domain=domain_bottom, source=source_do_bottom   )
        call self%register_diagnostic_variable(self%id_tNExcrS,     'tNExcrS',        'g/m3/s','rate HN4S excreted',                   output=output_instantaneous, domain=domain_bottom, source=source_do_bottom   )
@@ -395,8 +397,8 @@ subroutine do(self,_ARGUMENTS_DO_)
         !===========================================================================================================!
         ! 2.3 nutrient limitation function                                                                          !
         !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!
-        aPLim = max(0.0_rk,(1.0_rk - self%cPDMin / rPDW) * self%cPDMax /(self%cPDMax - self%cPDMin))                ! droop function for phospherous
-        aNLim = max(0.0_rk,(1.0_rk - self%cNDMin / rNDW) * self%cNDMax /(self%cNDMax - self%cNDMin))                ! droop function for nitrogen
+        aPLim = min(1.0_rk,max(0.0_rk,(1.0_rk - self%cPDMin / rPDW) * self%cPDMax /(self%cPDMax - self%cPDMin))) ! droop function for phospherous
+        aNLim = min(1.0_rk,max(0.0_rk,(1.0_rk - self%cNDMin / rNDW) * self%cNDMax /(self%cNDMax - self%cNDMin))) ! droop function for nitrogen
         if (self%lSi) then                                                                                          ! if silica is used
            aSiLim = sSiO2W /(self%hSiAss + sSiO2W)                                                                  !   calculate growth dependence on silica
         else                                                                                                        !

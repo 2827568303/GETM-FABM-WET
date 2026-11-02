@@ -1,0 +1,4 @@
+     1 diag51 ready
+     0 raiser hook fail Error: unable to intercept function at 61D184A7; please file a bug
+     0 SoftModalMessageBox replaced (自动按 OK)
+     0 diag22 ready

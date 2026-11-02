@@ -1,0 +1,285 @@
+﻿[js]      3 diag4 ready
+pid 36224
+[js]      4 CreateEvent name="" from combase.dll+0x118cb8
+[js]      4 CreateEvent name="" from combase.dll+0x118cc8
+[js]      4 WaitForSingleObjectEx(h=0x304, ms=-1) from combase.dll+0x1004c3
+[js]      4 CreateEvent name="" from combase.dll+0xe951d
+[js]      8 CreateMutex name="AudioDevProps2Mtx32" from AudioDevProps2.dll+0x202e1
+[js]      8 OpenMutex name="AudioDevProps2Mtx32" from AudioDevProps2.dll+0x20303
+[js]     16 WaitForSingleObjectEx(h=0x33c, ms=-1) from MSCTF.dll+0x5e669
+[js]     21 WaitForSingleObjectEx(h=0xe8, ms=-1) from clbcatq.dll+0x2ef44
+[js]     21 CreateEvent name="" from combase.dll+0xa52a0
+[js]     23 WaitForSingleObjectEx(h=0x368, ms=-1) from OLEAUT32.dll+0x428b8
+[js]     25 CreateEvent name="" from MPR.dll+0x3abb
+[js]     25 CreateEvent name="" from MPR.dll+0x3ad6
+[js]     30 CreateEvent name="" from RPCRT4.dll+0x1f961
+[js]     34 CreateMutex name="" from mscoree.dll+0x1c573
+[js]     34 CreateMutex name="" from mscoreei.dll+0x1298
+[js]     34 WaitForSingleObject(h=0x3b0, ms=-1) from mscoreei.dll+0x2ec92
+[js]     34 WaitForSingleObjectEx(h=0x3b0, ms=-1) from KERNELBASE.dll+0x15e772
+[js]     38 WaitForSingleObject(h=0x3b0, ms=-1) from mscoreei.dll+0x2e0cb
+[js]     38 WaitForSingleObjectEx(h=0x3b0, ms=-1) from KERNELBASE.dll+0x15e772
+[js]     38 CreateEvent name="" from clr.dll+0x5d704
+[js]     38 CreateEvent name="" from clr.dll+0x5d704
+[js]     38 CreateEvent name="" from clr.dll+0x5d704
+[js]     38 OpenEvent name="Global\\CLR_PerfMon_StartEnumEvent" from clr.dll+0xef8f5
+[js]     38 CreateEvent name="" from clr.dll+0x5d704
+[js]     41 CreateEvent name="" from clr.dll+0x5d704
+[js]     41 WaitForSingleObject(h=0x3fc, ms=4000) from KERNELBASE.dll+0x1ac4b9
+[js]     41 WaitForSingleObjectEx(h=0x3fc, ms=4000) from KERNELBASE.dll+0x15e772
+[js]     41 CreateEvent name="" from clr.dll+0xf4dab
+[js]     41 CreateEvent name="" from clr.dll+0xf4dab
+[js]     41 CreateEvent name="" from clr.dll+0xf4dab
+[js]     41 CreateEvent name="" from clr.dll+0xf4dab
+[js]     41 CreateEvent name="" from clr.dll+0xf4dab
+[js]     41 CreateEvent name="" from clr.dll+0xf4dab
+[js]     41 CreateEvent name="" from clr.dll+0xf4dab
+[js]     42 CreateEvent name="" from clr.dll+0xf4e81
+[js]     42 CreateEvent name="" from clr.dll+0xf4ebd
+[js]     42 CreateEvent name="" from clr.dll+0xf4dab
+[js]     42 CreateMutex name="" from clr.dll+0xf1909
+[js]     42 CreateEvent name="" from clr.dll+0x5d704
+[js]     42 CreateEvent name="" from clr.dll+0x5d704
+[js]     42 CreateEvent name="" from clr.dll+0x5d704
+[js]     42 CreateEvent name="" from clr.dll+0x5d704
+[js]     42 OpenEvent name="Global\\CLR_PerfMon_StartEnumEvent" from clr.dll+0xef8f5
+[js]     42 CreateEvent name="" from clr.dll+0xb60bb
+[js]     42 CreateEvent name="" from clr.dll+0x5d704
+[js]     42 CreateEvent name="" from clr.dll+0x5d704
+[js]     42 CreateEvent name="" from clr.dll+0x5d704
+[js]     42 CreateEvent name="" from clr.dll+0x5d704
+[js]     42 CreateEvent name="" from clr.dll+0xb60bb
+[js]     42 CreateEvent name="" from clr.dll+0x5d704
+[js]     42 CreateEvent name="" from clr.dll+0x5d704
+[js]     42 CreateEvent name="" from clr.dll+0x5d704
+[js]     43 CreateEvent name="" from clr.dll+0x5d704
+[js]     43 CreateEvent name="" from clr.dll+0xf7b54
+[js]     43 CreateEvent name="" from clr.dll+0x5d704
+[js]     43 CreateEvent name="" from clr.dll+0x5d704
+[js]     43 CreateEvent name="" from clr.dll+0xb60bb
+[js]     43 CreateEvent name="" from clr.dll+0xb60bb
+[js]     43 CreateEvent name="" from clr.dll+0xb60bb
+[js]     43 CreateEvent name="" from clr.dll+0x5d704
+[js]     43 CreateEvent name="" from clr.dll+0x5d704
+[js]     43 CreateEvent name="" from clr.dll+0x5d704
+[js]     43 CreateEvent name="" from clr.dll+0x5d704
+[js]     43 WaitForSingleObject(h=0x438, ms=3000) from clr.dll+0xe89c8
+[js]     43 WaitForSingleObjectEx(h=0x438, ms=3000) from KERNELBASE.dll+0x15e772
+[js]     47 CreateEvent name="" from clr.dll+0x5d704
+[js]     50 CreateEvent name="" from RPCRT4.dll+0x1d71a
+[js]     50 OpenEvent name="MSFT.VSA.COM.DISABLE.36224" from combase.dll+0x86ce6
+[js]     50 OpenEvent name="MSFT.VSA.IEC.STATUS.6c736db0" from KERNELBASE.dll+0x16ba0d
+[js]     50 CreateEvent name="" from combase.dll+0xfd7e4
+[js]     50 CreateEvent name="" from combase.dll+0xd6858
+[js]     50 CreateEvent name="" from combase.dll+0x831c5
+[js]     51 CreateEvent name="" from combase.dll+0x118cb8
+[js]     51 CreateEvent name="" from combase.dll+0x118cc8
+[js]     51 CreateEvent name="" from RPCRT4.dll+0x1f961
+[js]     52 WaitForSingleObjectEx(h=0x4e8, ms=-1) from wldp.dll+0x4e0e2
+[js]     53 CreateEvent name="Global\\CPFATE_36224_v4.0.30319" from clr.dll+0x10b73f
+[js]     53 WaitForSingleObjectEx(h=0x47c, ms=2000) from clr.dll+0x1dfcd
+[js]     53 CreateEvent name="" from combase.dll+0xe214d
+[js]     53 CreateEvent name="" from combase.dll+0xe951d
+[js]     53 WaitForSingleObjectEx(h=0x47c, ms=2000) from clr.dll+0x1dfcd
+[js]     54 CreateEvent name="" from bcrypt.dll+0x10ac2
+[js]     55 CreateEvent name="" from clr.dll+0x5d704
+[js]     55 CreateEvent name="" from clr.dll+0x5d704
+[js]     55 CreateEvent name="" from clr.dll+0x5d704
+[js]     55 CreateEvent name="" from clr.dll+0x5d704
+[js]     55 CreateEvent name="" from clr.dll+0x5d704
+[js]     69 WaitForSingleObjectEx(h=0x5b8, ms=-1) from windows.storage.dll+0x1b0719
+[js]     71 WaitForSingleObject(h=0x3b0, ms=-1) from mscoreei.dll+0x2ec92
+[js]     71 WaitForSingleObjectEx(h=0x3b0, ms=-1) from KERNELBASE.dll+0x15e772
+[js]     71 WaitForSingleObject(h=0x3b0, ms=-1) from mscoreei.dll+0x2e0cb
+[js]     71 WaitForSingleObjectEx(h=0x3b0, ms=-1) from KERNELBASE.dll+0x15e772
+[js]     76 WaitForSingleObjectEx(h=0x5c4, ms=-1) from uxtheme.dll+0x34d95
+[js]     88 WaitForSingleObjectEx(h=0x5f8, ms=-1) from combase.dll+0x1004c3
+[js]     92 CreateEvent name="" from combase.dll+0xe8f67
+[js]     92 CreateEvent name="" from combase.dll+0xe8f67
+[js]     92 CreateEvent name="" from RPCRT4.dll+0x1f961
+[js]     92 WaitForSingleObject(h=0x3fc, ms=4000) from KERNELBASE.dll+0x1ac4b9
+[js]     92 WaitForSingleObjectEx(h=0x3fc, ms=4000) from KERNELBASE.dll+0x15e772
+[js]     97 WaitForSingleObjectEx(h=0x62c, ms=-1) from fastprox.dll+0xd17f
+[  1.01] CPU  12.4%
+[js]   1228 CreateEvent name="" from clr.dll+0x5d704
+[js]   1242 CreateSemaphore name="<bad>" from clr.dll+0xa78e7
+[js]   1242 CreateEvent name="" from clr.dll+0xb60bb
+[js]   1242 CreateSemaphore name="<bad>" from clr.dll+0xa78e7
+[js]   1242 CreateEvent name="" from clr.dll+0xb60bb
+[js]   1250 CreateEvent name="" from msxml3.dll+0x64b9a
+[js]   1250 WaitForSingleObjectEx(h=0x688, ms=-1) from msxml3.dll+0x9dfe9
+[js]   1250 CreateEvent name="" from msxml3.dll+0x543c5
+[js]   1262 CreateEvent name="" from comsvcs.dll+0x45694
+[js]   1269 CreateEvent name="" from comsvcs.dll+0x4343f
+[js]   1269 CreateEvent name="" from comsvcs.dll+0x43454
+[js]   1269 WaitForSingleObject(h=0x6c0, ms=-1) from comsvcs.dll+0x434c7
+[js]   1269 WaitForSingleObjectEx(h=0x6c0, ms=-1) from KERNELBASE.dll+0x15e772
+[js]   1278 CreateEvent name="" from windows.storage.dll+0x119b87
+[js]   1278 CreateEvent name="" from windows.storage.dll+0x119b87
+[js]   1279 CreateEvent name="" from windows.storage.dll+0x119b87
+[js]   1279 CreateEvent name="" from windows.storage.dll+0x119b87
+[js]   1279 CreateEvent name="" from windows.storage.dll+0x119b87
+[js]   1280 CreateEvent name="" from windows.storage.dll+0x119b87
+[js]   1288 CreateEvent name="" from wininet.dll+0xb2095
+[js]   1292 CreateEvent name="" from RPCRT4.dll+0x1f961
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1c1f
+[js]   1292 WaitForSingleObject(h=0x784, ms=-1) from WINNSI.DLL+0x1c81
+[js]   1292 WaitForSingleObjectEx(h=0x784, ms=-1) from KERNELBASE.dll+0x15e772
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1d38
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1da2
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1dcf
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1f9d
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1c1f
+[js]   1292 WaitForSingleObject(h=0x784, ms=-1) from WINNSI.DLL+0x1c81
+[js]   1292 WaitForSingleObjectEx(h=0x784, ms=-1) from KERNELBASE.dll+0x15e772
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1d38
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1da2
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1dcf
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1c1f
+[js]   1292 WaitForSingleObject(h=0x784, ms=-1) from WINNSI.DLL+0x1c81
+[js]   1292 WaitForSingleObjectEx(h=0x784, ms=-1) from KERNELBASE.dll+0x15e772
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1d38
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1da2
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1dcf
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1c1f
+[js]   1292 WaitForSingleObject(h=0x784, ms=-1) from WINNSI.DLL+0x1c81
+[js]   1292 WaitForSingleObjectEx(h=0x784, ms=-1) from KERNELBASE.dll+0x15e772
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1d38
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1da2
+[js]   1292 CreateEvent name="" from WINNSI.DLL+0x1dcf
+[js]   1292 WaitForSingleObjectEx(h=0x818, ms=-1) from ondemandconnroutehelper.dll+0x623f
+[js]   1292 CreateEvent name="" from WINHTTP.dll+0x2b98f
+[js]   1292 CreateEvent name="" from WINHTTP.dll+0x807b3
+[js]   1292 OpenEvent name="Global\\SvcctrlStartEvent_A3752DX" from sechost.dll+0x22378
+[js]   1292 WaitForSingleObject(h=0x820, ms=180000) from sechost.dll+0x2238a
+[js]   1292 WaitForSingleObjectEx(h=0x820, ms=180000) from KERNELBASE.dll+0x15e772
+[js]   1295 OpenEvent name="Global\\SvcctrlStartEvent_A3752DX" from sechost.dll+0x22378
+[js]   1295 WaitForSingleObject(h=0x834, ms=180000) from sechost.dll+0x2238a
+[js]   1295 WaitForSingleObjectEx(h=0x834, ms=180000) from KERNELBASE.dll+0x15e772
+[js]   1300 CreateEvent name="" from WINHTTP.dll+0x2b98f
+[js]   1303 CreateEvent name="" from WINNSI.DLL+0x1c1f
+[js]   1303 WaitForSingleObject(h=0x854, ms=-1) from WINNSI.DLL+0x1c81
+[js]   1303 WaitForSingleObjectEx(h=0x854, ms=-1) from KERNELBASE.dll+0x15e772
+[js]   1303 CreateEvent name="" from WINNSI.DLL+0x1d38
+[js]   1304 CreateEvent name="" from WINNSI.DLL+0x1da2
+[js]   1304 CreateEvent name="" from WINNSI.DLL+0x1dcf
+[js]   1304 CreateEvent name="" from WINNSI.DLL+0x1c1f
+[js]   1304 WaitForSingleObject(h=0x854, ms=-1) from WINNSI.DLL+0x1c81
+[js]   1304 WaitForSingleObjectEx(h=0x854, ms=-1) from KERNELBASE.dll+0x15e772
+[js]   1304 CreateEvent name="" from WINNSI.DLL+0x1d38
+[js]   1304 CreateEvent name="" from WINNSI.DLL+0x1da2
+[js]   1304 CreateEvent name="" from WINNSI.DLL+0x1dcf
+[js]   1304 CreateEvent name="" from WINNSI.DLL+0x1c1f
+[js]   1304 WaitForSingleObject(h=0x854, ms=-1) from WINNSI.DLL+0x1c81
+[js]   1304 WaitForSingleObjectEx(h=0x854, ms=-1) from KERNELBASE.dll+0x15e772
+[js]   1304 CreateEvent name="" from WINNSI.DLL+0x1d38
+[js]   1304 CreateEvent name="" from WINNSI.DLL+0x1da2
+[js]   1304 CreateEvent name="" from WINNSI.DLL+0x1dcf
+[js]   1304 CreateEvent name="" from WINNSI.DLL+0x1c1f
+[js]   1304 WaitForSingleObject(h=0x854, ms=-1) from WINNSI.DLL+0x1c81
+[js]   1304 WaitForSingleObjectEx(h=0x854, ms=-1) from KERNELBASE.dll+0x15e772
+[js]   1304 CreateEvent name="" from WINNSI.DLL+0x1d38
+[js]   1304 CreateEvent name="" from WINNSI.DLL+0x1da2
+[js]   1304 CreateEvent name="" from WINNSI.DLL+0x1dcf
+[js]   1306 CreateEvent name="" from webio.dll+0x33834
+[js]   1306 CreateEvent name="" from WINHTTP.dll+0x2b98f
+[js]   1306 CreateEvent name="" from WINHTTP.dll+0x2b3e6
+[js]   1306 CreateEvent name="" from WINHTTP.dll+0x2b278
+[js]   1306 OpenEvent name="Global\\SvcctrlStartEvent_A3752DX" from sechost.dll+0x22378
+[js]   1306 WaitForSingleObject(h=0x8b0, ms=180000) from sechost.dll+0x2238a
+[js]   1306 WaitForSingleObjectEx(h=0x8b0, ms=180000) from KERNELBASE.dll+0x15e772
+[js]   1306 CreateEvent name="" from RPCRT4.dll+0x1f961
+[js]   1306 CreateEvent name="" from WINHTTP.dll+0x41a4c
+[js]   1307 WaitForSingleObjectEx(h=0x8b8, ms=-1) from WINHTTP.dll+0x45ab0
+[js]   1307 CreateEvent name="" from webio.dll+0x22aa1
+[js]   1307 WaitForSingleObjectEx(h=0x8a8, ms=-1) from WS2_32.dll+0x22dac
+[js]   1311 OpenEvent name="Global\\BFE_Notify_Event_{6528fa35-3f5e-420f-899b-2a840eec9320}" from fwpuclnt.dll+0x18f4b
+[  2.02] CPU  15.5%
+[  3.03] CPU   0.0%
+[js]   3476 WaitForSingleObject(h=0x680, ms=-1) from msxml3.dll+0x397c8
+[js]   3476 WaitForSingleObjectEx(h=0x680, ms=-1) from KERNELBASE.dll+0x15e772
+[js]   3500 CreateEvent name="" from clr.dll+0xb60bb
+[js]   3500 CreateSemaphore name="<bad>" from clr.dll+0xa78e7
+[js]   3504 CreateSemaphore name="<bad>" from clr.dll+0xa78e7
+[js]   3504 CreateEvent name="" from clr.dll+0xb60bb
+[js]   3504 WaitForSingleObjectEx(h=0x904, ms=-1) from clr.dll+0x1dfcd
+[js]   3504 CreateEvent name="" from clr.dll+0x5d704
+[js]   3504 CreateEvent name="" from clr.dll+0x5d704
+[js]   3504 CreateEvent name="" from clr.dll+0x5d704
+[js]   3504 CreateEvent name="" from clr.dll+0x5d704
+[js]   3510 CreateEvent name="" from mscorlib.ni.dll+0x4bd6ee
+[js]   3510 CreateEvent name="" from mscorlib.ni.dll+0x4bd6ee
+[js]   3515 CreateMutex name="Global\\RasPbFile" from rasapi32.dll+0xd371e
+[js]   3515 OpenMutex name="Global\\RasPbFile" from rasapi32.dll+0xd3755
+[js]   3516 CreateEvent name="" from rasapi32.dll+0x1573a
+[js]   3516 CreateEvent name="" from rasapi32.dll+0x15751
+[js]   3516 OpenEvent name="Global\\SvcctrlStartEvent_A3752DX" from sechost.dll+0x22378
+[js]   3516 WaitForSingleObject(h=0x964, ms=180000) from sechost.dll+0x2238a
+[js]   3516 WaitForSingleObjectEx(h=0x964, ms=180000) from KERNELBASE.dll+0x15e772
+[js]   3518 OpenEvent name="Global\\SvcctrlStartEvent_A3752DX" from sechost.dll+0x22378
+[js]   3518 WaitForSingleObject(h=0x974, ms=180000) from sechost.dll+0x2238a
+[js]   3518 WaitForSingleObjectEx(h=0x974, ms=180000) from KERNELBASE.dll+0x15e772
+[js]   3519 CreateEvent name="" from mscorlib.ni.dll+0x4bd6ee
+[js]   3519 CreateEvent name="" from mscorlib.ni.dll+0x4bd6ee
+[js]   3519 CreateEvent name="" from mscorlib.ni.dll+0x4bd6ee
+[js]   3520 OpenEvent name="Global\\SvcctrlStartEvent_A3752DX" from sechost.dll+0x22378
+[js]   3520 WaitForSingleObject(h=0x998, ms=180000) from sechost.dll+0x2238a
+[js]   3520 WaitForSingleObjectEx(h=0x998, ms=180000) from KERNELBASE.dll+0x15e772
+[js]   3520 OpenEvent name="Global\\SvcctrlStartEvent_A3752DX" from sechost.dll+0x22378
+[js]   3520 WaitForSingleObject(h=0x99c, ms=180000) from sechost.dll+0x2238a
+[js]   3520 WaitForSingleObjectEx(h=0x99c, ms=180000) from KERNELBASE.dll+0x15e772
+[js]   3520 CreateEvent name="" from RPCRT4.dll+0x1f961
+[js]   3521 CreateEvent name="" from mscorlib.ni.dll+0x4bd6ee
+[js]   3521 CreateEvent name="" from RPCRT4.dll+0x1f961
+[js]   3521 WaitForSingleObjectEx(h=0x98c, ms=-1) from RASMAN.DLL+0x176a1
+[js]   3521 CreateEvent name="" from mscorlib.ni.dll+0x4bd6ee
+[js]   3522 WaitForSingleObjectEx(h=0x98c, ms=-1) from RASMAN.DLL+0x176a1
+[js]   3522 CreateEvent name="" from mscorlib.ni.dll+0x4bd6ee
+[js]   3522 CreateEvent name="" from WINHTTP.dll+0x2b98f
+[js]   3524 CreateEvent name="" from clr.dll+0x5d704
+[js]   3524 CreateEvent name="" from clr.dll+0x5d704
+[js]   3524 CreateEvent name="" from clr.dll+0x5d704
+[js]   3524 CreateEvent name="" from clr.dll+0x5d704
+[js]   3525 CreateEvent name="" from mscorlib.ni.dll+0x4bd6ee
+[js]   3525 CreateEvent name="" from mscorlib.ni.dll+0x4bd6ee
+[  4.04] CPU   4.6%
+[  5.05] CPU   0.0%
+[js]   5596 WaitForSingleObjectEx(h=0xa58, ms=-1) from TextShaping.dll+0xd1759
+[js]   5596 WaitForSingleObjectEx(h=0xa58, ms=-1) from gdi32full.dll+0x48ac5
+[js]   5605 OpenMutex name="Local\\MSCTF.Asm.MutexDefault1" from MSCTF.dll+0x38eae
+[js]   5605 WaitForSingleObject(h=0xa5c, ms=2000) from MSCTF.dll+0x3b9bf
+[js]   5605 WaitForSingleObjectEx(h=0xa5c, ms=2000) from KERNELBASE.dll+0x15e772
+[js]   5605 OpenMutex name="CicLoadWinStaWinSta0" from MSCTF.dll+0x3c85b
+[js]   5605 OpenMutex name="Local\\MSCTF.CtfMonitorInstMutexDefault1" from MSCTF.dll+0x3c508
+[js]   5605 OpenEvent name="Local\\u_1ImmersiveFocusTrackingActiveEvent" from MSCTF.dll+0x3a142
+[  6.05] CPU   3.1%
+[  7.05] CPU   0.0%
+[  8.06] CPU   0.0%
+[  9.06] CPU   0.0%
+[ 10.07] CPU   0.0%
+[ 11.08] CPU   0.0%
+[ 12.08] CPU   0.0%
+[ 13.08] CPU   0.0%
+[ 14.10] CPU   0.0%
+[ 15.10] CPU   0.0%
+[ 16.11] CPU   0.0%
+[ 17.12] CPU   0.0%
+[ 18.13] CPU   0.0%
+[js]  18516 CreateEvent name="" from clr.dll+0x5d704
+[js]  18516 CreateEvent name="" from clr.dll+0x5d704
+[js]  18516 CreateEvent name="" from clr.dll+0x5d704
+[js]  18516 CreateEvent name="" from clr.dll+0x5d704
+[js]  18516 WaitForSingleObject(h=0xa20, ms=-1) from clr.dll+0x1731dd
+[js]  18516 WaitForSingleObjectEx(h=0xa20, ms=-1) from KERNELBASE.dll+0x15e772
+[js]  18516 WaitForSingleObjectEx(h=0x8f8, ms=20000) from clr.dll+0x172030
+[js]  19020 WaitForSingleObject(h=0xa20, ms=-1) from clr.dll+0x1731dd
+[js]  19020 WaitForSingleObjectEx(h=0xa20, ms=-1) from KERNELBASE.dll+0x15e772
+[ 19.14] CPU   0.0%
+[js]  19523 WaitForSingleObject(h=0xa20, ms=-1) from clr.dll+0x1731dd
+[js]  19523 WaitForSingleObjectEx(h=0xa20, ms=-1) from KERNELBASE.dll+0x15e772
+[ 20.14] CPU   0.0%
+[ 21.14] CPU   0.0%
+[ 22.15] CPU   0.0%
+[ 23.16] CPU   0.0%
+[ 24.17] CPU   0.0%
+done; leaving process alive

@@ -58,7 +58,7 @@ lake_config.yaml          case_config.yaml
 | Module 1: 前处理 | ✅ 已完成 | 从 lake_config.yaml 生成 4 个数据文件 |
 | Module 2: 模型构建 | ✅ 已完成 | 从 case_config.yaml 组装完整 case 目录 |
 | Module 3: 初始条件 | ✅ 已完成 | 3 种营养状态预设 + 自定义模式 |
-| Module 4: 模型运行 | ✅ 已完成 | 输入验证 + 执行 + 自动 numrecs patch |
+| Module 4: 模型运行 | ✅ 已完成 | 输入验证 + 执行 + 按完整物理记录修复 numrecs |
 | Module 5: 结果输出 | ⏳ 待开发 | 时间序列提取、可视化 |
 | Module 6: 率定校验 | ⏳ 待开发 | 点位对比、自动参数调整 |
 
@@ -251,8 +251,8 @@ Module 3 集成在 Module 2 中，通过 `initial_conditions.preset` 选择：
 
 1. **输入验证**: 5步验证（文件完整性、bathymetry、meteo float64、河流、配置文件）
 2. **模型执行**: OpenMP 多线程 + Patankar 警告过滤
-3. **自动 numrecs patch**: 修复 NetCDF3 已知 bug（GETM 在 meteo EOF 时未刷新头部）
-4. **输出验证**: 检查输出文件大小和退出码
+3. **条件性 numrecs patch**: 只按文件中可验证的完整物理记录修复 NetCDF3 头部；无法识别的格式或截断文件保持原头部并报告
+4. **输出验证**: 检查求解器退出状态、输出文件完整性和健康状况
 
 ### 用法
 
@@ -267,19 +267,20 @@ Options:
 
 ### 运行状态判断
 
-| 退出码 | 状态 | 说明 |
-|--------|------|------|
-| 0 | SUCCESS | 模型正常运行完成 |
-| 0 + "meteo EOF" | SUCCESS | 预期行为：气象数据读完后退出，输出已完整 |
-| 非0 | FAILED | 检查 run.log |
+| 条件 | 状态 | 说明 |
+|------|------|------|
+| 退出码为 0，且没有致命日志 | SUCCESS | 模型正常运行完成 |
+| 退出码为 0，日志报告 `Reached eof in: meteo_input.txt` | 有条件 | 只有输出记录可从文件布局和物理长度验证、时间覆盖配置的 stop，且输出健康检查通过时才算成功 |
+| EOF 输出不完整、未覆盖 stop、健康检查失败，或记录布局无法验证 | FAILED / 未判定 | 不按模拟日期虚增记录；检查 `run.log` 和输出文件 |
+| 非0退出码或其他致命日志 | FAILED | 检查 `run.log` |
 
 ### 输出文件
 
 | 文件 | 内容 | 格式 |
 |------|------|------|
-| `{run_id}.2d.nc` | 2D水动力（水位、流速） | NetCDF3（已patch） |
-| `{run_id}.3d.nc` | 3D水动力（温度、3D流速） | NetCDF3（已patch） |
-| `output.nc` | FABM生态（530个变量） | NetCDF3（已patch） |
+| `{run_id}.2d.nc` | 2D水动力（水位、流速） | NetCDF3（可验证时按完整物理记录修复头部） |
+| `{run_id}.3d.nc` | 3D水动力（温度、3D流速） | NetCDF3（可验证时按完整物理记录修复头部） |
+| `output.nc` | FABM生态（530个变量） | NetCDF3（可验证时按完整物理记录修复头部） |
 | `run.log` | 运行日志 | 文本 |
 
 ---
@@ -419,9 +420,9 @@ python3 workflow/4_run/run_model.py workflow/cases/Yilong --threads 8
 
 ### 5. 输出文件显示 0 字节 / 无法读取
 
-**原因**: NetCDF3 numrecs=0 bug（GETM 在 meteo EOF 时未刷新头部）
+**原因**: GETM 可能在 meteo EOF 时未刷新 NetCDF3 的 `numrecs` 头字段；截断或不支持的文件布局也可能使记录数无法确认。
 
-**解决**: 已在 run_model.py 中自动 patch，无需手动处理
+**处理**: `run_model.py` 仅在能从 NetCDF 记录布局和文件长度确认完整记录数时修复头字段。无法确认时会保留原 header 并报告跳过；不得按配置日期推算或补造记录。EOF 退出只有在完整输出覆盖配置 stop 且健康检查通过后才接受为成功。
 
 ### 6. 硅藻峰值过高（>10 gDW/m³）
 
@@ -479,7 +480,7 @@ python3 workflow/4_run/run_model.py workflow/cases/Yilong --threads 8
 4. **repair_state=true**: 自动修复负值状态变量
 5. **fwf_method=2**: 从文件读取淡水通量（降水-蒸发），不用模型自计算
 6. **precip/evap float64**: float32 精度不足会导致降水量被截断为 0
-7. **numrecs patch**: NetCDF3 格式 bug，GETM 在 meteo EOF 时未刷新记录计数
+7. **numrecs 修复**: GETM 可能在 meteo EOF 时未刷新 NetCDF3 记录计数；包装器只恢复物理存在的完整记录，无法验证的文件保持原 header 并按失败/未判定处理
 
 ---
 

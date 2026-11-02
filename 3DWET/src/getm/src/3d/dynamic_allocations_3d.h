@@ -213,12 +213,15 @@
 ! Below are allocations for Poor Mans Z-coordinates - PMZ
   allocate(kmin_pmz(I2DFIELD),stat=rc)
   if (rc /= 0) stop 'init_3d: Error allocating memory (kmin_pmz)'
+  kmin_pmz=1
 
   allocate(kumin_pmz(I2DFIELD),stat=rc)
   if (rc /= 0) stop 'init_3d: Error allocating memory (kumin_pmz)'
+  kumin_pmz=1
 
   allocate(kvmin_pmz(I2DFIELD),stat=rc)
   if (rc /= 0) stop 'init_3d: Error allocating memory (kvmin_pmz)'
+  kvmin_pmz=1
 
 ! for light attenuation
   allocate(A(I2DFIELD),stat=rc)

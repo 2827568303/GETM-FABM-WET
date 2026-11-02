@@ -1,0 +1,4 @@
+﻿[js] ready
+pid 24620
+[js] ErrObj=0x1d96a80
+[js] err Error: invalid type specified

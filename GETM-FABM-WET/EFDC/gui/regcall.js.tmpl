@@ -1,0 +1,31 @@
+// In a 32-bit host: override HKCR to HKCU\Software\Classes, then call DllRegisterServer directly
+// and report the HRESULT for each individual step.
+var target = '{{PATH}}';
+var k32 = Module.findGlobalExportByName('LoadLibraryW');
+var gpa = Module.findGlobalExportByName('GetProcAddress');
+var LoadLibraryW = new NativeFunction(k32, 'pointer', ['pointer'], 'stdcall');
+var GetProcAddress = new NativeFunction(gpa, 'pointer', ['pointer', 'pointer'], 'stdcall');
+var RegOpenKeyExW = new NativeFunction(Module.findGlobalExportByName('RegOpenKeyExW'), 'int', ['pointer', 'pointer', 'uint32', 'uint32', 'pointer'], 'stdcall');
+var RegOverridePredefKey = new NativeFunction(Module.findGlobalExportByName('RegOverridePredefKey'), 'int', ['pointer', 'pointer'], 'stdcall');
+
+var hk = Memory.alloc(4);
+var r = RegOpenKeyExW(ptr('0x80000001'), Memory.allocUtf16String('Software\\Classes'), 0, 0xF003F, hk);
+send({ openHKCU: r });
+send({ overrideHKCR: RegOverridePredefKey(ptr('0x80000000'), hk.readPointer()) });
+
+var h = LoadLibraryW(Memory.allocUtf16String(target));
+send({ loadLibrary: h.toString() });
+if (!h.isNull()) {
+  ['DllRegisterServer', 'DllUnregisterServer', 'DllInstall'].forEach(function (fn) {
+    var p = GetProcAddress(h, Memory.allocAnsiString(fn));
+    send({ export: fn, addr: p.toString() });
+    if (!p.isNull() && fn === 'DllRegisterServer') {
+      var f = new NativeFunction(p, 'int', [], 'stdcall');
+      var hr = f();
+      send({ register: '0x' + (hr >>> 0).toString(16) });
+    }
+  });
+} else {
+  send({ lastError: '0x' + (new NativeFunction(Module.findGlobalExportByName('GetLastError'), 'uint32', [], 'stdcall')()).toString(16) });
+}
+send({ done: true });

@@ -1,0 +1,5 @@
+﻿[js]      0 diag13 ready
+pid 56300
+[js]     82 ShowWindow hwnd=0x32c0592 cmd=4 from MSVBVM60.DLL+0x2d961
+[js]    271 ShowWindow hwnd=0x200e04 cmd=1 from USER32.DLL+0x897d8
+done

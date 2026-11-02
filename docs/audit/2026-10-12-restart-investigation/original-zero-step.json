@@ -1,0 +1,41 @@
+{
+  "returncode": 0,
+  "differences": {
+    "loop": {
+      "max_absolute_error": 300.0,
+      "index": []
+    },
+    "tke": {
+      "max_absolute_error": 1e-08,
+      "index": [
+        0,
+        0,
+        0
+      ]
+    },
+    "num": {
+      "max_absolute_error": 3.627493647833322e-24,
+      "index": [
+        0,
+        0,
+        0
+      ]
+    },
+    "nuh": {
+      "max_absolute_error": 3.627493647833322e-24,
+      "index": [
+        0,
+        0,
+        0
+      ]
+    },
+    "S": {
+      "max_absolute_error": 9999.0,
+      "index": [
+        0,
+        0,
+        0
+      ]
+    }
+  }
+}

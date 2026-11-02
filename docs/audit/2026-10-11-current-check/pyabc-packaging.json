@@ -1,0 +1,7 @@
+{
+  "import_succeeded": false,
+  "error_type": "ModuleNotFoundError",
+  "error": "matplotlib excluded by build_app.py",
+  "pyabc_version": "0.12.17",
+  "scope": "Import probe for explicit build exclusion; not a frozen executable test"
+}

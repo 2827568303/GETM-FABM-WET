@@ -1,0 +1,10 @@
+{
+  "installed_version": "1.4.1",
+  "valid_xlsx": true,
+  "http_status": 400,
+  "response": {
+    "error": "解析失败: openpyxl 未安装，无法读取 xlsx"
+  },
+  "solver_started": false,
+  "user_cases_modified": false
+}

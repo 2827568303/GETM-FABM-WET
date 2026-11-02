@@ -1,0 +1,14 @@
+﻿pid=51160 exe=C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\dist\EFDC-GUI-Portable\app\EFDC_Explorer8.4.pristine.exe
+[ 0.13] WIN hwnd=0x2206FC cls=VBMsoStdCompMgr      title=''                           vis=0 rect=(0, 0, 0, 0)
+[ 0.13] WIN hwnd=0x770DCE cls=ThunderRT6Main       title='EFDC_Explorer8.4'           vis=1 rect=(853, 533, 853, 533)
+[ 0.13] WIN hwnd=0x1340D16 cls=IME                  title='Default IME'                vis=0 rect=(0, 0, 0, 0)
+[ 2.51] WIN hwnd=0x160426 cls=#32770               title='EFDC_Explorer8.4'           vis=1 rect=(646, 484, 1067, 637)
+[ 2.51] WIN hwnd=0x35C0600 cls=MSCTFIME UI          title='MSCTFIME UI'                vis=0 rect=(0, 0, 0, 0)
+[ 2.51] shot #32770 hwnd=0x160426 EFDC_Explorer8.4 (421, 153)
+[ 4.05] shot #32770 hwnd=0x160426 EFDC_Explorer8.4 (421, 153)
+[ 5.56] shot #32770 hwnd=0x160426 EFDC_Explorer8.4 (421, 153)
+[ 7.06] shot #32770 hwnd=0x160426 EFDC_Explorer8.4 (421, 153)
+[ 8.57] shot #32770 hwnd=0x160426 EFDC_Explorer8.4 (421, 153)
+[10.08] shot #32770 hwnd=0x160426 EFDC_Explorer8.4 (421, 153)
+[11.58] shot #32770 hwnd=0x160426 EFDC_Explorer8.4 (421, 153)
+still running -> kill

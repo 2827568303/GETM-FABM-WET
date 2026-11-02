@@ -1,0 +1,68 @@
+{
+  "manifest_version": 1,
+  "created_for": "WET arbitrary-instance capability catalogue",
+  "upstream": {
+    "release": "v2.3",
+    "release_commit": "89e172cd6f113bff2ffe9e9680cbbeb7e0dd92a6",
+    "master_commit": "d2eee4419ab6762c092e07dc79316feff9efec5c",
+    "master_commit_is_research_reference_only": true
+  },
+  "adoption": {
+    "status": "local-getm-compatible-hybrid",
+    "description": "Local WET sources retain GETM compatibility and local fixes; this tree is not represented as an unmodified release or complete upstream master.",
+    "ghg_gasses": "not-adopted",
+    "greenhouse_gas_models": ["inorganic_carbon", "methane"],
+    "retained_local_fixes": [
+      {
+        "file": "3DWET/src/wet/src/fish.F90",
+        "description": "Retain local qStage guards around stage-state registration and stage process handling; retain local Day_last reproduction diagnostic handling.",
+        "evidence": "docs/audit/2026-10-16-wet-instance-code-map.md"
+      },
+      {
+        "file": "3DWET/app/server.py",
+        "description": "Retain existing local macrophyte initial-condition generation with y,x D/N/P/C fields.",
+        "evidence": "docs/audit/2026-10-16-wet-instance-code-map.md"
+      }
+    ]
+  },
+  "source_fingerprints": [
+    {"path":"3DWET/src/wet/src/fish.F90","sha256":"f1480fd50879b7a35ab27dec67027528fdd025e7c1a5649fcd44e0daedebc7a4"},
+    {"path":"3DWET/src/wet/src/phytoplankton.F90","sha256":"56525ab3f61f308e3f8a81fdd5d9785e39fdb768eda46090944fcf494cb39cd9"},
+    {"path":"3DWET/src/wet/src/zooplankton.F90","sha256":"7685e9919ae35df0843bf130c116165d6cd7ccb3aae45c568f469674de2ef3cf"},
+    {"path":"3DWET/src/wet/src/zoobenthos.F90","sha256":"eb55e7069744520d456139d412e7984d06471844af6bc8142e08b930fcb495eb"},
+    {"path":"3DWET/src/wet/src/bivalves.F90","sha256":"f952d4533a90c7cf4ca378061f8e3f0d2a88f6b67ae09c3ac5a1a1c6e4a59b77"},
+    {"path":"3DWET/src/wet/src/macrophytes.F90","sha256":"d016e669bd606e8b27b63876f3489558636b0c20f51574316a34f3b8c6525566"},
+    {"path":"3DWET/src/wet/src/fish_pclake.F90","sha256":"0ccbf5a2e1c0fab8a22937bd3a458dc9f99eb60fda7a144a571d534fc0f2d100"},
+    {"path":"3DWET/src/wet/src/abiotic_water.F90","sha256":"e64e752c929fbead00d3eaebe92dd54287d167903b1ba9a9ce0ce25c4f0a781e"},
+    {"path":"3DWET/src/wet/src/abiotic_sediment.F90","sha256":"aa564facc6d324f7bfb3aaf9e9c1510eacd56493e4d76172e513cae5fe572ca6"},
+    {"path":"3DWET/src/wet/src/om_pool.F90","sha256":"cdc114301108c1d1b95d48f632f3c59a274a5360da53e98b11f915839dd9e73c"},
+    {"path":"3DWET/src/wet/src/sediment_exchange.F90","sha256":"f4b25033bbd80f588ab720f08ad20240434b76cf4c1894260b97c8c045f93b98"},
+    {"path":"3DWET/src/wet/src/burial.F90","sha256":"62cb4959e066ba44e139f6691574d2ae3cea327507a789a8983efbc21ba2f1c5"},
+    {"path":"3DWET/src/wet/src/bot_pel_interface.F90","sha256":"e185c9dccbd487f589a7b342248a72aaae05f370ba44e208e3d4b2192b5f9c9c"},
+    {"path":"3DWET/src/wet/src/inorganic_carbon.F90","sha256":"5979947ab72512e66e373d24e7cd06a1e279a5b5b102156fce71be3b2555265d"},
+    {"path":"3DWET/src/wet/src/methane.F90","sha256":"739a499aa30adedab772659e3cf5ace1fefcb93622a5f0170636e4a86c6398cb"}
+  ],
+  "native_artifacts": {
+    "executable": {"path":"bin/getm_cartesian","sha256":"cb2cbd3c3bbea556684119d1f8fb77b9ecae496456bbb3cb6fa55f60869c78f9"},
+    "fabm_library": {"path":"lib/libfabm.a","sha256":"f3bcc0e05172fe9e9923d395a882b8f82b4b114914a50e9af55cc154d13b8c21"}
+  },
+  "known_registration_incompatibilities": [
+    {
+      "model": "wet/fish",
+      "port": "pred_dummy",
+      "producer_registration": {"kind": "diagnostic", "units": "-", "source": "3DWET/src/wet/src/fish.F90:220"},
+      "consumer_registration": {"kind": "state_dependency", "units": "DW/m3", "source": "3DWET/src/wet/src/fish.F90:351"},
+      "effect": "PISC prey compiler rejects this target; a visible native port is not treated as proof of dimensional compatibility.",
+      "native_evidence": "build/benthic-mirrors-native-diagnostic/candidate/native.log shows both registrations, but does not establish compatible units or validate PISC semantics."
+    }
+  ],
+  "probe": {
+    "status": "not-run",
+    "binary_fingerprint": null,
+    "ordered_states": [],
+    "units": {},
+    "ports": [],
+    "aggregates": [],
+    "note": "Source registrations and current binary hashes are recorded; no native registration probe was executed as part of catalogue/foodweb implementation."
+  }
+}

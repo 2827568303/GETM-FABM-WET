@@ -1,0 +1,20 @@
+=== EE_MULTI_TRIAL_8_4
+2026/10/30 18:21:26  6. Check if the computer is already activated or not. 
+2026/10/30 18:21:26  6.1 The license is activated. LicenseCode: A0ABBD96-D22B-46A2-AD1A-6D4FB37DAA47
+2026/10/30 18:21:26  6.1.1 Compare the client time with server time
+2026/10/30 18:21:26  6.1.2 Check valid Product Features
+=== EEMS_MULTI_TRIAL
+2026/10/30 18:21:40  6. Check if the computer is already activated or not. 
+2026/10/30 18:21:40  6.1 The license is activated. LicenseCode: A0ABBD96-D22B-46A2-AD1A-6D4FB37DAA47
+2026/10/30 18:21:40  6.1.1 Compare the client time with server time
+2026/10/30 18:21:40  6.1.2 Check valid Product Features
+=== PND_EE_MULTI_TRIAL_20160225
+2026/10/30 18:21:53  6. Check if the computer is already activated or not. 
+2026/10/30 18:21:53  6.1 The license is activated. LicenseCode: A0ABBD96-D22B-46A2-AD1A-6D4FB37DAA47
+2026/10/30 18:21:53  6.1.1 Compare the client time with server time
+2026/10/30 18:21:53  6.1.2 Check valid Product Features
+=== EE_MULTI_TRIAL_8_0
+2026/10/30 18:22:07  6. Check if the computer is already activated or not. 
+2026/10/30 18:22:07  6.1 The license is activated. LicenseCode: A0ABBD96-D22B-46A2-AD1A-6D4FB37DAA47
+2026/10/30 18:22:07  6.1.1 Compare the client time with server time
+2026/10/30 18:22:07  6.1.2 Check valid Product Features

@@ -1,0 +1,27 @@
+............................................F........................... [ 21%]
+........................................................................ [ 42%]
+...............................s...........ss........................... [ 63%]
+........................................................................ [ 84%]
+...................................................                      [100%]
+================================== FAILURES ===================================
+___________ test_legitimate_stop_between_output_intervals_is_valid ____________
+
+model = (WindowsPath('C:/Users/23801/AppData/Local/Temp/pytest-of-Lenovo/pytest-200/test_legitimate_stop_between_o0/source'), ...test-of-Lenovo/pytest-200/test_legitimate_stop_between_o0/trial'), <function model.<locals>.run at 0x000001D2340CC4C0>)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D2340B6B00>
+
+    def test_legitimate_stop_between_output_intervals_is_valid(model, monkeypatch):
+        source, target, run = model
+        (source/'getm.inp').write_text("&time\n start = '2020-01-01 00:00:00'\n stop = '2020-01-01 00:20:50'\n timestep = 2.\n/\n")
+        (source/'output.yaml').write_text('output:\n time_unit: second\n time_step: 60\n sync_interval: 1\n')
+        result = calibration.run_model_in_temp(source, [], keep_temp=True)
+>       assert result['success'], result
+E       AssertionError: {'success': False, 'error': 'Calibration outputs failed current-run integrity checks', 'output_health': {'ready': Fals...p_dir': 'C:\\Users\\23801\\AppData\\Local\\Temp\\pytest-of-Lenovo\\pytest-200\\test_legitimate_stop_between_o0\\trial'}
+E       assert False
+
+tests\test_calibration_integrity.py:174: AssertionError
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_project_api.py:138: Creating symlinks requires Windows developer mode or administrator rights
+SKIPPED [1] tests\test_result_files.py:106: Creating symlinks requires OS privilege
+SKIPPED [1] tests\test_result_files.py:119: Creating symlinks requires OS privilege
+FAILED tests/test_calibration_integrity.py::test_legitimate_stop_between_output_intervals_is_valid
+1 failed, 335 passed, 3 skipped in 32.01s

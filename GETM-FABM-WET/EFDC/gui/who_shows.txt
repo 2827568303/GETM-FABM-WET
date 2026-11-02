@@ -1,0 +1,4 @@
+﻿[js] {"ready": true}
+pid=44880
+[ 4.15] CHILD pid=25172 splwow64.exe
+done

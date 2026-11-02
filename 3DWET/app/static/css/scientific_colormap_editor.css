@@ -1,0 +1,20 @@
+#scientific-colormap-editor{width:min(650px,calc(100vw - 28px));max-height:calc(100dvh - 28px);padding:20px;
+    border:1px solid #afc0ca;border-radius:8px;background:#fff;color:#263e49;box-sizing:border-box;overflow:auto;font:13px 'Segoe UI','Microsoft YaHei',sans-serif}
+#scientific-colormap-editor::backdrop{background:#10263577}
+.colormap-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.colormap-heading h2{margin:0;font-size:18px}.colormap-heading button{font-size:22px}
+#scientific-colormap-editor button{min-height:34px;border:1px solid #b4c2ca;border-radius:4px;background:#f6f8fa;color:#263e49;cursor:pointer;padding:5px 10px}
+#scientific-colormap-editor button.btn-primary{background:#356778;color:#fff;border-color:#356778}
+#scientific-colormap-editor button:disabled{opacity:.45;cursor:default}
+#scientific-colormap-editor :focus-visible{outline:2px solid #32738e;outline-offset:2px}
+.colormap-preview{height:28px;border:1px solid #b4c2ca;border-radius:3px;margin:12px 0 18px}
+.colormap-options{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px}
+.colormap-options label{display:flex;flex-direction:column;gap:5px}.colormap-options .colormap-check{flex-direction:row;align-items:center}
+#scientific-colormap-editor select,#scientific-colormap-editor input[type=number]{min-height:34px;width:100%;box-sizing:border-box;border:1px solid #b4c2ca;border-radius:3px;padding:4px;background:#fff;color:#263e49}
+#scientific-colormap-editor input[type=color]{height:34px;width:54px;padding:2px;border:1px solid #b4c2ca;background:#fff}
+.colormap-note{font-size:12px;color:#586c78;line-height:1.6}
+.colormap-nodes{max-height:240px;overflow:auto;border-block:1px solid #e0e7eb;margin-bottom:12px}
+.colormap-node{display:grid;grid-template-columns:minmax(100px,1fr) 54px minmax(70px,1fr) auto;gap:10px;align-items:end;padding:8px 0}
+.colormap-node label{font-size:12px}.colormap-value{align-self:center;font-size:11px;overflow-wrap:anywhere}
+.colormap-error{min-height:18px;color:#a32f30}.colormap-actions{display:flex;flex-wrap:wrap;gap:8px}.colormap-actions span{flex:1}
+@media(max-width:500px){#scientific-colormap-editor{padding:14px}.colormap-options{gap:10px}.colormap-node{grid-template-columns:minmax(75px,1fr) 46px minmax(45px,1fr) auto;gap:6px}.colormap-actions button{min-height:40px}}

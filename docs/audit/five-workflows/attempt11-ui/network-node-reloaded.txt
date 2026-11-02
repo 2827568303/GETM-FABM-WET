@@ -1,0 +1,543 @@
+- img "3DWET"
+- heading "3DWET Studio" [level=1]
+- paragraph: 湖泊生态 · 三维建模工作台
+- generic: 总览
+- generic: 📊
+- text: 仪表盘
+- generic: 📁
+- text: 案例管理
+- generic: 前处理
+- generic: 🛠️
+- text: 前处理
+- generic: ▦
+- text: 交互网格编辑
+- generic: 📥
+- text: 输入数据
+- generic: 🧩
+- text: 模块配置
+- generic: ⚙️
+- text: 参数编辑
+- generic: 🧪
+- text: 初始条件
+- generic: ⏱️
+- text: 时间设置
+- generic: 运行
+- generic: ▶️
+- text: 运行控制
+- generic: 后处理
+- generic: 🌐
+- text: 地图视图
+- generic: 🗺️
+- text: 2D 可视化
+- generic: 🧊
+- text: 3D 可视化
+- generic: 🔥
+- text: 垂向热图
+- generic: 📈
+- text: 时间序列
+- generic: 率定
+- generic: 🎯
+- text: 率定分析
+- generic: 🔄
+- text: 自动率定
+- generic: 工作台
+- generic: ◉
+- text: 环境与启动诊断
+- generic: 📋
+- text: 项目导入与物理设置
+- generic: "案例: Round11 UI Lake 1401"
+- menubar "工作台菜单":
+  - button "项目"
+  - button "编辑"
+  - button "视图"
+  - button "图层"
+  - button "运行"
+  - button "设置"
+  - button "帮助"
+  - button "语言"
+  - generic: 3DWET Studio · GIS 工作台
+- toolbar "常用工具":
+  - button "▣ 案例":
+    - generic: ▣
+    - generic: 案例
+  - button "⚒ 前处理":
+    - generic: ⚒
+    - generic: 前处理
+  - button "▦ 网格":
+    - generic: ▦
+    - generic: 网格
+  - button "▶ 运行":
+    - generic: ▶
+    - generic: 运行
+  - button "⌖ 地图":
+    - generic: ⌖
+    - generic: 地图
+  - button "▤ 2D":
+    - generic: ▤
+    - generic: 2D
+  - button "◇ 3D":
+    - generic: ◇
+    - generic: 3D
+  - button "⚙ 诊断":
+    - generic: ⚙
+    - generic: 诊断
+- generic: 交互网格编辑
+- generic: Round11 UI Lake 1401
+- button "100%"
+- generic: 已完成
+- generic: 交互网格与湖点位
+- paragraph: 编辑水深、河口、测站和源点。修改先进入会话，保存后写入当前案例。下方生态网络显示真实 FABM 耦合。
+- generic: 已加载。选择点位或网格开始编辑。
+- button "加载 / 刷新"
+- button "↶ 撤销"
+- button "↷ 重做" [disabled]
+- button "全选水域"
+- button "清除选择"
+- button "保存到案例"
+- button "放弃编辑"
+- generic "湖泊网格与点位画布"
+- group "图形视图控制":
+  - button "放大图形": +
+  - button "缩小图形": −
+  - button "恢复完整图形范围": 复位
+  - button "全屏 / 退出全屏": ⛶
+- text: 网格属性
+- paragraph: 19 × 15 · 166 水格 · 最大水深 8.94 m
+- paragraph: 已选择 1 格
+- generic: 画布操作
+- combobox "画布操作":
+  - option "选择网格" [selected]
+  - option "点选新建 / 移动点位"
+  - option "平移视图"
+- generic: 画笔半径 / 格
+- spinbutton "画笔半径 / 格": "0"
+- generic: 目标水深 / m
+- spinbutton "目标水深 / m": "3"
+- button "设置水深"
+- button "设为陆地"
+- button "平滑选区"
+- text: 点位快捷编辑
+- generic: 现有点位
+- combobox "现有点位":
+  - option "＋ 新建点位" [selected]
+  - option "R11_IN (9, 8)"
+  - option "R11_OUT (10, 8)"
+  - option "R11_MON_1401 (10, 8)"
+- generic: 名称
+- textbox "名称":
+  - /placeholder: 河口用英文名称
+- generic: 类型 / 流量方向
+- combobox "类型 / 流量方向":
+  - option "测站" [selected]
+  - option "源点（空间标记）"
+  - option "入湖河口（正流量）"
+  - option "出湖河口（负流量）"
+  - option "河口（保留原流量符号）"
+- generic: 关联已有校准测站
+- combobox "关联已有校准测站":
+  - option "不关联" [selected]
+- paragraph: 点选一个水格指定位置。
+- button "应用点位"
+- button "删除点位"
+- button "打开校准"
+- paragraph: 滚轮缩放；中键、Shift 拖动或平移模式移动视图。点位模式下可拖动标记。河口改名同步流量列；方向按正负绝对值保存。新河口的流量须在输入数据页配置。测站/源点采用1起始网格坐标，源点标记本身不自动生成模型负荷。
+- heading "生态模块网络与快捷编辑" [level=3]
+- paragraph: 箭头从被引用模块指向使用该引用的模块。点击节点查看参数及耦合端口。滚轮缩放，拖动空白处平移；灰色节点为禁用模块。
+- button "刷新网络"
+- button "打开节点参数页"
+- button "打开模块配置"
+- generic: 20 个真实模块 · 357 个显式耦合端口
+- img "FABM实例耦合网络":
+  - generic "abiotic_water/sO2W → abiotic_sediment/oxygen_pool_water"
+  - generic "POM/tDTrans → abiotic_sediment/Trans_DPOM_sediment_update1 POM/tCTrans → abiotic_sediment/Trans_CPOM_sediment_update1"
+  - generic "DOM/tDTrans → abiotic_sediment/Trans_DDOM_sediment_update1 DOM/tCTrans → abiotic_sediment/Trans_CDOM_sediment_update1"
+  - generic "abiotic_sediment/sNH4S → burial/NH4_pool_in_sediment abiotic_sediment/sNO3S → burial/NO3_pool_in_sediment abiotic_sediment/sPO4S → burial/PO4_pool_in_sediment abiotic_sediment/sPAIMS → burial/PAIM_in_sediment abiotic_sediment/sDIMS → burial/inorg_pool_in_sediment abiotic_sediment/sSiPaS → burial/particulate_Si_in_sediment abiotic_sediment/bPorS → burial/bPorS abiotic_sediment/cDepthS → burial/cDepthS"
+  - generic "humus/sDS → burial/humus_DW_in_deep_sediment humus/sNS → burial/humus_N_in_deep_sediment humus/sPS → burial/humus_P_in_deep_sediment humus/sCS → burial/humus_C_in_deep_sediment humus/tDPOMS → burial/POM_sediment_update2 humus → burial/POM_group2 humus/sDS_PV → burial/humus_DW_in_deep_sediment_PV humus/sNS_PV → burial/humus_N_in_deep_sediment_PV humus/sPS_PV → burial/humus_P_in_deep_sediment_PV humus/sCS_PV → burial/humus_C_in_deep_sediment_PV"
+  - generic "sediment_exchange/tDAbioIMS → burial/IM_abiotic_update sediment_exchange/tDExchPOMS_1 → burial/POM_exchange_update1"
+  - generic "bot_pel_interface/bot_pel_conv → burial/bot_pel_conv"
+  - generic "cyanobacteria/tDPOMS → burial/POM_phytoplankton_update1"
+  - generic "diatoms/tDPOMS → burial/POM_phytoplankton_update2"
+  - generic "greens/tDPOMS → burial/POM_phytoplankton_update3"
+  - generic "zoobenthos/tDBentPOMS → burial/POM_zoobenthos_update1"
+  - generic "macrophytes/tDBedPOMS → burial/POM_macrophyte_update1"
+  - generic "POM/tDPOMS → burial/POM_sediment_update1 POM → burial/POM_group1"
+  - generic "DOM → burial/DOM_group1"
+  - generic "POM → sediment_exchange/pom_model1"
+  - generic "DOM → sediment_exchange/dom_model1"
+  - generic "abiotic_sediment/sDIMS → sediment_exchange/inorg_pool_in_sediment abiotic_sediment/sPO4S → sediment_exchange/PO4_in_sediment abiotic_sediment/sPAIMS → sediment_exchange/PAIM_in_sediment abiotic_sediment/sNH4S → sediment_exchange/NH4_in_sediment abiotic_sediment/sNO3S → sediment_exchange/NO3_in_sediment abiotic_sediment/sSiPaS → sediment_exchange/particulate_Si_in_sediment abiotic_sediment/sSiO2S → sediment_exchange/dissolved_Si_in_sediment abiotic_sediment/bPorS → sediment_exchange/bPorS abiotic_sediment/bPorCorS → sediment_exchange/bPorCorS abiotic_sediment/cDepthS → sediment_exchange/cDepthS abiotic_sediment/fDepthDifS → sediment_exchange/fDepthDifS"
+  - generic "abiotic_water/sSiPaW → sediment_exchange/particulate_Si_in_water abiotic_water/sSiO2W → sediment_exchange/SiO2_in_water abiotic_water/sNH4W → sediment_exchange/NH4_in_water abiotic_water/sNO3W → sediment_exchange/NO3_in_water abiotic_water/sPO4W → sediment_exchange/PO4_in_water abiotic_water/sDIMW → sediment_exchange/inorg_pool_in_water abiotic_water/sPAIMW → sediment_exchange/PAIM_in_water"
+  - generic "bot_pel_interface/bot_pel_conv → sediment_exchange/bot_pel_conv"
+  - generic "DOM/sDW → POM/DW_transformation_water DOM/sNW → POM/N_transformation_water DOM/sPW → POM/P_transformation_water DOM/sCW → POM/C_transformation_water DOM/sDS → POM/DW_transformation_sediment DOM/sNS → POM/N_transformation_sediment DOM/sPS → POM/P_transformation_sediment DOM/sCS → POM/C_transformation_sediment"
+  - generic "humus/sDS → POM/DW_refractory_sediment humus/sNS → POM/N_refractory_sediment humus/sPS → POM/P_refractory_sediment humus/sCS → POM/C_refractory_sediment"
+  - generic "abiotic_water/sO2W → POM/oxygen_pool_water abiotic_water/sNO3W → POM/NO3_pool_water"
+  - generic "bot_pel_interface/bot_pel_conv → POM/bot_pel_conv"
+  - generic "abiotic_water/sNH4W → DOM/N_transformation_water abiotic_water/sPO4W → DOM/P_transformation_water abiotic_water/sO2W → DOM/oxygen_pool_water abiotic_water/sNO3W → DOM/NO3_pool_water"
+  - generic "abiotic_sediment/sNH4S → DOM/N_transformation_sediment abiotic_sediment/sPO4S → DOM/P_transformation_sediment"
+  - generic "bot_pel_interface/bot_pel_conv → DOM/bot_pel_conv"
+  - generic "DOM/sDW → humus/DW_transformation_water DOM/sNW → humus/N_transformation_water DOM/sPW → humus/P_transformation_water DOM/sCW → humus/C_transformation_water DOM/sDS → humus/DW_transformation_sediment DOM/sNS → humus/N_transformation_sediment DOM/sPS → humus/P_transformation_sediment DOM/sCS → humus/C_transformation_sediment"
+  - generic "abiotic_water/sO2W → humus/oxygen_pool_water abiotic_water/sNO3W → humus/NO3_pool_water"
+  - generic "abiotic_sediment/afOxySed → humus/afOxySed"
+  - generic "bot_pel_interface/bot_pel_conv → humus/bot_pel_conv"
+  - generic "abiotic_water/sNH4W → macrophytes/NH4_pool_water abiotic_water/sNO3W → macrophytes/NO3_pool_water abiotic_water/sPO4W → macrophytes/PO4_pool_water abiotic_water/sO2W → macrophytes/oxygen_pool_water"
+  - generic "POM/sDW → macrophytes/POM_DW_pool_water POM/sPW → macrophytes/POM_N_pool_water POM/sNW → macrophytes/POM_P_pool_water POM/sCW → macrophytes/POM_C_pool_water POM/sDS → macrophytes/POM_DW_pool_sediment POM/sNS → macrophytes/POM_N_pool_sediment POM/sPS → macrophytes/POM_P_pool_sediment POM/sCS → macrophytes/POM_C_pool_sediment POM/sDS_PV → macrophytes/POM_DW_pool_sediment_PV POM/sNS_PV → macrophytes/POM_N_pool_sediment_PV POM/sPS_PV → macrophytes/POM_P_pool_sediment_PV POM/sCS_PV → macrophytes/POM_C_pool_sediment_PV"
+  - generic "abiotic_sediment/sNH4S → macrophytes/NH4_pool_sediment abiotic_sediment/sNO3S → macrophytes/NO3_pool_sediment abiotic_sediment/sPO4S → macrophytes/PO4_pool_sediment abiotic_sediment/afOxySed → macrophytes/oxic_layer_fraction abiotic_sediment/bPorS → macrophytes/bPorS abiotic_sediment/cDepthS → macrophytes/cDepthS"
+  - generic "DOM/sDW → macrophytes/DOM_DW_pool_water DOM/sNW → macrophytes/DOM_N_pool_water DOM/sPW → macrophytes/DOM_P_pool_water DOM/sCW → macrophytes/DOM_C_pool_water DOM/sDS → macrophytes/DOM_DW_pool_sediment DOM/sNS → macrophytes/DOM_N_pool_sediment DOM/sPS → macrophytes/DOM_P_pool_sediment DOM/sCS → macrophytes/DOM_C_pool_sediment DOM/sDS_PV → macrophytes/DOM_DW_pool_sediment_PV DOM/sNS_PV → macrophytes/DOM_N_pool_sediment_PV DOM/sPS_PV → macrophytes/DOM_P_pool_sediment_PV DOM/sCS_PV → macrophytes/DOM_C_pool_sediment_PV"
+  - generic "bot_pel_interface/bot_pel_conv → macrophytes/bot_pel_conv"
+  - generic "abiotic_water/sPO4W → cyanobacteria/PO4_pool_water abiotic_water/sNH4W → cyanobacteria/NH4_pool_water abiotic_water/sNO3W → cyanobacteria/NO3_pool_water abiotic_water/sO2W → cyanobacteria/oxygen_pool_water abiotic_water/sSiPaW → cyanobacteria/SiPa_pool_water abiotic_water/sSiO2W → cyanobacteria/SiO2_pool_water"
+  - generic "POM/sDW → cyanobacteria/POM_DW_pool_water POM/sNW → cyanobacteria/POM_N_pool_water POM/sPW → cyanobacteria/POM_P_pool_water POM/sCW → cyanobacteria/POM_C_pool_water POM/sDS → cyanobacteria/POM_DW_pool_sediment POM/sNS → cyanobacteria/POM_N_pool_sediment POM/sPS → cyanobacteria/POM_P_pool_sediment POM/sCS → cyanobacteria/POM_C_pool_sediment POM/sDS_PV → cyanobacteria/POM_DW_pool_sediment_PV POM/sNS_PV → cyanobacteria/POM_N_pool_sediment_PV POM/sPS_PV → cyanobacteria/POM_P_pool_sediment_PV POM/sCS_PV → cyanobacteria/POM_C_pool_sediment_PV"
+  - generic "DOM/sDW → cyanobacteria/DOM_DW_pool_water DOM/sNW → cyanobacteria/DOM_N_pool_water DOM/sPW → cyanobacteria/DOM_P_pool_water DOM/sCW → cyanobacteria/DOM_C_pool_water DOM/sDS → cyanobacteria/DOM_DW_pool_sediment DOM/sNS → cyanobacteria/DOM_N_pool_sediment DOM/sPS → cyanobacteria/DOM_P_pool_sediment DOM/sCS → cyanobacteria/DOM_C_pool_sediment DOM/sDS_PV → cyanobacteria/DOM_DW_pool_sediment_PV DOM/sNS_PV → cyanobacteria/DOM_N_pool_sediment_PV DOM/sPS_PV → cyanobacteria/DOM_P_pool_sediment_PV DOM/sCS_PV → cyanobacteria/DOM_C_pool_sediment_PV"
+  - generic "abiotic_sediment/sPO4S → cyanobacteria/PO4_pool_sediment abiotic_sediment/sNH4S → cyanobacteria/NH4_pool_sediment abiotic_sediment/sSiPaS → cyanobacteria/SiPa_pool_sediment abiotic_sediment/sSiO2S → cyanobacteria/SiO2_pool_sediment"
+  - generic "sediment_exchange/tDResusDead → cyanobacteria/base_resuspension_rate sediment_exchange/aFunTauTmSet → cyanobacteria/aFunTauTmSet"
+  - generic "bot_pel_interface/bot_pel_conv → cyanobacteria/bot_pel_conv"
+  - generic "abiotic_water/sPO4W → diatoms/PO4_pool_water abiotic_water/sNH4W → diatoms/NH4_pool_water abiotic_water/sNO3W → diatoms/NO3_pool_water abiotic_water/sO2W → diatoms/oxygen_pool_water abiotic_water/sSiPaW → diatoms/SiPa_pool_water abiotic_water/sSiO2W → diatoms/SiO2_pool_water"
+  - generic "POM/sDW → diatoms/POM_DW_pool_water POM/sNW → diatoms/POM_N_pool_water POM/sPW → diatoms/POM_P_pool_water POM/sCW → diatoms/POM_C_pool_water POM/sDS → diatoms/POM_DW_pool_sediment POM/sNS → diatoms/POM_N_pool_sediment POM/sPS → diatoms/POM_P_pool_sediment POM/sCS → diatoms/POM_C_pool_sediment POM/sDS_PV → diatoms/POM_DW_pool_sediment_PV POM/sNS_PV → diatoms/POM_N_pool_sediment_PV POM/sPS_PV → diatoms/POM_P_pool_sediment_PV POM/sCS_PV → diatoms/POM_C_pool_sediment_PV"
+  - generic "DOM/sDW → diatoms/DOM_DW_pool_water DOM/sNW → diatoms/DOM_N_pool_water DOM/sPW → diatoms/DOM_P_pool_water DOM/sCW → diatoms/DOM_C_pool_water DOM/sDS → diatoms/DOM_DW_pool_sediment DOM/sNS → diatoms/DOM_N_pool_sediment DOM/sPS → diatoms/DOM_P_pool_sediment DOM/sCS → diatoms/DOM_C_pool_sediment DOM/sDS_PV → diatoms/DOM_DW_pool_sediment_PV DOM/sNS_PV → diatoms/DOM_N_pool_sediment_PV DOM/sPS_PV → diatoms/DOM_P_pool_sediment_PV DOM/sCS_PV → diatoms/DOM_C_pool_sediment_PV"
+  - generic "abiotic_sediment/sPO4S → diatoms/PO4_pool_sediment abiotic_sediment/sNH4S → diatoms/NH4_pool_sediment abiotic_sediment/sSiPaS → diatoms/SiPa_pool_sediment abiotic_sediment/sSiO2S → diatoms/SiO2_pool_sediment"
+  - generic "sediment_exchange/tDResusDead → diatoms/base_resuspension_rate sediment_exchange/aFunTauTmSet → diatoms/aFunTauTmSet"
+  - generic "bot_pel_interface/bot_pel_conv → diatoms/bot_pel_conv"
+  - generic "abiotic_water/sPO4W → greens/PO4_pool_water abiotic_water/sNH4W → greens/NH4_pool_water abiotic_water/sNO3W → greens/NO3_pool_water abiotic_water/sO2W → greens/oxygen_pool_water abiotic_water/sSiPaW → greens/SiPa_pool_water abiotic_water/sSiO2W → greens/SiO2_pool_water"
+  - generic "POM/sDW → greens/POM_DW_pool_water POM/sNW → greens/POM_N_pool_water POM/sPW → greens/POM_P_pool_water POM/sCW → greens/POM_C_pool_water POM/sDS → greens/POM_DW_pool_sediment POM/sNS → greens/POM_N_pool_sediment POM/sPS → greens/POM_P_pool_sediment POM/sCS → greens/POM_C_pool_sediment POM/sDS_PV → greens/POM_DW_pool_sediment_PV POM/sNS_PV → greens/POM_N_pool_sediment_PV POM/sPS_PV → greens/POM_P_pool_sediment_PV POM/sCS_PV → greens/POM_C_pool_sediment_PV"
+  - generic "DOM/sDW → greens/DOM_DW_pool_water DOM/sNW → greens/DOM_N_pool_water DOM/sPW → greens/DOM_P_pool_water DOM/sCW → greens/DOM_C_pool_water DOM/sDS → greens/DOM_DW_pool_sediment DOM/sNS → greens/DOM_N_pool_sediment DOM/sPS → greens/DOM_P_pool_sediment DOM/sCS → greens/DOM_C_pool_sediment DOM/sDS_PV → greens/DOM_DW_pool_sediment_PV DOM/sNS_PV → greens/DOM_N_pool_sediment_PV DOM/sPS_PV → greens/DOM_P_pool_sediment_PV DOM/sCS_PV → greens/DOM_C_pool_sediment_PV"
+  - generic "abiotic_sediment/sPO4S → greens/PO4_pool_sediment abiotic_sediment/sNH4S → greens/NH4_pool_sediment abiotic_sediment/sSiPaS → greens/SiPa_pool_sediment abiotic_sediment/sSiO2S → greens/SiO2_pool_sediment"
+  - generic "sediment_exchange/tDResusDead → greens/base_resuspension_rate sediment_exchange/aFunTauTmSet → greens/aFunTauTmSet"
+  - generic "bot_pel_interface/bot_pel_conv → greens/bot_pel_conv"
+  - generic "cyanobacteria → cladocerans/prey_model1"
+  - generic "diatoms → cladocerans/prey_model2"
+  - generic "greens → cladocerans/prey_model3"
+  - generic "POM → cladocerans/prey_model4 POM/sDW → cladocerans/POM_DW_pool_water POM/sNW → cladocerans/POM_N_pool_water POM/sPW → cladocerans/POM_P_pool_water POM/sCW → cladocerans/POM_C_pool_water"
+  - generic "abiotic_water/sSiPaW → cladocerans/SiPa_pool_water abiotic_water/sNH4W → cladocerans/NH4_pool_water abiotic_water/sPO4W → cladocerans/PO4_pool_water abiotic_water/sSiO2W → cladocerans/SiO2_pool_water abiotic_water/sO2W → cladocerans/oxygen_pool_water"
+  - generic "DOM/sDW → cladocerans/DOM_DW_pool_water DOM/sNW → cladocerans/DOM_N_pool_water DOM/sPW → cladocerans/DOM_P_pool_water DOM/sCW → cladocerans/DOM_C_pool_water"
+  - generic "cyanobacteria → copepods/prey_model1"
+  - generic "diatoms → copepods/prey_model2"
+  - generic "greens → copepods/prey_model3"
+  - generic "POM → copepods/prey_model4 POM/sDW → copepods/POM_DW_pool_water POM/sNW → copepods/POM_N_pool_water POM/sPW → copepods/POM_P_pool_water POM/sCW → copepods/POM_C_pool_water"
+  - generic "abiotic_water/sSiPaW → copepods/SiPa_pool_water abiotic_water/sNH4W → copepods/NH4_pool_water abiotic_water/sPO4W → copepods/PO4_pool_water abiotic_water/sSiO2W → copepods/SiO2_pool_water abiotic_water/sO2W → copepods/oxygen_pool_water"
+  - generic "DOM/sDW → copepods/DOM_DW_pool_water DOM/sNW → copepods/DOM_N_pool_water DOM/sPW → copepods/DOM_P_pool_water DOM/sCW → copepods/DOM_C_pool_water"
+  - generic "cyanobacteria → zoobenthos/prey_model1"
+  - generic "diatoms → zoobenthos/prey_model2"
+  - generic "greens → zoobenthos/prey_model3"
+  - generic "POM → zoobenthos/prey_model4 POM/sDS → zoobenthos/POM_DW_pool_sediment POM/sPS → zoobenthos/POM_P_pool_sediment POM/sNS → zoobenthos/POM_N_pool_sediment POM/sCS → zoobenthos/POM_C_pool_sediment POM/sDS_PV → zoobenthos/POM_DW_pool_sediment_PV POM/sNS_PV → zoobenthos/POM_N_pool_sediment_PV POM/sPS_PV → zoobenthos/POM_P_pool_sediment_PV POM/sCS_PV → zoobenthos/POM_C_pool_sediment_PV"
+  - generic "abiotic_sediment/sSiPaS → zoobenthos/SiPa_pool_sediment abiotic_sediment/sNH4S → zoobenthos/NH4_pool_sediment abiotic_sediment/sNO3S → zoobenthos/NO3_pool_sediment abiotic_sediment/sPO4S → zoobenthos/PO4_pool_sediment abiotic_sediment/sSiO2S → zoobenthos/SiO2_pool_sediment"
+  - generic "DOM/sDS → zoobenthos/DOM_DW_pool_sediment DOM/sNS → zoobenthos/DOM_N_pool_sediment DOM/sPS → zoobenthos/DOM_P_pool_sediment DOM/sCS → zoobenthos/DOM_C_pool_sediment DOM/sDS_PV → zoobenthos/DOM_DW_pool_sediment_PV DOM/sNS_PV → zoobenthos/DOM_N_pool_sediment_PV DOM/sPS_PV → zoobenthos/DOM_P_pool_sediment_PV DOM/sCS_PV → zoobenthos/DOM_C_pool_sediment_PV"
+  - generic "abiotic_water/pO2Sat → zoobenthos/pO2Sat"
+  - generic "bot_pel_interface/bot_pel_conv → zoobenthos/bot_pel_conv"
+  - generic "cyanobacteria/wCO2UptW → inorganic_carbon/CO2_uptake_water_1 cyanobacteria/wCO2RespW → inorganic_carbon/CO2_respiration_water_1"
+  - generic "diatoms/wCO2UptW → inorganic_carbon/CO2_uptake_water_2 diatoms/wCO2RespW → inorganic_carbon/CO2_respiration_water_2"
+  - generic "greens/wCO2UptW → inorganic_carbon/CO2_uptake_water_3 greens/wCO2RespW → inorganic_carbon/CO2_respiration_water_3"
+  - generic "cladocerans/wCRespZoo → inorganic_carbon/C_respiration_zooplankton_1"
+  - generic "copepods/wCRespZoo → inorganic_carbon/C_respiration_zooplankton_2"
+  - generic "DOM/wCMin → inorganic_carbon/C_mineralization_water_1"
+  - generic "macrophytes/tCProdVeg → inorganic_carbon/C_production_macrophyte_1 macrophytes/tCRespVeg → inorganic_carbon/C_respiration_macrophyte_1"
+  - generic "zoobenthos/tCRespBent → inorganic_carbon/C_respiration_zoobenthos_1"
+  - generic "bot_pel_interface/bot_pel_conv → inorganic_carbon/bot_pel_conv"
+  - generic "POM/sDW → JuFish/POM_DW_pool_water POM/sNW → JuFish/POM_N_pool_water POM/sPW → JuFish/POM_P_pool_water POM/sCW → JuFish/POM_C_pool_water"
+  - generic "abiotic_water/sNH4W → JuFish/NH4_pool_water abiotic_water/sPO4W → JuFish/PO4_pool_water abiotic_water/sO2W → JuFish/oxygen_pool_water"
+  - generic "DOM/sDW → JuFish/DOM_DW_pool_water DOM/sNW → JuFish/DOM_N_pool_water DOM/sPW → JuFish/DOM_P_pool_water DOM/sCW → JuFish/DOM_C_pool_water"
+  - generic "bot_pel_interface/bot_pel_conv → JuFish/bot_pel_conv"
+  - generic "copepods → JuFish/PLANprey1"
+  - generic "cladocerans → JuFish/PLANprey2"
+  - generic "POM/sDW → AdFish/POM_DW_pool_water POM/sNW → AdFish/POM_N_pool_water POM/sPW → AdFish/POM_P_pool_water POM/sCW → AdFish/POM_C_pool_water"
+  - generic "abiotic_water/sNH4W → AdFish/NH4_pool_water abiotic_water/sPO4W → AdFish/PO4_pool_water abiotic_water/sO2W → AdFish/oxygen_pool_water"
+  - generic "DOM/sDW → AdFish/DOM_DW_pool_water DOM/sNW → AdFish/DOM_N_pool_water DOM/sPW → AdFish/DOM_P_pool_water DOM/sCW → AdFish/DOM_C_pool_water"
+  - generic "bot_pel_interface/bot_pel_conv → AdFish/bot_pel_conv"
+  - generic "zoobenthos → AdFish/BENTprey1"
+  - generic "JuFish → PiscFish/PISCprey1"
+  - generic "AdFish → PiscFish/PISCprey2"
+  - generic "POM/sDW → PiscFish/POM_DW_pool_water POM/sNW → PiscFish/POM_N_pool_water POM/sPW → PiscFish/POM_P_pool_water POM/sCW → PiscFish/POM_C_pool_water"
+  - generic "abiotic_water/sNH4W → PiscFish/NH4_pool_water abiotic_water/sPO4W → PiscFish/PO4_pool_water abiotic_water/sO2W → PiscFish/oxygen_pool_water"
+  - generic "DOM/sDW → PiscFish/DOM_DW_pool_water DOM/sNW → PiscFish/DOM_N_pool_water DOM/sPW → PiscFish/DOM_P_pool_water DOM/sCW → PiscFish/DOM_C_pool_water"
+  - generic "bot_pel_interface/bot_pel_conv → PiscFish/bot_pel_conv"
+  - generic "inorganic_carbon/sDICW → methane/DIC_pool_water"
+  - generic "abiotic_water/sO2W → methane/oxygen_pool_water"
+  - generic "abiotic_sediment/afOxySed → methane/aerobic_fraction_sediment"
+  - generic "bot_pel_interface/bot_pel_conv → methane/bot_pel_conv"
+  - generic "POM/tCTrans → methane/C_mineralization_sediment_1"
+  - generic "DOM/tCTrans → methane/C_mineralization_sediment_2"
+  - generic "humus/tCTrans → methane/C_mineralization_sediment_3"
+  - button "abiotic_water":
+    - generic: abiotic_water
+  - button "abiotic_sediment":
+    - generic: abiotic_sediment
+  - button "bot_pel_interface":
+    - generic: bot_pel_interface
+  - button "burial":
+    - generic: burial
+  - button "sediment_exchange":
+    - generic: sediment_exchange
+  - button "POM":
+    - generic: POM
+  - button "DOM":
+    - generic: DOM
+  - button "humus":
+    - generic: humus
+  - button "macrophytes":
+    - generic: macrophytes
+  - button "cyanobacteria":
+    - generic: cyanobacteria
+  - button "diatoms":
+    - generic: diatoms
+  - button "greens":
+    - generic: greens
+  - button "cladocerans":
+    - generic: cladocerans
+  - button "copepods":
+    - generic: copepods
+  - button "zoobenthos":
+    - generic: zoobenthos
+  - button "inorganic_carbon":
+    - generic: inorganic_carbon
+  - button "JuFish":
+    - generic: JuFish
+  - button "AdFish":
+    - generic: AdFish
+  - button "PiscFish":
+    - generic: PiscFish
+  - button "methane":
+    - generic: methane
+- group "图形视图控制":
+  - button "放大图形": +
+  - button "缩小图形": −
+  - button "恢复完整图形范围": 复位
+  - button "全屏 / 退出全屏": ⛶
+- generic: 模块实例
+- combobox "模块实例":
+  - option "abiotic_water"
+  - option "abiotic_sediment"
+  - option "bot_pel_interface"
+  - option "burial"
+  - option "sediment_exchange"
+  - option "POM" [selected]
+  - option "DOM"
+  - option "humus"
+  - option "macrophytes"
+  - option "cyanobacteria"
+  - option "diatoms"
+  - option "greens"
+  - option "cladocerans"
+  - option "copepods"
+  - option "zoobenthos"
+  - option "inorganic_carbon"
+  - option "JuFish"
+  - option "AdFish"
+  - option "PiscFish"
+  - option "methane"
+- paragraph: POM · wet/om_pool · 启用
+- generic: 显示名称（保留实例引用名）
+- textbox "显示名称（保留实例引用名）": POM R11 verified
+- generic: 现有参数
+- combobox "现有参数":
+  - option "不修改参数" [selected]
+  - option "NO3PerCW"
+  - option "cExtSp"
+  - option "cThetaMinS"
+  - option "cThetaMinW"
+  - option "cVSet"
+  - option "diagnostics"
+  - option "fRefrDWS"
+  - option "fRefrNutS"
+  - option "hNO3DenitW"
+  - option "hO2BOD"
+  - option "kDMinS"
+  - option "kDMinW"
+  - option "kNMinS"
+  - option "kNMinW"
+  - option "kPMinS"
+  - option "kPMinW"
+  - option "lPOMtoDOM"
+  - option "lRefrPV"
+  - option "lRefrpool"
+  - option "lTransPV"
+  - option "qTrans"
+- generic: 参数值
+- textbox "参数值" [disabled]
+- generic: 现有耦合端口
+- combobox "现有耦合端口":
+  - option "不修改耦合" [selected]
+  - option "C_refractory_sediment"
+  - option "C_transformation_sediment"
+  - option "C_transformation_water"
+  - option "DW_refractory_sediment"
+  - option "DW_transformation_sediment"
+  - option "DW_transformation_water"
+  - option "NO3_pool_water"
+  - option "N_refractory_sediment"
+  - option "N_transformation_sediment"
+  - option "N_transformation_water"
+  - option "P_refractory_sediment"
+  - option "P_transformation_sediment"
+  - option "P_transformation_water"
+  - option "bot_pel_conv"
+  - option "oxygen_pool_water"
+- generic: 已登记目标引用
+- combobox "已登记目标引用":
+  - option "请选择已登记引用" [selected]
+  - option "AdFish/sC"
+  - option "AdFish/sD"
+  - option "AdFish/sN"
+  - option "AdFish/sP"
+  - option "DOM/sCS"
+  - option "DOM/sCS_PV"
+  - option "DOM/sCW"
+  - option "DOM/sDS"
+  - option "DOM/sDS_PV"
+  - option "DOM/sDW"
+  - option "DOM/sNS"
+  - option "DOM/sNS_PV"
+  - option "DOM/sNW"
+  - option "DOM/sPS"
+  - option "DOM/sPS_PV"
+  - option "DOM/sPW"
+  - option "DOM/tCTrans"
+  - option "DOM/tDTrans"
+  - option "DOM/wCMin"
+  - option "JuFish/sC"
+  - option "JuFish/sD"
+  - option "JuFish/sN"
+  - option "JuFish/sP"
+  - option "POM/sCS"
+  - option "POM/sCS_PV"
+  - option "POM/sCW"
+  - option "POM/sDS"
+  - option "POM/sDS_PV"
+  - option "POM/sDW"
+  - option "POM/sNS"
+  - option "POM/sNS_PV"
+  - option "POM/sNW"
+  - option "POM/sPS"
+  - option "POM/sPS_PV"
+  - option "POM/sPW"
+  - option "POM/tCTrans"
+  - option "POM/tDPOMS"
+  - option "POM/tDTrans"
+  - option "PiscFish/sC"
+  - option "PiscFish/sD"
+  - option "PiscFish/sN"
+  - option "PiscFish/sP"
+  - option "abiotic_sediment/afOxySed"
+  - option "abiotic_sediment/bPorCorS"
+  - option "abiotic_sediment/bPorS"
+  - option "abiotic_sediment/cDepthS"
+  - option "abiotic_sediment/fDepthDifS"
+  - option "abiotic_sediment/sDIMS"
+  - option "abiotic_sediment/sNH4S"
+  - option "abiotic_sediment/sNO3S"
+  - option "abiotic_sediment/sPAIMS"
+  - option "abiotic_sediment/sPO4S"
+  - option "abiotic_sediment/sSiO2S"
+  - option "abiotic_sediment/sSiPaS"
+  - option "abiotic_water/pO2Sat"
+  - option "abiotic_water/sDIMW"
+  - option "abiotic_water/sNH4W"
+  - option "abiotic_water/sNO3W"
+  - option "abiotic_water/sO2W"
+  - option "abiotic_water/sPAIMW"
+  - option "abiotic_water/sPO4W"
+  - option "abiotic_water/sSiO2W"
+  - option "abiotic_water/sSiPaW"
+  - option "bot_pel_interface/bot_pel_conv"
+  - option "cladocerans/sC"
+  - option "cladocerans/sD"
+  - option "cladocerans/sN"
+  - option "cladocerans/sP"
+  - option "cladocerans/wCRespZoo"
+  - option "copepods/sC"
+  - option "copepods/sD"
+  - option "copepods/sN"
+  - option "copepods/sP"
+  - option "copepods/wCRespZoo"
+  - option "cyanobacteria/sCS"
+  - option "cyanobacteria/sCS_PV"
+  - option "cyanobacteria/sCW"
+  - option "cyanobacteria/sDS"
+  - option "cyanobacteria/sDS_PV"
+  - option "cyanobacteria/sDW"
+  - option "cyanobacteria/sNS"
+  - option "cyanobacteria/sNS_PV"
+  - option "cyanobacteria/sNW"
+  - option "cyanobacteria/sPS"
+  - option "cyanobacteria/sPS_PV"
+  - option "cyanobacteria/sPW"
+  - option "cyanobacteria/tDPOMS"
+  - option "cyanobacteria/wCO2RespW"
+  - option "cyanobacteria/wCO2UptW"
+  - option "diatoms/sCS"
+  - option "diatoms/sCS_PV"
+  - option "diatoms/sCW"
+  - option "diatoms/sDS"
+  - option "diatoms/sDS_PV"
+  - option "diatoms/sDW"
+  - option "diatoms/sNS"
+  - option "diatoms/sNS_PV"
+  - option "diatoms/sNW"
+  - option "diatoms/sPS"
+  - option "diatoms/sPS_PV"
+  - option "diatoms/sPW"
+  - option "diatoms/tDPOMS"
+  - option "diatoms/wCO2RespW"
+  - option "diatoms/wCO2UptW"
+  - option "greens/sCS"
+  - option "greens/sCS_PV"
+  - option "greens/sCW"
+  - option "greens/sDS"
+  - option "greens/sDS_PV"
+  - option "greens/sDW"
+  - option "greens/sNS"
+  - option "greens/sNS_PV"
+  - option "greens/sNW"
+  - option "greens/sPS"
+  - option "greens/sPS_PV"
+  - option "greens/sPW"
+  - option "greens/tDPOMS"
+  - option "greens/wCO2RespW"
+  - option "greens/wCO2UptW"
+  - option "humus/sCS"
+  - option "humus/sCS_PV"
+  - option "humus/sDS"
+  - option "humus/sDS_PV"
+  - option "humus/sNS"
+  - option "humus/sNS_PV"
+  - option "humus/sPS"
+  - option "humus/sPS_PV"
+  - option "humus/tCTrans"
+  - option "humus/tDPOMS"
+  - option "inorganic_carbon/sAlkW"
+  - option "inorganic_carbon/sDICW"
+  - option "macrophytes/sC"
+  - option "macrophytes/sC_PV"
+  - option "macrophytes/sD"
+  - option "macrophytes/sD_PV"
+  - option "macrophytes/sN"
+  - option "macrophytes/sN_PV"
+  - option "macrophytes/sP"
+  - option "macrophytes/sP_PV"
+  - option "macrophytes/tCProdVeg"
+  - option "macrophytes/tCRespVeg"
+  - option "macrophytes/tDBedPOMS"
+  - option "methane/sCH4W"
+  - option "sediment_exchange/aFunTauTmSet"
+  - option "sediment_exchange/tDAbioIMS"
+  - option "sediment_exchange/tDExchPOMS_1"
+  - option "sediment_exchange/tDResusDead"
+  - option "zoobenthos/sC"
+  - option "zoobenthos/sC_PV"
+  - option "zoobenthos/sD"
+  - option "zoobenthos/sD_PV"
+  - option "zoobenthos/sN"
+  - option "zoobenthos/sN_PV"
+  - option "zoobenthos/sP"
+  - option "zoobenthos/sP_PV"
+  - option "zoobenthos/tCRespBent"
+  - option "zoobenthos/tDBentPOMS"
+- button "保存节点修改"
+- paragraph: 只修改选择的字段并保留 YAML 其他内容。保存前生成备份，拒绝过期配置、无效引用或运行中的案例。
+- status:
+  - generic: 项目
+  - strong: Round11 UI Lake 1401
+  - generic: 网格
+  - strong: 待加载
+  - generic: 运行
+  - strong: 已完成
+  - generic: 视图
+  - strong: 100%
+  - generic: 坐标系
+  - strong: —

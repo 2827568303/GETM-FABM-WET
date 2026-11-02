@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "report": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\external-polygon-20261012-01\\verification.json",
+  "report_sha256": "8cb1ff377470f7d5eaabd5e9e55ea7497d343b646c592834ed320f89581ea0bc",
+  "seed": 2026101202,
+  "polygon": {
+    "cells": 175,
+    "depths": [
+      3.0,
+      5.0,
+      7.0
+    ],
+    "max_abs_error": 0.0
+  },
+  "run": "completed",
+  "result_passed": true,
+  "variables": 800,
+  "solver_sha256": "15884cc236ef8526cd28f51dde491e95d6bd87a0f340c291bcce10aa8bbdf9e4",
+  "scope": "Deterministic synthetic integration scenario; not observational, scientific-accuracy, annual stability, or complete browser UX validation."
+}

@@ -1,0 +1,6 @@
+     0 diag51 ready
+     0 ready
+  1513 winhttp hooks installed
+  2418 WinHttpReceiveResponse
+  2476 WinHttpOpen agent=
+  2503 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8

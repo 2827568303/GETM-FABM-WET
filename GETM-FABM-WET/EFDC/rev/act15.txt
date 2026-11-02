@@ -1,0 +1,4 @@
+     3 diag51 ready
+     0 diag100 ready
+ 10729 WaitForMultipleObjectsEx 7644ms ret=0 count=3 timeout=0 | h=0xa5c wait0=0 ; h=0xa2c wait0=258 ; h=0x9d8 wait0=258 | from KERNELBASE.dll+0x15f4d8
+ 10731 WaitForMultipleObjects 7646ms ret=0 count=3 timeout=-1 | h=0xa5c wait0=0 ; h=0xa2c wait0=258 ; h=0x9d8 wait0=258 | from KERNEL32.DLL+0x6cf56

@@ -1,0 +1,152 @@
+[
+  {
+    "file": "3DWET\\tests\\test_calibration_param_baseline.js",
+    "exit_code": 0,
+    "stdout": "parameter baseline: saved case values are clean; save refreshes baseline; reset remains PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_calibration_real_scientific_language.js",
+    "exit_code": 0,
+    "stdout": "real scientific language: catalog translation preserves Chinese and imported terminology PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_calibration_scientific_charts.js",
+    "exit_code": 0,
+    "stdout": "scientific charts: retain both languages without duplicate terms on locale change PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_calibration_spatial_controls.js",
+    "exit_code": 0,
+    "stdout": "spatial section controls: selected variable, time, fixed axis/index PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_calibration_ui.js",
+    "exit_code": 0,
+    "stdout": "calibration UI: selected station payload and zero objective rendering PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_calibration_workflow.js",
+    "exit_code": 0,
+    "stdout": "calibration workflow: actual variables, run completion, failure isolation, zero convergence, weights PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_canvas_size_controls.js",
+    "exit_code": 0,
+    "stdout": "2D size controls: initial, numeric, native resize, fit and bounds PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_chart_language.js",
+    "exit_code": 0,
+    "stdout": "chart language: existing dataset/title switches both ways, numeric arrays and dates preserved PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_dashboard_scientific_language.js",
+    "exit_code": 0,
+    "stdout": "dashboard scientific language: summary and six-field labels preserve Chinese/original pairs PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_i18n.js",
+    "exit_code": 0,
+    "stdout": "i18n: locale persistence, reversible source translation, unknown fallback and safe language packs PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_initial_drafts.js",
+    "exit_code": 0,
+    "stdout": "initial drafts: filter, hidden save, rerender and invalid empty input PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_initial_instance_inputs.js",
+    "exit_code": 0,
+    "stdout": "initial conditions: independent instance inputs and saved values PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_initial_scientific_language.js",
+    "exit_code": 0,
+    "stdout": "initial conditions scientific descriptions retain Chinese and original translation PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_model_dates.js",
+    "exit_code": 0,
+    "stdout": "model dates: ordinal conversions, validation, UTC and chart spacing PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_model_dates_ui.js",
+    "exit_code": 0,
+    "stdout": "model dates UI: charts, heatmap hover, inputs and solver ISO compatibility PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_parameter_types.js",
+    "exit_code": 0,
+    "stdout": "parameter types: boolean/string/number save, invalid rejection, empty-string reset PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_preprocess_case_load.js",
+    "exit_code": 0,
+    "stdout": "preprocess case load: common state, saved preview and failure handling PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_run_notifications.js",
+    "exit_code": 0,
+    "stdout": "run notifications: true ETA crossings, invalid estimates, deduplication and terminal states PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_scientific_language.js",
+    "exit_code": 0,
+    "stdout": "scientific language: Chinese, English and imported translation retain original terminology PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_spatial_sections.js",
+    "exit_code": 0,
+    "stdout": "Spatial section rendering passed\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_variable_guide.js",
+    "exit_code": 0,
+    "stdout": "Variable guide: missing values, lower bounds, initial comparison PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_view_controls.js",
+    "exit_code": 0,
+    "stdout": "view controls: bounds and cursor-anchored zoom PASS\n2D viewport: narrow, wide and tall fitting preserves aspect PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_viz_geometry.js",
+    "exit_code": 0,
+    "stdout": "lake geometry: shoreline, holes, disconnected cells, masks, scale and sigma PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_viz_render.js",
+    "exit_code": 0,
+    "stdout": "lake render: masks, true depth labels, volume arrays, empty data and preview PASS\n",
+    "stderr": ""
+  },
+  {
+    "file": "3DWET\\tests\\test_viz_scientific_language.js",
+    "exit_code": 0,
+    "stdout": "Plotly scientific terms retain originals in real English, Chinese and imported i18n PASS\n",
+    "stderr": ""
+  }
+]

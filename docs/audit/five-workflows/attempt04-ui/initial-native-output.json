@@ -1,0 +1,166 @@
+{
+  "status": {
+    "case_directory": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261013-attempt04\\external\\3DWET\\case\\Round4 UI Lake 1302",
+    "current_step": 600,
+    "elapsed": 8.25538969039917,
+    "eta_minutes": 0.0,
+    "eta_seconds": 0,
+    "logs": [
+      "2020-01-01 00:15:00: saving 3D ....",
+      "2020-01-01 00:16:00: saving 2D ....",
+      "2020-01-01 00:16:00: saving 3D ....",
+      "13:16:27.132 n=         500",
+      "2020-01-01 00:17:00: saving 2D ....",
+      "2020-01-01 00:17:00: saving 3D ....",
+      "2020-01-01 00:18:00: saving 2D ....",
+      "2020-01-01 00:18:00: saving 3D ....",
+      "2020-01-01 00:19:00: saving 2D ....",
+      "2020-01-01 00:19:00: saving 3D ....",
+      "13:16:27.674 n=         600",
+      "2020-01-01 00:20:00: saving 2D ....",
+      "2020-01-01 00:20:00: saving 3D ....",
+      "------------------------------------------------------------------------",
+      "Cleaning up....",
+      "------------------------------------------------------------------------",
+      "SEED_IN:     3.5383801460266113E-004 10^6 m3",
+      "SEED_OUT:    -3.5383801460266113E-004 10^6 m3",
+      "clean_input",
+      "------------------------------------------------------------------------",
+      "getm: Completed on 20261013 131627.748",
+      "Memory used (global 2D and 3D arrays):",
+      "2D:           68  kbytes",
+      "3D:          421  kbytes",
+      "Total CPU-time was:       3.92187500      seconds",
+      "Number of time steps:           600",
+      "Number of calc-points:          165",
+      "CPU-time/calc-point:      3.96148971E-05  seconds",
+      "Sim-time/CPU-time:        305.97609561752989",
+      "------------------------------------------------------------------------",
+      "GETM timers in seconds (             10000000  tics per second)",
+      "wall      #sysclocks     % of total",
+      "Timername                time (s)        calls       clocked time",
+      "initialize                    0.47              2         12.02",
+      "bottom_friction               0.00             36          0.00",
+      "momentum                      0.00           1200          0.04",
+      "uv_depths                     0.00              2          0.00",
+      "sum uv_advect                0.00           1400          0.11",
+      "sum uv_diffusion             0.00           1400          0.07",
+      "depth_update                  0.00           1202          0.02",
+      "sealevel                      0.00           1200          0.01",
+      "gotm                          0.00            200          0.09",
+      "uv_advect_3d                  0.01            200          0.26",
+      "uv_diffusion_3d               0.00            200          0.04",
+      "vv_momentum_3d                0.00            200          0.07",
+      "uu_momentum_3d                0.00            200          0.07",
+      "ww_momentum_3d                0.00            200          0.01",
+      "ss_nn                         0.00            202          0.02",
+      "bottom_friction_3d            0.00            200          0.01",
+      "stresses_3d                   0.00            200          0.01",
+      "slow_terms                    0.00            200          0.01",
+      "slow_bottom_friction          0.00            200          0.01",
+      "do_temperature                0.01            200          0.19",
+      "do_salinity                   0.00              0          0.00",
+      "coordinates                   0.00            202          0.03",
+      "do_internal_pressure          0.00            200          0.02",
+      "start_macro                   0.00            202          0.01",
+      "eq_state                      0.00            202          0.01",
+      "calc_mean_fields              0.00              0          0.00",
+      "do_meteo                      0.01           1202          0.25",
+      "getm_fabm                     2.45            200         62.65",
+      "integrate_2d other            0.01           2400          0.16",
+      "integrate_3d other            0.00           1200          0.04",
+      "do_input                      0.00           1200          0.01",
+      "do_output                     0.50           1202         12.85",
+      "output_manager_save           0.43           2400         11.10",
+      "do_output_processing          0.00           1200          0.00",
+      "sum do_advection             0.08          74800          2.12",
+      "sum do_advection_3d          0.29          12000          7.45",
+      "sum check_3d_fields          0.00            400          0.01",
+      "numerical mixing analysi      0.00              0          0.00",
+      "advection getm_fabm          0.27            200          6.96",
+      "TIMERS SUM        3.92         112854        100.00",
+      "------------------------------------------------------------------------",
+      "Copyright (C) Karsten Bolding and Hans Burchard.",
+      "under the General Public License (GPL) - http://www.gnu.org",
+      "------------------------------------------------------------------------",
+      "[INFO] 结果有效性检查通过（3.391秒）",
+      "[INFO] 输出已归档到 output/：ROUND4_UI_LAKE_1302_WET.2d.nc, ROUND4_UI_LAKE_1302_WET.3d.nc, output.nc",
+      "[INFO] 模型运行完成！耗时: 4.7秒 (0.1分钟)"
+    ],
+    "output_directory": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261013-attempt04\\external\\3DWET\\case\\Round4 UI Lake 1302\\output",
+    "performance": {
+      "estimate": {
+        "cfl_dt": 3.0168692260666514,
+        "cfl_max": 3.0168692260666514,
+        "cfl_ok": true,
+        "duration_days": 0.013888888888888888,
+        "estimated_hours": 0.0027500000000000003,
+        "estimated_minutes": 0.165,
+        "estimated_seconds": 9.9,
+        "grid": "19x14",
+        "nsteps": 600,
+        "nwater": 165,
+        "timestep": 2.0
+      },
+      "solver_mode": "预编译串行求解器",
+      "step_cost_seconds": 0.01375898281733195
+    },
+    "progress": 100,
+    "status": "completed",
+    "steps_per_second": 72.67979132442244,
+    "total_logs": 3465,
+    "total_steps": 600,
+    "writing_directory": null
+  },
+  "outputs": [
+    {
+      "name": "output.nc",
+      "records": 20,
+      "fields": {
+        "temp": {
+          "min": 16.244958877563477,
+          "max": 16.250219345092773
+        },
+        "DOM_sDW": {
+          "min": 6.1249613761901855,
+          "max": 6.125
+        },
+        "POM_sDW": {
+          "min": 7.246984958648682,
+          "max": 7.252955913543701
+        },
+        "abiotic_water_sO2W": {
+          "min": 8.499907493591309,
+          "max": 8.500570297241211
+        }
+      }
+    },
+    {
+      "name": "ROUND4_UI_LAKE_1302_WET.2d.nc",
+      "records": 20,
+      "fields": {}
+    },
+    {
+      "name": "ROUND4_UI_LAKE_1302_WET.3d.nc",
+      "records": 20,
+      "fields": {
+        "temp": {
+          "min": 16.244958877563477,
+          "max": 16.250219345092773
+        },
+        "DOM_sDW": {
+          "min": 6.1249613761901855,
+          "max": 6.125
+        },
+        "POM_sDW": {
+          "min": 7.246984958648682,
+          "max": 7.252955913543701
+        },
+        "abiotic_water_sO2W": {
+          "min": 8.499907493591309,
+          "max": 8.500570297241211
+        }
+      }
+    }
+  ]
+}

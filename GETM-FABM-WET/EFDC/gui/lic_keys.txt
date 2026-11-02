@@ -1,0 +1,759 @@
+﻿[js] {"ready": true}
+pid=58464
+[js] {"reg": "LsaPid", "val": "࢈"}
+[js] {"reg": "AppsUseLightTheme", "val": "\u0001"}
+[js] {"reg": "Com+Enabled", "val": "\u0001"}
+[js] {"reg": "MaxSxSHashCount", "val": "︨\u001a"}
+[js] {"reg": "null", "val": "{72C24DD5-D70A-438B-8A42-98424B88AFB8}"}
+[js] {"reg": "null", "val": "{72C24DD5-D70A-438B-8A42-98424B88AFB8}"}
+[js] {"reg": "null", "val": "Windows Script Host Shell Object"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\wshom.ocx"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Windows Script Host Shell Object"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\wshom.ocx"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\wshom.ocx"}
+[js] {"reg": "null", "val": "{0D43FE01-F093-11CF-8940-00A0C9054228}"}
+[js] {"reg": "null", "val": "{0D43FE01-F093-11CF-8940-00A0C9054228}"}
+[js] {"reg": "null", "val": "FileSystem Object"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "FileSystem Object"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "Flexnet.WrapperDongle.FlexWrapperDongle"}
+[js] {"reg": "null", "val": "mscoree.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "Flexnet.WrapperDongle.FlexWrapperDongle"}
+[js] {"reg": "null", "val": "mscoree.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "InstallRoot", "val": "C:\\Windows\\Microsoft.NET\\Framework\\"}
+[js] {"reg": "InstallRoot", "val": "C:\\Windows\\Microsoft.NET\\Framework\\"}
+[js] {"reg": "InstallRoot", "val": "C:\\Windows\\Microsoft.NET\\Framework\\"}
+[js] {"reg": "RuntimeVersion", "val": "v4.0.30319"}
+[js] {"reg": "Class", "val": "Flexnet.WrapperDongle.FlexWrapperDongle"}
+[js] {"reg": "Assembly", "val": "DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"}
+[js] {"reg": "RuntimeVersion", "val": "v4.0.30319"}
+[js] {"reg": "InstallRoot", "val": "C:\\Windows\\Microsoft.NET\\Framework\\"}
+[js] {"reg": "UseLegacyV2RuntimeActivationPolicyDefaultValue", "val": "￿￿\u0001"}
+[js] {"reg": "Release", "val": "␅\bπ"}
+[js] {"reg": "EnableLog", "val": "Ϝ"}
+[js] {"reg": "LoggingLevel", "val": "Ϝ"}
+[js] {"reg": "ForceLog", "val": "Ϝ"}
+[js] {"reg": "LogFailures", "val": "Ϝ"}
+[js] {"reg": "LogResourceBinds", "val": "Ϝ"}
+[js] {"reg": "DevOverrideEnable", "val": "觴珹\u0004"}
+[js] {"reg": "AllowPotentiallyInsecureAutoNgenBehaviors", "val": "\u001a"}
+[js] {"reg": "Release", "val": "␅\b\u0004"}
+[js] {"reg": "RuntimeVersion", "val": "v4.0.30319"}
+[js] {"reg": "Class", "val": "Flexnet.WrapperDongle.FlexWrapperDongle"}
+[js] {"reg": "Assembly", "val": "DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"}
+[js] {"reg": "CodeBase", "val": "file:///C:/EFDC84_LIC/DSILIC1.dll"}
+[js] {"reg": "null", "val": "mscoree.dll"}
+[js] {"reg": "RuntimeVersion", "val": "v4.0.30319"}
+[js] {"reg": "Class", "val": "Flexnet.WrapperDongle.FlexWrapperDongle"}
+[js] {"reg": "Assembly", "val": "DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"}
+[js] {"reg": "RuntimeVersion", "val": "v4.0.30319"}
+[js] {"reg": "NoClientChecks", "val": "R"}
+[js] {"reg": "Latest", "val": "{"}
+[js] {"reg": "index123", "val": "￿㿿"}
+[js] {"reg": "RaiseActivationAuthenticationLevel", "val": "쌸\u001a"}
+[js] {"reg": "DefaultAccessPermission", "val": "在活动的激活上下文中找不到任何查找密钥。 "}
+[js] {"reg": "Category", "val": "\u0002"}
+[js] {"reg": "Name", "val": "Common AppData"}
+[js] {"reg": "ParentFolder", "val": "{62AB5D82-FDC1-4DC3-A9DD-070D1D495D97}"}
+[js] {"reg": "DeferPrecreateAndRedirect", "val": "{62AB5D82-FDC1-4DC3-A9DD-070D1D495D97}"}
+[js] {"reg": "LocalRedirectOnly", "val": "ָ"}
+[js] {"reg": "Roamable", "val": "ָ"}
+[js] {"reg": "PreCreate", "val": "ָ"}
+[js] {"reg": "Stream", "val": "ָ"}
+[js] {"reg": "PublishExpandedPath", "val": "ָ"}
+[js] {"reg": "DefinitionFlags", "val": "ָ"}
+[js] {"reg": "FolderTypeID", "val": "핐\u001a窼獋\u00015핔\u001a篠獋\u0001D하\u001a窔獋\u0001C한\u001a竰獋"}
+[js] {"reg": "InitFolderHandler", "val": "핐\u001a窼獋\u00015핔\u001a篠獋\u0001D하\u001a窔獋\u0001C한\u001a竰獋"}
+[js] {"reg": "ProgramData", "val": "%SystemDrive%\\ProgramData"}
+[js] {"reg": "null", "val": "Flexnet.WrapperDongle.DemoLicense"}
+[js] {"reg": "null", "val": "mscoree.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "Flexnet.WrapperDongle.DemoLicense"}
+[js] {"reg": "null", "val": "mscoree.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "RuntimeVersion", "val": "v4.0.30319"}
+[js] {"reg": "Class", "val": "Flexnet.WrapperDongle.DemoLicense"}
+[js] {"reg": "Assembly", "val": "DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"}
+[js] {"reg": "RuntimeVersion", "val": "v4.0.30319"}
+[js] {"reg": "NoClientChecks", "val": "攍崑\u0010"}
+[js] {"reg": "RuntimeVersion", "val": "v4.0.30319"}
+[js] {"reg": "Class", "val": "Flexnet.WrapperDongle.DemoLicense"}
+[js] {"reg": "Assembly", "val": "DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"}
+[js] {"reg": "CodeBase", "val": "file:///C:/EFDC84_LIC/DSILIC1.dll"}
+[js] {"reg": "null", "val": "mscoree.dll"}
+[js] {"reg": "RuntimeVersion", "val": "v4.0.30319"}
+[js] {"reg": "Class", "val": "Flexnet.WrapperDongle.DemoLicense"}
+[js] {"reg": "Assembly", "val": "DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"}
+[js] {"reg": "RuntimeVersion", "val": "v4.0.30319"}
+[js] {"reg": "NoClientChecks", "val": "➸Ӏ瘬ѣ푌\u001a異Ғ쬖崑坰ѻ瘘ѣ￾￿"}
+[js] {"reg": "Category", "val": "\u0003"}
+[js] {"reg": "Name", "val": "Common Documents"}
+[js] {"reg": "ParentFolder", "val": "{DFDF76A2-C82A-4D63-906A-5644AC457385}"}
+[js] {"reg": "DeferPrecreateAndRedirect", "val": "{DFDF76A2-C82A-4D63-906A-5644AC457385}"}
+[js] {"reg": "Description", "val": "\u0007"}
+[js] {"reg": "RelativePath", "val": "Documents"}
+[js] {"reg": "ParsingName", "val": "Documents"}
+[js] {"reg": "InfoTip", "val": "Documents"}
+[js] {"reg": "LocalizedName", "val": "@%SystemRoot%\\system32\\shell32.dll,-21801"}
+[js] {"reg": "Icon", "val": "%SystemRoot%\\system32\\imageres.dll,-3"}
+[js] {"reg": "Security", "val": "%SystemRoot%\\system32\\imageres.dll,-3"}
+[js] {"reg": "StreamResource", "val": "%SystemRoot%\\system32\\imageres.dll,-3"}
+[js] {"reg": "StreamResourceType", "val": "%SystemRoot%\\system32\\imageres.dll,-3"}
+[js] {"reg": "LocalRedirectOnly", "val": "׈"}
+[js] {"reg": "Roamable", "val": "׈"}
+[js] {"reg": "PreCreate", "val": "\u0001"}
+[js] {"reg": "Stream", "val": "\u0001"}
+[js] {"reg": "PublishExpandedPath", "val": "\u0001"}
+[js] {"reg": "DefinitionFlags", "val": "\u0001"}
+[js] {"reg": "Attributes", "val": "\u0001"}
+[js] {"reg": "FolderTypeID", "val": "픸\u001a窼獋\u00017피\u001a篠獋\u00018핀\u001a窔獋\u00016필\u001a竰獋"}
+[js] {"reg": "InitFolderHandler", "val": "픸\u001a窼獋\u00017피\u001a篠獋\u00018핀\u001a窔獋\u00016필\u001a竰獋"}
+[js] {"reg": "Common Documents", "val": "%PUBLIC%\\Documents"}
+[js] {"reg": "Category", "val": "\u0002"}
+[js] {"reg": "Name", "val": "ProgramFiles"}
+[js] {"reg": "ParentFolder", "val": "{905E63B6-C1BF-494E-B29C-65B732D3D21A}"}
+[js] {"reg": "DeferPrecreateAndRedirect", "val": "{905E63B6-C1BF-494E-B29C-65B732D3D21A}"}
+[js] {"reg": "Description", "val": "\u0002"}
+[js] {"reg": "RelativePath", "val": "\u0002"}
+[js] {"reg": "ParsingName", "val": "\u0002"}
+[js] {"reg": "InfoTip", "val": "\u0002"}
+[js] {"reg": "LocalizedName", "val": "@%SystemRoot%\\system32\\shell32.dll,-21781"}
+[js] {"reg": "Icon", "val": "@%SystemRoot%\\system32\\shell32.dll,-21781"}
+[js] {"reg": "Security", "val": "@%SystemRoot%\\system32\\shell32.dll,-21781"}
+[js] {"reg": "StreamResource", "val": "@%SystemRoot%\\system32\\shell32.dll,-21781"}
+[js] {"reg": "StreamResourceType", "val": "@%SystemRoot%\\system32\\shell32.dll,-21781"}
+[js] {"reg": "LocalRedirectOnly", "val": "׌"}
+[js] {"reg": "Roamable", "val": "׌"}
+[js] {"reg": "PreCreate", "val": "\u0001"}
+[js] {"reg": "Stream", "val": "\u0001"}
+[js] {"reg": "PublishExpandedPath", "val": "\u0001"}
+[js] {"reg": "DefinitionFlags", "val": "\u0001"}
+[js] {"reg": "Attributes", "val": "\u0001"}
+[js] {"reg": "FolderTypeID", "val": "펰\u001a窼獋\u00016펴\u001a篠獋\u00011편\u001a窔獋\u00014펼\u001a竰獋"}
+[js] {"reg": "InitFolderHandler", "val": "펰\u001a窼獋\u00016펴\u001a篠獋\u00011편\u001a窔獋\u00014펼\u001a竰獋"}
+[js] {"reg": "ProgramFilesDir", "val": "C:\\Program Files (x86)"}
+[js] {"reg": "Category", "val": "\u0002"}
+[js] {"reg": "Name", "val": "ProgramFilesX86"}
+[js] {"reg": "ParentFolder", "val": "{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}"}
+[js] {"reg": "DeferPrecreateAndRedirect", "val": "{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}"}
+[js] {"reg": "LocalizedName", "val": "@%SystemRoot%\\system32\\shell32.dll,-21817"}
+[js] {"reg": "Icon", "val": "@%SystemRoot%\\system32\\shell32.dll,-21817"}
+[js] {"reg": "Security", "val": "@%SystemRoot%\\system32\\shell32.dll,-21817"}
+[js] {"reg": "StreamResource", "val": "@%SystemRoot%\\system32\\shell32.dll,-21817"}
+[js] {"reg": "StreamResourceType", "val": "@%SystemRoot%\\system32\\shell32.dll,-21817"}
+[js] {"reg": "LocalRedirectOnly", "val": "׌"}
+[js] {"reg": "Roamable", "val": "׌"}
+[js] {"reg": "PreCreate", "val": "\u0001"}
+[js] {"reg": "Stream", "val": "\u0001"}
+[js] {"reg": "PublishExpandedPath", "val": "\u0001"}
+[js] {"reg": "DefinitionFlags", "val": "\u0001"}
+[js] {"reg": "Attributes", "val": "\u0001"}
+[js] {"reg": "FolderTypeID", "val": "풀\u001a窼獋\u00014풄\u001a篠獋\u00010품\u001a窔獋\u0001F풌\u001a竰獋"}
+[js] {"reg": "InitFolderHandler", "val": "풀\u001a窼獋\u00014풄\u001a篠獋\u00010품\u001a窔獋\u0001F풌\u001a竰獋"}
+[js] {"reg": "Category", "val": "\u0002"}
+[js] {"reg": "Name", "val": "ProgramFilesCommon"}
+[js] {"reg": "ParentFolder", "val": "{F7F1ED05-9F6D-47A2-AAAE-29D317C6F066}"}
+[js] {"reg": "DeferPrecreateAndRedirect", "val": "{F7F1ED05-9F6D-47A2-AAAE-29D317C6F066}"}
+[js] {"reg": "LocalRedirectOnly", "val": "א"}
+[js] {"reg": "Roamable", "val": "א"}
+[js] {"reg": "PreCreate", "val": "א"}
+[js] {"reg": "Stream", "val": "א"}
+[js] {"reg": "PublishExpandedPath", "val": "א"}
+[js] {"reg": "DefinitionFlags", "val": "א"}
+[js] {"reg": "FolderTypeID", "val": "펰\u001a窼獋\u0001E펴\u001a篠獋\u0001F편\u001a窔獋\u0001A펼\u001a竰獋"}
+[js] {"reg": "InitFolderHandler", "val": "펰\u001a窼獋\u0001E펴\u001a篠獋\u0001F편\u001a窔獋\u0001A펼\u001a竰獋"}
+[js] {"reg": "CommonFilesDir", "val": "C:\\Program Files (x86)\\Common Files"}
+[js] {"reg": "null", "val": "{172BDDF8-CEEA-11D1-8B05-00600806D9B6}"}
+[js] {"reg": "null", "val": "Wbem Scripting Object Path"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\wbem\\wbemdisp.dll"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\wbem\\wbemdisp.dll"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Wbem Scripting Object Path"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\wbem\\wbemdisp.dll"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\wbem\\wbemdisp.dll"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "Logging Directory", "val": "%systemroot%\\system32\\wbem\\Logs\\"}
+[js] {"reg": "Logging", "val": "0"}
+[js] {"reg": "Log File Max Size", "val": "65536"}
+[js] {"reg": "Default Impersonation Level", "val": "\u0003"}
+[js] {"reg": "null", "val": "WBEM Locator"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wbemprox.dll"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wbemprox.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "WBEM Locator"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wbemprox.dll"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wbemprox.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "WbemDefaultPathParser"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wmiutils.dll"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wmiutils.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "WbemDefaultPathParser"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wmiutils.dll"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wmiutils.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "Windows Management and Instrumentation"}
+[js] {"reg": "null", "val": "{7C857801-7381-11CF-884D-00AA004B2E24}"}
+[js] {"reg": "null", "val": "PSFactoryBuffer"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wbemsvc.dll"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wbemsvc.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "PSFactoryBuffer"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wbemsvc.dll"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wbemsvc.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "{7C857801-7381-11CF-884D-00AA004B2E24}"}
+[js] {"reg": "null", "val": "{7C857801-7381-11CF-884D-00AA004B2E24}"}
+[js] {"reg": "null", "val": "Microsoft WBEM Call Context"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\fastprox.dll"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\fastprox.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "Microsoft WBEM Call Context"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\fastprox.dll"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\fastprox.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "ContextLimit", "val": "￿￿￿￿\u0004"}
+[js] {"reg": "ObjectLimit", "val": "￿￿\u0004"}
+[js] {"reg": "IdentifierLimit", "val": "ꯜ돖"}
+[js] {"reg": "AmsiEnable", "val": "\u0001"}
+[js] {"reg": "null", "val": "{D68AF00A-29CB-43FA-8504-CE99A996D9EA}"}
+[js] {"reg": "null", "val": "Microsoft WBEM (non)Standard Marshaling for IWbemServices"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\fastprox.dll"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\fastprox.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "Microsoft WBEM (non)Standard Marshaling for IWbemServices"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\fastprox.dll"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\fastprox.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "ProgramData", "val": "%SystemDrive%\\ProgramData"}
+[js] {"reg": "Public", "val": "%SystemDrive%\\Users\\Public"}
+[js] {"reg": "Default", "val": "%SystemDrive%\\Users\\Default"}
+[js] {"reg": "ProgramFilesDir", "val": "C:\\Program Files (x86)"}
+[js] {"reg": "CommonFilesDir", "val": "C:\\Program Files (x86)\\Common Files"}
+[js] {"reg": "ProgramFilesDir (x86)", "val": "C:\\Program Files (x86)"}
+[js] {"reg": "CommonFilesDir (x86)", "val": "C:\\Program Files (x86)\\Common Files"}
+[js] {"reg": "ProgramW6432Dir", "val": "C:\\Program Files"}
+[js] {"reg": "CommonW6432Dir", "val": "C:\\Program Files\\Common Files"}
+[js] {"reg": "FeatureBits", "val": "\u0001"}
+[js] {"reg": "null", "val": "PSFactoryBuffer"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wbemsvc.dll"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wbemsvc.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "PSFactoryBuffer"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wbemsvc.dll"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\wbemsvc.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\wbem\\wbemdisp.TLB"}
+[js] {"reg": "null", "val": "{1B1CAD8C-2DAB-11D2-B604-00104B703EFD}"}
+[js] {"reg": "null", "val": "Microsoft WBEM (non)Standard Marshaling for IEnumWbemClassObject"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\fastprox.dll"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\fastprox.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "Microsoft WBEM (non)Standard Marshaling for IEnumWbemClassObject"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\fastprox.dll"}
+[js] {"reg": "null", "val": "%systemroot%\\system32\\wbem\\fastprox.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "{7C857801-7381-11CF-884D-00AA004B2E24}"}
+[js] {"reg": "null", "val": "{7C857801-7381-11CF-884D-00AA004B2E24}"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\wbem\\wbemdisp.TLB"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\wbem\\wbemdisp.TLB"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\stdole2.tlb"}
+[js] {"reg": "null", "val": "{172BDDF8-CEEA-11D1-8B05-00600806D9B6}"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\wbem\\wbemdisp.TLB"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\wbem\\wbemdisp.TLB"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\wbem\\wbemdisp.TLB"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\stdole2.tlb"}
+[js] {"reg": "Category", "val": "\u0004"}
+[js] {"reg": "Name", "val": "AppData"}
+[js] {"reg": "ParentFolder", "val": "{3EB685DB-65F9-4CF6-A03A-E3EF65729F3D}"}
+[js] {"reg": "DeferPrecreateAndRedirect", "val": "{3EB685DB-65F9-4CF6-A03A-E3EF65729F3D}"}
+[js] {"reg": "Description", "val": "\u0002"}
+[js] {"reg": "RelativePath", "val": "AppData\\Roaming"}
+[js] {"reg": "ParsingName", "val": "AppData\\Roaming"}
+[js] {"reg": "InfoTip", "val": "AppData\\Roaming"}
+[js] {"reg": "LocalizedName", "val": "AppData\\Roaming"}
+[js] {"reg": "Icon", "val": "AppData\\Roaming"}
+[js] {"reg": "Security", "val": "AppData\\Roaming"}
+[js] {"reg": "StreamResource", "val": "AppData\\Roaming"}
+[js] {"reg": "StreamResourceType", "val": "AppData\\Roaming"}
+[js] {"reg": "LocalRedirectOnly", "val": "ٰ"}
+[js] {"reg": "Roamable", "val": "ٰ"}
+[js] {"reg": "PreCreate", "val": "ٰ"}
+[js] {"reg": "Stream", "val": "ٰ"}
+[js] {"reg": "PublishExpandedPath", "val": "ٰ"}
+[js] {"reg": "DefinitionFlags", "val": "ٰ"}
+[js] {"reg": "FolderTypeID", "val": "페\u001a窼獋\u00018펜\u001a篠獋\u00015펠\u001a窔獋\u0001F펤\u001a竰獋"}
+[js] {"reg": "InitFolderHandler", "val": "페\u001a窼獋\u00018펜\u001a篠獋\u00015펠\u001a窔獋\u0001F펤\u001a竰獋"}
+[js] {"reg": "AppData", "val": "%USERPROFILE%\\AppData\\Roaming"}
+[js] {"reg": "Category", "val": "\u0002"}
+[js] {"reg": "Name", "val": "Profile"}
+[js] {"reg": "ParentFolder", "val": "{5E6C858F-0E22-4760-9AFE-EA3317B67173}"}
+[js] {"reg": "DeferPrecreateAndRedirect", "val": "{5E6C858F-0E22-4760-9AFE-EA3317B67173}"}
+[js] {"reg": "Description", "val": "쨐ѻ"}
+[js] {"reg": "RelativePath", "val": "쨐ѻ"}
+[js] {"reg": "ParsingName", "val": "쨐ѻ"}
+[js] {"reg": "InfoTip", "val": "쨐ѻ"}
+[js] {"reg": "LocalizedName", "val": "쨐ѻ"}
+[js] {"reg": "Icon", "val": "쨐ѻ"}
+[js] {"reg": "Security", "val": "쨐ѻ"}
+[js] {"reg": "StreamResource", "val": "쨐ѻ"}
+[js] {"reg": "StreamResourceType", "val": "쨐ѻ"}
+[js] {"reg": "LocalRedirectOnly", "val": "ٰ"}
+[js] {"reg": "Roamable", "val": "ٰ"}
+[js] {"reg": "PreCreate", "val": "ٰ"}
+[js] {"reg": "Stream", "val": "ٰ"}
+[js] {"reg": "PublishExpandedPath", "val": "ٰ"}
+[js] {"reg": "DefinitionFlags", "val": "ٰ"}
+[js] {"reg": "FolderTypeID", "val": "콐\u001a窼獋\u00018코\u001a篠獋\u0001E콘\u001a窔獋\u00016콜\u001a竰獋"}
+[js] {"reg": "InitFolderHandler", "val": "콐\u001a窼獋\u00018코\u001a篠獋\u0001E콘\u001a窔獋\u00016콜\u001a竰獋"}
+[js] {"reg": "ProfileImagePath", "val": "C:\\Users\\23801"}
+[js] {"reg": "AppData", "val": "%USERPROFILE%\\AppData\\Roaming"}
+[js] {"reg": "Default", "val": "%SystemDrive%\\Users\\Default"}
+[js] {"reg": "null", "val": "XML DOM Document"}
+[js] {"reg": "null", "val": "%SystemRoot%\\System32\\msxml3.dll"}
+[js] {"reg": "null", "val": "%SystemRoot%\\System32\\msxml3.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "XML DOM Document"}
+[js] {"reg": "null", "val": "%SystemRoot%\\System32\\msxml3.dll"}
+[js] {"reg": "null", "val": "%SystemRoot%\\System32\\msxml3.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\wshom.ocx"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "ADODB.Connection"}
+[js] {"reg": "null", "val": "C:\\Program Files (x86)\\Common Files\\System\\ado\\msado15.dll"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "ADODB.Connection"}
+[js] {"reg": "null", "val": "C:\\Program Files (x86)\\Common Files\\System\\ado\\msado15.dll"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "ADODB.Recordset"}
+[js] {"reg": "null", "val": "C:\\Program Files (x86)\\Common Files\\System\\ado\\msado15.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "ADODB.Recordset"}
+[js] {"reg": "null", "val": "C:\\Program Files (x86)\\Common Files\\System\\ado\\msado15.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "MSDAINITIALIZE Class"}
+[js] {"reg": "null", "val": "C:\\Program Files (x86)\\Common Files\\System\\Ole DB\\oledb32.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "MSDAINITIALIZE Class"}
+[js] {"reg": "null", "val": "C:\\Program Files (x86)\\Common Files\\System\\Ole DB\\oledb32.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "AppID", "val": "{2206CDB0-19C1-11D1-89E0-00C04FD7A829}"}
+[js] {"reg": "null", "val": "MSDAINITIALIZE"}
+[js] {"reg": "LegacyAuthenticationLevel", "val": "USERٖ"}
+[js] {"reg": "LegacyImpersonationLevel", "val": "\u0002"}
+[js] {"reg": "AuthenticationLevel", "val": "90"}
+[js] {"reg": "ProtectionLevel", "val": "￿￿"}
+[js] {"reg": "Queue Size", "val": "\u001a\u001a澖悲閈޻됸޺琹悲怨仓爀悲熰悲"}
+[js] {"reg": "Holders", "val": "\u001a\u001a澖悲閈޻됸޺琹悲怨仓爀悲熰悲"}
+[js] {"reg": "MaxResLifeTime", "val": "\u001a\u001a澖悲閈޻됸޺琹悲怨仓爀悲熰悲"}
+[js] {"reg": "Always Test Connection", "val": "\u001a\u001a澖悲閈޻됸޺琹悲怨仓爀悲熰悲"}
+[js] {"reg": "null", "val": "DispenserManager"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\comsvcs.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "DispenserManager"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\comsvcs.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "SecurityCacheLimit", "val": "￾￿"}
+[js] {"reg": "DisableAppDomainTracking", "val": "타\u001a\u0004"}
+[js] {"reg": "null", "val": "{dee35070-506b-11cf-b1aa-00aa00b8de95}"}
+[js] {"reg": "null", "val": "{dee35070-506b-11cf-b1aa-00aa00b8de95}"}
+[js] {"reg": "null", "val": "Microsoft.Jet.OLEDB.4.0"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\msjetoledb40.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "Microsoft.Jet.OLEDB.4.0"}
+[js] {"reg": "null", "val": "Microsoft.Jet.OLEDB.4.0"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\msjetoledb40.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "OLEDB_SERVICES", "val": "￾￿Microsoft.Jet.OLEDB.4.0"}
+[js] {"reg": "SPTimeOut", "val": "굯悱\u0004"}
+[js] {"reg": "null", "val": "Microsoft OLE DB Data Conversion Library"}
+[js] {"reg": "null", "val": "C:\\Program Files (x86)\\Common Files\\System\\Ole DB\\oledb32.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "Microsoft OLE DB Data Conversion Library"}
+[js] {"reg": "null", "val": "C:\\Program Files (x86)\\Common Files\\System\\Ole DB\\oledb32.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "Microsoft OLE DB Error Collection Service"}
+[js] {"reg": "null", "val": "C:\\Program Files (x86)\\Common Files\\System\\Ole DB\\oledb32.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "Microsoft OLE DB Error Collection Service"}
+[js] {"reg": "null", "val": "C:\\Program Files (x86)\\Common Files\\System\\Ole DB\\oledb32.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "Microsoft Jet 4.0 OLE DB Provider Error Lookup"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\msjetoledb40.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "Microsoft Jet 4.0 OLE DB Provider Error Lookup"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\msjetoledb40.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "{13709620-C279-11CE-A49E-444553540000}"}
+[js] {"reg": "null", "val": "{13709620-C279-11CE-A49E-444553540000}"}
+[js] {"reg": "null", "val": "Shell Automation Service"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\shell32.dll"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\shell32.dll"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Shell Automation Service"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\shell32.dll"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\shell32.dll"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\shell32.dll"}
+[js] {"reg": "MonitorRegistry", "val": "\u0001"}
+[js] {"reg": "FolderValueFlags", "val": "∀\u0018\u0004"}
+[js] {"reg": "ValidateRegItems", "val": "쀘߃➲ᓽퟨ\u001a獛뙼獋"}
+[js] {"reg": "MonitorRegistry", "val": "스߃➲ᓽퟨ\u001a獛麗獌"}
+[js] {"reg": "Data", "val": "ූ"}
+[js] {"reg": "Generation", "val": "\u0001"}
+[js] {"reg": "Generation", "val": "\u0001"}
+[js] {"reg": "DriveMask", "val": " "}
+[js] {"reg": "ShellState", "val": "$"}
+[js] {"reg": "Hidden", "val": "\u0002"}
+[js] {"reg": "ShowCompColor", "val": "\u0001"}
+[js] {"reg": "HideFileExt", "val": "\u0001"}
+[js] {"reg": "ShowInfoTip", "val": "\u0001"}
+[js] {"reg": "WebView", "val": "\u0001"}
+[js] {"reg": "ShowTypeOverlay", "val": "\u0001"}
+[js] {"reg": "ShowStatusBar", "val": "\u0001"}
+[js] {"reg": "Data", "val": "ූ"}
+[js] {"reg": "Generation", "val": "\u0001"}
+[js] {"reg": "Data", "val": "ූ"}
+[js] {"reg": "Generation", "val": "\u0001"}
+[js] {"reg": "Data", "val": "ූ"}
+[js] {"reg": "Generation", "val": "\u0001"}
+[js] {"reg": "Data", "val": "ූ"}
+[js] {"reg": "Generation", "val": "\u0001"}
+[js] {"reg": "Data", "val": "ූ"}
+[js] {"reg": "Generation", "val": "\u0001"}
+[js] {"reg": "Data", "val": "ූ"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\shell32.dll"}
+[js] {"reg": "Generation", "val": "\u0001"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\shell32.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "SyncMode5", "val": "\u0004"}
+[js] {"reg": "Category", "val": "\u0004"}
+[js] {"reg": "Name", "val": "Cache"}
+[js] {"reg": "ParentFolder", "val": "{F1B32785-6FBA-4FCF-9D55-7B8E7F157091}"}
+[js] {"reg": "DeferPrecreateAndRedirect", "val": "{F1B32785-6FBA-4FCF-9D55-7B8E7F157091}"}
+[js] {"reg": "Description", "val": "\u001aࠀ"}
+[js] {"reg": "RelativePath", "val": "Microsoft\\Windows\\INetCache"}
+[js] {"reg": "ParsingName", "val": "Microsoft\\Windows\\INetCache"}
+[js] {"reg": "InfoTip", "val": "Microsoft\\Windows\\INetCache"}
+[js] {"reg": "LocalizedName", "val": "Microsoft\\Windows\\INetCache"}
+[js] {"reg": "Icon", "val": "Microsoft\\Windows\\INetCache"}
+[js] {"reg": "Security", "val": "Microsoft\\Windows\\INetCache"}
+[js] {"reg": "StreamResource", "val": "Microsoft\\Windows\\INetCache"}
+[js] {"reg": "StreamResourceType", "val": "Microsoft\\Windows\\INetCache"}
+[js] {"reg": "LocalRedirectOnly", "val": "\u0001"}
+[js] {"reg": "Roamable", "val": "\u0001"}
+[js] {"reg": "PreCreate", "val": "\u0001"}
+[js] {"reg": "Stream", "val": "\u0001"}
+[js] {"reg": "PublishExpandedPath", "val": "\u0001"}
+[js] {"reg": "DefinitionFlags", "val": "\u0001"}
+[js] {"reg": "FolderTypeID", "val": "\u001a窼獋\u00012\u001a篠獋\u0001F\u001a窔獋\u0001C\u001a竰獋"}
+[js] {"reg": "InitFolderHandler", "val": "\u001a窼獋\u00012\u001a篠獋\u0001F\u001a窔獋\u0001C\u001a竰獋"}
+[js] {"reg": "Cache", "val": "%USERPROFILE%\\AppData\\Local\\Microsoft\\Windows\\INetCache"}
+[js] {"reg": "Default", "val": "%SystemDrive%\\Users\\Default"}
+[js] {"reg": "Cache", "val": "%USERPROFILE%\\AppData\\Local\\Microsoft\\Windows\\INetCache"}
+[js] {"reg": "Category", "val": "\u0004"}
+[js] {"reg": "Name", "val": "Local AppData"}
+[js] {"reg": "ParentFolder", "val": "{F1B32785-6FBA-4FCF-9D55-7B8E7F157091}"}
+[js] {"reg": "DeferPrecreateAndRedirect", "val": "{F1B32785-6FBA-4FCF-9D55-7B8E7F157091}"}
+[js] {"reg": "RelativePath", "val": "AppData\\Local"}
+[js] {"reg": "ParsingName", "val": "AppData\\Local"}
+[js] {"reg": "InfoTip", "val": "AppData\\Local"}
+[js] {"reg": "LocalizedName", "val": "AppData\\Local"}
+[js] {"reg": "Icon", "val": "AppData\\Local"}
+[js] {"reg": "Security", "val": "AppData\\Local"}
+[js] {"reg": "StreamResource", "val": "AppData\\Local"}
+[js] {"reg": "StreamResourceType", "val": "AppData\\Local"}
+[js] {"reg": "LocalRedirectOnly", "val": "\u0001"}
+[js] {"reg": "Roamable", "val": "\u0001"}
+[js] {"reg": "PreCreate", "val": "\u0001"}
+[js] {"reg": "Stream", "val": "\u0001"}
+[js] {"reg": "PublishExpandedPath", "val": "\u0001"}
+[js] {"reg": "DefinitionFlags", "val": "\u0001"}
+[js] {"reg": "FolderTypeID", "val": "\u001a窼獋\u00012\u001a篠獋\u0001F\u001a窔獋\u0001C\u001a竰獋"}
+[js] {"reg": "InitFolderHandler", "val": "\u001a窼獋\u00012\u001a篠獋\u0001F\u001a窔獋\u0001C\u001a竰獋"}
+[js] {"reg": "Local AppData", "val": "%USERPROFILE%\\AppData\\Local"}
+[js] {"reg": "Default", "val": "%SystemDrive%\\Users\\Default"}
+[js] {"reg": "Local AppData", "val": "%USERPROFILE%\\AppData\\Local"}
+[js] {"reg": "MBCSAPIforCrack", "val": "篨Ǫ\u001a檔皫\u001a楺皫궏㷿"}
+[js] {"reg": "Security_HKLM_only", "val": "帤炦\u0004"}
+[js] {"reg": "EFDC_Explorer8.4.pristine.exe", "val": "ༀ炍\u0004"}
+[js] {"reg": "*", "val": "ༀ炍\u0004"}
+[js] {"reg": "FEATURE_CLIENTAUTHCERTFILTER", "val": "\u0003"}
+[js] {"reg": "FEATURE_CLIENTAUTHCERTFILTER", "val": "\u0003"}
+[js] {"reg": "EFDC_Explorer8.4.pristine.exe", "val": "夐炟\u0004"}
+[js] {"reg": "*", "val": "夐炟\u0004"}
+[js] {"reg": "EFDC_Explorer8.4.pristine.exe", "val": "夐炟\u0004"}
+[js] {"reg": "*", "val": "夐炟\u0004"}
+[js] {"reg": "FromCacheTimeout", "val": "￿￿\u0005"}
+[js] {"reg": "SecureProtocols", "val": "⠀"}
+[js] {"reg": "IdnEnabled", "val": "\u0003"}
+[js] {"reg": "PreConnectLimit", "val": "\u0014"}
+[js] {"reg": "PreResolveLimit", "val": "\u0006"}
+[js] {"reg": "EnableHttp1_1", "val": "륨޾筰炠篦炠溬璸"}
+[js] {"reg": "EnableNegotiate", "val": "\u0001"}
+[js] {"reg": "SocketSendBufferLength", "val": "￿￿\u0001"}
+[js] {"reg": "KeepAliveTimeout", "val": ""}
+[js] {"reg": "MaxHttpRedirects", "val": "\n"}
+[js] {"reg": "MaxConnectionsPerServer", "val": "\u0002"}
+[js] {"reg": "MaxConnectionsPerServer", "val": "\u0002"}
+[js] {"reg": "MaxConnectionsPer1_0Server", "val": "\u0004"}
+[js] {"reg": "MaxConnectionsPer1_0Server", "val": "\u0004"}
+[js] {"reg": "MaxConnectionsPerProxy", "val": "\u0004"}
+[js] {"reg": "MaxConnectionsPerProxy", "val": "\u0004"}
+[js] {"reg": "ServerInfoTimeout", "val": "퓀\u0001\u0014"}
+[js] {"reg": "ConnectTimeOut", "val": ""}
+[js] {"reg": "ConnectTimeOut", "val": ""}
+[js] {"reg": "ConnectRetries", "val": "\u0005"}
+[js] {"reg": "ConnectRetries", "val": "\u0005"}
+[js] {"reg": "SendTimeOut", "val": "田"}
+[js] {"reg": "SendTimeOut", "val": "田"}
+[js] {"reg": "ReceiveTimeOut", "val": "田"}
+[js] {"reg": "ReceiveTimeOut", "val": "田"}
+[js] {"reg": "MimeExclusionListForCache", "val": "%USERPROFILE%\\AppData\\Local"}
+[js] {"reg": "DnsCacheEntries", "val": "Ā"}
+[js] {"reg": "DnsCacheTimeout", "val": "܈"}
+[js] {"reg": "TcpAutotuning", "val": "\u0001"}
+[js] {"reg": "ProxySettingsPerUser", "val": "\u0001"}
+[js] {"reg": "BadProxyExpiresTime", "val": "\u001e"}
+[js] {"reg": "AutoProxyDetectType", "val": "C"}
+[js] {"reg": "TabProcGrowth", "val": "￿￿\u0001"}
+[js] {"reg": "TabProcGrowth", "val": "￿￿\u0001"}
+[js] {"reg": "PolicySubPath", "val": "MpeHttpExt\\Payload"}
+[js] {"reg": "Transports", "val": "Tcpip6"}
+[js] {"reg": "Mapping", "val": "\b"}
+[js] {"reg": "WinSock 2.0 Provider ID", "val": "냀離⛔ᇐ뾻ꨀ氀Ͽ"}
+[js] {"reg": "MinSockaddrLength", "val": "\u001c"}
+[js] {"reg": "MaxSockaddrLength", "val": "\u001c"}
+[js] {"reg": "EnableDhcp", "val": "\u0001"}
+[js] {"reg": "EnableDhcp", "val": "\u0001"}
+[js] {"reg": "MigrateProxy", "val": "\u0001"}
+[js] {"reg": "EnableDhcp", "val": "\u0001"}
+[js] {"reg": "EnableDhcp", "val": "\u0001"}
+[js] {"reg": "PolicySubPath", "val": "MpeHttpExt\\Payload"}
+[js] {"reg": "ProxyEnable", "val": "\u0001"}
+[js] {"reg": "ProxyServer", "val": "127.0.0.1:7897"}
+[js] {"reg": "AutoDetect", "val": "\u0001"}
+[js] {"reg": "null", "val": "{AFBA6B42-5692-48EA-8141-DC517DCF0EF1}"}
+[js] {"reg": "null", "val": "{AFBA6B42-5692-48EA-8141-DC517DCF0EF1}"}
+[js] {"reg": "null", "val": "Server XML HTTP"}
+[js] {"reg": "null", "val": "%SystemRoot%\\System32\\msxml3.dll"}
+[js] {"reg": "null", "val": "%SystemRoot%\\System32\\msxml3.dll"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Server XML HTTP"}
+[js] {"reg": "null", "val": "%SystemRoot%\\System32\\msxml3.dll"}
+[js] {"reg": "null", "val": "%SystemRoot%\\System32\\msxml3.dll"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "WinHttpRequest Component version 5.1"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\winhttpcom.dll"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\winhttpcom.dll"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "WinHttpRequest Component version 5.1"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\winhttpcom.dll"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\winhttpcom.dll"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Multi Language Support"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\mlang.dll"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\mlang.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "Multi Language Support"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\mlang.dll"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\mlang.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "SecurityProviders", "val": "credssp.dll"}
+[js] {"reg": "Name", "val": "CREDSSP"}
+[js] {"reg": "Comment", "val": "Microsoft CredSSP Security Provider"}
+[js] {"reg": "Capabilities", "val": "ܳ࢜"}
+[js] {"reg": "RpcId", "val": "￿"}
+[js] {"reg": "Version", "val": "\u0001"}
+[js] {"reg": "Type", "val": "!"}
+[js] {"reg": "TokenSize", "val": "ᵈ\u0001࢜"}
+[js] {"reg": "Transports", "val": "Tcpip6"}
+[js] {"reg": "Mapping", "val": "\b"}
+[js] {"reg": "Mapping", "val": "\b"}
+[js] {"reg": "WinSock 2.0 Provider ID", "val": "᪠ꮋᇏꎌ耀䡟銡࡙"}
+[js] {"reg": "MinSockaddrLength", "val": "\u0010"}
+[js] {"reg": "MaxSockaddrLength", "val": "\u0010"}
+[js] {"reg": "Hostname", "val": "kk"}
+[js] {"reg": "Hostname", "val": "kk"}
+[js] {"reg": "Hostname", "val": "kk"}
+[js] {"reg": "Hostname", "val": "kk"}
+[js] {"reg": "Hostname", "val": "kk"}
+[js] {"reg": "Hostname", "val": "kk"}
+[js] {"reg": "EnableDhcp", "val": "\u0001"}
+[js] {"reg": "EnableDhcp", "val": "\u0001"}
+[js] {"reg": "EnableDhcp", "val": "\u0001"}
+[js] {"reg": "EnableDhcp", "val": "\u0001"}
+[js] {"reg": "NoClientChecks", "val": "䏐ು끘ೄ㭞睤䏨ುd"}
+[js] {"reg": "InstallationType", "val": "Client"}
+[js] {"reg": "EnableDhcp", "val": "\u0001"}
+[js] {"reg": "EnableDhcp", "val": "\u0001"}
+[js] {"reg": "MigrateProxy", "val": "\u0001"}
+[js] {"reg": "ProxyEnable", "val": "\u0001"}
+[js] {"reg": "ProxyServer", "val": "127.0.0.1:7897"}
+[js] {"reg": "AutoDetect", "val": "\u0001"}
+[js] {"reg": "EnableDhcp", "val": "\u0001"}
+[js] {"reg": "EnableDhcp", "val": "\u0001"}
+[js] {"reg": "EnableDhcp", "val": "\u0001"}
+[js] {"reg": "EnableDhcp", "val": "\u0001"}
+[js] {"reg": "null", "val": "ImageList"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\MSCOMCTL.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "ImageList"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\MSCOMCTL.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "SSTab"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\TABCTL32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "SSTab"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\TABCTL32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Standard Picture"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\oleaut32.dll"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Standard Picture"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\oleaut32.dll"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Threed.SSCheck"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\THREED32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Threed.SSCheck"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\THREED32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Threed.SSFrame"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\THREED32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Threed.SSFrame"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\THREED32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Threed.SSOption"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\THREED32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Threed.SSOption"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\THREED32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "DataFilePath", "val": "C:\\Windows\\Fonts\\staticcache.dat"}
+[js] {"reg": "null", "val": "Spin.SpinButton"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\SPIN32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Spin.SpinButton"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\SPIN32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "{00000320-0000-0000-C000-000000000046}"}
+[js] {"reg": "DragDropExtension", "val": "{9FC8E510-A27C-4B3B-B9A3-BF65F00256A8}"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\dataexchange.dll"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\dataexchange.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\dataexchange.dll"}
+[js] {"reg": "null", "val": "%SystemRoot%\\system32\\dataexchange.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "RichTextBox"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\RICHTX32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "RichTextBox"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\RICHTX32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"ini": "ScrollInset/null", "dflt": "P?", "got": "?", "file": "null"}
+[js] {"ini": "DragDelay/null", "dflt": "", "got": "?", "file": "null"}
+[js] {"ini": "DragMinDist/null", "dflt": "", "got": "?", "file": "null"}
+[js] {"ini": "ScrollDelay/null", "dflt": "", "got": "?", "file": "null"}
+[js] {"ini": "ScrollInterval/null", "dflt": "", "got": "?", "file": "null"}
+[js] {"ini": "flags/null", "dflt": "", "got": "?", "file": "null"}
+[js] {"reg": "DragDropExtension", "val": "{9FC8E510-A27C-4B3B-B9A3-BF65F00256A8}"}
+[js] {"reg": "DragDropExtension", "val": "{9FC8E510-A27C-4B3B-B9A3-BF65F00256A8}"}
+[js] {"reg": "DragDropExtension", "val": "{9FC8E510-A27C-4B3B-B9A3-BF65F00256A8}"}
+[js] {"reg": "DragDropExtension", "val": "{9FC8E510-A27C-4B3B-B9A3-BF65F00256A8}"}
+[js] {"reg": "null", "val": "MSFlexGrid"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\MSFLXGRD.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "MSFlexGrid"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\MSFLXGRD.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Standard Font"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\oleaut32.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "null", "val": "Standard Font"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\oleaut32.dll"}
+[js] {"reg": "ThreadingModel", "val": "Both"}
+[js] {"reg": "DragDropExtension", "val": "{9FC8E510-A27C-4B3B-B9A3-BF65F00256A8}"}
+[js] {"reg": "null", "val": "Threed.SSCommand"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\THREED32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Threed.SSCommand"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\THREED32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Threed.SSPanel"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\THREED32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Threed.SSPanel"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\THREED32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "StatusBar"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\MSCOMCTL.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "StatusBar"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\MSCOMCTL.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "DragDropExtension", "val": "{9FC8E510-A27C-4B3B-B9A3-BF65F00256A8}"}
+[js] {"reg": "DragDropExtension", "val": "{9FC8E510-A27C-4B3B-B9A3-BF65F00256A8}"}
+[js] {"reg": "null", "val": "CommonDialog"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\COMDLG32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "CommonDialog"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\COMDLG32.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Toolbar"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\MSCOMCTL.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "Toolbar"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\MSCOMCTL.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\TABCTL32.OCX"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\MSCOMCTL.OCX"}
+[js] {"reg": "null", "val": "{172BDDF8-CEEA-11D1-8B05-00600806D9B6}"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\wbem\\wbemdisp.TLB"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\wbem\\wbemdisp.TLB"}
+[js] {"ini": "device/", "dflt": "酿\u001a", "got": "?", "file": "null"}
+[js] {"reg": "ChangeID", "val": "⣐\u0001੬"}
+[js] {"ini": "device/", "dflt": "\u0007\u0007", "got": "?", "file": "null"}
+[js] {"reg": "EnableAnchorContext", "val": "뀝涄૜"}
+[js] {"reg": "null", "val": "{00020424-0000-0000-C000-000000000046}"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\MSCOMCTL.OCX"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\THREED32.OCX"}
+[js] {"reg": "null", "val": "C:\\Windows\\System32\\stdole32.tlb"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\RICHTX32.OCX"}
+[js] {"reg": "null", "val": "C:\\Windows\\SysWOW64\\stdole2.tlb"}
+[js] {"reg": "null", "val": "C:\\Windows\\System32\\stdole32.tlb"}
+[js] {"reg": "null", "val": "C:\\Windows\\System32\\stdole32.tlb"}
+[js] {"reg": "null", "val": "C:\\Windows\\System32\\stdole32.tlb"}
+[js] {"reg": "null", "val": "C:\\Windows\\System32\\stdole32.tlb"}
+[js] {"reg": "null", "val": "ProgressBar"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\MSCOMCTL.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+[js] {"reg": "null", "val": "ProgressBar"}
+[js] {"reg": "null", "val": "C:\\EFDC84_LIC\\vb6\\MSCOMCTL.OCX"}
+[js] {"reg": "ThreadingModel", "val": "Apartment"}
+done

@@ -1,0 +1,2189 @@
+{
+  "passed": true,
+  "source_case": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\source-final-defaults-all5-20261010\\3DWET\\case\\Lake Luoma",
+  "work": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-packaged-features-20261011",
+  "features": {
+    "case_inventory_directory": {
+      "status": "passed",
+      "seconds": 0.141,
+      "details": {
+        "inputs": 9,
+        "cases": 2,
+        "directory_listing": {
+          "entries": [
+            {
+              "is_dir": true,
+              "name": "Calibration Lake",
+              "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-packaged-features-20261011\\3DWET\\case\\Calibration Lake"
+            },
+            {
+              "is_dir": true,
+              "name": "Feature Lake",
+              "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-packaged-features-20261011\\3DWET\\case\\Feature Lake"
+            }
+          ],
+          "parent": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-packaged-features-20261011\\3DWET",
+          "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-packaged-features-20261011\\3DWET\\case"
+        }
+      }
+    },
+    "case_save_as_open_project_import_delete_roundtrip": {
+      "status": "passed",
+      "seconds": 0.844,
+      "details": {
+        "manifest_files": 15,
+        "input_sha256": "60597f1d9bd02d7e75e472642715dc818c548528fc7c7bd5585fe025b8088e53",
+        "duplicate_rejected": {
+          "error": "案例名称已存在"
+        },
+        "created_cases_deleted": true
+      }
+    },
+    "points_drag_crud_undo_redo_calibration_mapping": {
+      "status": "passed",
+      "seconds": 0.437,
+      "details": {
+        "created_dragged_saved_deleted": true,
+        "undo_redo": true,
+        "land_rejected": true,
+        "mapping": [
+          19,
+          24
+        ]
+      }
+    },
+    "ecology_network_real_edges_scalar_edit_guards": {
+      "status": "passed",
+      "seconds": 1.063,
+      "details": {
+        "nodes": 17,
+        "edges": 316,
+        "scalar_persisted": true,
+        "stale_rejected": true,
+        "invalid_coupling_rejected": true
+      }
+    },
+    "physics_namelist_scalar_persistence_guards": {
+      "status": "passed",
+      "seconds": 0.109,
+      "details": {
+        "edit_backup_restore": true,
+        "stale_type_path_guards": true,
+        "parameters": 126
+      }
+    },
+    "diagnostic_navigation_safe_repair_stale_guard": {
+      "status": "passed",
+      "seconds": 0.891,
+      "details": {
+        "checks": 4,
+        "actions": [
+          {
+            "control": "pp-grid-canvas",
+            "file": "bathymetry.nc",
+            "label": "定位设置",
+            "page": "preprocess",
+            "type": "locate"
+          },
+          {
+            "control": "time-dt",
+            "file": "getm.inp",
+            "label": "定位设置",
+            "page": "time",
+            "type": "locate"
+          },
+          {
+            "control": "output-modules",
+            "file": "output.yaml",
+            "label": "定位设置",
+            "page": "time",
+            "type": "locate"
+          },
+          {
+            "file": "output.yaml",
+            "id": "standard_output",
+            "label": "采用当前案例的标准输出订阅",
+            "type": "repair"
+          },
+          {
+            "control": "output-modules",
+            "file": "output.yaml",
+            "label": "定位设置",
+            "page": "time",
+            "type": "locate"
+          }
+        ],
+        "repair": {
+          "action": "fix_sync_interval",
+          "backup": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-packaged-features-20261011\\3DWET\\case\\Feature Lake\\backups\\output.yaml.20261011T044035145324-82fde8c8.bak",
+          "case_path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-packaged-features-20261011\\3DWET\\case\\Feature Lake",
+          "file": "output.yaml",
+          "revision": "af8b549721efbc63d0fd48d5b3d9385f5fc1165f359dc208eb29f762574ae299",
+          "success": true
+        },
+        "final_ok": true
+      }
+    },
+    "fish_ghg_module_switches_persist_and_native_ready": {
+      "status": "passed",
+      "seconds": 3.343,
+      "details": {
+        "fish_off_on": true,
+        "ghg_off_on": true,
+        "executable_ready": true,
+        "draft_persisted": true
+      }
+    },
+    "eco_engine_switches_persist": {
+      "status": "passed",
+      "seconds": 0.766,
+      "details": {
+        "direct_off_on": true,
+        "module_selection_off": true
+      }
+    },
+    "time_hotstart_output_configuration_validation": {
+      "status": "passed",
+      "seconds": 0.562,
+      "details": {
+        "time": {
+          "start": "2020-01-01 00:00:00",
+          "step_2d": 30,
+          "step_3d": 30,
+          "stop": "2020-01-01 00:20:00",
+          "timestep": 2
+        },
+        "hotstart_toggle": true,
+        "output_subscription": true,
+        "rejected_negative_dt_zero_sync_unregistered_v": true
+      }
+    },
+    "remaining_help_estimate_river_crud_fabm_config": {
+      "status": "passed",
+      "seconds": 1.11,
+      "details": {
+        "help_shapes": true,
+        "estimate": {
+          "cfl_dt": 20.043668730711666,
+          "cfl_max": 20.043668730711666,
+          "cfl_ok": true,
+          "duration_days": 0.013888888888888888,
+          "estimated_hours": 0.01996666666666667,
+          "estimated_minutes": 1.1980000000000002,
+          "estimated_seconds": 71.88000000000001,
+          "grid": "44x54",
+          "nsteps": 600,
+          "nwater": 1198,
+          "timestep": 2.0
+        },
+        "river_add_duplicate_delete": true,
+        "fabm_parameter_toggle_sidecar": true,
+        "picker_poll_without_OS_dialog": true
+      }
+    },
+    "synthetic_observations_native_optimization_apply_comparison": {
+      "status": "passed",
+      "seconds": 47.25,
+      "details": {
+        "status": {
+          "end_time": "2026-10-11T12:41:26.885459",
+          "engine": "scipy-lbfgsb",
+          "error": null,
+          "fallback": "旧配置 parsac 使用 SciPy L-BFGS-B 有界优化；未执行 PEST、GLUE 或 MCMC。",
+          "history": [
+            {
+              "iteration": 1,
+              "objective": 0.0,
+              "params": [
+                {
+                  "module": "abiotic_water",
+                  "param": "kNitrW",
+                  "value": 0.3
+                }
+              ],
+              "timestamp": "2026-10-11T12:41:04.733353"
+            },
+            {
+              "iteration": 2,
+              "objective": 0.0,
+              "params": [
+                {
+                  "module": "abiotic_water",
+                  "param": "kNitrW",
+                  "value": 0.30000001
+                }
+              ],
+              "timestamp": "2026-10-11T12:41:26.885459"
+            }
+          ],
+          "history_len": 2,
+          "job_id": "20261011_124041_0fd22d",
+          "max_iter": 2,
+          "method": "parsac",
+          "objective": "rmse",
+          "params": [
+            {
+              "max": 0.301,
+              "min": 0.299,
+              "module": "abiotic_water",
+              "param": "kNitrW"
+            }
+          ],
+          "progress": 1.0,
+          "result": {
+            "best_objective": 0.0,
+            "best_params": [
+              {
+                "module": "abiotic_water",
+                "param": "kNitrW",
+                "value": 0.3
+              }
+            ],
+            "engine": "scipy.lbfgsb",
+            "history": [
+              {
+                "iteration": 1,
+                "objective": 0.0,
+                "params": [
+                  {
+                    "module": "abiotic_water",
+                    "param": "kNitrW",
+                    "value": 0.3
+                  }
+                ]
+              },
+              {
+                "iteration": 2,
+                "objective": 0.0,
+                "params": [
+                  {
+                    "module": "abiotic_water",
+                    "param": "kNitrW",
+                    "value": 0.30000001
+                  }
+                ]
+              }
+            ],
+            "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+            "n_iterations": 2,
+            "success": true
+          },
+          "start_time": "2026-10-11T12:40:41.494237",
+          "status": "completed"
+        },
+        "apply": {
+          "applied": [
+            {
+              "module": "abiotic_water",
+              "param": "kNitrW",
+              "value": 0.3
+            }
+          ],
+          "objective": 0.0,
+          "success": true
+        },
+        "observations": 21,
+        "csv_rows": 2,
+        "scatter_pairs": 23,
+        "native_input_only_source": true,
+        "scientific_accuracy_claim": false
+      }
+    },
+    "native_calibration_stop_status_persists_after_worker": {
+      "status": "passed",
+      "seconds": 22.625,
+      "details": {
+        "status": "stopped",
+        "worker_ended": true,
+        "history_len": 2
+      }
+    },
+    "native_run_start_status_duplicate_guard_stop": {
+      "status": "passed",
+      "seconds": 0.406,
+      "details": {
+        "status": "stopped",
+        "duplicate_start_rejected": true,
+        "editing_while_running_rejected": true
+      }
+    }
+  },
+  "scope": "Native short-run feature integration with synthetic observations; not scientific accuracy, annual stability, or complete browser UX validation.",
+  "calibration_job_id": "20261011_124041_0fd22d",
+  "api_calls": [
+    {
+      "method": "POST",
+      "path": "/api/case/load",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 197169
+    },
+    {
+      "method": "GET",
+      "path": "/api/cases",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 576
+    },
+    {
+      "method": "GET",
+      "path": "/api/case/inputs",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 1481
+    },
+    {
+      "method": "GET",
+      "path": "/api/system/list_dir?path=C%3A%5CUsers%5C23801%5CDesktop%5CGETM-FABM-WET-260928%5Cbuild%5Cfinal-packaged-features-20261011%5C3DWET%5Ccase",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 566
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/save_as",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 185
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/open",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 196908
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/import",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 3507
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/import",
+      "passed": true,
+      "http_status": 400,
+      "response_bytes": 55
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/delete",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 53
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/delete",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 53
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/load",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 197169
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/points",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 147
+    },
+    {
+      "method": "GET",
+      "path": "/api/grid/editor",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 30714
+    },
+    {
+      "method": "POST",
+      "path": "/api/grid/edit",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 30816
+    },
+    {
+      "method": "POST",
+      "path": "/api/grid/edit",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 30814
+    },
+    {
+      "method": "POST",
+      "path": "/api/grid/edit",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 30815
+    },
+    {
+      "method": "POST",
+      "path": "/api/grid/edit",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 30814
+    },
+    {
+      "method": "POST",
+      "path": "/api/grid/edit",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 30970
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/points",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 124
+    },
+    {
+      "method": "POST",
+      "path": "/api/grid/edit",
+      "passed": true,
+      "http_status": 400,
+      "response_bytes": 73
+    },
+    {
+      "method": "POST",
+      "path": "/api/grid/edit",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 30712
+    },
+    {
+      "method": "POST",
+      "path": "/api/grid/edit",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 30868
+    },
+    {
+      "method": "POST",
+      "path": "/api/grid/edit",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 30714
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/calibration/points?id=4e8c1a6e",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 17
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/points",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 3
+    },
+    {
+      "method": "GET",
+      "path": "/api/ecology/network",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 55878
+    },
+    {
+      "method": "POST",
+      "path": "/api/ecology/network",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 56038
+    },
+    {
+      "method": "POST",
+      "path": "/api/ecology/network",
+      "passed": true,
+      "http_status": 409,
+      "response_bytes": 157
+    },
+    {
+      "method": "POST",
+      "path": "/api/ecology/network",
+      "passed": true,
+      "http_status": 400,
+      "response_bytes": 91
+    },
+    {
+      "method": "POST",
+      "path": "/api/ecology/network",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 56036
+    },
+    {
+      "method": "GET",
+      "path": "/api/physics/config",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 10093
+    },
+    {
+      "method": "POST",
+      "path": "/api/physics/config",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 10289
+    },
+    {
+      "method": "POST",
+      "path": "/api/physics/config",
+      "passed": true,
+      "http_status": 409,
+      "response_bytes": 103
+    },
+    {
+      "method": "POST",
+      "path": "/api/physics/config",
+      "passed": true,
+      "http_status": 400,
+      "response_bytes": 79
+    },
+    {
+      "method": "POST",
+      "path": "/api/physics/config",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 10289
+    },
+    {
+      "method": "GET",
+      "path": "/api/physics/config?file=../outside",
+      "passed": true,
+      "http_status": 400,
+      "response_bytes": 55
+    },
+    {
+      "method": "GET",
+      "path": "/api/run/check",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 2445
+    },
+    {
+      "method": "GET",
+      "path": "/api/run/check",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 3171
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/repair",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 459
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/repair",
+      "passed": true,
+      "http_status": 409,
+      "response_bytes": 109
+    },
+    {
+      "method": "GET",
+      "path": "/api/run/check",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 2445
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/modules",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 199160
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/modules",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 309
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/modules",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 380
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/modules",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 199160
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/modules",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 309
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/modules",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 252935
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/ghg",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 123
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/ghg",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 242077
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/ghg",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 124
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/ghg",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 250449
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/load",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 197169
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/engines",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 29
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/engines",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 943
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/engines",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 28
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/engines",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 942
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/modules",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 245
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/engines",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 943
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/load",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 197169
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/time",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 100
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/time",
+      "passed": true,
+      "http_status": 400,
+      "response_bytes": 86
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/time",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 17
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/time",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 100
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/hotstart",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 37
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/hotstart",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 17
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/hotstart",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 51
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/hotstart",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 17
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/output",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 16442
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/output",
+      "passed": true,
+      "http_status": 400,
+      "response_bytes": 231
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/output",
+      "passed": true,
+      "http_status": 400,
+      "response_bytes": 401
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/output",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 209
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/output",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 16487
+    },
+    {
+      "method": "GET",
+      "path": "/api/preprocess/help",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 1377
+    },
+    {
+      "method": "GET",
+      "path": "/api/run/estimate",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 282
+    },
+    {
+      "method": "GET",
+      "path": "/api/system/pick_folder_result",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 27
+    },
+    {
+      "method": "GET",
+      "path": "/api/input/rivers",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 734
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/add",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 17
+    },
+    {
+      "method": "GET",
+      "path": "/api/input/rivers",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 799
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/add",
+      "passed": true,
+      "http_status": 400,
+      "response_bytes": 55
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/delete",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 17
+    },
+    {
+      "method": "GET",
+      "path": "/api/input/rivers",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 734
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/fabm",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 196358
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/fabm/param",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 17
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/fabm/module",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 196437
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/fabm/module",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 196434
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/load",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 197169
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/load",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 196908
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/points",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 161
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/data",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 17
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/data?point_id=d9347659&variable=temp",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 1200
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/upload",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 74
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/config",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 17
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/config",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 148
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/start",
+      "passed": true,
+      "http_status": 400,
+      "response_bytes": 79
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status",
+      "passed": true,
+      "http_status": 400,
+      "response_bytes": 32
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/start",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 183
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 625
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 625
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 625
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 625
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 625
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 625
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 625
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 625
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 625
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 625
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 625
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124041_0fd22d",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 1222
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/apply",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 101
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/load",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 197169
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/comparison?point_id=d9347659&variable=temp",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 4349
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/calibration/points?id=d9347659",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 17
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/load",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 196908
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/config",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 224
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/start",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 183
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/stop",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 70
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 486
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status?job_id=20261011_124128_4a107f",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 1270
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/load",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 196908
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/start",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 17
+    },
+    {
+      "method": "GET",
+      "path": "/api/run/status",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 1140
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/start",
+      "passed": true,
+      "http_status": 409,
+      "response_bytes": 149
+    },
+    {
+      "method": "POST",
+      "path": "/api/physics/config",
+      "passed": true,
+      "http_status": 409,
+      "response_bytes": 97
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/stop",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 17
+    },
+    {
+      "method": "GET",
+      "path": "/api/run/status",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 1198
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/stop",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 17
+    }
+  ],
+  "expected_validation_rejections": [
+    {
+      "method": "POST",
+      "path": "/api/projects/import",
+      "http_status": 400
+    },
+    {
+      "method": "POST",
+      "path": "/api/grid/edit",
+      "http_status": 400
+    },
+    {
+      "method": "POST",
+      "path": "/api/ecology/network",
+      "http_status": 409
+    },
+    {
+      "method": "POST",
+      "path": "/api/ecology/network",
+      "http_status": 400
+    },
+    {
+      "method": "POST",
+      "path": "/api/physics/config",
+      "http_status": 409
+    },
+    {
+      "method": "POST",
+      "path": "/api/physics/config",
+      "http_status": 400
+    },
+    {
+      "method": "GET",
+      "path": "/api/physics/config?file=../outside",
+      "http_status": 400
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/repair",
+      "http_status": 409
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/time",
+      "http_status": 400
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/output",
+      "http_status": 400
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/output",
+      "http_status": 400
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/add",
+      "http_status": 400
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/start",
+      "http_status": 400
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status",
+      "http_status": 400
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/start",
+      "http_status": 409
+    },
+    {
+      "method": "POST",
+      "path": "/api/physics/config",
+      "http_status": 409
+    }
+  ],
+  "route_coverage": [
+    {
+      "method": "DELETE",
+      "path": "/api/calibration/points",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/config",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status",
+      "status": "passed",
+      "reason": "71 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/comparison",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/data",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/points",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/case/init_conditions",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/case/inputs",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/cases",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/engines",
+      "status": "passed",
+      "reason": "3 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/fabm",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/ghg",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/hotstart",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/modules",
+      "status": "passed",
+      "reason": "3 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/output",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/time",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/dashboard/summary",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/ecology/network",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/geo/field",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/geo/grid",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/grid/editor",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/input/meteo/draft",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/input/rivers",
+      "status": "passed",
+      "reason": "3 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/input/rivers/series",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/physics/config",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/preprocess/help",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/preprocess/preview",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/results/2d",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/results/3d_surface",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/results/profile",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/results/state_vars_surface",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/results/timeseries",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/results/timeseries_cell",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/results/variables",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/run/check",
+      "status": "passed",
+      "reason": "3 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/run/estimate",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/run/status",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/system/diagnostics",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/system/health",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/system/list_dir",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/system/pick_folder_result",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/apply",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/config",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/start",
+      "status": "passed",
+      "reason": "3 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/stop",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/data",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/points",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/upload",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/build",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/delete",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/init_conditions",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/load",
+      "status": "passed",
+      "reason": "9 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/open",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/save_as",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/engines",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/fabm/module",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/fabm/param",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/ghg",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/hotstart",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/modules",
+      "status": "passed",
+      "reason": "4 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/output",
+      "status": "passed",
+      "reason": "3 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/time",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ecology/network",
+      "status": "passed",
+      "reason": "4 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/grid/edit",
+      "status": "passed",
+      "reason": "9 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/meteo/save",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/meteo/upload",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/add",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/delete",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/save",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/upload",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/physics/config",
+      "status": "passed",
+      "reason": "5 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/bathymetry/interpolate",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/bathymetry/upload",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/bathymetry/upload_xyz",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/boundary/upload",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/case/create",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/grid/generate",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/hypsograph",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/save",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/import",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/results/timeseries_polygon",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/repair",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/start",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/stop",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/system/explore",
+      "status": "not_applicable",
+      "reason": "Interactive OS picker/Explorer is excluded from headless API validation."
+    },
+    {
+      "method": "POST",
+      "path": "/api/system/pick_folder",
+      "status": "not_applicable",
+      "reason": "Interactive OS picker/Explorer is excluded from headless API validation."
+    }
+  ]
+}

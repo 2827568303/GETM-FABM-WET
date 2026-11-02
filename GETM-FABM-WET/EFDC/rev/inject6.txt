@@ -1,0 +1,4 @@
+﻿[js]      0 diag14 ready
+pid 44656
+[js]     27 ENTER CheckLicensing
+done

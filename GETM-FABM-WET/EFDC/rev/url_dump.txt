@@ -1,0 +1,17 @@
+hit @0x65842
+  raw: 'licensing80.ds-intl.biz/GetTimeLocation.php༁demoUrl椀https://www.eems-analytics.info/wp-json/v2/eemsdemo/ഁwebUrl䄀https://www.eemodelingsystem.comഀbuyUrlጀupdateUrlᜀmailSupport̀@㌀mail@eemodelin'
+
+hit @0x7CB97
+  raw: 'p桤琀琀瀀㨀⼀⼀氀椀挀攀渀猀椀渀最㠀\u3000⸀搀猀ⴀ椀渀琀氀⸀戀椀稀⼀䜀攀琀吀椀洀攀䰀漀挀愀琀椀漀渀⸀瀀栀瀀栀https://www.eems-analytics.info/wp-json/v2/eemsdemo/桀琀琀瀀猀㨀⼀⼀眀眀眀⸀攀攀洀漀搀攀氀椀渀最猀礀猀琀攀洀⸀挀漀洀㈀mail@eemodelingsystem.com\u0603ⴒ\x03\u0e00ࠃ\u0e00\u2005Ă\u181c\u2003ࠀ\u2007ሂሱᰵ\u2005ࠁㄒ\u2003Ā\u2004ሀԹĠሁйĠࠁ'
+
+https:// @0x65832
+  'https://www.eems-analytics.info/wp-json/v2/eemsdemo/ഁwebUrl䄀https://www.eemodelingsystem.comഀbuyUrlጀupdateUrlᜀmailSuppor'
+
+https:// @0x658AA
+  'https://www.eemodelingsystem.comഀbuyUrlጀupdateUrlᜀmailSupport̀@㌀mail@eemodelingsystem.com伀Flexnet.Wrapper.Dongle.Message'
+
+https:// @0x7CB87
+  'https://www.eems-analytics.info/wp-json/v2/eemsdemo/桀琀琀瀀猀㨀⼀⼀眀眀眀⸀攀攀洀漀搀攀氀椀渀最猀礀猀琀攀洀⸀挀漀洀㈀mail@eemodelingsystem.com\u0603ⴒ\x03\u0e00ࠃ\u0e00\u2005Ă\u181c\u2003'
+
+https:// @0x7CBF0
+  'https://www.eemodelingsystem.com洲愀椀氀䀀攀攀洀漀搀攀氀椀渀最猀礀猀琀攀洀⸀挀漀洀̀ሆ̭\x00̎\x08ԎȠᰁ̘ ܈Ƞㄒ㔒ԜĠለ̱ Ё 㤒\u2005ā㤒\u2004ā̈ ЎĠก\u0603㤒\u0602Ј(㤒⠃ࠀ⠃\u0e00\u2004ሀԤĠሁ̤ሆФ(␒\u0602ܘ ሕĽࠎĠᔁ㴒ก'

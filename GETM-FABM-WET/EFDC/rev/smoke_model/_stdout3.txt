@@ -1,0 +1,4 @@
+*********************************************************
+*** ERROR:  RUNNING EFDCPlus WITHOUT LICENSE !        ***
+*********************************************************
+Fortran Pause - Enter command<CR> or <CR> to continue.

@@ -1,0 +1,1193 @@
+004E4078 A .text  frmAct_ExpirationAlerts
+004E4090 A .text  frmAct_License_Validation
+004E40F4 A .text  frmAct_License_Bypass
+004E412C A .text  frmAct_Demo_SignIn
+004E4140 A .text  frmAct_Demo_UserInfo
+004E4158 A .text  frmAct_Demo_Survey
+004E416C A .text  frmAct_Demo_ChangePassword
+004E4188 A .text  frmAct_Demo_Registration
+004E41A4 A .text  frmAct_Demo_Feedback
+004E41BC A .text  Act_License
+004E4208 A .text  frmAct_Deactivation
+004E4234 A .text  frmAct_LicenseManager
+004E46C4 A .text  cJpeg
+004E4AC4 A .text  cJPGWriter
+004E4AD0 A .text  cPNGwriter
+004E4B18 A .text  cGIFparser
+004E4B30 A .text  cPNGparser
+004E4B3C A .text  cBMPparser
+004E4C08 A .text  frmEEMS_CheckUpdate
+004E4CF4 A .text  frmEE_Export_EMF
+004E4F1C A .text  picLogoBox
+004E52E8 U .text  EEMS
+004E5304 U .text  EEMS_PERPETUAL_20170802
+004E5338 U .text  EEMS_VERSIONDATE
+004E5360 U .text  EEMS_RENTAL_20170802
+004E5390 U .text  EEMS_RENTAL
+004E53AC U .text  EEMS_TRIAL_20170802
+004E53D8 U .text  EEMS_TRIAL
+004E53F4 U .text  EEMS_MULTITRIAL_20170802
+004E5434 U .text  EEMS_MULTI_TRIAL
+004E545C U .text  EE_DEMO_8_3
+004E55D0 U .text  LicenseInfo
+004E6BA8 U .text  ../vbpjlogo.gif
+004E8AA8 A .text  GetActiveWindow
+004E9124 U .text  image/jpeg
+004E9140 U .text  image/png
+004E9430 U .text  ee_activation.log
+004E9530 A .text  lblExpired
+004E95E0 U .text  Please contact DSI to obtain a license for 
+004E9AE8 U .text  Here is my license information:
+004E9C68 U .text  Your Trial license will expire on 
+004E9CD0 U .text  Your Rental license will expire on 
+004E9D30 U .text  License Version: 
+004E9D58 U .text  License Code: 
+004E9DA4 U .text  Expiry Date: 
+004E9E08 U .text  EE Trial License Expiry
+004E9E3C U .text  EE Rental License Expiry
+004EA10C A .text  lblDemoInfo
+004EA14C A .text  lblDemoSignUp
+004EA190 A .text  chkUserActivity
+004EA248 A .text  txtLicenseFile
+004EA294 A .text  frmActivation
+004EA2D8 A .text  cmdDemoVersion
+004EA2E8 A .text  frameActivationFULL
+004EA314 A .text  frameActivationMain
+004EA4D8 U .text  Select license key file
+004EA688 U .text  The license code is invalid.  Please enter a valid license code.
+004EA77C U .text  The license code you have entered has an invalid length.
+004EA7F4 U .text   ****** Activation Process ******
+004EA9D8 U .text   1. User entered LicenseCode:
+004EAA18 U .text   2. Checking connection to the license server...
+004EAA80 U .text  Connecting to the licensing server...
+004EAB24 U .text  Cannot connect to the licensing server. Please check your internet connection. Or wait 30 seconds and try again.
+004EAC0C U .text   3. Get Product and Feature from the server based on the license code
+004EAC9C U .text  Checking the license code is valid or not...
+004EACF8 A .text  lblDeactiveTrial
+004EAD98 U .text  The license code is invalid. Please re-check it!
+004EAEB0 U .text  Your license fulfillment (
+004EB010 U .text  Getting the license information ...
+004EB05C U .text  Feature has expired
+004EB088 U .text  The license code has expired.
+004EB0C8 U .text  ) already activated!
+004EB0F8 U .text  Your License Name & Code are valid.
+004EB144 U .text   6. Check the remaining seats available for new activations
+004EB1C0 U .text  Check seats available for activation...
+004EB214 U .text      License has a total of [ 
+004EB2AC U .text   ] seats available for activation.
+004EB2F8 U .text  Your License has a total of [ 
+004EB384 U .text   ] Seats available for activation.
+004EB3D0 U .text  Please click 'OK' to continue with activation or 'Cancel' to exit.
+004EB488 U .text   ] seats.  Currently there are NO seats available for activation.
+004EB510 U .text  Currently you don't have any Seats available for activation.
+004EB590 U .text  Activating...
+004EB5B0 U .text   7.1 Deactivate if could not checkout the license file
+004EB624 U .text     Failed to deactivate.
+004EB670 U .text  The activation of the fulfillment is denied by the activation policy because fulfill count exceeded the available seat count.
+004EB770 U .text  This computer has already activated with a trial license. The activation information is: 
+004EB828 U .text   7. Activating...
+004EB8D4 U .text  ActivationID=
+004EB8F4 U .text  FeatureName=
+004EB978 U .text  LicenseFile=
+004EB998 U .text  ExpirationDate=
+004EB9DC U .text  Failed to activate. Error 
+004EBA28 U .text   7.3 Check if the perpetual has expired ...
+004EBA84 U .text         Cannot activate this version (
+004EBAD4 U .text  ).  Active maintenance period expired on: 
+004EBB30 U .text  Sorry, you cannot activate this version (
+004EBB88 U .text  ). Your active maintenance period expired on: 
+004EBC0C U .text      The product is activated but the perpetual expired. Call deactivte to return the seat.
+004EBCC8 U .text   7.4 Write license configuration
+004EBD2C U .text   7.5 EE Activated and Checked Out Successfully
+004EBDF0 U .text  ) in procedure DeleteLicFiles of Form frmAct_License_Validation
+004EBEA0 U .text        Could not find the license file.
+004EBFD0 U .text        Could not find license information file: 
+004EC0E8 U .text   3. Copy the license file to DSI folder.
+004EC140 U .text  Copy the license file to DSI folder.
+004EC1B4 U .text        Could extract the license file.
+004EC204 U .text   4. Checkout license file.
+004EC240 U .text  Checkout license file.
+004EC274 U .text       Check if perpetual expired ...
+004EC2C0 U .text  You cannot activate this version (
+004EC390 U .text       Active and checkout successfully ...
+004EC3E8 U .text        Failed to active with this license file.
+004EC44C U .text  Failed to activate the dongle license. 
+004EC678 U .text  Demo Registration Error: 
+004EC6B0 U .text  LicensedUser_
+004EC76C U .text  - This demonstration version is a limited capability version of EEMS. 
+004EC8A8 U .text  Click here to Activate
+004EC910 U .text   are not entitled to add new features to them. For your own models, you are limited to less than 300 
+004ECAC8 U .text  &Activate
+004ECD88 U .text  - Some of the features that you use in EEMS will be recorded for analytical purposes in order to improve the tool.
+004ECE74 U .text  Demo Version Information
+004ECEBC U .text  EEMS needs to be activated before it can be used. To activate now please enter your License Code into the boxes below then click ''Activate'', if the License Code is found to be valid you will be asked to confirm you wish to activate. Once confirmed you will be able to use this software. Activation can only take place once per License Seat (unless you deactivate and then reactivate).
+004ED308 U .text  Click here if you are not registered on the EEMS website.
+004ED39C U .text  EEMS needs to be activated before it can be used. To activate now please plug your dongle into the computer and follow the instructions below. Once confirmed you will be able to use this software. Activation can only take place once per License Seat (unless you deactivate and then reactivate).
+004ED5F0 U .text  EEMS needs to be activated before it can be used. To activate the Demo Version you will need to register on our website or in the user interface. Follow the instructions below to continue. Once confirmed you will be able to use this software in its demonstration mode.
+004ED810 U .text  License code has invalid format.
+004EEAD8 U .text   ****** Activation Process (Special) ******
+004EEBF8 U .text   EE Activated Successfully
+004EEC3C U .text  EE Failed to Activated Successfully
+004EF4C8 A .text  txtDemoLimit
+004EF8C8 U .text  Invalid License information !
+004F1E24 U .text  The MS-Logoff digest header has been returned from the Web site. This header specifically instructs the digest package to purge credentials for the associated realm. This error will only be returned if INTERNET_ERROR_MASK_LOGIN_FAILURE_DISPLAY_ENTITY_BODY has been set.
+004F2B9C U .text  SSL certificate date that was received from the server is bad. The certificate is expired.
+004F3300 U .text  The License Code does not appear to be valid.  Please check the code you entered.  The License Code is case sensitve.
+004F34EC U .text  The activation process has either lost the Internet connection or has timed out.  Please wait 30 seconds and try again.
+004F37F4 U .text   Demo_Signin: could not get machine id from server
+004F3860 U .text  Do you want to remove EEMS Demo license? Note that you will no longer be able to use your license after proceeding.
+004F3ABC U .text  Demo_GetUserInfo
+004F3B04 U .text  ) in procedure Form_Load of Form frmAct_Demo_UserInfo
+004F3BE4 U .text  SELECT * FROM [dsi_countries] order by name
+004F3CC0 U .text  Please enter your expectations for using EEMS.
+004F3ED0 A .text  cmdSendActivationCode
+004F3EE8 A .text  frameActiveAccount
+004F3F08 A .text  txtActivationCode
+004F4070 U .text  Do you want to remove EE Demo license? Note that you will no longer be able to use your license after proceeding.
+004F41F0 U .text  Please enter the Activation Code!
+004F436C U .text  DEACTIVATE
+004F4654 A .text  cmdSendActivationLog
+004F4DA0 U .text  \efdc.mdb;
+004F4F94 U .text  ) in procedure fnoIsAlreadyActivated of Module Act_License
+004F508C U .text  .ini
+004F5318 U .text   2. Read license information
+004F54A4 U .text   ****** Check Licensing ******
+004F5524 A .text  cmdDemo_ChangePassword
+004F5718 A .text  cmdDeactivate
+004F5784 U .text   6. Check if the computer is already activated or not. 
+004F57F8 U .text   6.1 The license is activated. LicenseCode: 
+004F9684 U .text   6.1.2 Check valid Product Features
+004F96D0 U .text   6.1.3 Check the license is valid or not by checking with FNO server
+004F9760 U .text   6.1.4 Check license file
+004F97EC A .text  FrameDemo
+004F984C U .text  ). Your Maintenance Expiration Date is: 
+004F98E0 A .text  lblLicenseCode
+004F9914 A .text  lblDeactivate
+004F9924 A .text  cmdDemo
+004F9958 A .text  cmdRemoveLicense
+004F996C A .text  cmdDemo_UserInfo
+004F99A4 A .text  txtTrialLicenseCode
+004F99C4 A .text  frameDeactivate
+004F99D4 A .text  lbTrialExpiresDay
+004F9A00 U .text   6.2 Begin the activation process...
+004F9A50 U .text  There is an error when checking the license. Error 
+004F9ABC U .text  ) in procedure CheckLicensing of Module Act_License_Module
+004F9B38 U .text   Demo is already activated...
+004F9B78 U .text  Failed to sign in Demo Version.
+004F9BBC U .text  Failed to check the license with FNO. Error 
+004F9C1C U .text  Your license (
+004F9C70 U .text  You will no longer be able to use the license. The application will stop now.
+004F9D5C U .text   *** Recreate the license file *** 
+004F9DB8 U .text       Recreate license file successfully ...
+004F9E14 U .text  Failed to recreate license file.
+004F9E5C U .text  Failed to recreate license file. Error 
+004F9F50 U .text  The licenseWrapper is not valid, the application will stop now. Please contact DS-INTL.
+004FA004 U .text    LicenseWrapper Is Nothing
+004FA080 U .text  ) in procedure Init_FlexnetWrapper of Module Act_License
+004FA198 U .text  The license dongle has been removed. You have 5 minutes to save your work before 
+004FA348 U .text  ) in procedure USB_Change of Module Act_License
+004FA3AC U .text  ) in procedure GetClientHardware of Module Act_License_Module
+004FA42C U .text  Sorry, your license has expired. Please contact DSI.
+004FA4D4 U .text  ) in procedure ShowExpiredForm of Module Act_License_Module
+004FA550 U .text  The product feature is empty
+004FA600 U .text  The license file is empty.
+004FA63C U .text  The license file does not exist at 
+004FA688 U .text  The feature 
+004FA6B4 U .text   does not map with the license file 
+004FA720 U .text  CheckLicenseFile(): 
+004FAE64 U .text  ActivationID or Product Name is missing.
+004FAEBC U .text  Could not create the license (.lic) file.
+004FAF14 U .text  Could not create the license (.lic) file. Please run as administrator.
+004FAFA8 U .text  has expired
+004FAFC8 U .text  Could not activate. Please re-check the license code.
+004FB038 U .text       fnpActivateProduct: 
+004FB1A4 U .text    Your license has been updated. Please wait while the licensing system updates.
+004FB24C U .text       Deactivate first
+004FB27C U .text       Activate again
+004FB2A8 U .text       Reactivate successfully.
+004FB2E8 U .text       Failed to update your license (could not activate)
+004FB384 U .text       Failed to update your license (could not deactivate).
+004FB400 U .text  Failed to update your license. Error 
+004FB450 U .text       Failed to re-activate the license. Error 
+004FB4B4 U .text  Checkout dongle license file successfully!
+004FB510 U .text  The license has expired.
+004FB564 U .text  Feature start date is in the future
+004FB5B0 U .text  There are some problems with your license, the application will stop now. Please contact DS-INTL.
+004FB73C U .text  Checkout the license file successfully!
+004FB7BC U .text  The license is expired.
+004FB7F0 U .text  Failed to checkout the license file!
+004FB860 U .text  The license has not been activated yet!
+004FB8B4 U .text       fnpCheckOutWithLicenseFile(): 
+004FB918 U .text       fnpDeactivateProduct ...
+004FB984 U .text       Deactivate successfully.
+004FB9C4 U .text       Reset the license.
+004FBA5C U .text       fnpDeactivateProduct: 
+004FBAF0 U .text  ) in procedure fnoGetInfo of Module Act_License
+004FBB54 U .text  ) in procedure GetLicenseInfo of Form frmAct_License_Validation
+004FC280 U .text  //XmlResult/result/fulfillmentInfo/fulfillmentID/expirationDate
+004FC304 U .text      ExpirationDate=
+004FC330 U .text   .GetDate(ExpirationDate)=
+004FC7D8 U .text  ACTIVE
+004FC828 U .text  //XmlResult/result/fulfillmentInfo/fulfillmentID/licenseText
+004FC954 U .text      ExpirationDate not found
+004FCA58 U .text      EEMS FirstName not found
+004FCAE8 U .text      EEMS LastName not found
+004FCB80 U .text      EEMS TelephoneNumber not found
+004FCBD6 A .text  KspicPicture
+004FCC40 U .text      EEMS Organization not found
+004FCCE8 U .text      EEMS Address not found
+004FCD78 U .text      EEMS CountryCode not found
+004FCE18 U .text      EEMS Occupation not found
+004FCEF0 U .text      EEMS ID not found
+004FD3E8 U .text  \EE.ico
+004FD570 U .text  IsActivated
+004FD58C U .text  FeatureName
+004FD5A8 U .text  ) in procedure ReadLicense of Module ReadLicenseSettings_Error
+004FD640 U .text  \eems.mdb;
+004FD65C U .text  \eems.mdb
+004FD7B8 U .text  SELECT * FROM [dsi_settings]
+004FD86C U .text  ActivationID
+004FD8B0 U .text  LicenseFile
+004FD908 U .text  ExpirationDate
+004FD9EC U .text  demo_email
+004FDA08 U .text  demo_password
+004FDA28 U .text  demo_rememberpassword
+004FDA58 U .text  demo_activationcode
+004FDA84 U .text  demo_firstname
+004FDAA8 U .text  demo_lastname
+004FDAC8 U .text  demo_countrycode
+004FDAF0 U .text  demo_organization
+004FDB18 U .text  demo_address
+004FDB38 U .text  demo_telnumber
+004FDB5C U .text  demo_registrationstep
+004FDB8C U .text  demo_occupation
+004FDBF4 U .text  ) in procedure ReadLicense of Module Act_License
+004FDCAC U .text       LicenseServiceIsAvailable Error 
+004FDCFC U .text  ) in procedure LicenseServiceIsAvailable of Module Act_License
+004FE5EC U .text  DSI Provided Demonstration Models
+004FE634 U .text  300 Active Cells with only Salinity and/or Dye
+004FE718 U .text  You are currently using the DEMO Version of 
+004FE7C8 U .text  Contact DSI to obtain an unrestricted licensed version of 
+004FEB88 U .text  Your EEMS Demo Version has been successfully activated.
+004FEBFC U .text  Failed to activate EEMS Demo Version: 
+004FECB8 U .text  Send Activate Code Successfully. Please check your email box to get activation code it!
+004FED6C U .text  Failed to Send Activate Code: 
+004FF5F4 U .text  EEMS Demo Version License requires Online Internet Connection. Please check your internet connection.
+004FF6C4 U .text  INSERT INTO dsi_track_logs(sessionid,logtime,logcontent) values(
+004FF794 U .text  ) in procedure Demo_TrackLog2Access
+004FF7E0 U .text  \EFDC_LIC.exe demo_tracklog
+004FF81C U .text  Failed Demo_Access2Server
+005007B4 U .text  You should only need to deactivate if you are moving 
+005008C8 U .text  Are you sure you want to Deactivate?
+00500918 U .text   ****** Deactivation Process ******
+00500A10 U .text   1. Product/LicenseCode:
+00500B90 U .text   3. Checking the licensing server connection ...
+00500BFC U .text      Cannot connect to the licensing server. Please check your internet connection or wait 30 seconds and try again.
+00500CE8 U .text  Deactivating...
+00500DE0 U .text   4.1 The fulfillment is exists -> Deactivate product
+00500E50 U .text  Removing the license...
+00500E94 U .text   is deactivated successfully. 
+00500F1C U .text    is deactivated successfully. 
+00500F60 U .text  Failed to deactivate the license. Error: 
+00500FB8 U .text  Failed to deactivate. Error 
+00500FF8 U .text  The License Code you have entered has an invalid length.
+00501070 U .text  The Activation wizard cannot proceed as you do not agree to the Terms and Conditions for Use.  The Activation wizard will close after click OK
+0050119C U .text  The license code is empty. Please check that!
+005011FC U .text  Licensing Information:
+00501284 U .text  - License Name: 
+005012AC U .text  - License Code: 
+005013E0 U .text  Cannot connect to the licensing server. Please check your Internet connection or wait 30 seconds and try again.
+00501500 U .text  This Multi-Trial License expires in 
+00501558 U .text  Do you want to remove your license? Note that you will no longer be able to use your license after proceeding.
+0050163C U .text   *** Deactivate Process for Dongle ***
+00501690 U .text       Deleted the Dongle license file.
+005016E0 U .text  Do you want to deactivate this Perpetual license?
+00501748 U .text  Do you want to deactivate this Subscription license?
+005017B8 U .text  Do you want to remove your license and try with Demo license? Note that you will no longer be able to use your license after proceeding.
+005018D0 U .text   **** Remove Demo Version
+00501908 U .text  Multi-Trial License
+00501938 U .text   Deactivate if the license is Perpetual or Rental
+005019A0 U .text  Could not deactivate your license
+00501AFC U .text  EEMS Log File
+00501B1C U .text  ) in procedure cmdDemo_UserInfo_Click of Form frmAct_LicenseManager
+00501BA8 U .text  ) in procedure cmdDeno_Feedback_Click of Form frmAct_LicenseManager
+00501D04 U .text  ) in procedure cmdDemo_ChangePassword_Click of Form frmAct_LicenseManager
+00501D9C U .text       Delete the license file of Dongle.
+00501DF0 U .text  Do you want to remove your Trial license? Note that you will no longer be able to use your Trial license after proceeding.
+00501F80 U .text  Do you want to remove your Demo license? Note that you will no longer be able to use your Demo license after proceeding.
+00502078 U .text   **** Upgrade from Demo Version
+005020E0 U .text   Deactivate if the license is Perpectual or Rental
+0050214C U .text   *** The user deleted the license file.
+005021A0 U .text  Do you want to remove this license? Note that you will no longer be able to use your license after proceeding.
+0050235C U .text  A valid license has been entered.
+005023A4 U .text  DEMO VERSION
+005023FC U .text  This Trial License has expired!
+00502440 U .text  THIS TRIAL LICENSE PERIOD HAS BEEN EXCEEDED.
+005024A0 U .text  Click 'Upgrade' if you want to remove this license and upgrade to Subscription License. Note that a live Internet connection is required.
+005025B8 U .text  Trial License
+005025D8 U .text  This Trial License expires in 
+00502630 U .text  THIS TRIAL LICENSE EXPIRES IN 
+00502688 U .text  THIS MULTI-TRIAL LICENSE EXPIRES IN 
+005026D8 U .text  This Multi-Trial License has expired!
+00502728 U .text  THIS MULTI-TRIAL LICENSE PERIOD HAS BEEN EXCEEDED.
+00502794 U .text  This Subscription License expires in 
+005027E4 U .text  THIS SUBSCRIPTION LICENSE EXPIRES IN 
+00502868 U .text  This Subscription License has expired!
+005028BC U .text  THIS SUBSCRIPTION LICENSE PERIOD HAS BEEN EXCEEDED.
+00502928 U .text  Maintenance Expiration Date: 
+00502968 U .text  Click 'Remove' to remove the license of the dongle.
+00502A40 U .text  Click 'Deactivate' to deactivate this product. Note that a live Internet connection is required.
+00502B08 U .text  &Deactivate
+005031C0 U .text  .jpg
+00504518 U .text  .bmp
+005045BC U .text  You must first convert the TIF file to a JPG then retry.
+00504634 U .text  DSI_EE_GeoRef_ASDF.txt
+005046B0 U .text  Picture
+00504D54 U .text  Invalid Picture.
+00504DFC U .text  Error loading picture into the DIB!
+00505108 U .text  BMP
+00505114 U .text  JPG
+00505120 U .text  WMF
+0050512C U .text  EMF
+00505138 U .text  GIF
+00505EB0 U .text  Logo_Use
+00505EC8 U .text  Logo_File
+00505EE0 U .text  LogoWidth
+00509510 A .text  _mitab_c_create_feature@8
+00509564 A .text  _mitab_c_destroy_feature@4
+0050A1D0 A .text  _mitab_c_next_feature_id@8
+0050A26C A .text  _mitab_c_read_feature@8
+0050A5C8 A .text  _mitab_c_write_feature@8
+0050A790 A .text  _mitab_c_get_feature_count@4
+005117C8 U .text  http://maps.google.com/mapfiles/kml/pal4/icon49.png
+00511AC4 U .text  No .PRJ-file was found. Check values and try to convert if seems like Geographic Coordinates?
+00512244 U .text  .mdb
+00512C34 U .text  Failed to read feature 
+00512C68 U .text  Read feature 
+00513D00 A .text  picLogo
+00513D38 A .text  imgLogo
+00513D94 A .text  txtLogo
+00513DAC A .text  chkLogo
+00513FF0 A .text  lblActiveWidth
+00514000 A .text  lblActiveHeight
+005169D0 U .text  Load a Picture File
+005169FC U .text  Picture Files|*.JPG;*.bmp;*.jpeg;*.wmf;*.gif;*.emf;*.tif
+005182A4 A .text  OleCreatePictureIndirect
+0051853C A .text  mnuCell_Activate
+00518550 A .text  mnuCell_Deactivate
+00518E6C A .text  IsDeactiveCell
+005198B4 U .text  .emf
+0051A308 U .text  You are currently using the DEMO Version of EFDC_Explorer which does not allow saving the model.  The current model is limited to: 
+0051A414 U .text  Contact DSI to obtain an unrestricted licensed version of EFDC_Explorer at
+0051DA58 U .text  \EE_Activation.log
+0051DA84 U .text  ===EFDC_Explorer Activation LOG!===
+0051DC54 U .text  The following list is a list of status EFDC_Explorer Activation:
+0051DF48 U .text  ActiveIJ_Auto
+0051EAA4 U .text  DEMOpacity
+0051EB00 U .text  DEMFixColor
+00520B7C U .text  TS_WetDry.emf
+00520D4C U .text  TS_IN2.emf
+00520F2C U .text  TS_IN1.emf
+005210E8 U .text  TS_Depth.emf
+00521108 U .text  TS_WSEL.emf
+00521310 U .text  TS_TimeSteps.emf
+00521338 U .text  TS_VEL.emf
+00521354 U .text  TS_BedShear.emf
+00521378 U .text  TS_BHT_TEM.emf
+0052139C U .text  TS_BHT_THK.emf
+005213C0 U .text  TS_ICE_THK.emf
+005213E4 U .text  TS_ICE_TEM.emf
+00524538 A .text  SaveAsPNG
+0052485C U .text  jpg
+00524868 U .text  bmp
+00524874 U .text  png
+0052488C U .text  gif
+00525634 A .text  LoadPicture_DIBhandle
+0052564C A .text  LoadPicture_FileName
+00525664 A .text  LoadPicture_stdPicture
+0052567C A .text  LoadPicture_Stream
+005256FC A .text  SaveAsBMP
+00525708 A .text  SaveAsJPG
+005258E8 A .text  CopyStdPicture
+005261A0 U .text  delme99.bmp
+005263D8 U .text  PNG
+005264DC U .text  Error Loading Reference Pictures/Images.
+005268CC U .text   Active Cell Area:     
+00526AC8 U .text   Active Cell Records:  
+00526CF4 U .text   Active AVG Volume:    
+00526D44 U .text   Active Cell Min DX:   
+00526D78 U .text   Active Cell Avg DX:   
+00526DAC U .text   Active Cell Max DX:   
+00526DE0 U .text   Active Cell Min DY:   
+00526E14 U .text   Active Cell Avg DY:   
+00526E48 U .text   Active Cell Max DY:   
+00527050 U .text   Active Cell Average:   
+005270A4 U .text   Active Cell Minimum:   
+005270DC U .text   Active Cell Maximum:   
+00528310 A .text  PageLogo
+00528470 U .text  EEMS Report Created by DSI
+0052B2A0 U .text  C ISMHYST = activate hysteresis in benthic mixing
+0052B308 U .text  C           =0, not activated
+0052B348 U .text  C           =1, activated
+0052B380 U .text  C   ISMZB = activate diagnostic output for FUNCTION ZBRENT to file ZBRENT.LOG
+0052B85C U .text  C isSDBIN = switch to activate writing benthic flux rates to a binary output
+0052B9A0 U .text  C           < 0 EE Linkage activated.  ABS(isSDBIN) is EE write interval.
+00532D9C U .text  C               Nitrogen Classes + Reactive DOC/CBOD Variable)
+00532F64 U .text  C               + Reactive DOC/CBOD)
+00533734 U .text  C  ISRPEM = 1 To Activate Rooted Plant And Epiphyte Algae Sub-Model (RPEM)
+00534194 U .text  C        ! 20) TAM - total active metal
+0053448C U .text  C  IWQSI   = switch to activate silica state variables (0=off; 1=activated)
+00534528 U .text  C  IWQFCB  = switch to activate fecal coliform bacteria (0=off; 1=activated)
+005389A0 U .text  C           photoactive available radiation (PAR) for algae growth
+00541A8C U .text  C STEMFAC = SOD temperature factor, use 1.0 to ignore temperature effects
+00541B24 U .text  C47    FPO4    FNH4    FNO3    FSAD    FCOD     SOD STEMFAC
+0054C874 U .text  C   ISRPEMSPAC = 1 to activate spatial output
+0054CB94 U .text  C   ISRPEMTIME = 1 to activate time series output
+0054D644 U .text  WQBENMAP.INP  Warning!  Not all of the active cells assigned mud/sand.
+0054D944 U .text  WQSDMAP.INP  Warning!  Not all of the active cells assigned a benthic zone.  The default zone is Zone 1.
+0054E3A0 U .text  C48  Error!  i,j,k points to an inactive cell!  Point Source: 
+0054EB94 U .text  WQWCMAP.INP  Warning!  Not all of the active cells-layers assigned a zone.  The default zone is Zone 1.
+005502DC U .text  ActiveIJ = 
+00550474 U .text  Active Cell Polygon
+00551230 U .text  Maximum Active Layers for Sub-Area (KMax):
+0055128C U .text  Minimum Active Layers for Sub-Area (KMin):
+005518D8 U .text   Active Cells
+00551904 U .text  C KL - Local Number of Active Vertical Layers                                         
+00551AF8 U .text  GVCLayer: Assigned GVC Layers to an inactive cell @ I=
+00551C30 U .text  Minimum active layer > KC for BC group: 
+00551D30 U .text   pointing to Inactive Cell! I:
+00552BF8 U .text    ***Warning: South BC: Cell to North is not active. BC Cell  I:
+00552CB8 U .text    ***Warning: East BC: Cell to West is not active. BC Cell  I:
+00552D3C U .text    ***Warning: West BC: Cell to East is not active. BC Cell  I:
+00552DC0 U .text    ***Warning: North BC: Cell to South is not active. BC Cell  I:
+00552EF4 U .text    ***Warning: Downstream Flow Control BC pointing to Inactive Cell! I:
+00552F88 U .text    Flow Control BC pointing to Inactive Cell! I:
+00552FEC U .text   DS cell pointing to Inactive Cell! I:
+00553080 U .text   US cell pointing to Inactive Cell! I:
+005532C0 U .text    Tracer pointing to Inactive Cell! I:
+005535B8 U .text  Flow Control BC pointing to Inactive Cell! I:
+00553624 U .text  Tracer pointing to Inactive Cell! I:
+00554168 U .text  One or more Mask I & J indices point to an inactive cell (Mask: 
+00554C10 U .text  Your have selected Active-Parent Layering for sediment bed armoring but not Startup Initialization.
+00554CF8 U .text    You should turn on Startup Initialization or turn off Active-Parent Layering.
+00554D9C U .text  Your have selected Active-Parent Layering with Startup Initialization for the sediment bed.
+00555868 U .text  The wave action with radiation shear stress effects has been activated.  However, the Nikuradse Roughness (KSW) is set to zero.  Set to 2.5*d50.
+005561FC U .text  # Erosion rates for active and deposited Layers ERATEND [cm/s]     #
+005564F8 U .text  # Active Layer Thickness Multiplier  TACTM    [Written by DSI's EE8.2.1 or higher] #
+00556980 U .text  Missing SEDZLJ files!  Deactivating SEDZLJ
+00556B50 U .text  No SEDFlume data loaded.  Check BED.SDF file Format.  Deactivating SEDZLJ
+00556D0C U .text  No SEDFlume cores loaded.  Check CORE_FIELD file Format.  Deactivating SEDZLJ
+00556EEC U .text  ERATE.SDF file is Missing!  Deactivating SEDZLJ
+00556FC0 U .text  ERATE.SDF file format is Unknown!  Deactivating SEDZLJ
+0055A2D8 A .text  _FreeImage_JPEGTransform@16
+0055AA60 A .text  _FreeImage_JPEGCrop@24
+0055B9F0 A .text  Picture2
+0055C290 A .text  glShadeModel
+0055EE50 U .text  Host cell points to inactive cell!  Re-enter!
+0055F0F8 U .text   as a bad I/J index.  I/J points to an inactive cell.
+0055F368 U .text  Bad Tracer I/J.  I/J points to an inactive cell.
+0055F434 U .text  Receiver cell points to inactive cell!  Re-enter!
+00561EA8 A .text  chkActive
+00563FE4 U .text  You have activated maximum Vertical Molecular Diffusuvities but the Max specified is < Background/Constant.  Please correct.
+005640F0 U .text  You have activated maximum Vertical Viscosities but the Max specified is < Background/Constant.  Please correct.
+00564E44 U .text  Inactive Cell
+00566FAC U .text  The DEMO version only allows for maximum 2 threads. Contact DSI (
+00567034 U .text  ) for an unrestricted license.
+00567F48 U .text  PNG (*.png)|*.png|JPEG (*.jpg)|*.jpg|GIF (*.gif)|*.gif|Bitmap (*.bmp)|*.bmp|TIFF (*.tif)|*.tif|All Files (*.*)|*.*
+00568104 U .text  .png
+005682BC U .text  The option of linking RPEM to sediment diagenesis has been deactivated since sediment diagenesis is not being simulated
+0056B924 U .text  Determining Active Cells (
+0056C288 U .text  No active cells found!
+0056CD24 A .text  spnGroups
+0056E0C0 U .text  Please Activate Temperature first before Importing data.
+0056E9D0 U .text  Rose-Wind.png
+0057177C U .text  Active Cell Polygon (Optional)
+00572AF4 U .text  Not enough active cells identified!  Try again.
+00572BF8 U .text   Active Cells in a 
+005737A0 U .text  Show the bottom active layer.
+00574E58 U .text  Active Vertical Layers (Diff) = 
+00574EA0 U .text  Active Vertical Layers = 
+00576298 U .text  Active Layer d50 = 
+0057633C U .text  Active Layer d50 (microns) = 
+00576424 U .text  Active Layer Mass (g/m^2) = 
+00578CE0 U .text  delme99.emf
+0057AC48 U .text  Load Picture/Graphic for Reference
+0057ACAC U .text  Images|*.bmp;*.jpg;*.png|All Files (*.*)|*.*
+0057C4D4 U .text  Minimum D*V (m2/s) below which will be counted as 'inactive'
+0057CA80 U .text  Polyline Editing Keys (when 'Move Point' is Activated):
+0057CB34 U .text  , # Active Lay = 
+0057D3FC U .text  CTRL-P - Switch on/off Adding frames for pictures/graphics for reference
+0057E200 U .text  Adding frames for pictures/graphics for reference has been SWITCHED ON.
+0057E348 U .text  Adding frames for pictures/graphics for reference has been SWITCHED OFF.
+0057E54C U .text  This feature is not available with SEDZLJ at this stage.
+0057E5D0 U .text  The sediment core editing functionality is disabled if sediment transport is not activated.
+0057E7B8 U .text  Enter the picture box size in CM (Default is current size):
+0057EFA0 U .text  EEMS Habitat Tools
+0057F7D0 U .text  Cell Active
+0057F7EC U .text  Cell Not Active
+00581020 U .text  After Active Tracking Period
+0058243C U .text  Active Layer d50 (um)
+005824D8 U .text  Active Layer d50 (microns)
+005825A0 U .text  Active Layer Mass (g/m^2)
+00582844 U .text  Flow_TS_Cell.emf
+00582880 U .text  _Cell.emf
+00582A20 U .text  BC_South.emf
+00582A40 U .text  BC_East.emf
+00582A5C U .text  BC_West.emf
+00582A78 U .text  BC_North.emf
+00582A98 U .text  BC_WR_Flow.emf
+00582D5C U .text  After Picture: 
+00583524 U .text   Active Cell Area-ha:  
+00583558 U .text   Active Cell Vol-10^6m3:  
+00583594 U .text   Active Cell  Average:   
+005835E0 U .text   Active Cell  Minimum:   
+00583618 U .text   Active Cell Maximum:  
+00583A8C U .text  The Toolbar is Inactive when conducting Sediment Core Editing.  Use Ctrl-T to toggle editing on/off.
+00584F6C U .text  Enter the Active number of Layers (1 to 
+0058513C U .text  export_bmp
+0058535C U .text  export_emf
+00585B50 U .text  TotalActiveMetal
+0058650C U .text  _.png
+00589664 U .text  d50 (Active Lay)
+00589C10 U .text  altitudeMode
+00589E0C U .text  <table border="0" width="100%"><br><br>============================<br><tr><td align="center"><strong>Prepared by Dynamic Solutions-International, LLC</strong></td></tr><tr><td width="200" valign="center" align="right" class="padded"><a href="http://ds-international.biz"><img alt="" src="http://ds-international.biz/images/DSI_Logo_Text_0200.png"/></a></td> </tr></table>
+0058A5C0 U .text  http://www.ds-intl.biz/wp-content/uploads/2016/06/DSI_Logo_Text_0250.png"/></a></td> </tr></table>
+0058A93C U .text  <a href=" +  webUrl + "><img alt="" src="https://www.eemodelingsystem.com/wp-content/uploads/2017/07/logo.png"/>
+0058AD34 U .text  -lv.png
+0058B0AC A .text  chkActivate
+0058C058 U .text  Activated Cohesive sediment transport but there are no cohesive sediments defined. Turning OFF Cohesive transport.
+0058C240 U .text  Activated Non-Cohesive sediment transport but there are no cohesive sediments defined. Turning of Non-Cohesive Transport.
+0058D0FC U .text  Computed (Not Active)
+0058F0D0 U .text    to activate the switch between Bedload and Suspended load.
+005902CC U .text  picView3D_012345.bmp
+005902FC U .text  picView3D_01234567.bmp
+00590330 U .text  \picView3D_01234567.bmp
+00590B3C U .text  Image Bitmap (*.bmp)|*.bmp
+00591BB0 U .text  .JPG
+00591FBC U .text  View3D_012345.bmp
+00591FE4 U .text  \View3D_012345.bmp
+00595030 U .text  .gif
+00595040 U .text  image/gif
+00595058 U .text  image/bmp
+00595090 A .text  GdipImageSelectActiveFrame
+005951F0 A .text  GetGifFramePalette
+00595204 A .text  GetGifLoopCount
+00595214 A .text  GifFrameDelay
+00595224 A .text  GifMinimumFrameDelay
+00595D78 U .text  JPEG Encoder Class
+0059B788 U .text  EE    EFDC_DSI_VER: 7.301
+005A0338 U .text  *  DABEDT    = DEPTH OR THICKNESS OF ACTIVE BED TEMPERATURE LAYER, METERS, <0 FOR SPATIALLY VARIABLE BED T AND THICK USING TEMPB.INP
+005A1B90 U .text  *        KB:   MAXIMUM NUMBER OF BED LAYERS (EXCLUDING ACTIVE LAYER)
+005A1C20 U .text  *  ISDTXBUG: 1 TO ACTIVATE SEDIMENT AND TOXICS DIAGNOSTICS
+005A2AFC U .text  *            2 FOR BANK EROSION INTERNALLY CALCULATED BY STABILITY ANALYSIS (Not Active)
+005A2CE0 U .text  *   ISNDAL:  1 TO ACTIVATE NON-COHESIVE ARMORING EFFECTS (GARCIA & PARKER)
+005A2D7C U .text  *            2 SAME AS 1 WITH ACTIVE-PARENT LAYER FORMULATION
+005A3354 U .text  *   HBEDAL:    ACTIVE ARMORING LAYER THICKNESS
+005A3E30 U .text  *          1 ACTIVE BED MORPHOLOGY: NO WATER ENTRAIN/EXPULSION EFFECTS
+005A3EC4 U .text  *          2 ACTIVE BED MORPHOLOGY: WITH WATER ENTRAIN/EXPULSION EFFECTS
+005A6C30 U .text  gif87a
+005A836C U .text  *              1 ACTIVATE BEDLOAD OPTION.  USES SEDBLBC.INP TO SPECIFY CELLS
+005A84F8 U .text  *  ISTRAN:  1 OR GREATER TO ACTIVATE TRANSPORT
+005A89D8 U .text  *                WHICH NO BED LOAD TRANSPORT CAN OCCUR.  NOT ACTIVE FOR BLBSNT=0.0
+005AA3D8 U .text  *  ISHOUSATONIC:  1 ACTIVATE HOUSATONIC RIVER SUPERFUND SEDIMENT-TOXICS OPTIONS
+005AAF4C U .text  *            1 ACTIVATE RUN CONTINUATION - EE LINKAGE OUTPUT WILL BE APPENDED TO THE EXISTING FILES
+005AB12C U .text  *  ISMMC:    <0 FLAG TO GLOBALLY ACTIVATE WRITING EXTRA MODEL RESULTS LOG FILES
+005AB1D0 U .text  *  ISBAL:    1 FOR ACTIVATING MASS, MOMENTUM AND ENERGY BALANCES AND
+005AD2FC U .text  *  ISHDMF:  1 TO ACTIVE HORIZONTAL MOMENTUM DIFFUSION
+005AD3B4 U .text  *           2 TO ACTIVE HORIZONTAL MOMENTUM DIFFUSION WITH WATER COLUMN DIFFUSION
+005AE3A8 U .text  *  ISADAC:  1 TO ACTIVATE ANTI-NUMERICAL DIFFUSION CORRECTION TO
+005AE600 U .text  *  ISADAH:  1 TO ACTIVATE ANTI-NUM DIFFUSION CORRECTION TO HORIZONTAL
+005AE764 U .text  *  ISADAV:  1 TO ACTIVATE ANTI-NUM DIFFUSION CORRECTION TO VERTICAL
+005AF2E0 U .text  *           -NDRYSTP FOR ISDRY=-99 TO ACTIVATE WASTING WATER IN DRY CELLS 
+005AFFB4 U .text  *  LC:        NUMBER OF ACTIVE CELLS IN HORIZONTAL + 2
+005B14CC U .text  *         FOR IGRIDV=1, THE LAYERS ABOVE THE BOTTOM ACTIVE SGZ LAYER ARE 
+005B223C U .text  *  CK2UUC:  CORRECTION FOR UU CURVATURE ACCELERATION   (NOT ACTIVE)
+005B22C8 U .text  *  CK2VVC:  CORRECTION FOR VV CURVATURE ACCELERATION   (NOT ACTIVE)
+005B2354 U .text  *  CK2UVC:  CORRECTION FOR UV CURVATURE ACCELERATION   (NOT ACTIVE)
+005B2FA8 U .text  *              MOMENTUM DIFFUSION IS ACTIVE AND AHO OR AHD ARE NONZERO
+005B375C U .text  *                    (FOR ISSTAB = 0,1,2) THIS OPTION NOT ACTIVE
+005B37E4 U .text  *     ISAVBMX:   SET TO 1 TO ACTIVATE MAX VISCOSITY AND DIFFUSIVITY OF AVMX AND ABMX
+005B4548 U .text  *  ISGWIT:     1 TO ACTIVATE SOIL MOISTURE BALANCE WITH DRYING AND WETTING
+005B45E4 U .text  *              2 TO ACTIVATE GROUNDWATER INTERACTION WITH BED AND WATER COL
+005B4690 U .text  *              1 TO ACTIVATE SOIL MOISTURE BALANCE WITH DRYING AND WETTING
+005B472C U .text  *              2 TO ACTIVATE GROUNDWATER INTERACTION WITH BED AND WATER COLUMN (GWMAP & GWSER)
+005B4884 U .text  *  ISCHAN:    >0 ACTIVATE SUBGRID CHANNEL MODEL AND READ MODCHAN.INP
+005B4D1C U .text  * ITIDASM:     1 FOR TIDAL ELEVATION ASSIMILATION (NOT ACTIVE)
+005B57D4 U .text  *  ISWRSR    = 1 Activates inclusion of Rotational component of rad stress
+005B5870 U .text  *  ISWRSI    = 1 Activates inclusion of Irrotational component of rad stress
+005BAC7C U .text  *       VALUE IS REQUIRED EVEN IF TOXIC TRANSPORT IS NOT ACTIVE
+005BAFC8 U .text  *       EVEN IF COHESIVE SEDIMENT TRANSPORT IS INACTIVE
+005BB230 U .text  *       REQUIRED EVEN IF NON-COHESIVE SEDIMENT TRANSPORT IS INACTIVE
+005BB390 U .text  *  ICAL: 0 BYPASS,  1 ACTIVE (NORMAL - TOTAL LAYER FLOW AT DIFFUSER),  2 - W/R (USE W/R SERIES)
+005C3110 U .text  *   DPDIFTOX: DEPTH IN BED OVER WHICH PARTICLE MIXING IS ACTIVE (m)
+005C3F24 U .text  EFDC_DSI_VER
+005C4128 U .text  *     ISTOXALL:   1 TO ACTIVATE ACCUMULATION OF TOXIC FLUXES
+005CA4F0 U .text  *  ISPD:   1 TO ACTIVE SIMULTANEOUS RELEASE AND LAGRANGIAN TRANSPORT OF
+005CA638 U .text  *          2 TO ACTIVATE DS-INTERNATIONAL'S LPT DRIFTER COMPUTATIONS (DRIFTER.INP)
+005CA8E4 U .text  *  ISLRPD: 1 TO ACTIVATE CALCULATION OF LAGRANGIAN MEAN VELOCITY OVER TIME
+005CB324 U .text  *  ISDUMP: GREATER THAN 0 TO ACTIVATE
+005CBCA8 U .text  *  ISVPV:   1 TO ACTIVATE INSTANTANEOUS VELOCITY
+005CDBA0 U .text  *        100 TO ACTIVATE THE HIGH FREQUENCY DOMAIN OUTPUT READING SNAPSHOT.INP
+005CE0E4 U .text  *  ISSPV:    1 TO ACTIVATE INSTANTANEOUS SCALAR FIELDS
+005CE1D8 U .text  *  ISRSPV:   1 TO ACTIVATE FOR RESIDUAL SCALAR FIELDS
+005CEB30 U .text  *  ISRSPV:  1 TO ACTIVATE FOR RESIDUAL VELOCITY
+005CF18C U .text  *          2 TO WRITE TO 3D CHARACTER ARRAY FORMAT FILES (NOT ACTIVE)
+005CF230 U .text  *          3 TO WRITE TO 3D HDF IMAGE FORMAT FILES (NOT ACTIVE)
+005CF2B4 U .text  *          4 TO WRITE TO 3D HDF FLOATING POINT FORMAT FILES (NOT ACTIVE)
+005CFBBC U .text  *            ACTIVATION OF THE REWRITE OPTION I3DRW=1 WRITES TO THE FULL
+005D01F4 U .text  *  I3DRW:  0 FILES WRITTEN FOR ACTIVE CO WATER CELLS ONLY
+005D0698 U .text  C81 OUTPUT ACTIVATION AND SCALES FOR 3D FIELD OUTPUT
+005D0790 U .text  *  IS3(VARID): 1 TO ACTIVATE THIS VARIABLE
+005D1648 U .text  *  NBTMSR:  TIME STEP TO BEGIN WRITING TO TIME SERIES FILES (Inactive)
+005D16DC U .text  *  NSTMSR:  TIME STEP TO STOP WRITING TO TIME SERIES FILES (Inactive)
+005D3AF8 U .text  C   READ I,J,NGWSL(I,J),GWFAC(I,J) for each active horizontal cell
+005D3D38 U .text  C **  DAGWZ :   Depth Active Groundwater
+005DAD70 U .text  Cells activated in Cell.Inp but not set in DXDY
+005DC020 U .text  Two time level (preferred option) is not selected.  Active?
+005DC09C U .text  Conjugate Gradient Solver with Wetting and Drying not selected (preferred option) is not selected.  Activate?
+005DCF68 U .text  ERROR:  Cells activated in Cell.Inp but not set in LXLY.  Deactivating cell
+005DD004 U .text   Not assigned in LXLY!  Inactivating Cell!
+005DD8E4 U .text  ) is specified but is inactive!
+005E01D0 U .text  C **  DABEDT    =DEPTH OR THICKNESS OF ACTIVE BED TEMPERATURE LAYER, METERS
+005E08A4 U .text  EE    EFDC_DSI_VER: 00
+005E0A34 U .text  EE    EFDC_DSI_VER: 7.300
+005E3574 A .text  PngPropertyGet
+005E37F4 U .text  C ** ISWCBL = 1 to activate wave current boundary layer model  (Ignored)
+005E3940 A .text  SaveToStream_GIF
+005E4698 A .text  SaveToStream_JPG
+005E5010 A .text  PngPropertySet
+005E51F8 A .text  SaveToStream_PNG
+005E5B88 A .text  SaveToFile_PNG
+005E5D70 A .text  SaveToFile_JPG
+005E612C A .text  SaveToFile_GIF
+005E633C U .text        4   999    999.0   999.0 efdc_dsi_wasp.hyd    999      999     0
+005E6CA0 A .text  LoadPicture_FromOrignalFormat
+005E7B1C A .text  LoadPicture_PastedFiles
+005E7CE8 A .text  LoadPicture_DropedFiles
+005E7E24 A .text  KeepGDIplusActive
+005E7E60 A .text  LoadPicture_FileBK
+005E7E74 A .text  LoadPicture_Resource
+005E7E8C A .text  LoadPicture_ByHandle
+005E7EA4 A .text  LoadPicture_ClipBoard
+005E7F80 A .text  SaveToPNG
+005E7F8C A .text  SaveToJPG
+005E7FE0 A .text  OleLoadPicture
+005E8430 A .text  IsIconPNG
+005E8810 A .text  SaveAsGIF
+005E9008 U .text  PictureBox
+005E9058 U .text  gif89a
+005E96D4 U .text  \delRose.png
+005E9934 U .text  Rose.emf
+005E994C U .text  Rose.png
+005EB8E4 U .text  Current user does not have administrator rights. Please run as administrator to use this feature.
+005EED24 U .text  Picture Files|*.bmp;*.WMF;*.jpg;*.emf;*.gif|All Files (*.*)|*.*
+005EEECC U .text  Windows Metafiles (*.EMF)|*.EMF|All Files (*.*)|*.*
+005EEFA8 U .text  TS_.emf
+005F0D48 U .text  You are currently using the DEMO Version of EFDC_Explorer. The function is limited!
+005F130C U .text  The DEMO version only allows for 10 particles or less.  Contact DSI (
+005F2738 U .text  Valid I/J Pair but points to an inactive cell. 
+005F3750 U .text  TS_FE.emf
+005F3930 U .text  TS_EVAP.emf
+005F4260 U .text  Global Restart Switch is not activated.  Activate main output Restart switch?
+005F5998 U .text  Depth Active Groundwater (m):
+005F5AC0 U .text  Do you want to evenly redistribute all the BC flows to the active layers for all the Flow type boundary groups?
+005F7AC0 U .text  Invalid or inactive I,J selection!
+005F7EB8 U .text  Minimum Active Layers (must be >= 1) (KMin):
+005F8028 U .text  WS Profile.emf
+005F86F4 U .text  Grid Profile.emf
+005FA5B8 U .text  Point 6a ACTIVATE
+005FDFDC U .text  \EFDC_Explorer.ini
+005FE76C U .text  Total Active Metal
+005FFC5C U .text   Demo Version
+00600DF8 U .text   is active in the cell map but not initialized in the DXDY file!
+00602B7C U .text  Activate Sediments
+00602BA8 U .text  Activate Cohesive Sediments
+00602DD8 U .text  Activate Non-Cohesive Sediments
+00604AA8 U .text  Not Active
+00604AF4 U .text  Active
+00604B08 U .text  Deactivated
+00604B24 U .text  Active Bed
+00604C1C U .text  Active-Parent
+00604EF0 U .text  Generated New Model  Active Cells: 
+00606F90 U .text  EFDC_Explorer: License Management
+0060734C U .text  The licensing Dongle timeout period has expired. The application will stop now.
+0060746C U .text   minutes to save your work after which EEMS will close.
+006074E0 U .text  The licensing timeout period has expired. The application will stop now.
+00607EB8 U .text  View_3D_.jpg
+00607F98 U .text  VP_.emf
+00607FAC U .text  Slice_2D_.emf
+00607FCC U .text  LP_.emf
+00609AA8 U .text  820 - Total Active Metals
+0060F3CC U .text  Note: The I & J's in the ATMMAP.INP file do not map to an active cell.  I: 
+0060F478 U .text  Note: The I & J's in the WNDMAP.INP file do not map to an active cell.  I: 
+0060F514 U .text  Note: The I & J's in the ICEMAP.INP file do not map to an active cell.  I: 
+00610DC8 U .text  Picture Files(*.bmp;*.jpg;*.png)|*.jpg;*.bmp;*.png|All files|*.*
+00610E50 U .text  ) in procedure ExportPictures of Form frmEFDC_View_Series
+0061238C U .text  No active cells found for (
+00612900 U .text  The Logo File is not a valid picture!  Using default.
+00612C7C U .text  Picture Files|*.jpg;*.bmp;*.png|All files|*.*
+00615708 U .text    Erosion Rates for Active/Deposited sediment class
+0061578C U .text    One or more erosion rates for the Active/Deposited sediments is zero.  Setting to 1.0E-12
+00615848 U .text     Layers 1 and 2 are reservered for computations as the active layers.  Zero the layer thickness for layer: 
+006161A0 U .text  Erosion Rates for Active and Deposited Layers by Shear Category (cm/s)
+006195EC U .text  Demonstration
+006196E8 U .text   has expired.  Please contact DS-INTL.
+00619F5C U .text   activated do not match!
+0061A0B4 U .text  EE_WC.Out is a Bad file!  The active cells in the input data (
+0061A138 U .text  ) does not match the active cells in the file (
+0061AE44 U .text  Will not populate sediment information for layers below the top active layer!
+0061CBD0 U .text  #habitat\TS_.emf
+0061CBF8 U .text  No active cells found.  Exiting.
+0061D374 U .text  A Channel Index file has been specified but the CI Suitability curve has not been set.  Continue processing only using the CI file to determine active cell list?
+0061DAB4 U .text  Time series of Active Domain Composite Habitat Index
+0061F53D A .text  Filename of bitmap to export.  The file extension will determine format (i.e. JPG, BMP, PNG, TIF)
+00625278 A .text  frmAct_ExpirationAlerts
+00625294 A .text  Expiration Alerts
+0062568A A .text  lblExpired
+006256E9 A .text  lblExpired
+00625734 A .text  lblExpired
+00625743 A .text  Please contact DSI to obtain a license for EFDC_Explorer8.3.
+0062579C A .text  lblExpired
+006257AB A .text  Your Trial license will expire on ...
+00625E44 A .text  frmAct_Demo_Feedback
+00625E5D A .text  Feedback for EEMS
+0062634A A .text  Please rate EEMS from 1 to 10 (where 10 is the best):
+006263AD A .text  Please provide us with your comments and feedback on EEMS?
+00627124 A .text  frmAct_Demo_ChangePassword
+00627143 A .text  Change Password for EEMS Demo Version
+00629CCC A .text  frmAct_Demo_SignIn
+00629CE3 A .text  Sign in EEMS Demo Version
+0062A122 A .text  Back to EEMS Activation Wizard
+0062A172 A .text  Login EEMS
+0062A31D A .text  EEMS will login automatically
+0062D5D4 A .text  frmAct_Demo_UserInfo
+0062D5ED A .text  User Information for EEMS Demo Version
+0062D9A9 A .text  Demo License - Sign Up
+0063093B A .text  Paste all characters in the characters to copy text box to active document
+00630CF0 A .text  frmEE_Export_EMF
+00633124 A .text  chkActive
+00633166 A .text  Active
+006387F3 A .text  lblActiveWidth
+00638830 A .text  lblActiveHeight
+0063C303 A .text  GIF89a
+0063C57A A .text  Filename of bitmap to export.  The file extension will determine format (i.e. JPG, BMP, PNG, TIF)
+0063D4A7 A .text  *.wmf
+0063EFDE A .text  Logo Options
+0063F000 A .text  chkLogo
+0063F04F A .text  txtLogo
+00646998 A .text  frmAct_Demo_Survey
+006469AF A .text  User Survey for EEMS Demo Version
+00647380 A .text  ,What features of EEMS are you interested in?
+00647BEC A .text  What are your expectations for using EEMS?
+00654D4D A .text  *.wmf
+00658313 A .text  Active:
+0065FE39 A .text  To add files select File/Load, Drag & Drop to the Picturebox or press INS.
+00661C7D A .text  Once the Low Chord is reached, this is the minimum number of time steps to keep active.  Ctrl-A to set all cells.
+00661D1A A .text  The elevation above which the rating curve is activated.  Ctrl-A to set all cells.
+00662F24 A .text  picLogo
+00662F4C A .text  imgLogo
+00662F62 A .text  GIF89a
+00665102 A .text  spnGroups
+0066885C A .text  GIF89aA
+00668BC0 A .text  GIF89aA
+00668E19 A .text  GIF89aA
+00669046 A .text  GIF89aA
+0066929C A .text  GIF89aA
+006694EE A .text  GIF89aA
+00669744 A .text  GIF89aA
+00669D14 A .text  GIF89aA
+0066EAF5 A .text  Enter the Core offset for this run.  Usually this should be 0.  Needed if running more than one EFDC_DSI_OMP model at the same time.
+00671497 A .text  Activate HMD with Smagorinsky 
+00671583 A .text  9Activate HMD with Smagorinsky, Wall Drag and WC Diffusion
+00673B9C A .text  chkActivate
+006741E0 A .text  frmAct_Demo_Registration
+006741FD A .text  Registration for EEMS Demo Version
+0067487A U .text   Activate Account
+006748BE U .text  $frameActiveAccount
+006759E2 A .text  frameActiveAccount
+00675A37 A .text  Activate Account
+00675A97 A .text  &Activate Account
+00675AC1 A .text  cmdSendActivationCode
+00675ADB A .text  &Send Activation Code
+00675B06 A .text  txtActivationCode
+00675B33 A .text  txtDemoLimit
+00675C08 A .text  \viewkind4\uc1\pard\lang1033\f0\fs17 Please check your email inbox to get the activation code that has been sent to you. If you have not received an activation code, please click on "Send Activation Code" button and check your email again, including your spam. Once you have the activation code, please copy and paste it into the text below and select  "Activate Account" button.
+00675DAD A .text  Activation Code (*)
+00676390 A .text  ,What features of EEMS are you interested in?
+00676C06 A .text  What are your expectations for using EEMS?
+00676EAD A .text  GIF89a
+006770EC A .text  GIF89a
+00677141 A .text  GIF89a
+0067719C A .text  GIF89a
+006771FF A .text  GIF89a
+00677259 A .text  GIF89a
+006772B3 A .text  GIF89a
+0067730F A .text  GIF89a
+00677367 A .text  GIF89a
+006773C6 A .text  GIF89a
+00677422 A .text  GIF89a
+0067747E A .text  GIF89a
+006774D8 A .text  GIF89a
+0067762E A .text  GIF89a
+00677686 A .text  GIF89a
+006776DF A .text  GIF89a
+00677731 A .text  GIF89a
+00677789 A .text  GIF89a
+006777E4 A .text  GIF89a
+00677831 A .text  GIF89a
+00677884 A .text  GIF89a
+006778DC A .text  GIF89a
+0067793A A .text  GIF89a
+00677993 A .text  GIF89a
+00677A7F A .text  GIF89aF
+00677AD7 A .text  GIF89aF
+00677B32 A .text  GIF89aF
+00677B90 A .text  GIF89aF
+00677BEF A .text  GIF89aF
+00677C4E A .text  GIF89aF
+00677D44 A .text  GIF89aF
+00677D99 A .text  GIF89aF
+00677E0A A .text  GIF89aF
+00677E6A A .text  GIF89aF
+00677EC8 A .text  GIF89aF
+00677F2B A .text  GIF89aF
+00677F8D A .text  GIF89aF
+00677FF2 A .text  GIF89aF
+0067804D A .text  GIF89aF
+006780A8 A .text  GIF89aF
+00678105 A .text  GIF89aF
+0067B5D3 A .text  "Activate diagnostics to ZBRENT.LOG
+0067C881 A .text  Dongle License
+0067CC5B A .text  You have 5 minutes to save your work after which EEMS will close.
+0067CCC7 A .text  If you want to keep using EEMS please reinsert the dongle.
+0067CD5D A .text  GIF89a
+0067F61A A .text  The licensing dongle has been removed.
+0068693A A .text  Active and Deposited Sediments Erosion Rate Matrix
+006871B8 A .text  Active && Deposited Sediment Characteristics
+0068769F A .text  A dimensionless multiplier for the active layer thickness.
+00687736 A .text  Controls erosion/deposition calculations.  Water column transport is always active.
+0068797F A .text  Controls erosion/deposition calculations.  Water column transport is always active.
+006879ED A .text  Active Layer Multiplier:
+00688477 A .text  chkActivate
+0068B3FF A .text  Not required.  Used for flagging active cells using an irregular boundary.
+0068B9EB A .text  Active Cell Polygon:
+0068C264 A .text  Value Indicating Inactive Node/Corner:
+0068C2F5 A .text  Active Cell Polygon (Optional)
+0068C616 A .text  Value Indicating Inactive Cell:
+0068CF85 A .text  chkActivate
+006914D8 A .text  Inactivate Cells if Clipped
+00699A26 A .text  Number of Active Cells:
+0069AB82 A .text  $Armoring with Active-Parent Layering
+0069AE35 A .text  Active Layer Options
+0069AED3 A .text  Active Layer: Constant Mass
+0069AF79 A .text   Active Layer: Constant Thickness
+0069B0A5 A .text  Active Layer Thickness:
+0069CAC3 A .text  chkActivate
+0069CB62 A .text  chkActivate
+0069ED9C A .text  frmAct_LicenseManager
+0069EDB6 A .text  License Management
+0069F360 U .text  chkUserActivity
+0069F3A4 U .text  (cmdSendActivationLog
+0069F3F4 U .text  $License Management
+0069F43E U .text  FrameDemo
+0069F511 A .text  cmdSendActivationLog
+0069F52A A .text  &Send Activation Log
+0069F54E A .text  If you have trouble activating EEMS select this to send the log file to DSI.
+0069F5A4 A .text  chkUserActivity
+0069F5B8 A .text  Report EEMS Usage Statistics:
+0069F5E9 A .text  Some of the features that you use in EEMS will be recorded for analytical purposed in order to improve the tool but not to track users
+0069F679 A .text  FrameDemo
+0069F687 A .text  License Information
+0069F779 A .text  Click 'Upgrade' if you want to remove this license and upgrade to a Subscription License. Note that an active internet connection is required.
+0069F81E A .text  txtDemoLimit
+0069F8F3 A .text  \viewkind4\uc1\pard\lang1033\f0\fs17 - This demonstration version is a limited capability version of EEMS.                               - Using EE you may load and run models provided by DSI from our website but you are not entitled to add new features to them. For your own models, you are limited to less than 300 horizontal cells and use of the dye, salinity, and particle tracking (10 drifters) modules. You can run your model with EFDC+. If you load a model larger than 300 cells you may view your model without editing. However, you cannot save edits, run the model or view output.                                                                                                      - Using CVLGrid you may load and edit any grids. However, saving and exporting is disabled.                                                                                                                          - Some of the features that you use in EEMS will be recorded for analytical purposes in order to improve the tool.
+0069FD73 A .text  cmdDemo_UserInfo
+0069FDAF A .text  cmdDemo_ChangePassword
+0069FDF0 A .text  cmdDemo
+0069FDFC A .text  &Demo Version
+006A001A A .text  A valid license has been entered.
+006A010A A .text  License Information
+006A0242 A .text  frameDeactivate
+006A028A A .text  Deactivation
+006A02D8 A .text  cmdDeactivate
+006A02EA A .text  &Deactivate
+006A030B A .text  lblDeactivate
+006A031D A .text  Click 'Deactivate' to deactivate this product. Note that a live Internet connection is required.
+006A0601 A .text  lblLicenseCode
+006A0614 A .text  License Code:
+006A080A A .text  cmdRemoveLicense
+006A081F A .text  &Deactivate
+006A0840 A .text  lblDeactiveTrial
+006A0855 A .text  Click 'Deactivate' to deactivate this product. Note that a live Internet connection is required.
+006A08CE A .text  lblLicenseCode
+006A08E1 A .text  License Code:
+006A0909 A .text  txtTrialLicenseCode
+006A0962 A .text  lbTrialExpiresDay
+006A0978 A .text  Expires -- days after Activation. 
+006A09C6 A .text  GIF89a
+006A4DAE A .text  GIF89aA
+006A5112 A .text  GIF89aA
+006A536B A .text  GIF89aA
+006A5598 A .text  GIF89aA
+006A57EE A .text  GIF89aA
+006A5A40 A .text  GIF89aA
+006A5C96 A .text  GIF89aA
+006A6266 A .text  GIF89aA
+006A6DCF A .text  Maximum number of layers to display, starting from the top active layer.
+006AF3B0 A .text  frmAct_Deactivation
+006AF3C8 A .text  Deactivation Confirmation
+006AF8B9 A .text  Current License Information
+006AFAC3 A .text  License Code:
+006AFBF5 U .text  EFDC_Explorer8.2  Activation
+006AFDFD A .text  GIF89a
+006B2132 A .text  GIF89a
+006B59AD A .text  Click 'Next' to perform the  product deactivation. Please note that a live internet connection is required to deactivate. 
+006B5A59 A .text  After deactivation is completed you will be able to  re-activate on this computer or activate on another computer. Failure to deactivate before uninstalling or making changes to computer OS may lead to the loss of a license seat. 
+006B5BC4 A .text  frmAct_License_Bypass
+006B5BDE A .text  Activation Wizard
+006B6086 A .text  If you don't yet have a license, please click "Buy Now" to go to our website to register as a user and to purchase a license.
+006B6118 A .text  &Activate EE
+006B6136 A .text  Click here to Activation
+006B61E4 A .text  frmActivation
+006B6307 A .text  Enter the License Code you received, then click "Activate EE".
+006B66D0 A .text  GIF89a
+006B8CC4 A .text  GIF89a
+006BC596 A .text  EEMS needs to be activated before it can be used.  To activate now please enter your License Infomation into the boxes below then click "Next", if the License Code are found to be valid you will be asked to confirm you wish to activate. Once confirmed you will be able to use this software.  Activation can only take place once per License Seat (unless you deactivate and then reactivate). 
+006BC7A8 A .text  frmAct_License_Validation
+006BC7C6 A .text  Activation Wizard
+006BCB95 A .text  frameActivationFULL
+006BCBCA A .text  &Activate
+006BCBE3 A .text  Click here to Activate
+006BCC03 A .text  chkUserActivity
+006BCC17 A .text  Report EEMS Usage Statistics:
+006BCC48 A .text  Some of the features that you use in EEMS will be recorded for analytical purposed in order to improve the tool but not to track users
+006BCCDA A .text  frmActivation
+006BCDFD A .text  Enter the License Code you received, then click "Activate" button.
+006BCE69 A .text  Activate with License Code
+006BCEAE A .text  Activate with a Dongle
+006BCF1A A .text  frmActivation
+006BCF41 A .text  txtLicenseFile
+006BCFB9 A .text  Plug the dongle into any USB port, browse to the license file then click "Activate" button.
+006BD03E A .text  License File:
+006BD130 A .text  Select License Version
+006BD176 A .text  If you don't yet have a license, please click "Buy Now" to go to our website to register as a user and to purchase a license.
+006BD5FF A .text  frameActivationMain
+006BD65B A .text  Click here to Activate
+006BD67B A .text  cmdDemoVersion
+006BD68E A .text  &Demo Version
+006BD6AB A .text  Click here to sign in if you have already a registered user on the EEMS website.
+006BD705 A .text  lblDemoInfo
+006BD715 A .text  Demo Information
+006BD75F A .text  lblDemoSignUp
+006BD7C8 A .text  Requires activation key
+006BD86F A .text  Select a version to activate
+006BD8BC A .text  GIF89a
+006C11F9 A .text  GIF89a
+006C3709 A .text  EFDC_Explorer needs to be activated before it can be used.  To activate now please enter your License Infomation into the boxes below then click "Activate", if the License Code are found to be valid you will be asked to confirm you wish to activate. Once confirmed you will be able to use this software.  Activation can only take place once per License Seat (unless you deactivate and then reactivate). 
+006C876F A .text  GIF89a
+006C885E A .text  GIF89a
+006DC9C9 A .text  GIF89aA
+006DCD2D A .text  GIF89aA
+006DCF86 A .text  GIF89aA
+006DD1B3 A .text  GIF89aA
+006DD409 A .text  GIF89aA
+006DD65B A .text  GIF89aA
+006DD8B1 A .text  GIF89aA
+006DDE81 A .text  GIF89aA
+006E3A67 A .text  Click on Picture to Change Display Options
+006E3CE4 A .text  Click on Picture to Change Display Options
+006E5515 A .text  THESE TERMS AND CONDITIONS CONSTITUTE AN AGREEMENT AND GOVERN YOUR USE OF SOFTWARE AND SERVICES PROVIDED BY DYNAMIC SOLUTIONS INTERNATIONAL, LLC ("DS-INTL").  IF YOU REGISTER FOR A FREE TRIAL OR DEMONSTRATION VERSION OF DS-INTL'S SOFTWARE, THIS AGREEMENT WILL ALSO GOVERN THAT FREE TRIAL OR DEMONSTRATION VERSION.  BY ACCEPTING THIS AGREEMENT, EITHER BY CLICKING A BOX INDICATING YOUR ACCEPTANCE OR BY SUBMITTING A PURCHASE ORDER, YOU AGREE TO THE TERMS OF THIS AGREEMENT. FURTHERMORE, USE OF ANY SOFTWARE PROVIDED BY DS-INTL SHALL CONSTITUTE ACCEPTANCE OF THIS AGREEMENT.  IF YOU ARE ENTERING INTO THIS AGREEMENT ON BEHALF OF A COMPANY OR OTHER LEGAL ENTITY, YOU REPRESENT THAT YOU HAVE THE AUTHORITY TO BIND SUCH ENTITY TO THESE TERMS AND CONDITIONS, IN WHICH CASE THE TERMS "YOU" OR "YOUR" SHALL REFER TO SUCH ENTITY.  IF YOU DO NOT HAVE SUCH AUTHORITY, OR IF YOU DO NOT AGREE WITH THESE TERMS AND CONDITIONS, YOU MUST NOT ACCEPT THIS AGREEMENT AND MAY NOT USE DS-INTL'S SOFTWARE.
+006E5BAC A .text  "Purchased Software" means Software that You purchase under a Purchase Order and/or in exchange for payment of a license fee, as distinguished from those provided pursuant to a free trial. 
+006E5C6B A .text  "Software" means a version of the EFDC_Explorer or CVLGrid software that is licensed or provided to You by DS-INTL under a demonstration version, free trial, perpetual license, rental license, web-based subscription, or pursuant to an Purchase Order. 
+006E5E34 A .text  2.  LICENSE.  DS-INTL hereby grants, subject to Your continued compliance with terms of this Agreement, and You hereby accept a limited, non-transferable, non-exclusive license to use a version of the Software.  This license for Purchased Software allows for installation of the Software on one workstation or computer per seat.  Licenses that have multiple seats must be installed on workstations or computers in the same physical office location. Installation on additional computers in a different physical location shall require an additional license from DS-INTL.  You shall not transfer Your license to another organization without direct permission from DS-INTL. Once installed on the applicable workstations, the Software may be used by You and Your employees only, and You may not allow use of the Software by third parties, in exchange for payment or otherwise.  This license does not include any right to copy, modify, translate, reverse engineer, decompile, disassemble, market, sublicense or distribute the Soft
+006E6236 A .text  ware; to make the Software available to any other person or entity; or to create works derivative of the Software.  You acknowledge that You are acquiring only a license to use the Software and are not acquiring any title to or ownership thereof, or any part thereof.  You agree that Your purchase of the Software is neither contingent on the delivery of any future functionality or features nor dependent on any oral or written public comments made by Us regarding future functionality or features.  DS-INTL reserves the right to, at any time and from time to time, alter or reduce the functionality of the Software; provided, that DS-INTL will not materially reduce the functionality of the Purchased Software.
+006E6500 A .text  3.  UPGRADES.  Users of Purchased Software who have active software maintenance with DS-INTL for support services will be entitled to receive generally available updates and upgrades at no additional charge.  All other updates and upgrades will be subject to DS-INTL's then applicable licensing fees.  
+006E6A22 A .text  5.2.  ANY DATA YOU ENTER INTO DURING YOUR FREE TRIAL WILL BE PERMANENTLY LOST UNLESS YOU (i) EXPORT SUCH DATA BEFORE THE EXPIRATION OF THE FREE TRIAL, AS APPLICABLE, OR (ii) PURCHASE A FULL LICENSE TO THE SOFTWARE AND TRANSFER THAT DATA TO YOUR FULL LICENSE. 
+006E6BDF A .text  5.  FREE DEMONSTRATION VERSION.
+006E6C00 A .text  6.1.  If You register on Our website for a free demonstration version, DS-INTL will make a version of the Software available to You subject to the terms of this Agreement on a demonstration basis with limited capability free of charge until the earlier of (a) the demonstration version is terminated or (b) the start date of any Purchased Services ordered by You. Additional demonstration version terms and conditions may appear on the demonstration version registration web page. Any such additional terms and conditions are incorporated into this Agreement by reference and are legally binding. 
+006E6E57 A .text  6.2.  ANY DATA YOU ENTER INTO YOUR DEMONSTRATION VERSION MAY BE PERMANENTLY LOST AS SAVING CAPABILITIES ARE RESTRICTED. 
+006E6ED1 A .text  NOTWITHSTANDING ANY OTHER PROVISION OF THIS AGREEMENT, THE DEMONSTRATION VERSION OF THE SOFTWARE ARE PROVIDED "AS-IS" WITHOUT ANY WARRANTY OF ANY TYPE WHATSOEVER, EXPRESS OR IMPLIED. 
+006E7630 A .text  eement, and You further agree neither to do nor to permit any act which may in any way jeopardize or be detrimental to the validity of Our patent, copyright, trade secret, contractual, ownership or other rights in the Proprietary Material.  You agree to use Your best efforts to maintain the confidentiality of Proprietary Material and to protect Our ownership rights, patents, copyrights and trade secrets, including taking such steps as You take to protect Your own patents, copyrights and trade secrets.  Proprietary Material may not be copied except for the internal use by You as a back-up copy for use consistent with your customary computer practices.  Any and all back-up copies must include Our patent, copyright and proprietary rights notices and all labels or other features that disclose the Software name.  You may not modify or attempt to modify the Software without the prior written consent of DS-INTL.  Modifications and developments of any kind in the Software or information or material supplied to You by 
+006E7A33 A .text  Us at any time are the sole and exclusive property of DS-INTL.  You hereby grant and agree to grant to DS-INTL all of Your rights, including copyright(s), in any and all such developments and modifications whether conceived, requested or made by Us or You before, during or after the termination of this Agreement which relate in any way to the Software.  You also agree that DS-INTL shall have the sole and exclusive right, including copyright(s), in any and all computer programs, software and/or documentation that derives from or is created or developed by You or Us based on or with reference to the Software or materials or information supplied by DS-INTL at any time and You hereby assign and agree to assign any and all rights, including copyright(s), that You may have or obtain therein.  Your obligations set forth in this Agreement with respect to the Proprietary Material and Software shall survive any termination or expiration of the license or this Agreement.
+006E8050 A .text  9.  WARRANTY AND LIMITATION OF LIABILITIES.  DS-INTL warrants that DS-INTL owns all right, title and interest in and to the Purchased Software or otherwise has the right to grant to You a license to the Purchased Software to the extent set forth in this Agreement without violating or infringing upon any rights of any third party and without breach of any third-party license to DS-INTL.  You acknowledge that the Software is a tool and that the accuracy of the tool is dependent on many variables outside Our control, including without limitation the quality and accuracy of data You supply.  Accordingly, You acknowledge and agree that DS-INTL shall not be liable in any way for the results or performance of the Software.  Without limiting the generality of the foregoing, in no event shall DS-INTL be liable for any indirect, special, incidental, consequential, exemplary or punitive damages, including but not limited to damages for lost data, lost profits, lost revenue or costs of procurement of substitute goods or 
+006EAADD A .text  25.  CONFIDENTIALITY.  You may not disclose the terms of this Agreement or of any ancillary agreement, whether oral or written, to any third party without the prior written consent of DS-INTL.  DS-INTL shall have the right to monitor Your use of the Software from time to time as desired including without limitation to monitor usage trends and feature demand.  During the term of this Agreement and surviving its expiration or termination, DS-INTL will regard and use reasonable efforts to preserve as confidential all information that may be obtained from You.  
+006EAF5D A .text  GIF89a
+006EF1C4 A .text  GIF89a
+006EFC05 A .text  GIF89a
+006F0873 A .text  GIF89a
+006F1040 A .text  GIF89a
+006F1CF5 A .text  GIF89a
+006F2804 A .text  GIF89a
+006F319A A .text  GIF89a
+006F3D5F A .text  GIF89a
+006F4B35 A .text  GIF89a
+006F5422 A .text  GIF89a
+006F62E8 A .text  GIF89a
+006F71E4 A .text  GIF89a
+006F814B A .text  GIF89a
+006F94E1 A .text  GIF89a
+006FA338 A .text  GIF89a
+006FD6B3 A .text  GIF89a$
+0071B172 A .text  picLogoBox
+0071B19D A .text  imgLogo
+0071B1B3 A .text  GIF89ad
+0071E5C9 A .text  Picture2
+00721504 A .text  GIF89a
+00721738 A .text  GIF89a
+0072392D A .text  GIF89a
+0072C4E9 A .text  GIF89a
+0073260B U .text  Load Picture
+00732657 U .text  Save Picture
+00732970 A .text  GIF89a
+00739E6B A .text  picLogo
+0073B622 U .text  DSI_Logo_300
+0074C989 A .text  GIF89a 
+0074CECA A .text  GIF87a
+0074CF66 A .text  GIF89a
+0074D055 A .text  GIF89a
+0074D146 A .text  GIF89a$
+0074EB44 A .text  GIF89a 
+0074F52B A .text  GIF89a 
+0074FF29 A .text  GIF89a
+00750EDB A .text  Save Picture
+00750F50 A .text  frmEEMS_CheckUpdate
+00750F68 A .text  EEMS Updates
+00751478 A .text  picPicture
+00751496 A .text  GIF89ax
+0075A203 A .text  Check for EEMS Updates
+00773E87 A .text  GIF89a
+0077BD1A A .text  GIF89a
+0078212B A .text  GIF89a
+007826B5 A .text  GIF89a
+00782C39 A .text  GIF89a
+007843AC U .text  export_emf
+007843C4 U .text  export_emf
+00784402 U .text  export_bmp
+0078441A U .text  export_bmp
+00784CDA U .text  Active Polyline Tools
+00790FB3 A .text  GIF89a 
+00791A57 A .text  GIF89a
+007922D2 A .text  GIF89a
+00792B68 A .text  GIF89a 
+00793697 A .text  picLogoBox
+007936C2 A .text  imgLogo
+007936D8 A .text  GIF89ad
+00795601 A .text  GIF89a
+00795833 A .text  GIF89a
+00795F78 A .text  GIF89a
+007970A0 A .text  GIF89a
+007972D2 A .text  GIF89a
+00797E22 A .text  GIF89a
+00798054 A .text  GIF89a
+00798AC5 A .text  GIF89a
+00798CF7 A .text  GIF89a
+0079946B A .text  GIF89a
+0079969D A .text  GIF89a
+00799E4F A .text  GIF89a
+0079A081 A .text  GIF89a
+0079AA6F A .text  GIF89a
+0079ACA1 A .text  GIF89a
+0079BCA6 A .text  GIF89a
+0079BED8 A .text  GIF89a
+0079C934 A .text  GIF89a
+0079CB66 A .text  GIF89a
+0079D160 A .text  GIF89a
+0079D392 A .text  GIF89a
+0079F458 A .text  GIF89a
+0079F55E A .text  GIF89a
+0079F661 A .text  GIF89a
+0079F777 A .text  GIF89a
+0079F812 A .text  GIF89a
+0079FCE9 A .text  GIF89a
+007A03B0 A .text  GIF89a
+007A0A75 A .text  GIF89a
+007A110D A .text  GIF89a
+007A17AB A .text  GIF89a
+007A1E4A A .text  GIF89a
+007A254C A .text  GIF89a
+007A2C17 A .text  GIF89a
+007A32D9 A .text  GIF89a
+007A3997 A .text  GIF89a
+007A404F A .text  GIF89a
+007A46FA A .text  GIF89a
+007A4DA4 A .text  GIF89a
+007A542A A .text  GIF89a
+007A59D2 A .text  GIF89a
+007A5F7D A .text  GIF89a
+007A6603 A .text  GIF89a
+007A6CB5 A .text  GIF89a
+007A726B A .text  GIF89a
+007A7849 A .text  GIF89a
+007A7F1F A .text  GIF89a
+007A8595 A .text  GIF89a
+007A8BF4 A .text  GIF89a
+007A9284 A .text  GIF89a
+007A9910 A .text  GIF89a
+007AA393 A .text  mnuCell_Activate
+007AA3A8 A .text  Activate
+007AA3BA A .text  mnuCell_Deactivate
+007AA3D1 A .text  Deactivate
+007AC337 A .text  GIF89a 
+007ACD69 A .text  GIF89a 
+007AD83D A .text  GIF89a 
+007AE248 A .text  GIF89a 
+007AEC85 A .text  GIF89a 
+007AF655 A .text  GIF89a 
+007B007F A .text  GIF89a 
+007B09DF A .text  GIF89a 
+007B140F A .text  GIF89a 
+007B1DBD A .text  GIF89a 
+007B2888 A .text  GIF89a 
+007B3353 A .text  GIF89a 
+007B3EC0 A .text  GIF89a 
+007B44E7 A .text  GIF89a 
+007B504E A .text  GIF89a 
+007B6C7F A .text  Total Active Metal (TAM) Based
+007B70FC A .text  +Activate Salinity Toxicity of Cyanobacteria
+007B71AF A .text  Activate Silica State Variables
+007B81E0 A .text  Activated Parameters
+007BF065 A .text  Negative to activate dry cell water wasting
+007C0F94 A .text  Activate RPEM EE Linkage 
+007C293A A .text  Activate NetCDF Output
+007C298E A .text  Activate NetCDF output
+007CA55F A .text  Not Active
+007CA5A1 A .text  Not Active
+007CA623 A .text  Not Active
+007CA6DD A .text  Not Active
+007CA76B A .text  Not Active
+007CA7E5 A .text  Not Active
+007CA86D A .text  Not Active
+007CB29B A .text  Activate Salinity
+007CB33A A .text  Activate Hydro
+007CB3D4 A .text  Activate Temperature
+007CB474 A .text  Activate Dye
+007CB50C A .text  Activate Shellfish Larvae
+007CB5B1 A .text  Activate Toxics
+007CB64C A .text  Activate Cohesive Sediments
+007CB6F3 A .text  Activate Non-Cohesive Sediments
+007CB79E A .text  Activate Water Quality
+007CB840 A .text  Activate Waves
+007CB8D9 A .text  #Activate Lagrangian Particle Tracks
+007CBCBC A .text  Using the GVC active layers, redistribute the total flow into the active layers for all BC's.
+007CC45E A .text  Enter the Core offset for this run.  Usually this should be 0.  Needed if running more than one EFDC_DSI_OMP model at the same time.
+007CE1FF A .text  Active Modules
+007CEA49 A .text  0 - Deactivates, 1 - Actives
+007CED34 A .text  0 - Deactivates, 1 - Actives
+007CED82 A .text  0 - Deactivates, 1 - Actives
+007CF5D4 A .text  Activate Boundary Layer Impacts:
+007D3E1A A .text  GIF89a 
+007D44F6 A .text  GIF89a 
+007D4F44 A .text  GIF89a 
+007D58A5 A .text  GIF89a 
+007D627F A .text  GIF89a 
+007D6C89 A .text  GIF89a 
+007D7754 A .text  GIF89a 
+007EA87D U .text  License Manager
+007F9838 A .text  Picture
+007F9B14 A .text  TheStdPicture
+007F9F9C A .text  keepActive
+00FCC1AD A .text  PNGua
+011A7251 A .text  PNGj
+011B401D A .text  GIF8
+011BC602 A .text  PNGuHV
+0161D68A A .text  glShadeModel

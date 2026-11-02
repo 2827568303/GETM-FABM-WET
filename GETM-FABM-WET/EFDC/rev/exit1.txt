@@ -1,0 +1,7 @@
+﻿[js]      0 SoftModalMessageBox swallowed
+[js]      0 diag29 ready
+pid 13796
+[js]   3576 swallow msgbox text="There is an error when checking the license. Error 481 (Invalid picture)"
+[js]   3592 ExitProcess(0) from MSVBVM60.DLL+0x2ad05
+PROCESS EXITED code=0 at 3.7s
+elapsed=3.7

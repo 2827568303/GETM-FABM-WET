@@ -1,0 +1,79 @@
+     0 picfix installed
+     0 hookfail user32.dll!SetTimer Error: expected at least one callback
+     0 trace hooks installed
+    15 ShowWindow hwnd=0xe4b0750 cmd=0x4 from MSVBVM60.DLL+0x2d961
+    36 vbaFileOpen ""
+    36 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+    36 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+    36 vbaFileOpen ""
+    36 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+    36 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+    36 vbaFileOpen ""
+    36 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+    36 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+    36 vbaFileOpen ""
+    36 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+    36 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+    46 CreateFileW "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\EFDC 商业版8.4\EFDC_Explorer8.4.exe.config" from mscoreei.dll+0xb090
+    54 CreateFileW "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\EFDC 商业版8.4\DSILIC1.dll" from clr.dll+0x92a4d
+    54 CreateFileW "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\EFDC 商业版8.4\DSILIC1.dll" from clr.dll+0x91972
+  1249 vbaFileOpen ""
+  1249 CreateFileW "C:\Users\Public\DSI\EEMS8.3\EEMS.ini" from KERNELBASE.dll+0x16e521
+  1249 vbaFileOpen ""
+  1249 CreateFileW "C:\Users\Public\DSI\EFDC_Explorer8.0\EFDC_Explorer.ini" from KERNELBASE.dll+0x16e521
+  1277 vbaFileOpen ""
+  1278 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  1278 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  1278 vbaFileOpen ""
+  1278 CreateFileW "C:\Users\Public\DSI\EEMS8.3\EEMS.ini" from KERNELBASE.dll+0x16e521
+  1279 vbaFileOpen ""
+  1279 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  1279 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  1280 vbaFileOpen ""
+  1280 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  1280 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  1280 vbaFileOpen ""
+  1280 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  1280 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  1295 CreateFileW "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\EFDC 商业版8.4\DSILIC1.dll.config" from mscorlib.ni.dll+0x4b377e
+  2289 Sleep 30000 from winhttpcom.dll+0xe067
+  2289 vbaFileOpen ""
+  2289 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  2289 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  2345 WSAConnect
+  3104 WSAConnect
+  3625 CreateFileW "C:\Users\Public\DSI\EEMS8.3\DSILIC1.log" from mscorlib.ni.dll+0x4b377e
+  3625 vbaFileOpen ""
+  3625 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  3625 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  3625 vbaFileOpen ""
+  3625 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  3625 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  3625 vbaFileOpen ""
+  3625 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  3626 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  4325 vbaFileOpen ""
+  4325 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  4325 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  4325 vbaFileOpen ""
+  4325 CreateFileW "C:\Users\Public\DSI\EEMS8.3\EEMS.ini" from KERNELBASE.dll+0x16e521
+  4328 vbaFileOpen ""
+  4328 CreateFileW "C:\Users\Public\DSI\EEMS8.3\EEMS.ini" from KERNELBASE.dll+0x16e521
+  4328 vbaFileOpen ""
+  4328 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  4328 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  4328 vbaFileOpen ""
+  4328 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  4328 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  4328 vbaFileOpen ""
+  4328 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  4328 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  4332 vbaFileOpen ""
+  4332 CreateFileW "C:\Users\Public\DSI\EEMS8.3\license.bmp" from KERNELBASE.dll+0x16e521
+  4332 CreateFileW "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\EFDC 商业版8.4\EFDC_LIC.exe" from KERNELBASE.dll+0x1dc3a4
+  4420 vbaFileOpen ""
+  4420 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  4420 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  4420 vbaFileOpen ""
+  4420 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521
+  4420 CreateFileW "C:\Users\Public\DSI\EEMS8.4\ee_activation.log" from KERNELBASE.dll+0x16e521

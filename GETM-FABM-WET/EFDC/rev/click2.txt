@@ -1,0 +1,5 @@
+﻿pid 42676
+form ['0x2d90de8']
+show -> 0 vis= 0
+responds to WM_NULL: 0
+activate buttons []

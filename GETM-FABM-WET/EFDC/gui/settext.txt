@@ -1,0 +1,3 @@
+﻿pid=27296
+[ 3.83] CHILD pid=34804 splwow64.exe
+done

@@ -11,11 +11,11 @@
  */
 function pairObsSim(obs, sim, maxLagSec = 86400) {
     if (!obs || !obs.length || !sim || !sim.times || !sim.times.length) return [];
-    const simTimes = sim.times.map(t => new Date(t).getTime());
+    const simTimes = sim.times.map(t => ModelDates.parse(t)?.date.getTime());
     const simVals = sim.values;
     const pairs = [];
     for (const o of obs) {
-        const ot = new Date(o.time).getTime();
+        const ot = ModelDates.parse(o.time)?.date.getTime();
         if (isNaN(ot)) continue;
         let bestIdx = -1, bestLag = Infinity;
         for (let i = 0; i < simTimes.length; i++) {

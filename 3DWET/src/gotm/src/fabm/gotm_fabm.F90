@@ -1106,6 +1106,7 @@
    ! Call fabm_do here to make sure diagnostic variables all have an initial value.
    ! Note that rhs (biogeochemical source-sink terms) is a dummy variable that remains unused.
    rhs = _ZERO_
+   bottom_flux = _ZERO_
 #if 0
 ! This is how it is called in the master repository - does this matter Jorn?
       call fabm_do_bottom(model,rhs(1,:),bottom_flux)
@@ -1318,12 +1319,6 @@
 !  Calculate decimal day of the year (1 jan 00:00 = 0.)
    decimal_yearday = yearday-1 + dble(secondsofday)/86400
 
-   if (present(itime)) then
-      call fabm_update_time(model,itime)
-   else
-      call fabm_update_time(model,0.0_rk)
-   end if
-
    end subroutine calculate_derived_input
 !EOC
 
@@ -1508,6 +1503,10 @@
    do split=1,split_factor
       ! Update local light field (self-shading may have changed through changes in biological state variables)
       call light(nlev,bioshade_feedback)
+
+      ! Time-dependent expressions may depend on PAR. Update once per model
+      ! step, after light is recomputed for the current column and state.
+      if (split==1 .and. present(itime)) call fabm_update_time(model,itime)
 
       ! Time-integrate one biological time step
       call ode_solver(ode_method,size(cc,2),nlev,dt_eff,cc,right_hand_side_rhs,right_hand_side_ppdd)
@@ -1741,6 +1740,7 @@
    integer :: i,k,n
    type (type_bottom_diagnostic), pointer :: bottom_diagnostic_data
    REALTYPE                               :: rhs_sf(1:size(model%state_variables))
+   character(len=128)                     :: diag_destination_name,diag_source_name
 !EOP
 !-----------------------------------------------------------------------
 !BOC
@@ -1809,6 +1809,28 @@
  
    ! Add pelagic sink and source terms for all depth levels.
    call fabm_do(model,1,nlev,rhs(1:nlev,1:n))
+
+#ifdef _GOTM_DIAG_FIRST_RHS
+   do k=1,nlev
+      do i=1,numc
+         if (rhs(k,i)/=rhs(k,i).or.abs(rhs(k,i))>huge(rhs(k,i))) then
+            if (i<=size(model%state_variables)) then
+               write (*,'(a,a,a,i0,a,2(1x,es24.16))') 'First non-finite FABM RHS: ',trim(model%state_variables(i)%name), &
+                  ' level=',k,' state/rhs=',cc(k,i),rhs(k,i)
+            else if (i<=size(model%state_variables)+size(model%bottom_state_variables)) then
+               write (*,'(a,a,a,i0,a,2(1x,es24.16))') 'First non-finite FABM RHS: ', &
+                  trim(model%bottom_state_variables(i-size(model%state_variables))%name), &
+                  ' level=',k,' state/rhs=',cc(k,i),rhs(k,i)
+            else
+               write (*,'(a,a,a,i0,a,2(1x,es24.16))') 'First non-finite FABM RHS: ', &
+                  trim(model%surface_state_variables(i-size(model%state_variables)-size(model%bottom_state_variables))%name), &
+                  ' level=',k,' state/rhs=',cc(k,i),rhs(k,i)
+            end if
+            stop 3
+         end if
+      end do
+   end do
+#endif
  
    if (first) call save_diagnostics()
  
@@ -1840,6 +1862,8 @@
 !
 ! !LOCAL VARIABLES:
    integer :: i,n
+   integer :: k,j
+   character(len=128) :: diag_destination_name,diag_source_name
 !EOP
 !-----------------------------------------------------------------------
 !BOC
@@ -1876,6 +1900,41 @@
 
    ! Add pelagic sink and source terms for all depth levels.
    call fabm_do(model,1,nlev,pp(1:nlev,1:n,1:n),dd(1:nlev,1:n,1:n))
+
+#ifdef _GOTM_DIAG_FIRST_RHS
+   do k=1,nlev
+      do i=1,numc
+         if (i<=size(model%state_variables)) then
+            diag_destination_name=trim(model%state_variables(i)%name)
+         else if (i<=size(model%state_variables)+size(model%bottom_state_variables)) then
+            diag_destination_name=trim(model%bottom_state_variables(i-size(model%state_variables))%name)
+         else
+            diag_destination_name=trim(model%surface_state_variables(i-size(model%state_variables)-size(model%bottom_state_variables))%name)
+         end if
+         do j=1,numc
+            if (j<=size(model%state_variables)) then
+               diag_source_name=trim(model%state_variables(j)%name)
+            else if (j<=size(model%state_variables)+size(model%bottom_state_variables)) then
+               diag_source_name=trim(model%bottom_state_variables(j-size(model%state_variables))%name)
+            else
+               diag_source_name=trim(model%surface_state_variables(j-size(model%state_variables)-size(model%bottom_state_variables))%name)
+            end if
+            if (pp(k,i,j)/=pp(k,i,j).or.abs(pp(k,i,j))>huge(pp(k,i,j))) then
+               write (*,'(a,a,a,a,a,i0,a,i0,a,i0,a,3(1x,es24.16))') 'First non-finite FABM production: ', &
+                  trim(diag_destination_name),' from ',trim(diag_source_name),' layer=',k,' dest=',i,' src=',j, &
+                  ' state/production/destruction=',cc(k,i),pp(k,i,j),dd(k,i,j)
+               stop 3
+            end if
+            if (dd(k,i,j)/=dd(k,i,j).or.abs(dd(k,i,j))>huge(dd(k,i,j))) then
+               write (*,'(a,a,a,a,a,i0,a,i0,a,i0,a,3(1x,es24.16))') 'First non-finite FABM destruction: ', &
+                  trim(diag_destination_name),' from ',trim(diag_source_name),' layer=',k,' dest=',i,' src=',j, &
+                  ' state/production/destruction=',cc(k,i),pp(k,i,j),dd(k,i,j)
+               stop 3
+            end if
+         end do
+      end do
+   end do
+#endif
 
    if (first) call save_diagnostics()
 

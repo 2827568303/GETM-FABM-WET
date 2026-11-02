@@ -1,0 +1,8 @@
+﻿python :   File "<string>", line 34
+所在位置 行:1 字符: 198
++ ... \23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC'; python -c @"
++                                                              ~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  File "<string>", line 34:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+SyntaxError: no binding for nonlocal 'btn' found

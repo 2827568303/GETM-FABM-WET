@@ -1,0 +1,72 @@
+[
+  {
+    "file": "final-packaged-all6-20261011/verification.json",
+    "sha256": "6d323f7d9214d5de938d863299ae57bddb26dff4d0635f014f662bd1a4146758",
+    "bytes": 6014999
+  },
+  {
+    "file": "final-packaged-all6-20261011/hydro-invariants.json",
+    "sha256": "b3982cbe08f1c47be221ed5bfb2c723f0cfa847910b5628c7b5eb9d41d5d62b4",
+    "bytes": 2128
+  },
+  {
+    "file": "final-packaged-external-20261011/verification.json",
+    "sha256": "fd506c3680ef407323808b0f00a0f09d7853f119c57a74abc8f649ae85bb9a1a",
+    "bytes": 874951
+  },
+  {
+    "file": "final-packaged-external-20261011/hydro-invariants.json",
+    "sha256": "92edd78e7b7bd1d5d4140691ca2f7791dbdcae5c1a377961bbbdff43c2eb54db",
+    "bytes": 398
+  },
+  {
+    "file": "final-packaged-features-20261011/verification.json",
+    "sha256": "e15e03778cbde806659677ceca186db57e3b05ada80b01330d224dfe665458d6",
+    "bytes": 57811
+  },
+  {
+    "file": "final-installed-standalone-20261011-retry/verification.json",
+    "sha256": "ce9675786ccc3792ef985af4a85c7a7a0051ffcf9266b8cb2c605c346b5db987",
+    "bytes": 10266
+  },
+  {
+    "file": "source-final-defaults-all5-20261010/verification.json",
+    "sha256": "9e95fd319c404982c20adc3829f51774ab0e638f6e38f05c9cac42376ea8033c",
+    "bytes": 4956969
+  },
+  {
+    "file": "source-final-defaults-all5-20261010/hydro-invariants.json",
+    "sha256": "db1964c9fcf17d486096e34f11cf2a59e6f90c17d0d4485700fe62bc80c219b3",
+    "bytes": 1782
+  },
+  {
+    "file": "external-alternative-inputs-20261010/verification.json",
+    "sha256": "818a6b563694a5bea4a7ad1523afc80fa99362bfb14addcebe31ad89791e5ab8",
+    "bytes": 28966
+  },
+  {
+    "file": "native-pressure-regression-20261010-3/verification.json",
+    "sha256": "95498730717ac46bdaa672a71c65e5d1e16337ecedd781c1a91610c1196ac84a",
+    "bytes": 1771
+  },
+  {
+    "file": "source-all-five-20261010/verification.json",
+    "sha256": "2b0771b057cc5648cabeda00fb4f6724bc8f3a434abb5349285c4305d78bd67a",
+    "bytes": 1678
+  },
+  {
+    "file": "source-all-five-20261010/verification.results.json",
+    "sha256": "eab6bc2cca2d6b2af6ac80db3508b0916a8a039bf4020fc924680960449bc2a5",
+    "bytes": 651582
+  },
+  {
+    "file": "source-all-five-20261010/hydro-invariants.json",
+    "sha256": "da7586c43de876fa626e9d1dcaaa07c98f0f45da51e845e21d33317b11498d34",
+    "bytes": 1797
+  },
+  {
+    "file": "final-preview-20261011/verification.json",
+    "sha256": "7bc02c7bd476aa1b35ac7814d577525f7303bb42d30f5a6205708299ad31e7cf",
+    "bytes": 29030
+  }
+]

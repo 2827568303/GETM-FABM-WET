@@ -1,0 +1,2 @@
+﻿alive True
+ThunderRT6FormDC|EFDC_Explore8.0|

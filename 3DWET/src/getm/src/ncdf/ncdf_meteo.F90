@@ -11,17 +11,19 @@
 !
 ! !USES:
    use netcdf
+   use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
    use time, only: string_to_julsecs,time_diff,add_secs,in_interval
    use time, only: jul0,secs0,julianday,secondsofday,timestep,simtime
    use time, only: write_time_string,timestr
    use domain, only: imin,imax,jmin,jmax,az,lonc,latc,convc
    use grid_interpol, only: init_grid_interpol,do_grid_interpol
    use grid_interpol, only: to_rotated_lat_lon
-   use meteo, only: meteo_file,on_grid,calc_met,met_method,hum_method
+   use meteo, only: meteo_file,on_grid,calc_met,met_method,hum_method,use_measured_swr
    use meteo, only: RELATIVE_HUM,WET_BULB,DEW_POINT,SPECIFIC_HUM
    use meteo, only: airp,u10,v10,t2,hum,tcc
    use meteo, only: fwf_method,evap,precip
    use meteo, only: tausx,tausy,swr,shf
+   use meteo, only: measured_swr,measured_swr_old
    use meteo, only: new_meteo,t_1,t_2
    use meteo, only: evap_factor,precip_factor
    use exceptions
@@ -123,6 +125,7 @@
    logical         :: ok=.true.
    REALTYPE        :: olon,olat,rlon,rlat,x
    character(len=10) :: name_thisvar
+   character(len=64) :: measured_swr_units
 !EOP
 !-------------------------------------------------------------------------
 #ifdef DEBUG
@@ -263,6 +266,21 @@
          name_thisvar = name_precip
          err = nf90_inq_varid(ncid,name_precip,precip_id)
          if (err .NE. NF90_NOERR) go to 10
+      end if
+
+      if (use_measured_swr) then
+         name_thisvar = name_swr
+         err = nf90_inq_varid(ncid,name_swr,swr_id)
+         if (err .NE. NF90_NOERR) go to 10
+         err = nf90_get_att(ncid,swr_id,'units',measured_swr_units)
+         if (err .NE. NF90_NOERR) then
+            FATAL 'measured shortwave requires units="W m-2"'
+            stop 'init_meteo_input_ncdf()'
+         end if
+         if (trim(adjustl(measured_swr_units)) .ne. 'W m-2') then
+            FATAL 'measured shortwave requires units="W m-2"'
+            stop 'init_meteo_input_ncdf()'
+         end if
       end if
 
    else
@@ -831,6 +849,38 @@ STDERR 'grid_north_pole_longitude ',southpole(2)
          !KBKwrk_dp = _ZERO_
          call copy_var(grid_scan,wrk,wrk_dp)
          call do_grid_interpol(az,wrk_dp,gridmap,ti,ui,tcc)
+      end if
+
+      if (use_measured_swr) then
+         ! Keep raw forcing endpoints separate from swr, which do_meteo
+         ! overwrites with the time-interpolated value on every model step.
+         if (t_1 .lt. t_2) measured_swr_old = measured_swr
+         err = nf90_get_var(ncid,swr_id,wrk,start,edges)
+         if (err .ne. NF90_NOERR) go to 10
+         do j=1,jextr
+            do i=1,iextr
+               if (.not. ieee_is_finite(wrk(i,j)) .or. wrk(i,j) < 0.0) then
+                  FATAL 'measured shortwave must be finite and nonnegative'
+                  stop 'read_data()'
+               end if
+            end do
+         end do
+         if (point_source) then
+            measured_swr = wrk(1,1)
+         else if (on_grid) then
+            do j=jmin,jmax
+               do i=imin,imax
+                  measured_swr(i,j) = wrk(i,j)
+               end do
+            end do
+         else
+            call copy_var(grid_scan,wrk,wrk_dp)
+            call do_grid_interpol(az,wrk_dp,gridmap,ti,ui,measured_swr)
+         end if
+         if (any(.not. ieee_is_finite(measured_swr)) .or. any(measured_swr < 0.0)) then
+            FATAL 'measured shortwave must be finite and nonnegative'
+            stop 'read_data()'
+         end if
       end if
 
       if (evap_id .ge. 0) then

@@ -1,0 +1,16 @@
+﻿pid=56688 exe=C:\EFDC84_RUN\EFDC_Explorer8.4.pristine.exe
+[ 0.14] WIN hwnd=0x382513C4 cls=VBMsoStdCompMgr      title=''                           vis=0 rect=(0, 0, 0, 0)
+[ 0.14] WIN hwnd=0x4DE8121A cls=ThunderRT6Main       title='EFDC_Explorer8.4'           vis=1 rect=(853, 533, 853, 533)
+[ 0.14] WIN hwnd=0x6F08D0 cls=IME                  title='Default IME'                vis=0 rect=(0, 0, 0, 0)
+[ 2.79] WIN hwnd=0x302A1120 cls=ThunderRT6FormDC     title='EFDC_Explore8.0'            vis=0 rect=(0, 5, 815, 644)
+[ 2.91] WIN hwnd=0x302B1120 cls=#32770               title='EFDC_Explorer8.4'           vis=1 rect=(639, 498, 1118, 667)
+[ 2.91] WIN hwnd=0xF1064 cls=MSCTFIME UI          title='MSCTFIME UI'                vis=0 rect=(0, 0, 0, 0)
+[ 4.03] shot #32770 hwnd=0x302B1120 EFDC_Explorer8.4 (479, 169)
+[ 5.57] shot #32770 hwnd=0x302B1120 EFDC_Explorer8.4 (479, 169)
+[ 7.07] shot #32770 hwnd=0x302B1120 EFDC_Explorer8.4 (479, 169)
+[ 8.57] shot #32770 hwnd=0x302B1120 EFDC_Explorer8.4 (479, 169)
+[10.07] shot #32770 hwnd=0x302B1120 EFDC_Explorer8.4 (479, 169)
+[11.59] shot #32770 hwnd=0x302B1120 EFDC_Explorer8.4 (479, 169)
+[13.09] shot #32770 hwnd=0x302B1120 EFDC_Explorer8.4 (479, 169)
+[14.60] shot #32770 hwnd=0x302B1120 EFDC_Explorer8.4 (479, 169)
+still running -> kill

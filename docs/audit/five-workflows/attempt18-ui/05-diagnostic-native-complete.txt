@@ -1,0 +1,144 @@
+运行控制
+启动/停止模型，查看运行日志和进度
+状态
+已完成
+进度
+100.0%
+已用时间
+4s
+预计剩余
+-
+步数: 600 / 600 · 155.4 步/秒 · 预编译串行求解器
+100.0%
+运行控制
+🩺 运行前体检
+▶️ 开始运行
+⏹️ 停止
+✅ 可以运行（1 条提醒）
+体检只读取输入。修复仅执行按钮描述的修改，保存原文件备份后重新检查。CFL 通过后仍需短时试运行检查输出。
+✅ 地形
+193 个水格（bathymetry.nc）
+bathymetry · bathymetry.nc
+✅ 时间步长
+2s ≤ 重力波 CFL 估计上限 2.71518s；此检查不保证生态过程稳定，需短时试运行检查输出。
+configuration · getm.inp
+⚠️ 输出全部变量
+source: * 会写出模型注册的每一个变量。预计约 0.05 GB。（滇池 362 天实测 17.9 GB）
+建议：改用“标准”订阅：水动力 + 关键生态模块。
+output-all · output.yaml
+定位设置采用当前案例的标准输出订阅
+✅ 磁盘空间
+预计输出 0.05 GB，可用 449.8 GB
+disk-space · output.yaml
+2020-DOY001 00:15:00: saving 3D ....
+2020-DOY001 00:16:00: saving 2D ....
+2020-DOY001 00:16:00: saving 3D ....
+10:17:16.568 n= 500
+2020-DOY001 00:17:00: saving 2D ....
+2020-DOY001 00:17:00: saving 3D ....
+2020-DOY001 00:18:00: saving 2D ....
+2020-DOY001 00:18:00: saving 3D ....
+2020-DOY001 00:19:00: saving 2D ....
+2020-DOY001 00:19:00: saving 3D ....
+10:17:16.965 n= 600
+2020-DOY001 00:20:00: saving 2D ....
+2020-DOY001 00:20:00: saving 3D ....
+------------------------------------------------------------------------
+Cleaning up....
+------------------------------------------------------------------------
+NORTH_1501: 1.9341600537300111E-004 10^6 m3
+SOUTH_1501: -1.9341600537300111E-004 10^6 m3
+clean_input
+------------------------------------------------------------------------
+getm: Completed on 20261016 101717.010
+Memory used (global 2D and 3D arrays):
+2D: 81 kbytes
+3D: 499 kbytes
+Total CPU-time was: 2.53125000 seconds
+Number of time steps: 600
+Number of calc-points: 193
+CPU-time/calc-point: 2.18588084E-05 seconds
+Sim-time/CPU-time: 474.07407407407408
+------------------------------------------------------------------------
+GETM timers in seconds ( 10000000 tics per second)
+wall #sysclocks % of total
+Timername time (s) calls clocked time
+initialize 0.35 2 12.18
+bottom_friction 0.00 36 0.00
+momentum 0.00 1200 0.06
+uv_depths 0.00 2 0.00
+sum uv_advect 0.00 1400 0.17
+sum uv_diffusion 0.00 1400 0.09
+depth_update 0.00 1202 0.03
+sealevel 0.00 1200 0.01
+gotm 0.00 200 0.13
+uv_advect_3d 0.01 200 0.42
+uv_diffusion_3d 0.00 200 0.07
+vv_momentum_3d 0.00 200 0.11
+uu_momentum_3d 0.00 200 0.12
+ww_momentum_3d 0.00 200 0.01
+ss_nn 0.00 202 0.03
+bottom_friction_3d 0.00 200 0.02
+stresses_3d 0.00 200 0.01
+slow_terms 0.00 200 0.01
+slow_bottom_friction 0.00 200 0.02
+do_temperature 0.01 200 0.31
+do_salinity 0.00 0 0.00
+coordinates 0.00 202 0.04
+do_internal_pressure 0.00 200 0.03
+start_macro 0.00 202 0.01
+eq_state 0.00 202 0.02
+calc_mean_fields 0.00 0 0.00
+do_meteo 0.01 1202 0.38
+getm_fabm 1.98 200 69.77
+integrate_2d other 0.01 2400 0.24
+integrate_3d other 0.00 1200 0.06
+do_input 0.00 1200 0.01
+do_output 0.24 1202 8.46
+output_manager_save 0.21 2400 7.44
+do_output_processing 0.00 1200 0.00
+sum do_advection 0.08 60400 2.82
+sum do_advection_3d 0.28 9600 9.87
+sum check_3d_fields 0.00 400 0.02
+numerical mixing analysi 0.00 0 0.00
+advection getm_fabm 0.26 200 9.06
+TIMERS SUM 2.84 96054 100.00
+------------------------------------------------------------------------
+Copyright (C) Karsten Bolding and Hans Burchard.
+under the General Public License (GPL) - http://www.gnu.org
+------------------------------------------------------------------------
+[INFO] 结果有效性检查通过（0.204秒）
+[INFO] 输出已归档到 output/：UI_2026101501_WET.2d.nc, UI_2026101501_WET.3d.nc, output.nc
+[INFO] 模型运行完成！耗时: 3.6秒 (0.1分钟)
+结果文件与磁盘清理
+当前案例：C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261015-attempt18\external\3DWET\case\UI_2026101501
+运行写入目录：C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261015-attempt18\external\3DWET\case\UI_2026101501
+完成后归档目录：C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261015-attempt18\external\3DWET\case\UI_2026101501\output
+运行中结果写入案例根目录；成功完成后归档至 output，表格列出当前实际位置。
+打开输出目录
+打开运行目录
+复制输出目录
+刷新文件
+扫描完全相同的副本
+选中重复副本
+全选结果
+清理所选（移至回收区）
+只列出受支持的模型结果和日志；输入、配置与掩膜文件受到保护。
+重复扫描会读取文件全部内容，较大输出可能需要较长时间。扫描后每组保留修改时间最新的一份。
+4 个文件 · 122.1 MB · 已选择 0 个
+选择	当前完整路径	类型	大小	修改时间	副本
+	
+C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261015-attempt18\external\3DWET\case\UI_2026101501\model_run.log
+复制路径	日志	258.1 KB	2026/10/16 10:17:17	
+	
+C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261015-attempt18\external\3DWET\case\UI_2026101501\output\UI_2026101501_WET.2d.nc
+复制路径	结果	91.6 KB	2026/10/16 10:17:17	
+	
+C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261015-attempt18\external\3DWET\case\UI_2026101501\output\UI_2026101501_WET.3d.nc
+复制路径	结果	65.2 MB	2026/10/16 10:17:17	
+	
+C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261015-attempt18\external\3DWET\case\UI_2026101501\output\output.nc
+复制路径	结果	56.5 MB	2026/10/16 10:17:16	
+案例回收区：0 个文件 · 0 B（占用磁盘，可恢复）
+恢复最近一次清理
+清空回收区并释放磁盘

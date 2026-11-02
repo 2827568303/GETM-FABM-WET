@@ -1,0 +1,724 @@
+- img "3DWET"
+- heading "3DWET Studio" [level=1]
+- paragraph: 湖泊生态 · 三维建模工作台
+- generic: 总览
+- generic: 📊
+- text: 仪表盘
+- generic: 📁
+- text: 案例管理
+- generic: 前处理
+- generic: 🛠️
+- text: 前处理
+- generic: ▦
+- text: 交互网格编辑
+- generic: 📥
+- text: 输入数据
+- generic: 🧩
+- text: 模块配置
+- generic: ⚙️
+- text: 参数编辑
+- generic: 🧪
+- text: 初始条件
+- generic: ⏱️
+- text: 时间设置
+- generic: 运行
+- generic: ▶️
+- text: 运行控制
+- generic: 后处理
+- generic: 🌐
+- text: 地图视图
+- generic: 🗺️
+- text: 2D 可视化
+- generic: 🧊
+- text: 3D 可视化
+- generic: 🔥
+- text: 垂向热图
+- generic: 📈
+- text: 时间序列
+- generic: 率定
+- generic: 🎯
+- text: 率定分析
+- generic: 🔄
+- text: 自动率定
+- generic: 工作台
+- generic: ◉
+- text: 环境与启动诊断
+- generic: 📋
+- text: 项目导入与物理设置
+- generic: "案例: Round4 UI Lake 1302"
+- menubar "工作台菜单":
+  - button "项目"
+  - button "编辑"
+  - button "视图"
+  - button "图层"
+  - button "运行"
+  - button "设置"
+  - button "帮助"
+  - button "语言"
+  - generic: 3DWET Studio · GIS 工作台
+- toolbar "常用工具":
+  - button "▣ 案例":
+    - generic: ▣
+    - generic: 案例
+  - button "⚒ 前处理":
+    - generic: ⚒
+    - generic: 前处理
+  - button "▦ 网格":
+    - generic: ▦
+    - generic: 网格
+  - button "▶ 运行":
+    - generic: ▶
+    - generic: 运行
+  - button "⌖ 地图":
+    - generic: ⌖
+    - generic: 地图
+  - button "▤ 2D":
+    - generic: ▤
+    - generic: 2D
+  - button "◇ 3D":
+    - generic: ◇
+    - generic: 3D
+  - button "⚙ 诊断":
+    - generic: ⚙
+    - generic: 诊断
+- generic: 初始条件
+- generic: Round4 UI Lake 1302
+- button "100%"
+- generic: 已完成
+- generic: 初始条件
+- generic: 设置初始水位、水温与各类水质变量的初始状态（冷启动初值）
+- generic: ▶
+- text: 💧 初始水位与水温
+- text: 初始水位
+- emphasis: （相对地形基准，m）
+- spinbutton: "0"
+- text: 湖面绝对高程
+- emphasis: （m, 如滇池 1884）
+- spinbutton
+- text: 地形基准面绝对高程
+- emphasis: （m）
+- spinbutton
+- text: 初始水温
+- emphasis: （℃）
+- spinbutton: "15.363749123032424"
+- text: 地形
+- code: bathymetry.nc
+- text: ：水域格 165 个，水深范围 3.000 ~ 7.000 m，均值 5.085 m。
+- text: 水位填 0 即湖面恰好位于地形零点；此处最大水深 7.000 m。
+- text: 💡 水位怎么填？ GETM 的
+- code: m2d/elev_const
+- text: 是「相对地形零点」的水面高度，和
+- code: bathymetry.nc
+- text: 用同一个零点。若你的地形文件是滇池那种「相对 1884 m 基准面的水深」， 则湖面就在 1884 m，elev_const 填 0；填 1884 会把水面抬到 3788 m。 用上面的「湖面绝对高程 − 地形基准面绝对高程」两栏也能自动算出 elev_const。
+- generic: ▶
+- text: 🌱 营养状态预设（一键填充水质初值）
+- radio "富营养（藻类浊水态）" [checked]
+- text: 富营养（藻类浊水态）
+- radio "重富营养（蓝藻水华频发）"
+- text: 重富营养（蓝藻水华频发）
+- radio "中营养（水草清水态）"
+- text: 中营养（水草清水态）
+- text: 选择一个营养状态，下方「水质初始条件」里各变量会自动填入该状态的标准初值，之后再可单独微调。 同时用于生成
+- code: fabm_init.nc
+- text: （沉水植物生物量随水深分布）。
+- text: 沉水植物生物量上限
+- emphasis: gDW/m²
+- spinbutton: "8"
+- generic: ▶
+- text: 🧫 水质初始条件（按模块，单位 g/m³）
+- textbox "搜索变量，如 NH4 / O2 / 藻"
+- button "↩ 按当前营养状态回填"
+- button "📐 套用预设数值"
+- generic: 底栖动物 / Benthic animals
+- generic: ●
+- text: zoobenthos
+- emphasis: zoobenthos
+- text: 底栖动物 / Benthic animals
+- code: wet/zoobenthos
+- generic "sC"
+- spinbutton: "0.2"
+- generic: gC/m2
+- generic "碳 C / C"
+- generic "sC_PV"
+- spinbutton: "0.2"
+- generic: gC/m2
+- generic "碳 C 的易降解（labile, PV）可变库 / C pel. var"
+- generic "sD"
+- spinbutton: "0.4"
+- generic: gDW/m2
+- generic "干重 DW（默认单位见同行） / DW"
+- generic "sD_PV"
+- spinbutton: "0.5"
+- generic: gDW/m2
+- generic "干重 DW 的易降解（labile, PV）可变库 / DW pel. var"
+- generic "sN"
+- spinbutton: "0.035"
+- generic: gN/m2
+- generic "氮 N / N"
+- generic "sN_PV"
+- spinbutton: "0.035"
+- generic: gN/m2
+- generic "氮 N 的易降解（labile, PV）可变库 / N pel. var"
+- generic "sP"
+- spinbutton: "0.005"
+- generic: gP/m2
+- generic "磷 P / P"
+- generic "sP_PV"
+- spinbutton: "0.005"
+- generic: gP/m2
+- generic "磷 P 的易降解（labile, PV）可变库 / P pel. var"
+- generic: 有机质 / Organic matter
+- generic: ●
+- text: DOM
+- emphasis: dom
+- text: "溶解性有机物质（DOM）：溶解态 C/N/P / Dissolved organic matter (DOM): dissolved C/N/P"
+- code: wet/om_pool
+- generic "sCS"
+- spinbutton: "4"
+- generic: gC/m2
+- generic "沉积态碳 CS / sediment C"
+- generic "sCW"
+- spinbutton: "1"
+- generic: gC/m3
+- generic "颗粒性碳 CW / water column C"
+- generic "sDS"
+- spinbutton: "10"
+- generic: gDW/m2
+- generic "沉积态干重 DS / sediment DW"
+- generic "sDW"
+- spinbutton: "10"
+- generic: gDW/m3
+- generic "颗粒性干重 DW / water column DW"
+- generic "sNS"
+- spinbutton: "0.06"
+- generic: gN/m2
+- generic "沉积态氮 NS / sediment N"
+- generic "sNW"
+- spinbutton: "0.01"
+- generic: gN/m3
+- generic "颗粒性氮 NW / water column N"
+- generic "sPS"
+- spinbutton: "0.01"
+- generic: gP/m2
+- generic "沉积态磷 PS / sediment P"
+- generic "sPW"
+- spinbutton: "0.001"
+- generic: gP/m3
+- generic "颗粒性磷 PW / water column P"
+- generic: ●
+- text: POM
+- emphasis: pom
+- text: "颗粒性有机物质（POM）：水体与沉积物中的颗粒态 C/N/P/DW / Particulate organic matter (POM): particulate C/N/P/dry weight in water and sediment"
+- code: wet/om_pool
+- generic "sCS"
+- spinbutton: "18.96"
+- generic: gC/m2
+- generic "沉积态碳 CS / sediment C"
+- generic "sCS_PV"
+- spinbutton: "18.96"
+- generic: gC/m2
+- generic "沉积态碳 CS 的易降解（labile, PV）可变库 / sediment C PV"
+- generic "sCW"
+- spinbutton: "0.04"
+- generic: gC/m3
+- generic "颗粒性碳 CW / water column C"
+- generic "sDS"
+- spinbutton: "47.4"
+- generic: gDW/m2
+- generic "沉积态干重 DS / sediment DW"
+- generic "sDS_PV"
+- spinbutton: "47.4"
+- generic: gDW/m2
+- generic "沉积态干重 DS 的易降解（labile, PV）可变库 / sediment DW PV"
+- generic "sDW"
+- spinbutton: "5"
+- generic: gDW/m3
+- generic "颗粒性干重 DW / water column DW"
+- generic "sNS"
+- spinbutton: "0.6"
+- generic: gN/m2
+- generic "沉积态氮 NS / sediment N"
+- generic "sNS_PV"
+- spinbutton: "0.6"
+- generic: gN/m2
+- generic "沉积态氮 NS 的易降解（labile, PV）可变库 / sediment N PV"
+- generic "sNW"
+- spinbutton: "0.01"
+- generic: gN/m3
+- generic "颗粒性氮 NW / water column N"
+- generic "sPS"
+- spinbutton: "0.1"
+- generic: gP/m2
+- generic "沉积态磷 PS / sediment P"
+- generic "sPS_PV"
+- spinbutton: "0.1"
+- generic: gP/m2
+- generic "沉积态磷 PS 的易降解（labile, PV）可变库 / sediment P PV"
+- generic "sPW"
+- spinbutton: "0.001"
+- generic: gP/m3
+- generic "颗粒性磷 PW / water column P"
+- generic: ●
+- text: humus
+- emphasis: humus
+- text: "腐殖质：难降解有机物的缓慢矿化库 / Humus: a slowly mineralizing pool of refractory organic matter"
+- code: wet/om_pool
+- generic "sCS"
+- spinbutton: "1487.6"
+- generic: gC/m2
+- generic "沉积态碳 CS / sediment C"
+- generic "sCS_PV"
+- spinbutton: "1487.6"
+- generic: gC/m2
+- generic "沉积态碳 CS 的易降解（labile, PV）可变库 / sediment C PV"
+- generic "sDS"
+- spinbutton: "3719"
+- generic: gDW/m2
+- generic "沉积态干重 DS / sediment DW"
+- generic "sDS_PV"
+- spinbutton: "3719"
+- generic: gDW/m2
+- generic "沉积态干重 DS 的易降解（labile, PV）可变库 / sediment DW PV"
+- generic "sNS"
+- spinbutton: "166"
+- generic: gN/m2
+- generic "沉积态氮 NS / sediment N"
+- generic "sNS_PV"
+- spinbutton: "166"
+- generic: gN/m2
+- generic "沉积态氮 NS 的易降解（labile, PV）可变库 / sediment N PV"
+- generic "sPS"
+- spinbutton: "16"
+- generic: gP/m2
+- generic "沉积态磷 PS / sediment P"
+- generic "sPS_PV"
+- spinbutton: "16"
+- generic: gP/m2
+- generic "沉积态磷 PS 的易降解（labile, PV）可变库 / sediment P PV"
+- generic: 水生植物 / Aquatic plants
+- generic: ●
+- text: macrophytes
+- emphasis: macrophytes
+- text: "水生（沉水）植物：生物量、营养盐吸收与衰亡 / Submerged aquatic plants: biomass, nutrient uptake and senescence"
+- code: wet/macrophytes
+- generic "sC"
+- spinbutton: "12"
+- generic: gC/m2
+- generic "碳 C / P"
+- generic "sC_PV"
+- spinbutton: "0"
+- generic: gC/m2
+- generic "碳 C 的易降解（labile, PV）可变库 / C pel. var"
+- generic "sD"
+- spinbutton: "30"
+- generic: gDW/m2
+- generic "干重 DW（默认单位见同行） / DW"
+- generic "sD_PV"
+- spinbutton: "0"
+- generic: gDW/m2
+- generic "干重 DW 的易降解（labile, PV）可变库 / DW pel. var"
+- generic "sN"
+- spinbutton: "0.6"
+- generic: gN/m2
+- generic "氮 N / N"
+- generic "sN_PV"
+- spinbutton: "0"
+- generic: gN/m2
+- generic "氮 N 的易降解（labile, PV）可变库 / N pel. var"
+- generic "sP"
+- spinbutton: "0.06"
+- generic: gP/m2
+- generic "磷 P / P"
+- generic "sP_PV"
+- spinbutton: "0"
+- generic: gP/m2
+- generic "磷 P 的易降解（labile, PV）可变库 / P pel. var"
+- generic: 浮游动物 / Zooplankton
+- generic: ●
+- text: cladocerans
+- emphasis: cladocerans
+- text: 枝角类（浮游动物） / Cladocerans (zooplankton)
+- code: wet/zooplankton
+- generic "sC"
+- spinbutton: "0.04"
+- generic: gC/m3
+- generic "碳 C / C"
+- generic "sD"
+- spinbutton: "0.3"
+- generic: gDW/m3
+- generic "干重 DW（默认单位见同行） / DW"
+- generic "sN"
+- spinbutton: "0.007"
+- generic: gN/m3
+- generic "氮 N / N"
+- generic "sP"
+- spinbutton: "0.001"
+- generic: gP/m3
+- generic "磷 P / P"
+- generic: ●
+- text: copepods
+- emphasis: copepods
+- text: 桡足类（浮游动物） / Copepods (zooplankton)
+- code: wet/zooplankton
+- generic "sC"
+- spinbutton: "0.04"
+- generic: gC/m3
+- generic "碳 C / C"
+- generic "sD"
+- spinbutton: "0.3"
+- generic: gDW/m3
+- generic "干重 DW（默认单位见同行） / DW"
+- generic "sN"
+- spinbutton: "0.007"
+- generic: gN/m3
+- generic "氮 N / N"
+- generic "sP"
+- spinbutton: "0.001"
+- generic: gP/m3
+- generic "磷 P / P"
+- generic: 浮游植物 / Phytoplankton
+- generic: ●
+- text: cyanobacteria
+- emphasis: cyanobacteria
+- text: 蓝藻（有害藻华贡献者） / Cyanobacteria (contributors to harmful algal blooms)
+- code: wet/phytoplankton
+- generic "sCS"
+- spinbutton: "0.0012"
+- generic: gC/m2
+- generic "沉积态碳 CS / sediment C"
+- generic "sCS_PV"
+- spinbutton: "0.0012"
+- generic: gC/m2
+- generic "沉积态碳 CS 的易降解（labile, PV）可变库 / sediment C PV"
+- generic "sCW"
+- spinbutton: "0.04"
+- generic: gC/m3
+- generic "颗粒性碳 CW / water column C"
+- generic "sDS"
+- spinbutton: "0.003"
+- generic: gDW/m2
+- generic "沉积态干重 DS / sediment DW"
+- generic "sDS_PV"
+- spinbutton: "0.003"
+- generic: gDW/m2
+- generic "沉积态干重 DS 的易降解（labile, PV）可变库 / sediment DW PV"
+- generic "sDW"
+- spinbutton: "0.3"
+- generic: gDW/m3
+- generic "颗粒性干重 DW / water column DW"
+- generic "sNS"
+- spinbutton: "0.0003"
+- generic: gN/m2
+- generic "沉积态氮 NS / sediment N"
+- generic "sNS_PV"
+- spinbutton: "0.0003"
+- generic: gN/m2
+- generic "沉积态氮 NS 的易降解（labile, PV）可变库 / sediment N PV"
+- generic "sNW"
+- spinbutton: "0.03"
+- generic: gN/m3
+- generic "颗粒性氮 NW / water column N"
+- generic "sPW"
+- spinbutton: "0.003"
+- generic: gP/m3
+- generic "颗粒性磷 PW / water column P"
+- generic: ●
+- text: diatoms
+- emphasis: diatom phytoplankton
+- text: 硅藻 / Diatoms
+- code: wet/phytoplankton
+- generic "sCS"
+- spinbutton: "0.00012"
+- generic: gC/m2
+- generic "沉积态碳 CS / sediment C"
+- generic "sCS_PV"
+- spinbutton: "0.00012"
+- generic: gC/m2
+- generic "沉积态碳 CS 的易降解（labile, PV）可变库 / sediment C PV"
+- generic "sCW"
+- spinbutton: "0.2"
+- generic: gC/m3
+- generic "颗粒性碳 CW / water column C"
+- generic "sDS"
+- spinbutton: "0.003"
+- generic: gDW/m2
+- generic "沉积态干重 DS / sediment DW"
+- generic "sDS_PV"
+- spinbutton: "0.003"
+- generic: gDW/m2
+- generic "沉积态干重 DS 的易降解（labile, PV）可变库 / sediment DW PV"
+- generic "sDW"
+- spinbutton: "0.3"
+- generic: gDW/m3
+- generic "颗粒性干重 DW / water column DW"
+- generic "sNS"
+- spinbutton: "0.0003"
+- generic: gN/m2
+- generic "沉积态氮 NS / sediment N"
+- generic "sNS_PV"
+- spinbutton: "0.0003"
+- generic: gN/m2
+- generic "沉积态氮 NS 的易降解（labile, PV）可变库 / sediment N PV"
+- generic "sNW"
+- spinbutton: "0.025"
+- generic: gN/m3
+- generic "颗粒性氮 NW / water column N"
+- generic "sPW"
+- spinbutton: "0.0025"
+- generic: gP/m3
+- generic "颗粒性磷 PW / water column P"
+- generic: ●
+- text: greens
+- emphasis: green phytoplankton
+- text: 绿藻 / Green algae
+- code: wet/phytoplankton
+- generic "sCS"
+- spinbutton: "0.0012"
+- generic: gC/m2
+- generic "沉积态碳 CS / sediment C"
+- generic "sCS_PV"
+- spinbutton: "0.0012"
+- generic: gC/m2
+- generic "沉积态碳 CS 的易降解（labile, PV）可变库 / sediment C PV"
+- generic "sCW"
+- spinbutton: "0.12"
+- generic: gC/m3
+- generic "颗粒性碳 CW / water column C"
+- generic "sDS"
+- spinbutton: "0.003"
+- generic: gDW/m2
+- generic "沉积态干重 DS / sediment DW"
+- generic "sDS_PV"
+- spinbutton: "0.003"
+- generic: gDW/m2
+- generic "沉积态干重 DS 的易降解（labile, PV）可变库 / sediment DW PV"
+- generic "sDW"
+- spinbutton: "0.2"
+- generic: gDW/m3
+- generic "颗粒性干重 DW / water column DW"
+- generic "sNS"
+- spinbutton: "0.0003"
+- generic: gN/m2
+- generic "沉积态氮 NS / sediment N"
+- generic "sNS_PV"
+- spinbutton: "0.0003"
+- generic: gN/m2
+- generic "沉积态氮 NS 的易降解（labile, PV）可变库 / sediment N PV"
+- generic "sNW"
+- spinbutton: "0.015"
+- generic: gN/m3
+- generic "颗粒性氮 NW / water column N"
+- generic "sPW"
+- spinbutton: "0.0015"
+- generic: gP/m3
+- generic "颗粒性磷 PW / water column P"
+- generic: 温室气体 / Greenhouse gases
+- generic: ●
+- text: inorganic_carbon
+- emphasis: inorganic carbon, pH and CO2 air-water exchange (GHG)
+- text: 无机碳 / pH / CO2 与大气交换（温室气体） / Inorganic carbon / pH / atmospheric CO2 exchange (greenhouse gas)
+- code: wet/inorganic_carbon
+- generic "sAlkW"
+- spinbutton: "2000"
+- generic: mEq/m3
+- generic "总碱度（水体，mEq/m3） / total alkalinity"
+- generic "sDICW"
+- spinbutton: "20"
+- generic: g/m3
+- generic "溶解性无机碳 DIC（水体，gC/m3） / dissolved inorganic carbon"
+- generic: ●
+- text: methane
+- emphasis: methane production, oxidation and emission (GHG)
+- text: 甲烷的产生、氧化与排放（温室气体） / Methane production, oxidation and emission (greenhouse gas)
+- code: wet/methane
+- generic "sCH4W"
+- spinbutton: "0.01"
+- generic: g/m3
+- generic "水体中的甲烷碳（gC/m3） / methane C in water"
+- generic: 非生物-水体 / Abiotic water processes
+- generic: ●
+- text: abiotic_water
+- emphasis: abiotic_process_in_water
+- text: "非生物过程（水体）：溶解氧、氮磷硅等无机营养盐、颗粒态无机物的沉降与吸附 / Abiotic water processes: dissolved oxygen, inorganic N/P/Si nutrients, particulate inorganic matter settling and adsorption"
+- code: wet/abiotic_water
+- generic "sDIMW"
+- spinbutton: "10"
+- generic: g/m3
+- generic "溶解性无机物（水体，g/m3） / inorganic matter"
+- generic "sNH4W"
+- spinbutton: "0.03"
+- generic: g/m3
+- generic "铵态氮 NH4（水体，gN/m3） / ammonium"
+- generic "sNO3W"
+- spinbutton: "0.3"
+- generic: g/m3
+- generic "硝态氮 NO3（水体，gN/m3） / nitrate"
+- generic "sO2W"
+- spinbutton: "8.5"
+- generic: g/m3
+- generic "溶解氧 O2（水体，gO2/m3） / oxygen"
+- generic "sPAIMW"
+- spinbutton: "0"
+- generic: g/m3
+- generic "被无机物吸附的磷 IM-adsorbed P（水体，gP/m3） / IM-adsorbed P"
+- generic "sPO4W"
+- spinbutton: "0.015"
+- generic: g/m3
+- generic "磷酸盐 PO4（水体，gP/m3） / phosphate"
+- generic "sSiO2W"
+- spinbutton: "3.5"
+- generic: g/m3
+- generic "二氧化硅（水体，gSi/m3） / silica dioxide"
+- generic "sSiPaW"
+- spinbutton: "0.025"
+- generic: g/m3
+- generic "颗粒态硅（水体，gSi/m3） / particulate Si"
+- generic: 非生物-沉积物 / Abiotic sediment processes
+- generic: ●
+- text: abiotic_sediment
+- emphasis: abiotic_process_in_sediment
+- text: "非生物过程（沉积物）：孔隙水交换、硝化/反硝化、磷吸附与释放 / Abiotic sediment processes: pore-water exchange, nitrification/denitrification, phosphorus adsorption and release"
+- code: wet/abiotic_sediment
+- generic "sDIMS"
+- spinbutton: "31700"
+- generic: g/m2
+- generic "无机物（沉积物，g/m2） / inorganic matter"
+- generic "sNH4S"
+- spinbutton: "0.04"
+- generic: g/m2
+- generic "铵态氮 NH4（沉积物，gN/m2） / ammonium"
+- generic "sNO3S"
+- spinbutton: "0.025"
+- generic: g/m2
+- generic "硝态氮 NO3（沉积物，gN/m2） / nitrate"
+- generic "sPAIMS"
+- spinbutton: "2"
+- generic: g/m2
+- generic "吸附态磷酸盐（沉积物，gP/m2） / absorbed phosphate"
+- generic "sPO4S"
+- spinbutton: "0.02"
+- generic: g/m2
+- generic "磷酸盐 PO4（沉积物，gP/m2） / phosphate"
+- generic "sSiO2S"
+- spinbutton: "0.1"
+- generic: g/m2
+- generic "溶解性二氧化硅（沉积物，gSi/m2） / dissolved SiO2"
+- generic "sSiPaS"
+- spinbutton: "14"
+- generic: g/m2
+- generic "颗粒态硅（沉积物，gSi/m2） / particulate Si"
+- generic: 鱼类 / Fish
+- generic: ●
+- text: AdFish
+- emphasis: adult benthivorous fish
+- text: "鱼类·底栖食性成鱼：捕食底栖动物并扰动沉积物（生物扰动导致内源释放） / Adult benthivorous fish: feed on benthic animals and disturb sediment, promoting internal nutrient release through bioturbation"
+- code: wet/fish
+- generic "sC"
+- spinbutton: "0.4"
+- generic: gC/m3
+- generic "碳 C / C"
+- generic "sD"
+- spinbutton: "1"
+- generic: gDW/m3
+- generic "干重 DW（默认单位见同行） / DW"
+- generic "sN"
+- spinbutton: "0.1"
+- generic: gN/m3
+- generic "氮 N / N"
+- generic "sP"
+- spinbutton: "0.022"
+- generic: gP/m3
+- generic "磷 P / P"
+- generic: ●
+- text: JuFish
+- emphasis: juvenile planktivorous fish
+- text: "鱼类·浮游食性幼鱼：捕食枝角类/桡足类等浮游动物，是鱼类种群的补充阶段 / Juvenile planktivorous fish: feed on cladocerans, copepods and other zooplankton; recruitment stage of the fish population"
+- code: wet/fish
+- generic "sC"
+- spinbutton: "0.1"
+- generic: gC/m3
+- generic "碳 C / C"
+- generic "sD"
+- spinbutton: "0.25"
+- generic: gDW/m3
+- generic "干重 DW（默认单位见同行） / DW"
+- generic "sN"
+- spinbutton: "0.025"
+- generic: gN/m3
+- generic "氮 N / N"
+- generic "sP"
+- spinbutton: "0.0055"
+- generic: gP/m3
+- generic "磷 P / P"
+- generic: ●
+- text: PiscFish
+- emphasis: piscivorous fish
+- text: "鱼类·食鱼性鱼：捕食幼鱼与成鱼，食物网顶级捕食者 / Piscivorous fish: feed on juvenile and adult fish; top predators in the food web"
+- code: wet/fish
+- generic "sC"
+- spinbutton: "0.049"
+- generic: gC/m3
+- generic "碳 C / C"
+- generic "sD"
+- spinbutton: "0.07"
+- generic: gDW/m3
+- generic "干重 DW（默认单位见同行） / DW"
+- generic "sN"
+- spinbutton: "0.007"
+- generic: gN/m3
+- generic "氮 N / N"
+- generic "sP"
+- spinbutton: "0.00154"
+- generic: gP/m3
+- generic "磷 P / P"
+- generic: 📋 预设中的其他变量
+- generic "DOM_sDW"
+- spinbutton: "10"
+- generic: g/m³
+- generic "POM_sDW"
+- spinbutton: "5"
+- generic: g/m³
+- generic "cladocerans_sD"
+- spinbutton: "0.3"
+- generic: g/m³
+- generic "copepods_sD"
+- spinbutton: "0.3"
+- generic: g/m³
+- generic "cyanobacteria_sDW"
+- spinbutton: "0.3"
+- generic: g/m³
+- generic "diatoms_sDW"
+- spinbutton: "0.3"
+- generic: g/m³
+- generic "greens_sDW"
+- spinbutton: "0.2"
+- generic: g/m³
+- generic "label"
+- spinbutton
+- generic: g/m³
+- generic "zoobenthos_sD"
+- spinbutton: "0.4"
+- generic: g/m³
+- generic: 💾 应用初始条件
+- button "💾 保存到案例" [active]
+- button "🔄 重新读取"
+- generic: ● 有未保存的修改
+- text: 保存会写入
+- code: getm.inp
+- text: （m2d/elev_const、temp/temp_const）、
+- code: fabm.yaml
+- text: （各模块 initialization） 与
+- code: fabm_init.nc
+- text: （沉水植物）。修改后若想让模型使用新初值，请保持冷启动。
+- status:
+  - generic: 项目
+  - strong: Round4 UI Lake 1302
+  - generic: 网格
+  - strong: 待加载
+  - generic: 运行
+  - strong: 已完成
+  - generic: 视图
+  - strong: 100%
+  - generic: 坐标系
+  - strong: —
+- generic: 初始条件 label 必须填写有限数值

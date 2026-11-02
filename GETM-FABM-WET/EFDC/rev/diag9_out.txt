@@ -1,0 +1,48 @@
+﻿[js]      0 diag8 ready
+pid 50128
+[js]     14 SetWindowPos hwnd=0x1470a42 flags=0x0
+[js]     14 ShowWindow hwnd=0x1470a42 cmd=4 from MSVBVM60.DLL+0x2d961
+[  1.00] CPU   9.3%
+[  2.00] CPU   7.8%
+[js]   2351 DestroyWindow hwnd=0x2bb61084 from winhttpcom.dll+0x8cb9
+[  3.01] CPU  10.9%
+[  4.01] CPU   1.6%
+[js]   4101 CreateWindow CicMarshalWndClass title="CicMarshalWnd" style=0x88000000 from MSCTF.dll+0x59033
+[js]   4103 CreateWindow MSCTFIME UI title="MSCTFIME UI" style=0x88000000 from USER32.DLL+0x30a6e
+[js]   4104 SetWindowPos hwnd=0x1c41378 flags=0x1a5
+[js]   4106 ShowWindow hwnd=0x1c41378 cmd=1 from USER32.DLL+0x897d8
+[  5.02] CPU   3.1%
+[  6.02] CPU   0.0%
+[  7.02] CPU   0.0%
+[  8.03] CPU   0.0%
+[  9.03] CPU   0.0%
+[ 10.04] CPU   0.0%
+[ 11.05] CPU   0.0%
+[ 12.06] CPU   0.0%
+[ 13.06] CPU   0.0%
+[ 14.07] CPU   0.0%
+[ 15.07] CPU   0.0%
+[ 16.08] CPU   0.0%
+[ 17.08] CPU   0.0%
+[ 18.10] CPU   0.0%
+[ 19.10] CPU   0.0%
+[ 20.10] CPU   0.0%
+[ 21.12] CPU   0.0%
+[ 22.13] CPU   0.0%
+[ 23.13] CPU   0.0%
+[ 24.14] CPU   0.0%
+[ 25.15] CPU   0.0%
+[js]  25150 NtUserWaitMessage 19029ms tid=34660 USER32.DLL+0x89819 <- USER32.DLL+0x89c64 <- USER32.DLL+0xaac97 <- USER32.DLL+0xaacf3 <- win32u.dll+0x212c <- USER32.DLL+0xa9a82 <- ntdll.dll+0x40c3e <- ntdll.dll+0x924e6 <- ntdll.dll+0x92677 <- ntdll.dll+0x66611
+[ 26.15] CPU   6.2%
+[js]  26171 CreateWindow SystemUserAdapterWindowClass title="" style=0x0 from CoreMessaging.dll+0x5d594
+[js]  26175 SetWindowPos hwnd=0x1c41378 flags=0x0
+[js]  26179 DestroyWindow hwnd=0x1c41378 from USER32.DLL+0x8988c
+[js]  26194 DestroyWindow hwnd=0x1470a42 from MSVBVM60.DLL+0x1588b
+[js]  26200 DestroyWindow hwnd=0xd00184 from MSVBVM60.DLL+0x33aff
+[js]  26200 DestroyWindow hwnd=0xb0de0 from MSVBVM60.DLL+0x35831
+[js]  26203 DestroyWindow hwnd=0x2306ee from MSCTF.dll+0x3cbfb
+[js]  26204 DestroyWindow hwnd=0x1910cc8 from combase.dll+0x129b3a
+[ 27.16] CPU   3.1%
+[ 28.16] CPU   0.0%
+[ 29.16] CPU   0.0%
+done; leaving process alive

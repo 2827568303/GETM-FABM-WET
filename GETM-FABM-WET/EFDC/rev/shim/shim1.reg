@@ -1,0 +1,167 @@
+REGEDIT4
+
+[HKEY_CLASSES_ROOT\Record\{93A02877-6964-3F7D-9243-ECF2244911DC}\1.0.0.2]
+"Class"="Flexnet.WrapperDongle.Enums.ResultEnum"
+"Assembly"="DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v4.0.30319"
+
+[HKEY_CLASSES_ROOT\Record\{603C1E44-C5CE-3A7C-8E73-D7070D8BC351}\1.0.0.2]
+"Class"="Flexnet.WrapperDongle.Enums.InitResultEnum"
+"Assembly"="DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v4.0.30319"
+
+[HKEY_CLASSES_ROOT\Flexnet.WrapperDongle.Objects.ForeignData]
+@="Flexnet.WrapperDongle.Objects.ForeignData"
+
+[HKEY_CLASSES_ROOT\Flexnet.WrapperDongle.Objects.ForeignData\CLSID]
+@="{B1B2C3D4-0001-4E5F-9A0B-222222222222}"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0001-4E5F-9A0B-222222222222}]
+@="Flexnet.WrapperDongle.Objects.ForeignData"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0001-4E5F-9A0B-222222222222}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="Flexnet.WrapperDongle.Objects.ForeignData"
+"Assembly"="DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v4.0.30319"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0001-4E5F-9A0B-222222222222}\InprocServer32\1.0.0.2]
+"Class"="Flexnet.WrapperDongle.Objects.ForeignData"
+"Assembly"="DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v4.0.30319"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0001-4E5F-9A0B-222222222222}\ProgId]
+@="Flexnet.WrapperDongle.Objects.ForeignData"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0001-4E5F-9A0B-222222222222}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\Flexnet.WrapperDongle.Objects.XmlResult]
+@="Flexnet.WrapperDongle.Objects.XmlResult"
+
+[HKEY_CLASSES_ROOT\Flexnet.WrapperDongle.Objects.XmlResult\CLSID]
+@="{B1B2C3D4-0002-4E5F-9A0B-222222222222}"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0002-4E5F-9A0B-222222222222}]
+@="Flexnet.WrapperDongle.Objects.XmlResult"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0002-4E5F-9A0B-222222222222}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="Flexnet.WrapperDongle.Objects.XmlResult"
+"Assembly"="DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v4.0.30319"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0002-4E5F-9A0B-222222222222}\InprocServer32\1.0.0.2]
+"Class"="Flexnet.WrapperDongle.Objects.XmlResult"
+"Assembly"="DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v4.0.30319"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0002-4E5F-9A0B-222222222222}\ProgId]
+@="Flexnet.WrapperDongle.Objects.XmlResult"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0002-4E5F-9A0B-222222222222}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\Flexnet.WrapperDongle.Objects.GetInfoReturnData]
+@="Flexnet.WrapperDongle.Objects.GetInfoReturnData"
+
+[HKEY_CLASSES_ROOT\Flexnet.WrapperDongle.Objects.GetInfoReturnData\CLSID]
+@="{B1B2C3D4-0003-4E5F-9A0B-222222222222}"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0003-4E5F-9A0B-222222222222}]
+@="Flexnet.WrapperDongle.Objects.GetInfoReturnData"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0003-4E5F-9A0B-222222222222}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="Flexnet.WrapperDongle.Objects.GetInfoReturnData"
+"Assembly"="DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v4.0.30319"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0003-4E5F-9A0B-222222222222}\InprocServer32\1.0.0.2]
+"Class"="Flexnet.WrapperDongle.Objects.GetInfoReturnData"
+"Assembly"="DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v4.0.30319"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0003-4E5F-9A0B-222222222222}\ProgId]
+@="Flexnet.WrapperDongle.Objects.GetInfoReturnData"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0003-4E5F-9A0B-222222222222}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\Flexnet.WrapperDongle.Objects.Product]
+@="Flexnet.WrapperDongle.Objects.Product"
+
+[HKEY_CLASSES_ROOT\Flexnet.WrapperDongle.Objects.Product\CLSID]
+@="{B1B2C3D4-0004-4E5F-9A0B-222222222222}"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0004-4E5F-9A0B-222222222222}]
+@="Flexnet.WrapperDongle.Objects.Product"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0004-4E5F-9A0B-222222222222}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="Flexnet.WrapperDongle.Objects.Product"
+"Assembly"="DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v4.0.30319"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0004-4E5F-9A0B-222222222222}\InprocServer32\1.0.0.2]
+"Class"="Flexnet.WrapperDongle.Objects.Product"
+"Assembly"="DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v4.0.30319"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0004-4E5F-9A0B-222222222222}\ProgId]
+@="Flexnet.WrapperDongle.Objects.Product"
+
+[HKEY_CLASSES_ROOT\CLSID\{B1B2C3D4-0004-4E5F-9A0B-222222222222}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\Flexnet.WrapperDongle.FlexWrapperDongle]
+@="Flexnet.WrapperDongle.FlexWrapperDongle"
+
+[HKEY_CLASSES_ROOT\Flexnet.WrapperDongle.FlexWrapperDongle\CLSID]
+@="{6399E2C8-63E4-4F31-823C-D256C17E7A13}"
+
+[HKEY_CLASSES_ROOT\CLSID\{6399E2C8-63E4-4F31-823C-D256C17E7A13}]
+@="Flexnet.WrapperDongle.FlexWrapperDongle"
+
+[HKEY_CLASSES_ROOT\CLSID\{6399E2C8-63E4-4F31-823C-D256C17E7A13}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="Flexnet.WrapperDongle.FlexWrapperDongle"
+"Assembly"="DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v4.0.30319"
+
+[HKEY_CLASSES_ROOT\CLSID\{6399E2C8-63E4-4F31-823C-D256C17E7A13}\InprocServer32\1.0.0.2]
+"Class"="Flexnet.WrapperDongle.FlexWrapperDongle"
+"Assembly"="DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v4.0.30319"
+
+[HKEY_CLASSES_ROOT\CLSID\{6399E2C8-63E4-4F31-823C-D256C17E7A13}\ProgId]
+@="Flexnet.WrapperDongle.FlexWrapperDongle"
+
+[HKEY_CLASSES_ROOT\CLSID\{6399E2C8-63E4-4F31-823C-D256C17E7A13}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\Flexnet.WrapperDongle.DemoLicense]
+@="Flexnet.WrapperDongle.DemoLicense"
+
+[HKEY_CLASSES_ROOT\Flexnet.WrapperDongle.DemoLicense\CLSID]
+@="{330D13A9-B2BE-4CCF-9B8A-DC2047FB3D33}"
+
+[HKEY_CLASSES_ROOT\CLSID\{330D13A9-B2BE-4CCF-9B8A-DC2047FB3D33}]
+@="Flexnet.WrapperDongle.DemoLicense"
+
+[HKEY_CLASSES_ROOT\CLSID\{330D13A9-B2BE-4CCF-9B8A-DC2047FB3D33}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="Flexnet.WrapperDongle.DemoLicense"
+"Assembly"="DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v4.0.30319"
+
+[HKEY_CLASSES_ROOT\CLSID\{330D13A9-B2BE-4CCF-9B8A-DC2047FB3D33}\InprocServer32\1.0.0.2]
+"Class"="Flexnet.WrapperDongle.DemoLicense"
+"Assembly"="DSILIC1, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v4.0.30319"
+
+[HKEY_CLASSES_ROOT\CLSID\{330D13A9-B2BE-4CCF-9B8A-DC2047FB3D33}\ProgId]
+@="Flexnet.WrapperDongle.DemoLicense"
+
+[HKEY_CLASSES_ROOT\CLSID\{330D13A9-B2BE-4CCF-9B8A-DC2047FB3D33}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]

@@ -1,0 +1,254 @@
+{
+  "program": "C:\\Users\\23801\\AppData\\Local\\Programs\\3DWET Studio\\3DWETStudio.exe",
+  "model_root": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-installed-standalone-20261011-retry\\3DWET",
+  "standalone_environment": true,
+  "health": {
+    "application": "3dwet-studio",
+    "instance_id": "29b65136beb24eca86e5858b0cc3c0cf",
+    "model_root": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-installed-standalone-20261011-retry\\3DWET",
+    "pid": 25148,
+    "ready": true
+  },
+  "case": "StudioDemo",
+  "ecology_modules": 20,
+  "preflight": {
+    "blocking": 0,
+    "case_path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-installed-standalone-20261011-retry\\3DWET\\case\\StudioDemo",
+    "checks": [
+      {
+        "actions": [
+          {
+            "control": "pp-grid-canvas",
+            "file": "bathymetry.nc",
+            "label": "定位设置",
+            "page": "preprocess",
+            "type": "locate"
+          }
+        ],
+        "detail": "280 个水格（bathymetry.nc）",
+        "fix": null,
+        "id": "bathymetry",
+        "level": "ok",
+        "source_file": "bathymetry.nc",
+        "target": {
+          "control": "pp-grid-canvas",
+          "file": "bathymetry.nc",
+          "page": "preprocess"
+        },
+        "title": "地形"
+      },
+      {
+        "actions": [
+          {
+            "control": "time-dt",
+            "file": "getm.inp",
+            "label": "定位设置",
+            "page": "time",
+            "type": "locate"
+          }
+        ],
+        "detail": "2s ≤ 重力波 CFL 估计上限 24.9923s；此检查不保证生态过程稳定，需短时试运行检查输出。",
+        "fix": null,
+        "id": "configuration",
+        "level": "ok",
+        "source_file": "getm.inp",
+        "target": {
+          "control": "time-dt",
+          "file": "getm.inp",
+          "page": "time"
+        },
+        "title": "时间步长"
+      },
+      {
+        "actions": [
+          {
+            "control": "output-modules",
+            "file": "output.yaml",
+            "label": "定位设置",
+            "page": "time",
+            "type": "locate"
+          },
+          {
+            "file": "output.yaml",
+            "id": "standard_output",
+            "label": "采用当前案例的标准输出订阅",
+            "type": "repair"
+          }
+        ],
+        "detail": "source: * 会写出模型注册的每一个变量。预计约 0.14 GB。（滇池 362 天实测 17.9 GB）",
+        "fix": "改用“标准”订阅：水动力 + 关键生态模块。",
+        "id": "output-all",
+        "level": "warn",
+        "repair": {
+          "file": "output.yaml",
+          "id": "standard_output",
+          "label": "采用当前案例的标准输出订阅"
+        },
+        "source_file": "output.yaml",
+        "target": {
+          "control": "output-modules",
+          "file": "output.yaml",
+          "page": "time"
+        },
+        "title": "输出全部变量"
+      },
+      {
+        "actions": [
+          {
+            "control": "output-modules",
+            "file": "output.yaml",
+            "label": "定位设置",
+            "page": "time",
+            "type": "locate"
+          }
+        ],
+        "detail": "预计输出 0.14 GB，可用 454.2 GB",
+        "fix": null,
+        "id": "disk-space",
+        "level": "ok",
+        "source_file": "output.yaml",
+        "target": {
+          "control": "output-modules",
+          "file": "output.yaml",
+          "page": "time"
+        },
+        "title": "磁盘空间"
+      }
+    ],
+    "n_warn": 1,
+    "ok": true,
+    "revision": "7292b91a52d90ff6cacea59ff5a00ac66060469e2491c4f132be2eb76b98bad5"
+  },
+  "run": {
+    "current_step": 600,
+    "elapsed": 8.238417863845825,
+    "eta_minutes": 0.0,
+    "eta_seconds": 0,
+    "logs": [
+      "2020-01-01 00:15:00: saving 2D ....",
+      "2020-01-01 00:16:00: saving 2D ....",
+      "12:45:46.318 n=         500",
+      "2020-01-01 00:17:00: saving 2D ....",
+      "2020-01-01 00:18:00: saving 2D ....",
+      "2020-01-01 00:19:00: saving 2D ....",
+      "12:45:47.219 n=         600",
+      "2020-01-01 00:20:00: saving 2D ....",
+      "------------------------------------------------------------------------",
+      "Cleaning up....",
+      "------------------------------------------------------------------------",
+      "INFL_NW:     1.3343311786651612E-003 10^6 m3",
+      "INFL_NW:     1.3343311786651612E-003 10^6 m3",
+      "INFL_NE:     1.0007484197616578E-003 10^6 m3",
+      "INFL_W:     1.0007484197616578E-003 10^6 m3",
+      "OUTFL_S:    -1.3412315368652344E-003 10^6 m3",
+      "OUTFL_E:    -1.3412315368652344E-003 10^6 m3",
+      "OUTFL_E:    -1.3412315368652344E-003 10^6 m3",
+      "clean_input",
+      "------------------------------------------------------------------------",
+      "getm: Completed on 20261011 124547.331",
+      "Memory used (global 2D and 3D arrays):",
+      "2D:          123  kbytes",
+      "3D:         1196  kbytes",
+      "Total CPU-time was:       6.06250000      seconds",
+      "Number of time steps:           600",
+      "Number of calc-points:          280",
+      "CPU-time/calc-point:      3.60863087E-05  seconds",
+      "Sim-time/CPU-time:        197.93814432989691",
+      "------------------------------------------------------------------------",
+      "GETM timers in seconds (             10000000  tics per second)",
+      "wall      #sysclocks     % of total",
+      "Timername                time (s)        calls       clocked time",
+      "initialize                    0.39              2          6.52",
+      "bottom_friction               0.00              4          0.00",
+      "momentum                      0.00           1200          0.04",
+      "uv_depths                     0.00              2          0.00",
+      "sum uv_advect                0.01           1320          0.11",
+      "sum uv_diffusion             0.00           1320          0.07",
+      "depth_update                  0.00           1202          0.02",
+      "sealevel                      0.00           1200          0.01",
+      "gotm                          0.01            120          0.10",
+      "uv_advect_3d                  0.01            120          0.24",
+      "uv_diffusion_3d               0.00            120          0.06",
+      "vv_momentum_3d                0.00            120          0.07",
+      "uu_momentum_3d                0.00            120          0.07",
+      "ww_momentum_3d                0.00            120          0.01",
+      "ss_nn                         0.00            122          0.03",
+      "bottom_friction_3d            0.00            120          0.01",
+      "stresses_3d                   0.00            120          0.00",
+      "slow_terms                    0.00            120          0.01",
+      "slow_bottom_friction          0.00            120          0.01",
+      "do_temperature                0.01            120          0.18",
+      "do_salinity                   0.00              0          0.00",
+      "coordinates                   0.00            122          0.02",
+      "do_internal_pressure          0.00            120          0.02",
+      "start_macro                   0.00            122          0.00",
+      "eq_state                      0.00            122          0.01",
+      "calc_mean_fields              0.00              0          0.00",
+      "do_meteo                      0.02           1202          0.31",
+      "getm_fabm                     4.76            120         78.68",
+      "integrate_2d other            0.01           2400          0.17",
+      "integrate_3d other            0.00            720          0.03",
+      "do_input                      0.00           1200          0.00",
+      "do_output                     0.00           1202          0.03",
+      "output_manager_save           0.81           2400         13.35",
+      "do_output_processing          0.00           1200          0.00",
+      "sum do_advection             0.15          74640          2.46",
+      "sum do_advection_3d          0.43           7200          7.15",
+      "sum check_3d_fields          0.00              0          0.00",
+      "numerical mixing analysi      0.00              0          0.00",
+      "advection getm_fabm          0.40            120          6.67",
+      "TIMERS SUM        6.05         104902        100.00",
+      "------------------------------------------------------------------------",
+      "Copyright (C) Karsten Bolding and Hans Burchard.",
+      "under the General Public License (GPL) - http://www.gnu.org",
+      "------------------------------------------------------------------------",
+      "[INFO] 结果有效性检查通过（0.457秒）",
+      "[INFO] 输出已归档到 output/：THEORETICAL_LAKE.2d.nc, output.nc",
+      "[INFO] 模型运行完成！耗时: 7.7秒 (0.1分钟)"
+    ],
+    "performance": {
+      "estimate": {
+        "cfl_dt": 24.992253601889068,
+        "cfl_max": 24.992253601889068,
+        "cfl_ok": true,
+        "duration_days": 0.013888888888888888,
+        "estimated_hours": 0.004666666666666667,
+        "estimated_minutes": 0.28,
+        "estimated_seconds": 16.8,
+        "grid": "24x20",
+        "nsteps": 600,
+        "nwater": 280,
+        "timestep": 2.0
+      },
+      "solver_mode": "预编译串行求解器",
+      "step_cost_seconds": 0.013730696439743041
+    },
+    "progress": 100,
+    "status": "completed",
+    "steps_per_second": 72.82951774431,
+    "total_logs": 3129,
+    "total_steps": 600
+  },
+  "outputs": {
+    "output.nc": {
+      "time_records": 21,
+      "variables": 864,
+      "nonfinite": []
+    },
+    "THEORETICAL_LAKE.2d.nc": {
+      "time_records": 20,
+      "variables": 17,
+      "nonfinite": []
+    }
+  },
+  "render_geometry": {
+    "shape": [
+      10,
+      20,
+      24
+    ],
+    "has_bathymetry": true,
+    "has_coordinates": true
+  },
+  "passed": true
+}

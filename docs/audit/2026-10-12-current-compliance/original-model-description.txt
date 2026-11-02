@@ -1,0 +1,405 @@
+GETM–FABM–WET（3DWET）
+模型完整说明
+结构、逻辑、生态学假设、控制方程、耦合方法与三维实现
+版本基线：pclake-1.1-fix / b834791
+生成日期：2026-07-11
+
+目录
+TOC \h \o "1-3"
+
+
+摘要：模型究竟是 PDE、独立网格 ODE，还是其他？
+结论是：三者兼有，但职责分层，属于算子分裂的三维输运–局地反应混合模型。
+GETM 在水平二维网格和垂向 sigma 层上求解三维水动力，并对可输运的 FABM 水柱状态量求解平流–扩散型偏微分方程（PDE）的离散形式。
+对每个湿水平网格柱，GETM 把温度、盐度、层厚、垂向速度、湍扩散、光、风、底应力等传给 GOTM–FABM。GOTM 先处理垂向运动与垂向扩散，再用 ODE 求解器积分 WET 给出的生态源汇项。
+沉积物、沉水植物、底栖动物等底面状态是每个水平湿网格上的二维底面状态，按局地常微分方程更新，不参加 GETM 的三维平流输运；它们通过底层源汇、沉降、再悬浮、扩散及面积–体积换算与最底层水体耦合。
+鱼类在当前实现中是欧拉型三维浓度状态，不是逐尾鱼的拉格朗日个体模型。其 D/P/N/C 状态随水动力输运，并叠加由缺氧（以及可选光照）触发的垂向游泳速度；代码中没有显式主动水平游泳或个体轨迹。
+当前理论湖算例的生态源汇求解器为 ode_method: 1，即一阶 Forward Euler；split_factor: 1，生态反应不做额外子步。
+因此，最准确的数学表述是：
+水柱变量：三维守恒输运 PDE + 每格局地生态 ODE（算子分裂）
+底面变量：每个水平格点独立的底面 ODE + 与最底水层的边界通量
+水动力变量：GETM 三维自由表面水动力方程组
+1. 说明范围、证据层级与版本边界
+本文区分三类内容：
+已实现且已启用：当前 Theoretical lake/fabm.yaml 中实际实例化，并在全年 NetCDF 中有对应状态或诊断量。
+代码库已实现但当前算例未启用：例如 bivalves.F90 双壳类模块。
+生态学解释或建模假设：由方程结构可以解释，但并非独立观测事实。
+当前理论湖实际启用 18 个 FABM 实例：abiotic_water、abiotic_sediment、bot_pel_interface、burial、sediment_exchange、POM、DOM、humus、macrophytes、cyanobacteria、diatoms、greens、cladocerans、copepods、zoobenthos、JuFish、AdFish 和 PiscFish。双壳类虽在 WET 工厂中注册，但当前配置没有实例化。resus_sed.F90 源文件存在，但当前模型工厂没有把它注册为独立 wet/resus_sed 实例；再悬浮相关过程由当前沉积物交换链路承担，不能把该文件单独算作已启用功能群。
+2. 总体结构
+
+图1 总体结构
+层级
+主要职责
+核心文件或配置
+GETM
+三维自由表面水动力、网格、温盐、河流、气象、三维平流输运、NetCDF 输出
+3DWET/src/getm、getm.inp
+GOTM
+单水柱垂向运动、湍扩散、垂向混合，并承载 GOTM–FABM 驱动
+3DWET/src/gotm/src/fabm/gotm_fabm.F90
+FABM
+从 YAML 创建生态实例，注册状态/依赖/诊断，汇总源汇，调用 ODE 求解器
+3DWET/src/fabm、fabm.yaml
+WET/PCLake
+水质、浮游生物、水生植物、底栖动物、鱼类、有机质和沉积物过程
+3DWET/src/wet/src/*.F90
+案例层
+初值、参数、食物关系、网格、气象、河流、数值格式和输出变量
+3DWET/case/Theoretical lake
+
+WET 的 wet_model_library.F90 是模块工厂，注册了 abiotic_water、abiotic_sediment、om_pool、phytoplankton、macrophytes、zooplankton、fish、fish_pclake、bivalves、zoobenthos、burial、sediment_exchange 和 bot_pel_interface。FABM 根据 model: wet/xxx 创建实例；同一 Fortran 类型可多次实例化，例如 phytoplankton 被实例化为蓝藻、硅藻和绿藻，fish 被实例化为幼龄食浮游生物鱼、成年食底栖鱼和食鱼鱼。
+3. 三维控制方程与算子分裂
+3.1 可输运水柱状态
+对任一 FABM 水柱状态浓度 C(x,y,z,t)，连续形式可写为：
+∂C/∂t+∂uC/∂x+∂vC/∂y+∂w+wbC/∂z=∇h·Kh∇hC+∂/∂zKz∂C/∂z+RCC,E+QC
+其中 u、v、w 来自 GETM；w_b 是 FABM 模块给出的相对垂向运动（藻类沉降、鱼类垂向游泳等）；K_h、K_z 为水平和垂向扩散/湍混合系数；R_C 是 WET 局地生态反应；Q_C 包含河流、降水蒸发、表面和底部边界通量等。
+代码不是一次性求解上述整体方程，而是顺序分裂：
+Cn--垂向平流/沉降-->C*--垂向扩散-->C**
+--生态ODE-->C***--GETM三维平流-->Cn+1
+GETM 的 do_getm_fabm 对每个湿网格 (i,j) 抽取一根垂向柱，将 fabm_pel(i,j,:,n) 和 fabm_ben(i,j,n) 复制到 GOTM–FABM 列数组，调用 do_gotm_fabm 后写回；随后只对 model%state_variables 中 cc_transport=true 的三维水柱状态调用 do_advection_3d。底面数组 fabm_ben 不进入该三维平流调用。
+3.2 局地生态 ODE
+在一个水柱网格单元中，WET 返回源汇向量：
+dX/dt=RX;T,I,O2,nutrients,prey,depth,shear,…
+当前配置采用 Forward Euler：
+Xn+1=Xn+Δt·RXn
+Δt=24 s，split_factor=1。FABM 在每次生态积分前后调用状态检查/修复；非负状态由注册的 minimum 和 repair_state: true 共同约束。需要强调：Forward Euler 不是无条件正定或无条件稳定格式，24 秒步长及状态修复是当前稳定运行的一部分，不应任意放大时间步。
+3.3 底面状态与边界通量
+对每个湿水平网格的底面状态 B(x,y,t)：
+dB/dt=RbB,Cbottom,Tbottom,O2bottom,τb,H,…
+底面过程产生的面积通量 F_b（单位常为 g m^-2 s^-1）通过最底层面积/体积比转成体积源项：
+Rbottom,water=Fb·Abottom/Vbottom≈Fb/Δzbottom
+代码中的 bot_pel_conv = 1/max(Δz,10^-6)承担 m^-2 与 m^-3 的换算。底面状态在水平上不被 do_advection_3d 输送，因此是“各水平格点独立的 ODE”，但并非彼此完全无关：它们通过上覆水体的三维输运间接耦合。
+4. 基本生态学假设
+功能群假设：同一功能群内个体被平均化，不追踪年龄、体长或个体差异；只有鱼类可选阶段/平均体重/储备变量，当前三个鱼类实例 qStage=0，未启用阶段转化。
+欧拉浓度假设：水柱生物被视为连续浓度场。鱼类不是个体轨迹；水平运动默认随水体平流，主动行为只通过垂向速度表达。
+局地摄食假设：捕食者仅摄食同一网格单元或同一底面–底层耦合位置中的猎物，不跨网格搜索。
+元素守恒框架：多数生物同时跟踪干重 D、磷 P、氮 N 和碳 C；摄食、同化、排泄、死亡在这些元素库间转移。部分 CO2 更新在源码中被注释，当前碳循环的闭合度应按实际启用变量审计，不能仅凭 D/P/N 守恒推断完整碳守恒。
+动态化学计量：藻类、浮游动物、鱼类等通过 D/P/N/C 比控制营养限制和同化效率；NearZero 用于避免除零。
+温度响应：过程速率使用 Arrhenius、Q10 或以最适温度为中心的高斯函数缩放。
+资源限制：初级生产由光、温度和细胞内/体内营养比共同限制；摄食使用清滤率、食物可用度、胃容纳或最适食谱宽度等饱和机制。
+底栖–水柱耦合：沉积物和底栖生物按面积计量，水柱按体积计量，通过最底层厚度换算。
+沉积物简化：沉积物是反应性底面库，不解析真实三维孔隙结构；孔隙率、有效扩散距离、好氧层比例等以参数化方式表示。
+外源迁移/补充：鱼类、底栖动物和水生植物可用 kMigr·(目标密度−当前密度) 表示与模型域外种群交换，这不是由空间游泳方程计算的迁移。
+5. 状态变量的空间域与三维实现
+组分
+主状态单位/输出维度
+空间实现
+是否三维输运
+NH4、NO3、PO4、O2、SiO2、悬浮无机物
+g m^-3；time,sigma,y,x
+水柱欧拉浓度
+是
+POM、DOM、humus 水柱镜像
+g m^-3 或耦合镜像；time,sigma,y,x
+水柱颗粒/溶解有机质
+是，按变量属性
+蓝藻、硅藻、绿藻
+D/P/N/C，time,sigma,y,x
+三维浓度，含沉降速度
+是
+枝角类、桡足类
+D/P/N/C，time,sigma,y,x
+三维浓度
+是
+JuFish、AdFish、PiscFish
+D/P/N/C，time,sigma,y,x
+三维欧拉浓度，含垂向游泳
+是
+水生植物主体
+g m^-2；time,y,x
+每格底面 ODE
+否
+底栖动物主体
+g m^-2；time,y,x
+每格底面 ODE
+否
+沉积物无机盐/有机质
+g m^-2；time,y,x
+每格底面 ODE
+否
+*_PV 变量
+常以 g m^-2 标注但输出为 time,sigma,y,x
+为跨域依赖和底层换算保留的水柱镜像/耦合载体
+技术上属于水柱状态；解释时不能等同真实底栖生物
+
+当前结果文件直接证明：PiscFish_sD、AdFish_sD、JuFish_sD、三类藻和两类浮游动物均为四维 (time,sigma,yc,xc)；macrophytes_sD、zoobenthos_sD 和藻类 sDS 为三维 (time,yc,xc) 底面状态；相应 _PV 为四维镜像。
+6. 公共环境响应方程
+6.1 Arrhenius 型温度函数
+fAT;θ=θT-20
+6.2 高斯最适温度函数
+fGT;σ,Topt=exp-T-Topt2-20-Topt2/2σ2
+6.3 Q10 函数
+fQ10T=Q10T-20/10
+6.4 日长比例
+m=1-tanφtanεcos0.0172·day
+fday=arccos1-m/π
+6.5 氧饱和浓度
+源码用绝对温度、盐度与经验系数计算 uFunO2Sat(salt,temp)，最终：
+O2sat=1.42763·expa-b+csalt
+7. 水体无机过程方程
+7.1 硅再矿化
+RSi,min=kSi,min·fAT;θSi·Siparticulate
+颗粒硅减少、溶解硅等量增加。
+7.2 磷吸附/解吸
+fO2=O2/hO2+BOD+O2
+Pads,max=cDW+fO2cFefFeDIM+cAlfAlDIM
+Kads=1-fred,max1-fO2Kads,ox
+Piso=Pads,maxKadsPO4/1+KadsPO4
+Peq=Piso·DIM
+Rsorp=ksorpPeq-PAIM
+因此 dPO4/dt=-R_sorp，dPAIM/dt=+R_sorp。
+7.3 水体硝化
+fO2,nit=O22/hO2,nit2+O22
+Rnit=knitfAT;θnitfO2,nitNH4
+RO2,nit=O2PerNH4·molO2/molN·Rnit
+对应 dNH4/dt=-R_nit、dNO3/dt=+R_nit、dO2/dt=-R_O2,nit。
+7.4 表面复氧
+kaer=0.727U100.5-0.371U10+0.0376U102
+Raer=kaerfAT;θaerO2sat-O2
+8. 沉积物无机过程与沉积物–水界面
+8.1 孔隙水浓度
+Cpore=Mareal/depthsed·porosity
+8.2 氧穿透与好氧比例
+RSOD=molO2/molC·ΣRC,OM+O2PerNH4·molO2/molN·Rnit
+z_oxy = sqrt[2 O2_water K_O2,eff / max(R_SOD,ε)]
+f_oxy = min(1,max(0,z_oxy/depth_sed))
+8.3 沉积物硝化与反硝化
+R_nit,S = f_oxy k_nit,S f_A(T) NH4_S
+R_denit,C = [NO3_pore^2/(h_NO3^2+NO3_pore^2)](1-f_oxy) R_C,OM
+R_denit,N = NO3PerC · molN/molC · R_denit,C
+8.4 溶质扩散
+K_eff = f_A(T) · turbidity_factor · porosity_corrected / diffusion_distance
+F_X = k_X (X_pore-X_bottomwater) K_eff
+NH4、NO3、PO4、SiO2 和 DOM 均按类似浓度梯度交换；水体端与沉积物端符号相反，并用最底层厚度完成面积–体积换算。
+8.5 沉降、再悬浮与埋藏
+F_set,X = v_set,corrected · C_X,bottom
+F_resus,POM = [POM/(f_lutum DIM+POM+ε)] · R_resus
+v_Δ = (R_DIM/ρ_IM + R_POM/ρ_OM)/(1-porosity)
+F_bur,DOM = DOM · v_Δ/depth_sed
+再悬浮受底剪切、沉水植物抑制和食底栖鱼生物扰动影响；埋藏按沉积物周转深度及各库化学计量比在 POM、DOM、无机物和深层腐殖质之间分配。
+9. 有机质库方程
+水柱 POM/DOM/humus 的基本分解形式为：
+R_D,min = k_D,min f_A(T) D
+R_N,min = k_N,min f_A(T) N
+R_P,min = k_P,min f_A(T) P
+R_C,min = k_D,min f_A(T) C
+耗氧与缺氧反硝化：
+f_O2 = O2/(h_O2+BOD+O2)
+R_O2,min = molO2/molC · (C/D) · f_O2 · R_D,min
+R_D,denit = NO3^2/(h_NO3^2+NO3^2) · (1-f_O2) · R_D,min
+R_N,denit = NO3PerC · molN/molC · (C/D) · R_D,denit
+沉积物有机质按 f_refractory 分到难降解库，其余转到下一有机质/无机营养库。总体遵循“死亡/排泄输入 → POM/DOM/humus → 再矿化 → NH4/PO4/CO2/耗氧”的闭环。
+10. 浮游植物方程
+当前实例：cyanobacteria、diatoms、greens。
+10.1 光限制
+无光抑制形式：
+f_L = [ln((1+I_top/h_L)/(1+I_bottom/h_L))]/(k_ext Δz)
+可选光抑制形式：
+f_L = e/(k_ext Δz)[exp(-I_bottom/I_opt)-exp(-I_top/I_opt)]
+10.2 内部营养配额限制
+f_P = max{0,(1-qP_min/qP) qP_max/(qP_max-qP_min)}
+f_N = max{0,(1-qN_min/qN) qN_max/(qN_max-qN_min)}
+f_Si = SiO2/(h_Si+SiO2)
+f_nut = min(f_P,f_N,f_Si)
+蓝藻可用固氮缓解 N 限制：
+f_Nfix,growth = f_μ,Nfix + f_N(1-f_μ,Nfix)
+R_Nfix = c_Nfix,max(1-f_N)D
+10.3 生长、吸收、呼吸和死亡
+μ = f_day(1-cover_surface) f_L f_T μ_max f_nut f_Nfix,growth
+R_D,ass = μD
+R_C,ass = c_C/D R_D,ass
+V_N,max,corr = V_N,max f_T(qN_max-qN)/(qN_max-qN_min)
+V_N = (NH4+NO3)V_N,max,corr/(V_N,max,corr/Aff_N+NH4+NO3)
+R_N,upt = V_N D
+R_D,resp = k_resp f_T D
+R_D,mort = k_mort D
+最终：
+dD/dt = R_D,ass-R_D,resp-R_D,mort
+dP/dt = R_P,upt-R_P,excr-R_P,mort
+dN/dt = R_N,upt+R_Nfix-R_N,excr-R_N,mort
+dC/dt = R_C,ass-R_C,resp-R_C,mort
+死亡按参数分到 POM 与 DOM；N 吸收在 NH4/NO3 间分配；硅藻同时更新颗粒硅和溶解硅。浮游植物可具有 vertical_movement=cVSet，因此其三维实现不仅是被动水动力输运，还含相对沉降。
+11. 浮游动物方程
+当前实例：cladocerans、copepods；猎物由 YAML 映射到三类藻等资源。
+f_feed = Σ(c_clear,i f_gut,i D_i)/(k_cons,max f_T + ε)
+R_D,cons,i = D_zoo c_clear,i D_i(1-f_feed)
+R_D,ass = f_ass ΣR_D,cons,i
+元素同化效率由食物化学计量决定：
+qN_food = ΣR_N,cons/ΣR_D,cons
+f_N,ass = min(1,qN_ref/qN_food · f_ass)
+R_N,ass = f_N,ass ΣR_N,cons
+P、C 同理。呼吸、排泄、排粪和死亡：
+R_D,resp = correction_stoich · k_resp f_T D_zoo
+R_D,eges = R_D,cons,total-R_D,ass
+R_D,mort = k_mort D_zoo + environmental_correction
+dD_zoo/dt = R_D,ass-R_D,resp-R_D,mort
+未同化食物、排泄和死亡按溶解无机、POM、DOM 比例回流；猎物状态同步减去各摄食通量。
+12. 水生植物方程与三维表现
+水生植物主体为底面面积生物量 D_veg(x,y,t)，不是三维自由漂浮浓度。
+f_cover,emerg = min(1,0.01 c_cover,specific D_emerg)
+μ_TL = f_day · f_shoot · f_L · f_T · μ_max
+f_nut = min(f_P,f_N)
+μ = μ_TL f_nut
+承载力修正与生产：
+r_net,intrinsic = μ_TL-k_resp f_T-k_mort
+R_env = max[0,(D_veg+D_comp)D_veg r_net,intrinsic/K]
+R_prod = max(0,μD_veg - μ/μ_max · R_env)
+根和茎叶分别从沉积物孔隙水与水柱吸收营养：
+R_N,upt = R_N,upt,water + R_N,upt,sediment
+R_P,upt = R_P,upt,water + R_P,upt,sediment
+最终底面状态：
+dD_veg/dt = k_migr(D_target-D_veg)+R_prod-R_mort-R_resp
+dN_veg/dt = k_migr(N_target-N_veg)+R_N,upt-R_N,excr-R_N,mort
+dP_veg/dt = k_migr(P_target-P_veg)+R_P,upt-R_P,excr-R_P,mort
+dC_veg/dt = k_migr(C_target-C_veg)+R_C,prod-R_C,resp-R_C,mort
+水生植物通过遮光、营养吸收、产氧/呼吸、死亡有机质输入和抑制再悬浮影响三维水体。macrophytes_sD_PV(time,sigma,y,x) 是技术性镜像/依赖载体；生态解释应以 macrophytes_sD(time,y,x) 为主体。
+13. 底栖动物方程
+底栖动物主体为 gDW m^-2 的底面 ODE。摄食基于底面猎物和食物限制：
+R_D,cons,i = clearance_i · preference_i · D_benthos · D_prey,i · limitation
+R_D,ass = f_ass ΣR_D,cons,i
+动态化学计量同化与呼吸：
+f_N,ass = clip(qN_ref/qN_food · f_ass,0,1)
+R_D,resp = (qP_ref/max(qP_benthos,ε)) k_resp f_T f_O2 D_benthos
+R_D,mort,O2 = k_mort,O2 D_benthos(1-f_O2)f_T
+最终：
+dD_benthos/dt = k_migr(D_target-D)+R_D,ass-R_D,resp-R_D,mort
+dP_benthos/dt = k_migr(P_target-P)+R_P,ass-R_P,excr-R_P,mort
+dN_benthos/dt = k_migr(N_target-N)+R_N,ass-R_N,excr-R_N,mort
+dC_benthos/dt = k_migr(C_target-C)+R_C,ass-R_C,resp-R_C,mort
+排粪、排泄和死亡进入沉积物 NH4、PO4、POM/DOM；成年食底栖鱼通过 BENTprey1: zoobenthos 取食该底面状态，并产生生物扰动再悬浮效应。1.1 修复为 P/D、N/D、C/D 等分母加入 NearZero 保护，避免零干重触发 NaN。
+14. 双壳类方程（代码库可选，当前算例未启用）
+W_ind = a_L · length^b_L
+I_max = k_AI W_ind^b_I
+f_food=min(D_food/h_food,1)
+R_D,cons,i = I_max f_food f_T f_density f_SS D_biv preference_i
+R_D,ass=f_ass ΣR_D,cons,i
+呼吸采用个体异速生长式并乘以面积生物量；排粪、假粪、缺氧死亡和阶段转化进入元素预算。该模块支持幼体/成体阶段，但由于当前 fabm.yaml 没有 bivalves 实例，不能把这些方程描述为本次理论湖结果的实际组成。
+15. 鱼类方程与三维实现
+15.1 当前食物网
+
+图2 当前食物网
+捕食者
+当前猎物
+JuFish（幼龄食浮游生物鱼）
+copepods、cladocerans
+AdFish（成年食底栖鱼）
+zoobenthos
+PiscFish（食鱼鱼）
+JuFish、AdFish
+
+15.2 摄食和同化
+鱼类对浮游、底栖和鱼类猎物分别计算潜在摄食：
+L_plan = f_veg Σ(c_clear,plan f_gut D_prey)/(k_cons,max f_T+ε)
+R_D,cons,plan,i = D_fish,eff f_feed f_veg c_clear,i D_prey,i(1-L_plan) f_time,plan
+底栖和食鱼摄食同形。三类食物的时间分配为：
+f_time,g = R_D,cons,g,potential / Σ_g R_D,cons,g,potential
+干重同化 R_D,ass=f_D,ass ΣR_D,cons；N/P/C 同化效率用捕获食物的元素比与鱼体参考元素比限制。
+15.3 Foraging-arena 可选机制
+代码保留动态易捕食比例 fVul：
+dfVul/dt = (P*_current-P*_optimal) f_PV / day
+它把摄食收益、代谢、捕食风险和易受捕食生物量联系起来。当前三个鱼实例 qOPT=0、qODB=0，最优行为和最适食谱宽度关闭，但状态 fVul 仍存在于通用 fish 模块。
+15.4 呼吸、死亡、外源迁移和总预算
+R_D,resp = (qP_ref/qP_fish)(1+f_resp,act f_feed) k_resp f_T D_fish
+R_D,eges = R_D,cons,total-R_D,ass
+R_D,mort = k_mort D_fish
+R_D,migr = k_migr(D_external-D_fish)
+dD_fish/dt = R_D,migr+R_D,ass-R_D,resp-R_D,mort-R_D,stage
+P/N/C 方程同形，分别减去排泄、呼吸、死亡和阶段转移。排泄进入 NH4/PO4，排粪和死亡进入 POM/DOM，骨骼比例可进入底部/系统外库。
+15.5 三维运动
+鱼类 D/P/N/C 是 g m^-3 的三维状态，默认参加水动力平流与垂向湍扩散。qTrans=2 时，缺氧触发主动垂向速度：
+w_fish = q_swim · cVswim
+该速度被加到垂向平流步骤。qTrans=3 还可用光阈值控制上下游动；当前三个鱼实例均为 qTrans=2。代码未实现主动水平定向游泳，所以鱼类三维分布是“水动力输运 + 局地生态反应 + 垂向行为”，不是完整三维个体运动模型。
+16. GETM–FABM–WET 每个时间步的耦合逻辑
+
+图3 运行流程
+GETM 更新水位、流速、温盐、层厚、湍扩散、垂向速度、气象、河流和底应力。
+遍历每个湿水平网格 (i,j)。
+将该柱所有水柱状态 fabm_pel(i,j,:,n)、底面状态 fabm_ben(i,j,n) 和诊断量复制到列数组。
+链接温度、盐度、密度、层厚、垂向速度、光、风、云、降水蒸发、底应力、经纬度、水深及累计模拟时间。
+计算每层 bot_pel_conv=1/Δz。
+GOTM–FABM 对可输运状态执行垂向沉降/上浮、垂向水动力平流和湍扩散。
+FABM 依次调用 fabm_do_bottom、fabm_do_surface、fabm_do 汇总底部、表面和水柱生态源汇。
+ODE 求解器以 Forward Euler 积分 24 秒生态反应，并执行状态修复。
+将列数组写回全三维 fabm_pel 和二维 fabm_ben。
+GETM 对所有 cc_transport=true 的水柱状态执行全三维平流（配置 fabm_adv_hor=4、fabm_adv_ver=4、fabm_adv_split=1）。
+按输出频率写入 2D、3D 和 FABM NetCDF。
+这是一种顺序耦合/算子分裂，不是每个子模型同时隐式求解。源汇、垂向输运和水平三维输运之间存在分裂误差，其量级随时间步、过程刚性和数值格式而变。
+17. 当前理论湖数值配置
+项目
+当前值
+模拟期
+2020-01-01 至 2021-01-01
+GETM 时间步
+24 s
+总步数
+1,317,600
+水平网格
+24×20，共 480 格，其中 280 个湿格
+垂向层
+10 个水层状态；GETM 3D 文件 sigma 坐标含 11 个界面
+生态 ODE
+Forward Euler，ode_method=1
+生态子步
+split_factor=1
+垂向扩散
+cnpar=1.0
+FABM 三维平流
+fabm_adv_hor=4、fabm_adv_ver=4、fabm_adv_split=1
+状态修复
+repair_state=true
+输出
+366 个日输出时刻
+
+全年验证结果存在 getm: Completed，运行日志无致命错误、NaN 或 Infinity 标记，结果检查为 issues: none。这证明当前配置可完成数值运行；它不等同于用观测数据完成了生态校准或验证。
+18. 解释边界、局限性与建议
+三维不等于所有生物都解三维 PDE：水生植物、底栖动物和沉积物主体是二维底面 ODE；只有水柱状态进入三维输运。
+鱼类三维分布是欧拉浓度近似：适合总生物量和食物网反馈，不适合个体迁徙、栖息地选择、鱼群行为或跨湖定向运动研究。
+局地食物网：捕食作用发生在同一网格位置，空间搜索尺度小于网格尺度的过程被参数化。
+镜像变量需谨慎：*_PV 是跨域技术变量，不应直接与底面真实生物量相加，也不应被当作独立生态功能群。
+Forward Euler 限制：强非线性、低氧突变或高摄食率条件下可能要求更小时间步或更稳健的正定/守恒 ODE 格式。
+当前验证边界：已验证完整运行和数值有限性，尚不能据此声称对真实湖泊的物种组成、季节振幅和营养盐通量已经校准。
+库能力与案例启用必须区分：双壳类、fish_pclake 等存在于代码库，但本理论湖的鱼类使用 wet/fish，双壳类未启用。
+19. 源码证据索引
+主题
+关键证据
+WET 模块注册
+3DWET/src/wet/src/wet_model_library.F90:50
+水柱/底面初值数组
+3DWET/src/getm/src/3d/getm_fabm.F90:320
+每个湿网格柱调用
+3DWET/src/getm/src/3d/getm_fabm.F90:566
+底面–水柱换算
+3DWET/src/getm/src/3d/getm_fabm.F90:626
+写回三维与二维状态
+3DWET/src/getm/src/3d/getm_fabm.F90:651
+GETM 三维平流
+3DWET/src/getm/src/3d/getm_fabm.F90:676
+垂向运动和扩散
+3DWET/src/gotm/src/fabm/gotm_fabm.F90:1368、:1482
+生态 ODE 积分
+3DWET/src/gotm/src/fabm/gotm_fabm.F90:1508
+底面/水柱源汇
+3DWET/src/gotm/src/fabm/gotm_fabm.F90:1771、:1810
+ODE 方法映射
+3DWET/src/gotm/src/fabm/gotm_fabm.F90:289
+鱼类状态和垂向游泳
+3DWET/src/wet/src/fish.F90:199、:1156
+水生植物底面方程
+3DWET/src/wet/src/macrophytes.F90:320
+底栖动物底面方程
+3DWET/src/wet/src/zoobenthos.F90:253
+浮游植物方程
+3DWET/src/wet/src/phytoplankton.F90:317
+浮游动物方程
+3DWET/src/wet/src/zooplankton.F90:222
+有机质方程
+3DWET/src/wet/src/om_pool.F90:269
+沉积物交换
+3DWET/src/wet/src/sediment_exchange.F90:313
+当前实例和捕食关系
+1.1/3DWET/case/Theoretical lake/fabm.yaml
+输出维度证据
+1.1结果/output.nc.header.txt、THEORETICAL_LAKE.3d.nc.header.txt
+
+20. 一句话总结
+3DWET 的生态组分不是被整体改写成一个统一 PDE；它采用 GETM 三维输运 PDE、GOTM 垂向物理、FABM 每网格局地 ODE 与底面二维 ODE 的算子分裂耦合。鱼类是带垂向行为的三维欧拉浓度场，水生植物和底栖动物主体则是各水平网格独立更新、通过最底层通量与三维水体间接耦合的底面状态。

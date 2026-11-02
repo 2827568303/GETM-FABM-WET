@@ -1,0 +1,3 @@
+﻿[js]      0 diag44 ready
+pid 44172
+[js]   2357 �� Err ʧ��: Error: invalid type specified

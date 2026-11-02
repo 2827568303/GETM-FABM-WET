@@ -1,0 +1,422 @@
+[
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-finish\",\"time\":13,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:04.265Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":13,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:04.269Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"indicator-replace-before\",\"time\":13,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:04.269Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"indicator-replace-after\",\"time\":13,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:04.286Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":14,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:06.115Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":14,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:06.186Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-start\",\"time\":14,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:06.199Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-finish\",\"time\":14,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:06.200Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":14,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:06.202Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":14,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:06.255Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-start\",\"time\":14,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"up\":{\"x\":0,\"y\":0,\"z\":1},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:06.264Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-finish\",\"time\":14,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:06.265Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":14,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:06.269Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"indicator-replace-before\",\"time\":14,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:06.269Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"indicator-replace-after\",\"time\":14,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:06.285Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":15,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:08.117Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":15,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:08.190Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-start\",\"time\":15,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:08.203Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-finish\",\"time\":15,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:08.204Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":15,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:08.207Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":15,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:08.259Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-start\",\"time\":15,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"up\":{\"x\":0,\"y\":0,\"z\":1},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:08.268Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-finish\",\"time\":15,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:08.269Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":15,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:08.274Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"indicator-replace-before\",\"time\":15,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:08.274Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"indicator-replace-after\",\"time\":15,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:08.290Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":16,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:10.116Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":16,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:10.189Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-start\",\"time\":16,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:10.201Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-finish\",\"time\":16,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:10.202Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":16,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:10.205Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":16,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:10.257Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-start\",\"time\":16,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"up\":{\"x\":0,\"y\":0,\"z\":1},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:10.266Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-finish\",\"time\":16,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:10.267Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":16,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:10.271Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"indicator-replace-before\",\"time\":16,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:10.271Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"indicator-replace-after\",\"time\":16,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:10.287Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":17,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:12.115Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":17,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:12.187Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-start\",\"time\":17,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:12.200Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-finish\",\"time\":17,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:12.201Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":17,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:12.203Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":17,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:12.260Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-start\",\"time\":17,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"up\":{\"x\":0,\"y\":0,\"z\":1},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:12.270Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-finish\",\"time\":17,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:12.272Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":17,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:12.276Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"indicator-replace-before\",\"time\":17,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:12.276Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"indicator-replace-after\",\"time\":17,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:12.292Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":18,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:14.118Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":18,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:14.191Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-start\",\"time\":18,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:14.205Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-finish\",\"time\":18,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:14.207Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":18,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:14.209Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":18,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:14.264Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-start\",\"time\":18,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"up\":{\"x\":0,\"y\":0,\"z\":1},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:14.271Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-finish\",\"time\":18,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:14.272Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":18,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:14.277Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"indicator-replace-before\",\"time\":18,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:14.277Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"indicator-replace-after\",\"time\":18,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:14.294Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":19,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:16.117Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":19,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:16.187Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-start\",\"time\":19,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:16.200Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-finish\",\"time\":19,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:16.201Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":19,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:16.204Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":19,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:16.258Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-start\",\"time\":19,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"up\":{\"x\":0,\"y\":0,\"z\":1},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:16.267Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"draw-finish\",\"time\":19,\"graph\":\"viz3d-section-plot\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":0,\"y\":-2,\"z\":0},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:16.268Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"capture\",\"time\":19,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:16.273Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"indicator-replace-before\",\"time\":19,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"input\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:16.273Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  },
+  {
+    "level": "debug",
+    "message": "[3DWET camera] {\"phase\":\"indicator-replace-after\",\"time\":19,\"graph\":\"viz3d-plotly\",\"layout\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}},\"cached\":{\"up\":{\"x\":0,\"y\":0,\"z\":1},\"center\":{\"x\":0,\"y\":0,\"z\":0},\"eye\":{\"x\":-0.16786405430346343,\"y\":-1.225815207320844,\"z\":2.5483717815055504},\"projection\":{\"type\":\"orthographic\"}}}",
+    "timestamp": "2026-10-17T03:45:16.289Z",
+    "url": "http://127.0.0.1:59122/static/js/viz3d.js?v=18"
+  }
+]

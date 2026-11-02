@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "unchanged_files": 15,
+  "before": {
+    "bathymetry.nc": "ec69a78619a84a4691e2acf0bb4a9a2351e16486e16622327dc98c632f3b4d70",
+    "fabm.yaml": "9a57d61dfc2e4bf8e0b498fd3db62b4b5f19513a909cf25c9400a97130ddbfa1",
+    "fabm_init.nc": "209c4df8236cd6c30b30227a7a484ff5a1ebcf490bd017163ac19515f756c14b",
+    "getm.inp": "085a8f715a4cb464d6b5721264e2ab9126576cd3238efa86a03c6c02ce8bfac7",
+    "getm_fabm.inp": "016b5f7a33604d7f6060c5e462b45a647deeda8cf858e7922867f7d5537f1491",
+    "gotmturb.nml": "7d32a6544a9855addb1d71805ea21284d2356af700fe2fa0e42173c366543737",
+    "gotm_fabm.yaml": "d4ca40280966eb541d3fa07be9d23a9ec81a2f2f73f2ea58bdda700cfafa99a4",
+    "initial_conditions.json": "a24c42f3692b64dbcc63bb22669c64a588f4f359e5c076958ce9fbca3cd9addc",
+    "meteo.nc": "3a19e9d5adb8be1d8c1d7e545d36417ca9fe12a3eb67f05a079f5d964df0a036",
+    "meteo_draft.json": "36d5d27160f47ff2bce3c38ec6895a38cdc602ad247f507cfdd02d38ae9f3e1d",
+    "meteo_input.txt": "cecdf0039eff06d3ada1018a1ad8cb7387b99d8468a37ca131d96fa79622f1bf",
+    "output.yaml": "fee1752d9ff88766e3753930e0bcf58dc200ac62fe27042fc1fe872e21009b91",
+    "riverinfo.dat": "eeb584c6df450901fd894913ae663250d5ec92ca9293ff4e956306bf2d6e0b4c",
+    "rivers.nc": "a99cb678ec101050e645882619b3b222551617d7d79319c59c7b3b0623c4bd71",
+    "rivers_setup.json": "30d9ef65dadaea3413b2cde65bc858487d806ce28c30acf3d005f4d6865cebd0"
+  },
+  "after": {
+    "bathymetry.nc": "ec69a78619a84a4691e2acf0bb4a9a2351e16486e16622327dc98c632f3b4d70",
+    "fabm.yaml": "9a57d61dfc2e4bf8e0b498fd3db62b4b5f19513a909cf25c9400a97130ddbfa1",
+    "fabm_init.nc": "209c4df8236cd6c30b30227a7a484ff5a1ebcf490bd017163ac19515f756c14b",
+    "getm.inp": "085a8f715a4cb464d6b5721264e2ab9126576cd3238efa86a03c6c02ce8bfac7",
+    "getm_fabm.inp": "016b5f7a33604d7f6060c5e462b45a647deeda8cf858e7922867f7d5537f1491",
+    "gotmturb.nml": "7d32a6544a9855addb1d71805ea21284d2356af700fe2fa0e42173c366543737",
+    "gotm_fabm.yaml": "d4ca40280966eb541d3fa07be9d23a9ec81a2f2f73f2ea58bdda700cfafa99a4",
+    "initial_conditions.json": "a24c42f3692b64dbcc63bb22669c64a588f4f359e5c076958ce9fbca3cd9addc",
+    "meteo.nc": "3a19e9d5adb8be1d8c1d7e545d36417ca9fe12a3eb67f05a079f5d964df0a036",
+    "meteo_draft.json": "36d5d27160f47ff2bce3c38ec6895a38cdc602ad247f507cfdd02d38ae9f3e1d",
+    "meteo_input.txt": "cecdf0039eff06d3ada1018a1ad8cb7387b99d8468a37ca131d96fa79622f1bf",
+    "output.yaml": "fee1752d9ff88766e3753930e0bcf58dc200ac62fe27042fc1fe872e21009b91",
+    "riverinfo.dat": "eeb584c6df450901fd894913ae663250d5ec92ca9293ff4e956306bf2d6e0b4c",
+    "rivers.nc": "a99cb678ec101050e645882619b3b222551617d7d79319c59c7b3b0623c4bd71",
+    "rivers_setup.json": "30d9ef65dadaea3413b2cde65bc858487d806ce28c30acf3d005f4d6865cebd0"
+  }
+}

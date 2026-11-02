@@ -1,0 +1,12 @@
+Command: .venv/Scripts/python.exe -m pytest 3DWET/tests tests -q -ra
+Final terminal chunk (earlier progress dots omitted):
+....................................... [ 37%]
+......................................................................s. [ 56%]
+............ss.......................................................... [ 75%]
+........................................................................ [ 93%]
+........................                                                 [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_project_api.py:138: Creating symlinks requires Windows developer mode or administrator rights
+SKIPPED [1] tests\test_result_files.py:106: Creating symlinks requires OS privilege
+SKIPPED [1] tests\test_result_files.py:119: Creating symlinks requires OS privilege
+381 passed, 3 skipped in 30.44s

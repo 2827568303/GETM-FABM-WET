@@ -1,0 +1,17 @@
+.studio-language-dialog{width:min(480px,calc(100vw - 32px));padding:22px;border:1px solid #afc1cd;border-radius:4px;background:#fff;color:#304b5c;box-shadow:0 18px 60px #19364740;font:13px/1.6 'Segoe UI','Microsoft YaHei',sans-serif;max-height:90vh;overflow:auto}
+.studio-language-dialog::backdrop{background:#19364755}
+.studio-language-dialog h2{margin:0 0 16px;font-size:19px;font-weight:600}
+.studio-language-dialog label{display:block;margin:12px 0 5px;font-weight:600}
+.studio-language-dialog select,.studio-language-dialog input{display:block;max-width:100%;width:100%;box-sizing:border-box}
+.studio-language-dialog select{height:35px}
+.studio-language-preview{margin:16px 0;padding:12px;border:1px solid #cbdce6;background:#f2f7fa;border-radius:2px}
+.studio-language-preview p{margin:5px 0 0;color:#486c80}
+.studio-language-help{font-size:12px;color:#617785;margin:8px 0}
+.studio-language-dialog code{display:block;padding:8px;background:#f4f6f7;overflow-wrap:anywhere;font-size:11px;white-space:normal}
+.studio-language-error{min-height:1.6em;color:#8d552b;font-size:12px}
+.studio-language-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.studio-language-dialog button:focus-visible,.studio-language-dialog select:focus-visible,.studio-language-dialog input:focus-visible{outline:2px solid #398bb3;outline-offset:3px}
+
+.studio-language-dialog{position:fixed;inset:0;margin:auto;height:fit-content}
+.studio-language-dialog input[hidden]{display:none}
+.studio-language-dialog span.studio-language-help{margin-left:8px}

@@ -58,6 +58,7 @@
    logical, public                     :: metforcing=.false.
    logical, public                     :: on_grid=.true.
    logical, public                     :: calc_met=.false.
+   logical, public                     :: use_measured_swr=.false.
    integer, public                     :: met_method
    integer, public                     :: albedo_method=1
    integer, public                     :: fwf_method=0
@@ -67,6 +68,7 @@
    REALTYPE, public, dimension(:,:), allocatable, target  :: airp,tausx,tausy
    REALTYPE, public, dimension(:,:), allocatable, target  :: zenith_angle
    REALTYPE, public, dimension(:,:), allocatable, target  :: albedo,swr,shf
+   REALTYPE, public, dimension(:,:), allocatable, target  :: measured_swr,measured_swr_old
    REALTYPE, public, dimension(:,:), allocatable, target  :: u10,v10,t2,hum,tcc
    REALTYPE, public, dimension(:,:), allocatable, target  :: evap,precip
    REALTYPE, public                    :: cd_mom,cd_heat,cd_latent
@@ -138,7 +140,7 @@
                     meteo_ramp,metfmt,meteo_file, &
                     tx,ty,albedo_method,albedo_const, &
                     swr_const,shf_const,evap_const,precip_const, &
-                    precip_factor,evap_factor,exchange_method
+                    precip_factor,evap_factor,exchange_method,use_measured_swr
 !EOP
 !-------------------------------------------------------------------------
 !BOC
@@ -149,6 +151,25 @@
 #endif
    LEVEL1 'init_meteo'
    read(NAMLST,meteo)
+
+   if (use_measured_swr) then
+      if (.not. metforcing) then
+         FATAL 'use_measured_swr requires metforcing=.true.'
+         stop 'init_meteo'
+      end if
+      if (met_method .ne. 2) then
+         FATAL 'use_measured_swr requires met_method=2'
+         stop 'init_meteo'
+      end if
+      if (.not. calc_met) then
+         FATAL 'use_measured_swr requires calc_met=.true.'
+         stop 'init_meteo'
+      end if
+      if (hotstart) then
+         FATAL 'direct measured shortwave restart is not yet supported'
+         stop 'init_meteo'
+      end if
+   end if
 
    LEVEL2 'Metforcing=',metforcing
    if (metforcing) then
@@ -341,6 +362,16 @@
       allocate(swr_old(E2DFIELD),stat=rc)
       if (rc /= 0) stop 'init_meteo: Error allocating memory (swr_old)'
       swr_old = _ZERO_
+
+      if (use_measured_swr) then
+         allocate(measured_swr(E2DFIELD),stat=rc)
+         if (rc /= 0) stop 'init_meteo: Error allocating memory (measured_swr)'
+         measured_swr = _ZERO_
+
+         allocate(measured_swr_old(E2DFIELD),stat=rc)
+         if (rc /= 0) stop 'init_meteo: Error allocating memory (measured_swr_old)'
+         measured_swr_old = _ZERO_
+      end if
 
       allocate(shf_old(E2DFIELD),stat=rc)
       if (rc /= 0) stop 'init_meteo: Error allocating memory (shf_old)'
@@ -794,6 +825,9 @@
                         enddo
                      endif
                   end if
+                  if (use_measured_swr .and. .not. first) then
+                     d_swr = measured_swr - measured_swr_old
+                  end if
                   call update_2d_halo(tausx,tausx,az, &
                                       imin,jmin,imax,jmax,H_TAG)
                   call wait_halo(H_TAG)
@@ -842,20 +876,29 @@
 !$OMP END DO
                end if
                hh = secondsofday*(_ONE_/3600)
-               if (have_sst) then
+               if (have_sst .or. use_measured_swr) then
 !$OMP DO SCHEDULE(RUNTIME)
                   do j=jmin,jmax
                      do i=imin,imax
                         if (az(i,j) .ge. 1) then
                            zenith_angle(i,j) = solar_zenith_angle             &
                                 (yearday,hh,lonc(i,j),latc(i,j))
-                           swr(i,j) = short_wave_radiation(zenith_angle(i,j), &
-                                yearday,lonc(i,j),latc(i,j),tcc(i,j))
+                           if (use_measured_swr) then
+                              if (first) then
+                                 swr(i,j) = measured_swr(i,j)
+                              else
+                                 swr(i,j) = measured_swr_old(i,j) + t_frac*d_swr(i,j)
+                              end if
+                           else
+                              swr(i,j) = short_wave_radiation(zenith_angle(i,j), &
+                                   yearday,lonc(i,j),latc(i,j),tcc(i,j))
+                           end if
                            if (albedo_method .gt. 0) then
                               albedo(i,j) = albedo_water                      &
                                    (albedo_method,zenith_angle(i,j),yearday)
                            end if
                         end if
+                        if (az(i,j) < 1 .and. use_measured_swr) swr(i,j) = _ZERO_
                      end do
                   end do
 !$OMP END DO

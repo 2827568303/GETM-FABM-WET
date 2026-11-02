@@ -1,0 +1,3 @@
+﻿[ 9.69] HIT hwnd=0x13f0ea2 cls=ThunderRT6FormDC title='' prev=0 vis=0 style=0x06CA0000
+[ 9.69] EXITED code=0
+alive=True known={20909730: 3.6008963584899902}

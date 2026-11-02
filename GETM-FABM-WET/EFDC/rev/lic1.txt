@@ -1,0 +1,3 @@
+     0 solve_lic1 ready
+    82 [WriteFile] "*** ERROR:  RUNNING EFDCPlus WITHOUT LICENSE !        ***\r\n"
+    83    stack: EFDCPlus_084_OMP_180718.exe+0x7ed0f0 <- EFDCPlus_084_OMP_180718.exe+0x7ee088 <- EFDCPlus_084_OMP_180718.exe+0x79c25b <- ntdll.dll+0x40ee2 <- ntdll.dll+0x40737 <- ntdll.dll+0x40ee2 <- ntdll.dll+0xb235c <- ntdll.dll+0x95f9e <- ntdll.dll+0x51719 <- ntdll.dll+0x93b5e <- ntdll.dll+0x5243d <- ntdll.dll+0x93b5e

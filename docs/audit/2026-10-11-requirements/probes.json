@@ -1,0 +1,43 @@
+{
+  "vertical_average": {
+    "layers": [
+      10,
+      30
+    ],
+    "equal_layer_thickness_m": [
+      2,
+      2
+    ],
+    "expected_depth_average": 20,
+    "actual_requested_level_zero": 10.0,
+    "frontend_request": "/api/results/2d?var=temp&time=0&level=0",
+    "conforms": false
+  },
+  "pyabc_hook": {
+    "reported_engine": "pyabc.smc (using scipy inner loop)",
+    "actual_executor": "ScipyEngine",
+    "scipy_called": true,
+    "real_abc_smc": false,
+    "note": "Direct legacy class probe; current UI correctly exposes only SciPy."
+  },
+  "dashboard_chlorophyll_alias": {
+    "input_variables": [
+      "temp",
+      "abiotic_water_sO2W",
+      "abiotic_water_sNO3W",
+      "abiotic_water_sPO4W",
+      "wet_chla_calculator_result",
+      "POM_sDW"
+    ],
+    "returned_variables": [
+      "POM_sDW",
+      "abiotic_water_sNO3W",
+      "abiotic_water_sO2W",
+      "abiotic_water_sPO4W",
+      "temp"
+    ],
+    "expected_count": 6,
+    "actual_count": 5,
+    "missing_chlorophyll_output": true
+  }
+}

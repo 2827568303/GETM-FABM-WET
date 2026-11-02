@@ -1,0 +1,69 @@
+{
+  "application": "3dwet-studio",
+  "python": "3.10.11",
+  "frozen": true,
+  "model_root": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\release\\stage\\3DWETStudio\\3DWET",
+  "writable": true,
+  "dependencies": {
+    "Flask": true,
+    "numpy": true,
+    "scipy": true,
+    "netCDF4": true,
+    "PyYAML": true,
+    "pyshp": true,
+    "pyproj": true,
+    "psutil": true,
+    "waitress": true,
+    "pywebview": true
+  },
+  "solver": {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\release\\stage\\3DWETStudio\\3DWET\\bin\\getm_cartesian.exe",
+    "exists": true,
+    "runtime_verified": true,
+    "runtime": {
+      "ready": true,
+      "missing": [],
+      "loader_verified": true,
+      "runtime_dir": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\release\\stage\\3DWETStudio\\3DWET\\bin\\runtime",
+      "detail": "求解器及其 DLL 已成功加载。",
+      "probe_exit_code": 2
+    },
+    "note": "Loader verification does not verify scientific execution."
+  },
+  "self_test": {
+    "imports": [
+      "calibration",
+      "tkinter"
+    ],
+    "http": {
+      "/": 200,
+      "/static/brand/3dwet-192.png": 200,
+      "/static/brand/3dwet.ico": 200,
+      "/static/brand/3dwet.svg": 200,
+      "/static/css/studio.css?v=4": 200,
+      "/static/css/style.css?v=11": 200,
+      "/static/css/view_controls.css?v=1": 200,
+      "/static/js/app.js?v=23": 200,
+      "/static/js/calibration_metrics.js?v=2": 200,
+      "/static/js/ecology_network.js?v=2": 200,
+      "/static/js/gridstudio.js?v=1": 200,
+      "/static/js/model_dates.js?v=1": 200,
+      "/static/js/preprocess.js?v=6": 200,
+      "/static/js/projects_studio.js?v=1": 200,
+      "/static/js/studio.js?v=1": 200,
+      "/static/js/view_controls.js?v=1": 200,
+      "/static/js/viz3d.js?v=4": 200,
+      "/static/vendor/chart.umd.min.js": 200,
+      "/static/vendor/leaflet.css": 200,
+      "/static/vendor/leaflet.js": 200,
+      "/static/vendor/plotly-2.35.2.min.js": 200,
+      "/api/system/health": 200,
+      "/api/system/diagnostics": 200,
+      "/api/cases": 200,
+      "/api/run/status": 200,
+      "/api/calibration/points": 200,
+      "/api/preprocess/help": 200
+    },
+    "passed": true
+  }
+}

@@ -1,0 +1,7 @@
+﻿pid=45824 exe=C:\EFDC84_RUN\EFDC_Explorer8.4.exe
+[ 0.25] NEW  cls='VBMsoStdCompMgr'    title=''                             vis=0 rect=(0,0 0x0) hwnd=0x990c94
+[ 0.25] NEW  cls='ThunderRT6Main'     title='EFDC_Explorer8.4'             vis=1 rect=(853,533 0x0) hwnd=0x91a0eda
+[ 0.25] NEW  cls='IME'                title='Default IME'                  vis=0 rect=(0,0 0x0) hwnd=0xeae0ce4
+[ 3.06] NEW  cls='ThunderRT6FormDC'   title='EFDC_Explore8.0'              vis=0 rect=(0,5 815x639) hwnd=0x3f510f0
+[ 9.21] EXITED code=0
+done alive=True

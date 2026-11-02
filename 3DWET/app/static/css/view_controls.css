@@ -1,0 +1,18 @@
+.vc-graphic-host { position: relative; min-width: 0; }
+/* Leaflet's overlay canvas sits in an absolute, zero-width pane; keep the global canvas max-width from collapsing it. */
+.leaflet-container canvas { max-width: none; }
+.vc-plot-tools { position: absolute; z-index: 12; top: 6px; left: 6px; display: flex; gap: 3px; opacity: .8; }
+.vc-plot-tools:hover, .vc-plot-tools:focus-within { opacity: 1; }
+.vc-plot-tools button { background: rgba(15, 23, 42, .92); color: #cbd5e1; border: 1px solid #475569; border-radius: 4px; padding: 3px 7px; font: inherit; font-size: 11px; cursor: pointer; }
+.vc-plot-tools button:hover { color: #fff; border-color: #38bdf8; }
+.vc-canvas-viewport { position: relative; width: 100%; overflow: hidden; background: var(--bg-primary, #0f1117); }
+.vc-canvas-viewport canvas { display: block; width: 100%; height: auto; max-width: none; }
+.vc-graphic-host:fullscreen, .vc-graphic-host.vc-expanded { background: var(--bg-primary, #0f1117); width: 100vw !important; height: 100vh !important; padding: 12px; }
+.vc-graphic-host.vc-expanded { position: fixed; inset: 0; z-index: 10000; }
+.vc-graphic-host:fullscreen > .js-plotly-plot, .vc-graphic-host.vc-expanded > .js-plotly-plot,
+.vc-graphic-host:fullscreen > .leaflet-container, .vc-graphic-host.vc-expanded > .leaflet-container { height: 100% !important; }
+.vc-canvas-viewport:fullscreen canvas, .vc-canvas-viewport.vc-expanded canvas { width: 100%; height: auto; max-height: none; }
+.vc-graphic-host:fullscreen .vc-plot-tools, .vc-graphic-host.vc-expanded .vc-plot-tools { top: 10px; left: 10px; }
+#vc-app-scale { min-width: 48px; }
+@media (max-width: 1000px) { .grid-2 { grid-template-columns: 1fr; } .form-row { flex-wrap: wrap; } .topbar-right { gap: 5px; } }
+@media (max-width: 720px) { .sidebar { width: 160px; } .content-area { padding: 12px; } .topbar { padding: 0 10px; } }

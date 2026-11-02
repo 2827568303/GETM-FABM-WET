@@ -1,0 +1,27 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const source=fs.readFileSync('3DWET/app/static/js/app.js','utf8');
+const start=source.indexOf('async function updateSpatialSection()');
+const end=source.indexOf('// ── Calibration workflow helpers',start);
+const elements={'viz3d-section-axis':{value:'yz'},'viz3d-section-index':{value:'3'},'viz3d-iso-var':{value:'temp'},'viz3d-iso-time':{value:'2'}};
+let args;
+const context=vm.createContext({$:id=>elements[id],state:{activeCasePath:'A',timeLabels3d:['t0','t1','actual output time']},
+    ModelDates:{format:x=>x||''},window:{renderSpatialSection:async(...a)=>{args=a;}},toast:()=>{}});
+vm.runInContext(source.slice(start,end),context);
+(async()=>{assert.equal(typeof context.updateSpatialSection,'function');await context.updateSpatialSection();
+    assert.deepEqual(Array.from(args).slice(0,4),['temp',2,'yz',3]);
+    assert.equal(args[4].caseKey,'A');assert.equal(args[4].timeLabel,'actual output time');
+    const range={min:10,max:20,palette:'lake',mode:'locked'},markers=[],pending=[];
+    context.window.ScientificWorkspace={current:()=>({variable:'temp',time:2,range,ve:13.6}),dateLabel:()=> 'actual output time'};
+    context.window.renderSpatialSection=(...a)=>{args=a;return new Promise(resolve=>pending.push(resolve));};
+    context.window.set3DSectionIndicator=async(...a)=>markers.push(a);
+    let first=context.updateSpatialSection();
+    assert.strictEqual(args[4].range,range,'section inherits the exact displayed main range');
+    assert.equal(args[4].ve,13.6,'auto vertical scale uses the effective main scale');
+    elements['viz3d-section-index'].value='4';let second=context.updateSpatialSection();
+    pending[1]({grid_shape:[7,8],index:4});await second;
+    pending[0]({grid_shape:[7,8],index:3});await first;
+    assert.equal(markers.length,1,'late section cannot move or clear the latest indicator');
+    assert.equal(markers[0][1],4);
+    const html=fs.readFileSync('3DWET/app/templates/index.html','utf8');assert.match(html,/id="viz3d-section-plot"/);
+    console.log('spatial section controls: selected variable, time, fixed axis/index PASS');
+})().catch(e=>{console.error(e);process.exitCode=1;});

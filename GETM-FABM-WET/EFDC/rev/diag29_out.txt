@@ -1,0 +1,52 @@
+﻿[js]      0 diag28 ready
+pid 41504
+[js]     36 === �ӿ� itf=0x1dce1a0 clsid=4b03000000000000c000000000000046
+[js]     36   QI(IDispatch) hr=0x80004002 disp=0x0
+[js]     41 === �ӿ� itf=0x3bb3630 clsid=01fe430d93f0cf11894000a0c9054228
+[js]     41   QI(IDispatch) hr=0x00000000 disp=0x3bb3630
+[js]     41   IDispatch vtable=0x6bc51144 GetIDsOfNames=0x6bc55700 Invoke=0x6bc55630
+[js]    208 === �ӿ� itf=0x545002c clsid=c8e29963e463314f823cd256c17e7a13
+[js]    208   QI(IDispatch) hr=0x00000000 disp=0x545002c
+[js]    208   IDispatch vtable=0x7a40820 GetIDsOfNames=0x74219e20 Invoke=0x7421a040
+[js]    214 === �ӿ� itf=0x545000c clsid=a9130d33beb2cf4c9b8adc2047fb3d33
+[js]    214   QI(IDispatch) hr=0x00000000 disp=0x545000c
+[js]    214   IDispatch vtable=0x7a40fd0 GetIDsOfNames=0x74219e20 Invoke=0x7421a040
+[js]    238 === �ӿ� itf=0x7c92354 clsid=5ef0c38b6bd8d011a07500c04fb68820
+[js]    238   QI(IDispatch) hr=0x80004002 disp=0x0
+[js]   1396 === �ӿ� itf=0x7ed3b30 clsid=110fd9f6739cd311b32e00c04f990bb4
+[js]   1396   QI(IDispatch) hr=0x00000000 disp=0x7edacd8
+[js]   1396   IDispatch vtable=0x60bd4cf0 GetIDsOfNames=0x60c88470 Invoke=0x60c38420
+[js]   1400   GetIDsOfNames ["FolderExists"]
+[js]   1400   Invoke dispId=10017 flags=0x61bf2f58 argc=1033
+[js]   1400      args err Error: access violation accessing 0x3
+[js]   1400   GetIDsOfNames ["FolderExists"]
+[js]   1400   Invoke dispId=10017 flags=0x61bf2f58 argc=1033
+[js]   1400      args err Error: access violation accessing 0x3
+[js]   1400   GetIDsOfNames ["FolderExists"]
+[js]   1400   Invoke dispId=10017 flags=0x61bf2f58 argc=1033
+[js]   1400      args err Error: access violation accessing 0x3
+[js]   1403   GetIDsOfNames ["FolderExists"]
+[js]   1403   Invoke dispId=10017 flags=0x61bf2f58 argc=1033
+[js]   1403      args err Error: access violation accessing 0x3
+[js]   1404   GetIDsOfNames ["FolderExists"]
+[js]   1404   Invoke dispId=10017 flags=0x61bf2f58 argc=1033
+[js]   1404      args err Error: access violation accessing 0x3
+[js]   1404   GetIDsOfNames ["FolderExists"]
+[js]   1404   Invoke dispId=10017 flags=0x61bf2f58 argc=1033
+[js]   1404      args err Error: access violation accessing 0x3
+[js]   1427   GetIDsOfNames ["FolderExists"]
+[js]   1427   Invoke dispId=10017 flags=0x61bf2f58 argc=1033
+[js]   1427      args err Error: access violation accessing 0x3
+[js]   1433   GetIDsOfNames ["FolderExists"]
+[js]   1433   Invoke dispId=10017 flags=0x61bf2f58 argc=1033
+[js]   1433      args err Error: access violation accessing 0x3
+[js]   1433   GetIDsOfNames ["FolderExists"]
+[js]   1433   Invoke dispId=10017 flags=0x61bf2f58 argc=1033
+[js]   1433      args err Error: access violation accessing 0x3
+[js]   3804   GetIDsOfNames ["FolderExists"]
+[js]   3804   Invoke dispId=10017 flags=0x61bf2f58 argc=1033
+[js]   3804      args err Error: access violation accessing 0x3
+[js]   3804   GetIDsOfNames ["FolderExists"]
+[js]   3804   Invoke dispId=10017 flags=0x61bf2f58 argc=1033
+[js]   3804      args err Error: access violation accessing 0x3
+done

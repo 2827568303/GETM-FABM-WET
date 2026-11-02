@@ -1,0 +1,8 @@
+﻿[js]      0 __vbaEnd @ 0x61c327b8
+[js]      0 __vbaEnd replaced
+[js]      0 SoftModalMessageBox swallowed
+[js]      0 diag31 ready
+pid 20504
+[js]   3481   msgbox swallowed: "There is an error when checking the license. Error 481 (Invalid picture)"
+PROCESS EXITED code=0 at 3.7s
+elapsed=3.7

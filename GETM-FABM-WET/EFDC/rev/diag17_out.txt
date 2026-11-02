@@ -1,0 +1,9 @@
+﻿[js]      1 attach ʧ�� 00401220: Error: unable to intercept function at 00401220; please file a bug
+[js]      1 attach ʧ�� 00401280: Error: unable to intercept function at 00401280; no instruction could be decoded there
+[js]      1 attach ʧ�� 004012a0: Error: unable to intercept function at 004012A0; please file a bug
+[js]      1 attach ʧ�� 00401360: Error: unable to intercept function at 00401360; please file a bug
+[js]      1 attach ʧ�� 004013b0: Error: unable to intercept function at 004013B0; please file a bug
+[js]      2 attach ʧ�� 004016a4: Error: unable to intercept function at 004016A4; please file a bug
+[js]      3 diag17 ready, targets=60
+pid 48584
+done

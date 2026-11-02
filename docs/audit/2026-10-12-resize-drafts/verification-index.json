@@ -1,0 +1,67 @@
+{
+  "new_data": {
+    "path": "build/external-resize-20261012-04/verification.json",
+    "sha256": "230aae3faa05dd4a5940a5775ae9fa9c98d94e7a4a98e636ca4704ca95e50336",
+    "passed": true,
+    "scope": "Deterministic synthetic integration scenario; not observational, scientific-accuracy, annual stability, or complete browser UX validation.",
+    "seed": 2026101204,
+    "solver_sha256": null,
+    "features": {}
+  },
+  "feature_matrix": {
+    "path": "build/features-resize-20261012-04/verification.json",
+    "sha256": "2401bdd78e686b3460e8b1c2825bd7c63d0b77db4008d27d6885d7622981533c",
+    "passed": true,
+    "scope": "Native short-run feature integration with synthetic observations; not scientific accuracy, annual stability, or complete browser UX validation.",
+    "seed": null,
+    "solver_sha256": "15884cc236ef8526cd28f51dde491e95d6bd87a0f340c291bcce10aa8bbdf9e4",
+    "features": {
+      "case_inventory_directory": "passed",
+      "case_save_as_open_project_import_delete_roundtrip": "passed",
+      "points_drag_crud_undo_redo_calibration_mapping": "passed",
+      "ecology_network_real_edges_scalar_edit_guards": "passed",
+      "physics_namelist_scalar_persistence_guards": "passed",
+      "diagnostic_navigation_safe_repair_stale_guard": "passed",
+      "fish_ghg_module_switches_persist_and_native_ready": "passed",
+      "eco_engine_switches_persist": "passed",
+      "time_hotstart_output_configuration_validation": "passed",
+      "remaining_help_estimate_river_crud_fabm_config": "passed",
+      "synthetic_observations_native_optimization_apply_comparison": "passed",
+      "native_calibration_stop_status_persists_after_worker": "passed",
+      "native_run_start_status_duplicate_guard_stop": "passed"
+    }
+  },
+  "drafts_rerun": {
+    "path": "docs/audit/2026-10-12-resize-drafts/drafts-rerun.json",
+    "sha256": "0ca595e63b26bda5fbedc924ba390e49b4d4db882722c28a535229381f4b0c2a",
+    "passed": true,
+    "scope": "Generated seed 2026101203, browser hidden-edit save and native rerun; not a full five-workflow round",
+    "seed": null,
+    "solver_sha256": null,
+    "features": {
+      "features": null
+    }
+  },
+  "results_experience": {
+    "path": "build/results-resize-20261012-04/verification.json",
+    "sha256": "14a2dc5f55f72c5e29f6cd9cbc83eb37706f038bcc85b0f51a98fb66e6f98cf2",
+    "passed": true,
+    "solver_sha256": "15884cc236ef8526cd28f51dde491e95d6bd87a0f340c291bcce10aa8bbdf9e4",
+    "variables": 814,
+    "scope": "Short native integration; does not establish scientific accuracy."
+  },
+  "builtin_cases": {
+    "path": "build\\builtin-final-candidate-20261012-02\\verification.json",
+    "sha256": "3a3cbb2b9d02bccd13ad547430117d9e7eaab307fa3f385338a6548ebaea6b99",
+    "passed": true,
+    "cases": [
+      "Lake Dianchi",
+      "Lake Luoma",
+      "NativeTest",
+      "Theoretical lake",
+      "_fish_probe"
+    ],
+    "solver_sha256": "15884cc236ef8526cd28f51dde491e95d6bd87a0f340c291bcce10aa8bbdf9e4",
+    "scope": "Short native integration and numerical-finiteness checks; not scientific accuracy or annual stability validation."
+  }
+}

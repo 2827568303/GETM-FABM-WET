@@ -42,7 +42,7 @@ function _ppCrsFields(prefix) {
 function _ppStatus(id, msg, ok = true) {
     const el = document.getElementById(id);
     if (!el) return;
-    el.innerHTML = `<span style="color:${ok ? 'var(--success)' : 'var(--danger)'};font-size:12px;">${msg}</span>`;
+    el.innerHTML = `<span style="color:${ok ? 'var(--success)' : 'var(--danger)'};font-size:12px;">${ModelDates.formatText(msg)}</span>`;
 }
 
 // Generic shapefile multipart upload
@@ -75,17 +75,18 @@ async function uploadBoundary() {
     state.preprocess.bbox = res.bbox;
     // rings_preview: 每个 polygon 的外环（多部件湖体如滇池 = 外海 + 草海）
     state.preprocess.boundary_rings = res.rings_preview || [res.coords_preview];
+    state.preprocess.boundary_holes = res.holes_preview || [];
     state.preprocess.boundary_preview = res.coords_preview;  // 兼容旧字段
     const [xmin, ymin, xmax, ymax] = res.bbox;
     const w = (xmax - xmin).toFixed(0), h = (ymax - ymin).toFixed(0);
-    _ppStatus('pp-boundary-status', `✓ 上传成功`, true);
+    _ppStatus('pp-boundary-status', `${StudioIcons.svg('check')} 上传成功`, true);
     const warnHtml = (res.warnings || []).map(w =>
-        `<div style="color:var(--warning);font-size:11px;margin-top:4px;">⚠ ${w}</div>`).join('');
+        `<div style="color:var(--warning);font-size:11px;margin-top:4px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-warning"></use></svg> ${w}</div>`).join('');
     const convHtml = res.conversion
-        ? `<div style="color:var(--success);font-size:11px;margin-top:4px;">🔄 ${res.conversion}</div>` : '';
+        ? `<div style="color:var(--success);font-size:11px;margin-top:4px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-refresh"></use></svg> ${res.conversion}</div>` : '';
     document.getElementById('pp-boundary-info').innerHTML = `
         <div>点数: <strong>${res.n_points}</strong></div>
-        <div>多边形个数: <strong>${res.n_polygons || 1}</strong></div>
+        <div>外环/湖岸片区: <strong>${res.n_polygons || 1}</strong> · 洞: <strong>${res.n_holes || 0}</strong></div>
         <div>范围: ${w}m × ${h}m</div>
         <div>坐标系: <strong>${res.crs_type}</strong>${res.utm_zone ? ' (UTM zone ' + res.utm_zone + ')' : ''}</div>
         <div>原始 CRS: ${res.orig_crs_type}</div>${warnHtml}${convHtml}`;
@@ -100,7 +101,7 @@ async function uploadBathymetry() {
     if (res.error) {
         _ppStatus('pp-bathy-status', '失败: ' + res.error, false);
         if (res.fields) {
-            document.getElementById('pp-bathy-info').innerHTML = `可用字段: <code>${res.fields.join(', ')}</code>`;
+            document.getElementById('pp-bathy-info').innerHTML = `可用字段: <code>${res.fields.map(escapeHtml).join(', ')}</code>`;
         }
         return;
     }
@@ -109,18 +110,22 @@ async function uploadBathymetry() {
     state.preprocess.bathy_preview_points = res.preview_points;
     state.preprocess.bathy_preview_polys = res.preview_polygons;
     state.preprocess.bathy_preview_depths = res.preview_depths;
-    _ppStatus('pp-bathy-status', '✓ 上传成功', true);
+    _ppStatus('pp-bathy-status', `${StudioIcons.svg('check')} 上传成功`, true);
     const warnHtml = (res.warnings || []).map(w =>
-        `<div style="color:var(--warning);font-size:11px;margin-top:4px;">⚠ ${w}</div>`).join('');
+        `<div style="color:var(--warning);font-size:11px;margin-top:4px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-warning"></use></svg> ${w}</div>`).join('');
     const convHtml = res.conversion
-        ? `<div style="color:var(--success);font-size:11px;margin-top:4px;">🔄 ${res.conversion}</div>` : '';
+        ? `<div style="color:var(--success);font-size:11px;margin-top:4px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-refresh"></use></svg> ${res.conversion}</div>` : '';
     const fitHtml = (res.inside_ratio != null)
         ? `<div style="font-size:11px;margin-top:2px;">对齐质量: 落入边界内采样点 <strong>${(res.inside_ratio * 100).toFixed(1)}%</strong></div>` : '';
     document.getElementById('pp-bathy-info').innerHTML = `
         <div>几何类型: <strong>${res.geom_type}</strong></div>
         <div>要素数: <strong>${res.n_features}</strong></div>
         <div>水深字段: <code>${res.depth_field}</code></div>
-        <div>水深范围: <strong>${res.depth_range[0].toFixed(2)} ~ ${res.depth_range[1].toFixed(2)} m</strong></div>${warnHtml}${convHtml}${fitHtml}`;
+        <div>可用字段: <code>${(res.fields || []).map(escapeHtml).join(', ')}</code></div>
+        <div>源 CRS: <strong>${escapeHtml(res.source_crs || '未知')}</strong></div>
+        <div>目标 CRS: <strong>${escapeHtml(res.target_crs || res.crs_type || '未知')}</strong></div>
+        <div>水深范围: <strong>${res.depth_range[0].toFixed(2)} ~ ${res.depth_range[1].toFixed(2)} m</strong></div>
+        ${res.geom_type === 'contour' ? `<div>等深线采样: <strong>${res.n_sample_points}</strong> 点，预览间距约 ${res.sample_spacing_m} m；插值时按网格间距加密</div>` : ''}${warnHtml}${convHtml}${fitHtml}`;
     drawBathymetryPreview(res);
 }
 
@@ -147,13 +152,13 @@ async function uploadBathymetryXyz() {
     state.preprocess.bathy_preview_polys = [];
     state.preprocess.bathy_preview_depths = res.preview_depths;
     const warnHtml = (res.warnings || []).map(w =>
-        `<div style="color:var(--warning);font-size:11px;margin-top:4px;">⚠ ${w}</div>`).join('');
+        `<div style="color:var(--warning);font-size:11px;margin-top:4px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-warning"></use></svg> ${w}</div>`).join('');
     document.getElementById('pp-bathy-info').innerHTML = `
         <div>来源: <strong>文本文件 (x,y,depth)</strong></div>
         <div>有效点数: <strong>${res.n_features}</strong>${res.n_bad_rows ? ` （跳过 ${res.n_bad_rows} 行）` : ''}</div>
         <div>水深范围: <strong>${res.depth_range[0].toFixed(2)} ~ ${res.depth_range[1].toFixed(2)} m</strong></div>
         <div>坐标系: <strong>${res.crs_type}</strong>${warnHtml}`;
-    _ppStatus('pp-bathy-status', '✓ 文本导入成功，继续“网格生成 → 插值”', true);
+    _ppStatus('pp-bathy-status', `${StudioIcons.svg('check')} 文本导入成功，继续“网格生成 → 插值”`, true);
     drawBathymetryPreview(res);
 }
 
@@ -183,14 +188,14 @@ async function uploadHypsograph() {
     state.preprocess.bathy_preview_polys = [];
     state.preprocess.bathy_preview_depths = res.preview_depths;
     const warnHtml = (res.warnings || []).map(w =>
-        `<div style="color:var(--warning);font-size:11px;margin-top:4px;">⚠ ${w}</div>`).join('');
+        `<div style="color:var(--warning);font-size:11px;margin-top:4px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-warning"></use></svg> ${w}</div>`).join('');
     document.getElementById('pp-bathy-info').innerHTML = `
         <div>来源: <strong>深度-面积曲线</strong>（自动生成圆形湖泊）</div>
         <div>层数: <strong>${res.n_levels}</strong>，测深点 <strong>${res.n_points}</strong></div>
         <div>最大水深: <strong>${res.max_depth_m} m</strong></div>
         <div>湖面面积: <strong>${(res.surface_area_m2 / 1e6).toFixed(3)} km²</strong>（半径 ${res.lake_radius_m} m）</div>
         <div>坐标系: <strong>${res.crs_type}</strong>${warnHtml}`;
-    _ppStatus('pp-bathy-status', '✓ 已从曲线生成边界 + 测深点，下一步“网格生成”', true);
+    _ppStatus('pp-bathy-status', `${StudioIcons.svg('check')} 已从曲线生成边界 + 测深点，下一步“网格生成”`, true);
     drawBathymetryPreview(res);
 }
 
@@ -219,7 +224,7 @@ async function generateGrid() {
     state.preprocess.grid_y0 = res.y0;
     state.preprocess.grid_dx = res.dx;
     state.preprocess.grid_dy = res.dy;
-    _ppStatus('pp-grid-status', `✓ 网格生成`, true);
+    _ppStatus('pp-grid-status', `${StudioIcons.svg('check')} 网格生成`, true);
     document.getElementById('pp-grid-info').innerHTML = `
         <div>网格: <strong>${res.nx} × ${res.ny}</strong> = ${res.n_total_cells} 格</div>
         <div>水域格数: <strong style="color:var(--info)">${res.n_water_cells}</strong> (${(res.water_ratio * 100).toFixed(1)}%)</div>
@@ -244,7 +249,7 @@ async function interpolateDepth() {
     });
     if (res.error) { _ppStatus('pp-interp-status', '失败: ' + res.error, false); return; }
     state.preprocess.depth_array = res.depth_array;
-    _ppStatus('pp-interp-status', '✓ 插值完成', true);
+    _ppStatus('pp-interp-status', `${StudioIcons.svg('check')} 插值完成`, true);
     document.getElementById('pp-depth-info').innerHTML = `
         <div>水域格数: <strong>${res.n_water_cells}</strong></div>
         <div>水深范围: <strong>${res.depth_min.toFixed(2)} ~ ${res.depth_max.toFixed(2)} m</strong></div>
@@ -269,16 +274,14 @@ async function saveBathymetry() {
         },
     });
     if (res.error) { _ppStatus('pp-save-status', '失败: ' + res.error, false); return; }
-    _ppStatus('pp-save-status', `✓ 已保存到 ${res.path}`, true);
-    // Update topbar case badge so the user sees the case is now active
-    state.activeCase = res.case_name;
-    if (document.getElementById('case-badge')) {
-        document.getElementById('case-badge').style.display = 'inline';
-        document.getElementById('case-badge').textContent = res.case_name;
+    _ppStatus('pp-save-status', `${StudioIcons.svg('check')} 已保存到 ${res.path}`, true);
+    // Populate path, modules, result state and status bar through the same
+    // loader used by case management; a name-only update retains the old case.
+    if (!await loadCase(res.case_name)) {
+        _ppStatus('pp-save-status', `已保存到 ${res.path}，但加载案例失败，请在案例管理中重新加载。`, false);
+        return;
     }
-    if (document.getElementById('footer-status')) {
-        document.getElementById('footer-status').textContent = `案例: ${res.case_name}`;
-    }
+    navigate('preprocess');
     document.getElementById('pp-depth-info').innerHTML += `
         <div style="margin-top:8px;color:var(--success);">案例 <strong>${res.case_name}</strong> 已加载</div>
         <div>水域格数: ${res.n_water_cells}，面积 ${(res.lake_area_m2 / 1e6).toFixed(3)} km²</div>
@@ -335,6 +338,18 @@ function drawBoundaryPreview(rings, bbox) {
     _ppDrawBoundaryRings(ctx, rings, tx, ty, {
         strokeStyle: '#3b82f6', lineWidth: 1.5, fillStyle: 'rgba(59,130,246,0.15)',
     });
+    _ppDrawBoundaryHoles(ctx, tx, ty);
+}
+
+function _ppDrawBoundaryHoles(ctx, tx, ty) {
+    const holes = state.preprocess.boundary_holes || [];
+    if (!holes.length) return;
+    ctx.save();
+    ctx.setLineDash([3, 2]);
+    _ppDrawBoundaryRings(ctx, holes, tx, ty, {
+        strokeStyle: '#f59e0b', lineWidth: 1.1,
+    });
+    ctx.restore();
 }
 
 function drawBathymetryPreview(res) {
@@ -346,6 +361,7 @@ function drawBathymetryPreview(res) {
         _ppDrawBoundaryRings(ctx, bndRings, tx, ty, {
             strokeStyle: 'rgba(255,255,255,0.3)', lineWidth: 1,
         });
+        _ppDrawBoundaryHoles(ctx, tx, ty);
     }
     const depths = res.preview_depths || [];
     if (res.geom_type === 'point') {
@@ -359,6 +375,23 @@ function drawBathymetryPreview(res) {
             ctx.beginPath();
             ctx.arc(tx(p[0]), ty(p[1]), 3, 0, 2 * Math.PI);
             ctx.fill();
+        });
+    } else if (res.geom_type === 'contour') {
+        const lines = res.preview_lines || [];
+        const lineDepths = res.preview_line_depths || [];
+        const dmin = res.depth_range[0], dmax = res.depth_range[1];
+        const range = dmax - dmin || 1;
+        lines.forEach((line, i) => {
+            if (!line || line.length < 2) return;
+            const t = ((lineDepths[i] ?? dmin) - dmin) / range;
+            ctx.strokeStyle = _ppHeatColor(t);
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            line.forEach((p, j) => {
+                const X = tx(p[0]), Y = ty(p[1]);
+                if (j === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+            });
+            ctx.stroke();
         });
     } else {
         const polys = res.preview_polygons || [];
@@ -391,6 +424,7 @@ function drawGridPreview(res) {
         _ppDrawBoundaryRings(ctx, bndRings, tx, ty, {
             strokeStyle: '#ef4444', lineWidth: 1.2,
         });
+        _ppDrawBoundaryHoles(ctx, tx, ty);
     }
     // Draw grid cells: water=blue, land=grey
     const { nx, ny, mask, x0, y0, dx, dy } = res;
@@ -537,8 +571,9 @@ function _ppRedrawDepth() {
         _ppDrawBoundaryRings(ctx, bndRings, tx, ty, {
             strokeStyle: 'rgba(255,255,255,0.6)', lineWidth: 1,
         });
+        _ppDrawBoundaryHoles(ctx, tx, ty);
     }
-    // River marks (▲ symbol + name)
+    // River marks (<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-river"></use></svg> symbol + name)
     (state.preprocess.rivers || []).forEach(r => {
         const X = tx(x0 + (r.i - 0.5) * dx);
         const Y = ty(y0 + (r.j - 0.5) * dy);
@@ -568,6 +603,7 @@ function _ppBindDepthCanvas() {
     if (!canvas || canvas._ppBound) return;
     canvas._ppBound = true;
     canvas.addEventListener('wheel', ev => {
+        if (ev.ctrlKey) return;
         if (!state.preprocess._depthOff) return;
         ev.preventDefault();
         const T = _ppDepthTransform();
@@ -611,7 +647,7 @@ function _ppBindDepthCanvas() {
     });
     window.addEventListener('mouseup', () => { drag = null; });
     // Click to mark a river cell
-    canvas.addEventListener('click', ev => {
+    canvas.addEventListener('click', async ev => {
         if (!state.preprocess._depthOff) return;
         if (!state.preprocess._riverMode) return;
         const T = _ppDepthTransform();
@@ -629,7 +665,7 @@ function _ppBindDepthCanvas() {
         if ((state.preprocess.rivers || []).some(r => r.i === i && r.j === j)) {
             toast(`(${i}, ${j}) 已标记过河流`, 'warning'); return;
         }
-        const name = prompt(`在格点 (i=${i}, j=${j}) 添加河流\n河流名（英文大写，如 PANLONGJING）：`, '');
+        const name = await window.promptStudio(`在格点 (i=${i}, j=${j}) 添加河流\n河流名（英文大写，如 PANLONGJING）：`, '');
         if (!name || !name.trim()) return;
         const clean = name.trim().toUpperCase();
         if (!/^[A-Z_][A-Z0-9_]{0,23}$/.test(clean)) { toast('河流名须为英文/数字/下划线', 'error'); return; }
@@ -644,7 +680,7 @@ function toggleRiverMarkMode() {
     state.preprocess._riverMode = !state.preprocess._riverMode;
     const btn = document.getElementById('pp-river-mode-btn');
     if (btn) {
-        btn.textContent = state.preprocess._riverMode ? '🖱️ 标记模式: 开' : '🖱️ 标记模式: 关';
+        StudioIcons.setStatus(btn, 'pointer', state.preprocess._riverMode ? '标记模式: 开' : '标记模式: 关');
         btn.style.background = state.preprocess._riverMode ? 'var(--success)' : '';
         btn.style.color = state.preprocess._riverMode ? '#fff' : '';
     }
@@ -674,7 +710,7 @@ function _ppRenderRiverList() {
     }
     el.innerHTML = rivers.map((r, k) =>
         `<div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid var(--border);">
-            <span style="color:var(--success);">▲</span>
+            <span style="color:var(--success);"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-river"></use></svg></span>
             <strong>${r.name}</strong>
             <span style="color:var(--text-muted);">i=${r.i}, j=${r.j}</span>
             <button class="btn" style="padding:1px 8px;font-size:11px;margin-left:auto;" onclick="removePpRiver(${k})">删除</button>

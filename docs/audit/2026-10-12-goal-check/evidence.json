@@ -1,0 +1,553 @@
+{
+  "collected_utc": "2026-10-12T06:59:05.045367+00:00",
+  "python_exit_code": 1,
+  "javascript_groups": 24,
+  "javascript_failed": 0,
+  "files": {
+    ".trae/documents/3DWET_GUI_完成方案.md": {
+      "exists": true,
+      "sha256": "d69488b2a39831c666d153b812f3470dec5bc90fbbb68f046ea7d14ef1751319"
+    },
+    ".trae/documents/preprocess_redesign.md": {
+      "exists": true,
+      "sha256": "8d192f6e799efc684b9409e4eed47047f7ce0852ea29ad15dd6984dcf6855599"
+    },
+    "docs/superpowers/plans/2026-10-11-repair-and-five-workflows.md": {
+      "exists": true,
+      "sha256": "12dff7fac99344fb3169d470d7fe1ab0ee82c72f162cc3ea7b970b4b3e92ec0a"
+    },
+    "姚杨杰/GETM-FABM-WET_3DWET模型完整说明.docx": {
+      "exists": true,
+      "sha256": "5a47265639702ea494decf39a4c906a5f509c824fa28d617a362477a7eddc23f"
+    },
+    "release/installer-manifest.json": {
+      "exists": true,
+      "sha256": "75716fe48757f10d69cc4dba6d4eb1fa662ffa62956f79f9ddf05b6fcd517ea2"
+    },
+    "release/3DWETStudio-Setup.exe": {
+      "exists": true,
+      "sha256": "66edf7de1681a9cfd64852c96bbf7836e7c29508f5ac3d294924fbb1b75c0952"
+    },
+    "3DWET/bin/getm_cartesian.exe": {
+      "exists": true,
+      "sha256": "f06a7219490a9d160f72c18788db463fe9cf1ec4881b0b0c52141d8762e65e8a"
+    },
+    "build/native-restart-fix/getm_cartesian.exe": {
+      "exists": true,
+      "sha256": "15884cc236ef8526cd28f51dde491e95d6bd87a0f340c291bcce10aa8bbdf9e4"
+    },
+    "release/stage/3DWETStudio/3DWET/bin/getm_cartesian.exe": {
+      "exists": true,
+      "sha256": "f06a7219490a9d160f72c18788db463fe9cf1ec4881b0b0c52141d8762e65e8a"
+    },
+    "3DWET/app/static/js/i18n.js": {
+      "exists": true,
+      "sha256": "34a440e74944a5b8887ff64380699825cde7004ce7b1ffcbd465cbb09f947511"
+    },
+    "3DWET/app/static/js/app.js": {
+      "exists": true,
+      "sha256": "2c5fe8052fa88777e39667650555195f05a158357fc83ea24b9e647a4294525b"
+    },
+    "build/builtin-final-candidate-20261012-02/3DWET/bin/getm_cartesian.exe": {
+      "exists": true,
+      "sha256": "15884cc236ef8526cd28f51dde491e95d6bd87a0f340c291bcce10aa8bbdf9e4"
+    }
+  },
+  "reports": {
+    "build/builtin-final-candidate-20261012-02/verification.json": {
+      "passed": true,
+      "duration_seconds": 1200,
+      "repetitions": 1,
+      "results_only": false,
+      "keep_defaults": true,
+      "scope": "Short native integration and numerical-finiteness checks; not scientific accuracy or annual stability validation.",
+      "cases": [
+        "Lake Dianchi",
+        "Lake Luoma",
+        "NativeTest",
+        "Theoretical lake",
+        "_fish_probe"
+      ],
+      "case_results": [
+        {
+          "case": "Lake Dianchi",
+          "passed": true
+        },
+        {
+          "case": "Lake Luoma",
+          "passed": true
+        },
+        {
+          "case": "NativeTest",
+          "passed": true
+        },
+        {
+          "case": "Theoretical lake",
+          "passed": true
+        },
+        {
+          "case": "_fish_probe",
+          "passed": true
+        }
+      ],
+      "sha256": "3a3cbb2b9d02bccd13ad547430117d9e7eaab307fa3f385338a6548ebaea6b99"
+    },
+    "build/external-language-20261012-05/verification.json": {
+      "passed": true,
+      "duration_seconds": 1200,
+      "scope": "Deterministic synthetic integration scenario; not observational, scientific-accuracy, annual stability, or complete browser UX validation.",
+      "url": "http://127.0.0.1:57009",
+      "sha256": "db0f44a6b68f2b8addf2b148d93c66b3b9da9489aafe880513fefef8ce8c88c3"
+    },
+    "build/features-resize-20261012-04/verification.json": {
+      "passed": true,
+      "source_case": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\external-resize-20261012-04\\3DWET\\case\\Imported Random Lake",
+      "work": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\features-resize-20261012-04",
+      "scope": "Native short-run feature integration with synthetic observations; not scientific accuracy, annual stability, or complete browser UX validation.",
+      "solver_sha256": "15884cc236ef8526cd28f51dde491e95d6bd87a0f340c291bcce10aa8bbdf9e4",
+      "calibration_job_id": "20261012_143115_2a86f4",
+      "features": {
+        "case_inventory_directory": {
+          "status": "passed",
+          "seconds": 0.078,
+          "details": {
+            "inputs": 9,
+            "cases": 2,
+            "directory_listing": {
+              "entries": [
+                {
+                  "is_dir": true,
+                  "name": "Calibration Lake",
+                  "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\features-resize-20261012-04\\3DWET\\case\\Calibration Lake"
+                },
+                {
+                  "is_dir": true,
+                  "name": "Feature Lake",
+                  "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\features-resize-20261012-04\\3DWET\\case\\Feature Lake"
+                }
+              ],
+              "parent": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\features-resize-20261012-04\\3DWET",
+              "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\features-resize-20261012-04\\3DWET\\case"
+            }
+          }
+        },
+        "case_save_as_open_project_import_delete_roundtrip": {
+          "status": "passed",
+          "seconds": 0.984,
+          "details": {
+            "manifest_files": 18,
+            "input_sha256": "b1cee585cceadcceada79c67b451b31d35eab9a34d94c0c3b44b221804b18679",
+            "duplicate_rejected": {
+              "error": "案例名称已存在"
+            },
+            "created_cases_deleted": true
+          }
+        },
+        "points_drag_crud_undo_redo_calibration_mapping": {
+          "status": "passed",
+          "seconds": 0.391,
+          "details": {
+            "created_dragged_saved_deleted": true,
+            "undo_redo": true,
+            "land_rejected": true,
+            "mapping": [
+              1,
+              6
+            ]
+          }
+        },
+        "ecology_network_real_edges_scalar_edit_guards": {
+          "status": "passed",
+          "seconds": 1.437,
+          "details": {
+            "nodes": 20,
+            "edges": 357,
+            "scalar_persisted": true,
+            "stale_rejected": true,
+            "invalid_coupling_rejected": true
+          }
+        },
+        "physics_namelist_scalar_persistence_guards": {
+          "status": "passed",
+          "seconds": 0.094,
+          "details": {
+            "edit_backup_restore": true,
+            "stale_type_path_guards": true,
+            "parameters": 126
+          }
+        },
+        "diagnostic_navigation_safe_repair_stale_guard": {
+          "status": "passed",
+          "seconds": 1.594,
+          "details": {
+            "checks": 5,
+            "actions": [
+              {
+                "control": "pp-grid-canvas",
+                "file": "bathymetry.nc",
+                "label": "定位设置",
+                "page": "preprocess",
+                "type": "locate"
+              },
+              {
+                "control": "time-dt",
+                "file": "getm.inp",
+                "label": "定位设置",
+                "page": "time",
+                "type": "locate"
+              },
+              {
+                "control": "physics-rows",
+                "file": "getm.inp",
+                "label": "定位设置",
+                "page": "projecttools",
+                "selector": "[aria-label=\"domain.check_cfl\"]",
+                "type": "locate"
+              },
+              {
+                "file": "getm.inp",
+                "id": "enable_cfl",
+                "label": "启用 CFL 检查",
+                "type": "repair"
+              },
+              {
+                "control": "output-modules",
+                "file": "output.yaml",
+                "label": "定位设置",
+                "page": "time",
+                "type": "locate"
+              },
+              {
+                "file": "output.yaml",
+                "id": "standard_output",
+                "label": "采用当前案例的标准输出订阅",
+                "type": "repair"
+              },
+              {
+                "control": "output-modules",
+                "file": "output.yaml",
+                "label": "定位设置",
+                "page": "time",
+                "type": "locate"
+              }
+            ],
+            "repair": {
+              "action": "fix_sync_interval",
+              "backup": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\features-resize-20261012-04\\3DWET\\case\\Feature Lake\\backups\\output.yaml.20261012T063107999658-c35e900a.bak",
+              "case_path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\features-resize-20261012-04\\3DWET\\case\\Feature Lake",
+              "file": "output.yaml",
+              "revision": "c100bddf2b5987d6ed7d40f5fcd06fb06380248ad86d543acd24ec0d9e796be5",
+              "success": true
+            },
+            "final_ok": true
+          }
+        },
+        "fish_ghg_module_switches_persist_and_native_ready": {
+          "status": "passed",
+          "seconds": 3.656,
+          "details": {
+            "fish_off_on": true,
+            "ghg_off_on": true,
+            "executable_ready": true,
+            "draft_persisted": true
+          }
+        },
+        "eco_engine_switches_persist": {
+          "status": "passed",
+          "seconds": 0.797,
+          "details": {
+            "direct_off_on": true,
+            "module_selection_off": true
+          }
+        },
+        "time_hotstart_output_configuration_validation": {
+          "status": "passed",
+          "seconds": 0.875,
+          "details": {
+            "time": {
+              "start": "2020-01-01 00:00:00",
+              "step_2d": 8640,
+              "step_3d": 8640,
+              "stop": "2020-01-01 00:20:00",
+              "timestep": 2
+            },
+            "checkpoint_configuration": true,
+            "missing_restart_rejected": true,
+            "restart_continuation": "Requires separate native consistency acceptance",
+            "output_subscription": true,
+            "rejected_negative_dt_zero_sync_unregistered_v": true
+          }
+        },
+        "remaining_help_estimate_river_crud_fabm_config": {
+          "status": "passed",
+          "seconds": 1.515,
+          "details": {
+            "help_shapes": true,
+            "estimate": {
+              "cfl_dt": 2.6628074742685257,
+              "cfl_max": 2.6628074742685257,
+              "cfl_ok": true,
+              "duration_days": 0.013888888888888888,
+              "estimated_hours": 0.0023166666666666665,
+              "estimated_minutes": 0.13899999999999998,
+              "estimated_seconds": 8.34,
+              "grid": "19x13",
+              "nsteps": 600,
+              "nwater": 139,
+              "timestep": 2.0
+            },
+            "river_add_duplicate_delete": true,
+            "fabm_parameter_toggle_sidecar": true,
+            "picker_poll_without_OS_dialog": true
+          }
+        },
+        "synthetic_observations_native_optimization_apply_comparison": {
+          "status": "passed",
+          "seconds": 21.344,
+          "details": {
+            "status": {
+              "end_time": "2026-10-12T14:31:34.781396",
+              "engine": "scipy-lbfgsb",
+              "error": null,
+              "fallback": "旧配置 parsac 使用 SciPy L-BFGS-B 有界优化；未执行 PEST、GLUE 或 MCMC。",
+              "history": [
+                {
+                  "iteration": 1,
+                  "objective": 0.0,
+                  "params": [
+                    {
+                      "module": "abiotic_water",
+                      "param": "kNitrW",
+                      "value": 0.3
+                    }
+                  ],
+                  "timestamp": "2026-10-12T14:31:23.381027"
+                },
+                {
+                  "iteration": 2,
+                  "objective": 0.0,
+                  "params": [
+                    {
+                      "module": "abiotic_water",
+                      "param": "kNitrW",
+                      "value": 0.29969999999999997
+                    }
+                  ],
+                  "timestamp": "2026-10-12T14:31:29.591210"
+                },
+                {
+                  "iteration": 3,
+                  "objective": 0.0,
+                  "params": [
+                    {
+                      "module": "abiotic_water",
+                      "param": "kNitrW",
+                      "value": 0.3003
+                    }
+                  ],
+                  "timestamp": "2026-10-12T14:31:34.781396"
+                }
+              ],
+              "history_len": 3,
+              "job_id": "20261012_143115_2a86f4",
+              "max_iter": 2,
+              "method": "parsac",
+              "objective": "rmse",
+              "objective_weights": [],
+              "params": [
+                {
+                  "max": 0.301,
+                  "min": 0.299,
+                  "module": "abiotic_water",
+                  "param": "kNitrW"
+                }
+              ],
+              "point_ids": [
+                "627a054b"
+              ],
+              "progress": 1.0,
+              "result": {
+                "best_objective": 0.0,
+                "best_params": [
+                  {
+                    "module": "abiotic_water",
+                    "param": "kNitrW",
+                    "value": 0.3
+                  }
+                ],
+                "engine": "scipy.lbfgsb",
+                "history": [
+                  {
+                    "iteration": 1,
+                    "objective": 0.0,
+                    "params": [
+                      {
+                        "module": "abiotic_water",
+                        "param": "kNitrW",
+                        "value": 0.3
+                      }
+                    ]
+                  },
+                  {
+                    "iteration": 2,
+                    "objective": 0.0,
+                    "params": [
+                      {
+                        "module": "abiotic_water",
+                        "param": "kNitrW",
+                        "value": 0.29969999999999997
+                      }
+                    ]
+                  },
+                  {
+                    "iteration": 3,
+                    "objective": 0.0,
+                    "params": [
+                      {
+                        "module": "abiotic_water",
+                        "param": "kNitrW",
+                        "value": 0.3003
+                      }
+                    ]
+                  }
+                ],
+                "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+                "n_iterations": 3,
+                "success": true
+              },
+              "start_time": "2026-10-12T14:31:15.776530",
+              "status": "completed"
+            },
+            "apply": {
+              "applied": [
+                {
+                  "module": "abiotic_water",
+                  "param": "kNitrW",
+                  "value": 0.3
+                }
+              ],
+              "objective": 0.0,
+              "success": true
+            },
+            "observations": 20,
+            "csv_rows": 2,
+            "scatter_pairs": 22,
+            "native_input_only_source": true,
+            "scientific_accuracy_claim": false
+          }
+        },
+        "native_calibration_stop_status_persists_after_worker": {
+          "status": "passed",
+          "seconds": 6.875,
+          "details": {
+            "status": "stopped",
+            "worker_ended": true,
+            "history_len": 1
+          }
+        },
+        "native_run_start_status_duplicate_guard_stop": {
+          "status": "passed",
+          "seconds": 0.375,
+          "details": {
+            "status": "stopped",
+            "duplicate_start_rejected": true,
+            "editing_while_running_rejected": true
+          }
+        }
+      },
+      "sha256": "2401bdd78e686b3460e8b1c2825bd7c63d0b77db4008d27d6885d7622981533c"
+    },
+    "build/results-resize-20261012-04/verification.json": {
+      "passed": true,
+      "scope": "Short native integration; does not establish scientific accuracy.",
+      "source_case": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\external-resize-20261012-04\\3DWET\\case\\Imported Random Lake",
+      "solver_sha256": "15884cc236ef8526cd28f51dde491e95d6bd87a0f340c291bcce10aa8bbdf9e4",
+      "url": "http://127.0.0.1:53601",
+      "english_metadata": "passed",
+      "external_unit_reference": "passed",
+      "sha256": "14a2dc5f55f72c5e29f6cd9cbc83eb37706f038bcc85b0f51a98fb66e6f98cf2"
+    }
+  },
+  "installer_manifest": {
+    "app_version": "1.4.1",
+    "built_utc": "2026-10-11T10:47:46.6155994Z",
+    "installer": "3DWETStudio-Setup.exe",
+    "sha256": "66EDF7DE1681A9CFD64852C96BBF7836E7C29508F5AC3D294924FBB1B75C0952",
+    "bytes": 281324378,
+    "prerequisites": [
+      {
+        "filename": "innosetup-6.7.3.exe",
+        "url": "https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe",
+        "sha256": "9C73C3BAE7ED48D44112A0F48E66742C00090BDB5BEF71D9D3C056C66E97B732",
+        "signer": "Pyrsys B.V.",
+        "role": "Build tool only; not installed on the end user's machine"
+      },
+      {
+        "filename": "MicrosoftEdgeWebView2RuntimeInstallerX64.exe",
+        "url": "https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/18c66e75-0385-4019-be3f-3f4a2bb867d5/MicrosoftEdgeWebView2RuntimeInstallerX64.exe",
+        "discovery_url": "https://go.microsoft.com/fwlink/?linkid=2124701",
+        "sha256": "AC22ECDC19C5B88B87F3FA752C00DA9541653A8F5C0C5FC4A3B2B6EBE6591F69",
+        "signer": "Microsoft Corporation",
+        "bytes": 212358352,
+        "role": "Offline x64 Evergreen WebView2 prerequisite"
+      }
+    ]
+  },
+  "workflow_ledger": {
+    "rounds": [
+      {
+        "work": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261012-attempt01",
+        "seed": 2026101206,
+        "version": "120bbbe40a240583d6aa612b3720b2b30802da11932d31f21194b62d5c763025",
+        "input_identity": "fb559e9ca521e5051b89d40281084d504f6648421caf3404dcdb8db0ce003dc3",
+        "status": "awaiting_ui"
+      }
+    ],
+    "consecutive_complete": 0,
+    "required_complete": 5,
+    "scope": "Full backend stages plus every required UI check; installation acceptance is separate."
+  },
+  "active_round": {
+    "status": "awaiting_ui",
+    "seed": 2026101206,
+    "version": "120bbbe40a240583d6aa612b3720b2b30802da11932d31f21194b62d5c763025",
+    "stages": {
+      "external": {
+        "passed": true,
+        "report": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261012-attempt01\\external\\verification.json",
+        "sha256": "b5a6984d1a5d626fc838e7d2c4debb7531e90e273f0196eee99f6304f58edccb"
+      },
+      "features": {
+        "passed": true,
+        "report": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261012-attempt01\\features\\verification.json",
+        "sha256": "7a9d66351e88a1c0bdc5b3d3357f4ded07a5019651f4a907ad82ad19f95d93c6"
+      },
+      "results": {
+        "passed": true,
+        "report": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261012-attempt01\\results\\verification.json",
+        "sha256": "3c243f3615df185a759bb6aafb2f32f3be616e18b8d3544c3cb4f0442ac953fb"
+      },
+      "scipy": {
+        "passed": true,
+        "report": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261012-attempt01\\scipy\\verification.json",
+        "sha256": "4cfc762cc1b1ae2ab42773203169bcd7774ee4a86a5eca5d211d54a8d08fdc2c"
+      },
+      "abc": {
+        "passed": true,
+        "report": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261012-attempt01\\abc\\verification.json",
+        "sha256": "6176324cdf87bc7cf6b7a789b91b113161c1a4028da4056a46fe0faa0fbad125"
+      },
+      "restart": {
+        "passed": true,
+        "report": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261012-attempt01\\restart\\verification.json",
+        "sha256": "86a334d67bf8a5306c803d11db934cda001e5a5c4447d0eabf246b7fa47351da"
+      }
+    },
+    "error": null
+  },
+  "integrity_isolated_repeat": {
+    "attempts": 40,
+    "not_ready": 0,
+    "conclusion": "Not reproduced in isolated repeats; original full-suite failure remains unresolved."
+  }
+}

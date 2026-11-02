@@ -1,0 +1,7 @@
+﻿[js]      0 diag39 ready
+pid 48016
+[js]   9808 RtlExitUserProcess(0)
+[js]   9811   �˳�ʱ�Ĵ���: ThunderRT6FormDC|"EFDC_Explore8.0"|vis=0|0x5dc8111a ;; VBMsoStdCompMgr|""|vis=0|0x1b2102e ;; ThunderRT6Main|"EFDC_Explorer8.4"|vis=1|0x12f11a2 ;; IME|"Default IME"|vis=0|0xb5058c
+[js]   9848   forced show 0x5dc8111a now vis=1
+[js]   9849 �����Խ���Ϣѭ������ֹ�˳���
+done

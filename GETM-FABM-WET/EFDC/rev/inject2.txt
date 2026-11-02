@@ -1,0 +1,4 @@
+﻿[js]      0 diag13 ready
+pid 45216
+[js]     91 ShowWindow hwnd=0x1b1a1154 cmd=4 from MSVBVM60.DLL+0x2d961
+done

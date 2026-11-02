@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>EFDC 模型前端</title>
+<style>
+  :root{
+    --bg:#0e1116; --panel:#161b22; --line:#232a34; --fg:#e6edf3; --mut:#8b949e;
+    --acc:#3fb950; --acc2:#58a6ff; --warn:#d29922; --err:#f85149;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);
+    font:13px/1.5 "Segoe UI","Microsoft YaHei",system-ui,sans-serif}
+  #app{display:grid;grid-template-columns:230px 1fr 380px;grid-template-rows:46px 1fr 190px;height:100%}
+  header{grid-column:1/-1;display:flex;align-items:center;gap:14px;padding:0 14px;
+    background:var(--panel);border-bottom:1px solid var(--line)}
+  header h1{font-size:14px;margin:0;font-weight:600;letter-spacing:.3px}
+  .badge{font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid var(--line);color:var(--mut)}
+  .badge.ok{color:var(--acc);border-color:#1f6f34;background:#0f2a17}
+  .badge.warn{color:var(--warn);border-color:#6b5300;background:#2a2100}
+  #models{border-right:1px solid var(--line);overflow:auto;background:var(--panel)}
+  .m{padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+  .m:hover{background:#1c2430}
+  .m.sel{background:#12283f;border-left:3px solid var(--acc2);padding-left:9px}
+  .m b{display:block;font-weight:600;font-size:12px;word-break:break-all}
+  .m span{color:var(--mut);font-size:11px}
+  #center{display:flex;flex-direction:column;min-width:0}
+  #toolbar{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--panel)}
+  button{background:#21262d;color:var(--fg);border:1px solid var(--line);border-radius:6px;
+    padding:5px 12px;cursor:pointer;font-size:12px}
+  button:hover{background:#2d333b}
+  button.primary{background:#1f6f34;border-color:#2ea043}
+  button.danger{background:#5c1f1f;border-color:#8b2f2f}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  #gridwrap{flex:1;position:relative;min-height:0}
+  #grid{width:100%;height:100%;display:block}
+  #hover{position:absolute;pointer-events:none;background:#000c;border:1px solid var(--line);
+    padding:4px 8px;border-radius:5px;font-size:11px;display:none;white-space:nowrap}
+  #info{padding:6px 12px;border-top:1px solid var(--line);color:var(--mut);font-size:11px;background:var(--panel)}
+  #side{border-left:1px solid var(--line);display:flex;flex-direction:column;background:var(--panel);min-width:0}
+  .card{padding:10px 12px;border-bottom:1px solid var(--line)}
+  .card h2{margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);font-weight:600}
+  .kv{display:grid;grid-template-columns:88px 1fr;gap:2px 8px;font-size:12px}
+  .kv i{color:var(--mut);font-style:normal}
+  #chartbox{flex:1;min-height:0;padding:6px 8px}
+  #chart{width:100%;height:100%;display:block}
+  #bottom{grid-column:1/-1;border-top:1px solid var(--line);background:#0b0e13;
+    display:grid;grid-template-columns:1fr 300px;min-height:0}
+  #log{overflow:auto;padding:8px 12px;font:11.5px/1.45 Consolas,"Cascadia Mono",monospace;
+    color:#9fb0c0;white-space:pre-wrap;word-break:break-all}
+  #stats{border-left:1px solid var(--line);padding:8px 12px;font-size:12px}
+  .bar{height:6px;background:#1c2430;border-radius:3px;overflow:hidden;margin:6px 0 10px}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,#2ea043,#58a6ff);width:0%}
+  .legend{display:flex;gap:10px;font-size:11px;color:var(--mut);flex-wrap:wrap}
+  .legend b{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>EFDC 模型前端</h1>
+    <span class="badge" id="bSolver">求解器检查中…</span>
+    <span class="badge" id="bState">空闲</span>
+    <span class="badge" id="bPerp" style="display:none">PERPETUAL 授权</span>
+    <span style="flex:1"></span>
+    <span style="color:var(--mut);font-size:11px" id="clock"></span>
+  </header>
+
+  <div id="models"></div>
+
+  <div id="center">
+    <div id="toolbar">
+      <button class="primary" id="btnRun">▶ 运行模型</button>
+      <button class="danger" id="btnStop" disabled>■ 停止</button>
+      <span style="color:var(--mut);font-size:11px" id="runinfo">未选择模型</span>
+      <span style="flex:1"></span>
+      <label class="legend" style="cursor:pointer">
+        <input type="checkbox" id="chkColor" checked> 按湖底高程着色
+      </label>
+    </div>
+    <div id="gridwrap">
+      <canvas id="grid"></canvas>
+      <div id="hover"></div>
+    </div>
+    <div id="info">选择左侧模型 → 显示网格（538 格）</div>
+  </div>
+
+  <div id="side">
+    <div class="card">
+      <h2>模型信息</h2>
+      <div class="kv" id="kv">
+        <i>标题</i><span id="vTitle">—</span>
+        <i>活动格数</i><span id="vCells">—</span>
+        <i>网格范围</i><span id="vBbox">—</span>
+        <i>湖底高程</i><span id="vElev">—</span>
+      </div>
+    </div>
+    <div class="card" style="padding-bottom:4px">
+      <h2>实时曲线 <span id="chartMetric" style="color:var(--acc2)">水位 (m)</span></h2>
+      <div class="legend" style="margin-bottom:4px">
+        <span><b style="background:#58a6ff"></b>水位</span>
+        <span><b style="background:#3fb950"></b>东向流速</span>
+        <span><b style="background:#d29922"></b>北向流速</span>
+      </div>
+    </div>
+    <div id="chartbox"><canvas id="chart"></canvas></div>
+  </div>
+
+  <div id="bottom">
+    <div id="log">等待运行…\n</div>
+    <div id="stats">
+      <div class="kv" style="grid-template-columns:70px 1fr">
+        <i>进度</i><span id="sProg">0%</span>
+        <i>已运行</i><span id="sEl">0 min</span>
+        <i>预计剩余</i><span id="sEta">—</span>
+        <i>时间(天)</i><span id="sDay">—</span>
+        <i>采样点</i><span id="sN">0</span>
+      </div>
+      <div class="bar"><i id="pbar"></i></div>
+      <div style="color:var(--mut);font-size:11px" id="sExit"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let MODELS = [], SEL = null, DETAIL = null, TIMER = null;
+
+async function jget(u){ const r = await fetch(u); return r.json(); }
+async function jpost(u, body){
+  const r = await fetch(u, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body||{})});
+  return r.json();
+}
+
+/* ---------------- 模型列表 ---------------- */
+async function loadModels(){
+  const d = await jget('/api/models');
+  MODELS = d.models || [];
+  $('bSolver').textContent = d.solver_exists ? '求解器就绪（PERPETUAL）' : '求解器缺失';
+  $('bSolver').className = 'badge ' + (d.solver_exists ? 'ok' : 'warn');
+  const box = $('models'); box.innerHTML = '';
+  MODELS.forEach((m,idx)=>{
+    const el = document.createElement('div');
+    el.className = 'm' + (idx===0?' sel':'');
+    el.innerHTML = `<b>${m.name}</b><span>${m.cells||'?'} 格 · ${m.mtime}</span>`;
+    el.onclick = ()=>{
+      document.querySelectorAll('.m').forEach(x=>x.classList.remove('sel'));
+      el.classList.add('sel');
+      selectModel(m);
+    };
+    box.appendChild(el);
+  });
+  if (MODELS.length) selectModel(MODELS[0]);
+  else $('info').textContent = '没有找到含 EFDC.INP 的模型目录';
+}
+
+/* ---------------- 模型详情 + 网格 ---------------- */
+async function selectModel(m){
+  SEL = m;
+  $('runinfo').textContent = m.name;
+  DETAIL = await jget('/api/model?path=' + encodeURIComponent(m.path));
+  $('vTitle').textContent = DETAIL.title || '(无标题)';
+  $('vCells').textContent = (DETAIL.cells||[]).length + ' 格';
+  if (DETAIL.bbox){
+    const b = DETAIL.bbox;
+    $('vBbox').textContent = `${Math.round(b[2]-b[0])} × ${Math.round(b[3]-b[1])} m`;
+    const bs = (DETAIL.cells||[]).map(c=>c.bottom).filter(v=>v!=null);
+    if (bs.length) $('vElev').textContent = `${Math.min(...bs).toFixed(1)} ~ ${Math.max(...bs).toFixed(1)} m`;
+  }
+  $('info').textContent = `${DETAIL.name} · ${(DETAIL.cells||[]).length} 格 · 鼠标悬停查看单元格`;
+  drawGrid();
+}
+
+function elevColor(v, lo, hi){
+  if (v==null) return '#2a3441';
+  const t = Math.max(0, Math.min(1, (v-lo)/((hi-lo)||1)));
+  // 深蓝 -> 青 -> 绿 -> 黄
+  const stops = [[20,40,80],[30,120,160],[60,180,140],[210,200,90]];
+  const s = t*(stops.length-1), i = Math.floor(s), f = s-i;
+  const a = stops[i], b = stops[Math.min(i+1,stops.length-1)];
+  return `rgb(${Math.round(a[0]+(b[0]-a[0])*f)},${Math.round(a[1]+(b[1]-a[1])*f)},${Math.round(a[2]+(b[2]-a[2])*f)})`;
+}
+
+let GRIDMAP = null;
+function drawGrid(){
+  const cv = $('grid'), wrap = $('gridwrap');
+  const dpr = window.devicePixelRatio || 1;
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  cv.width = W*dpr; cv.height = H*dpr;
+  cv.style.width = W+'px'; cv.style.height = H+'px';
+  const g = cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0);
+  g.clearRect(0,0,W,H);
+  if (!DETAIL || !DETAIL.cells || !DETAIL.cells.length){
+    g.fillStyle='#8b949e'; g.font='13px sans-serif'; g.fillText('该模型没有 corners.inp，无法绘图', 20, 30);
+    return;
+  }
+  const b = DETAIL.bbox;
+  const pad = 16;
+  const sx = (W-2*pad)/((b[2]-b[0])||1), sy = (H-2*pad)/((b[3]-b[1])||1);
+  const s = Math.min(sx, sy);
+  const ox = pad + ((W-2*pad) - (b[2]-b[0])*s)/2;
+  const oy = pad + ((H-2*pad) - (b[3]-b[1])*s)/2;
+  const tx = x => ox + (x-b[0])*s;
+  const ty = y => H - (oy + (y-b[1])*s);
+  const colorize = $('chkColor').checked;
+  const bs = DETAIL.cells.map(c=>c.bottom).filter(v=>v!=null);
+  const lo = bs.length?Math.min(...bs):0, hi = bs.length?Math.max(...bs):1;
+  GRIDMAP = {s, ox, oy, b, H};
+  DETAIL.cells.forEach(c=>{
+    g.beginPath();
+    c.pts.forEach((p,k)=> k? g.lineTo(tx(p[0]),ty(p[1])) : g.moveTo(tx(p[0]),ty(p[1])));
+    g.closePath();
+    g.fillStyle = colorize ? elevColor(c.bottom, lo, hi) : '#1f2a36';
+    g.fill();
+    g.strokeStyle = 'rgba(255,255,255,.18)'; g.lineWidth = .6; g.stroke();
+  });
+}
+
+/* ---------------- 悬停 ---------------- */
+$('grid').addEventListener('mousemove', e=>{
+  if (!DETAIL || !DETAIL.cells) return;
+  const r = $('grid').getBoundingClientRect();
+  const mx = e.clientX-r.left, my = e.clientY-r.top;
+  const box = $('hover');
+  if (!GRIDMAP){ box.style.display='none'; return; }
+  const {s, ox, oy, b, H} = GRIDMAP;
+  const wx = b[0] + (mx-ox)/s, wy = b[1] + (H-my-oy)/s;
+  let hit = null;
+  for (const c of DETAIL.cells){
+    const xs = c.pts.map(p=>p[0]), ys = c.pts.map(p=>p[1]);
+    if (wx>=Math.min(...xs)&&wx<=Math.max(...xs)&&wy>=Math.min(...ys)&&wy<=Math.max(...ys)){ hit=c; break; }
+  }
+  if (!hit){ box.style.display='none'; return; }
+  box.style.display='block';
+  box.style.left = (mx+14)+'px'; box.style.top = (my+10)+'px';
+  box.innerHTML = `I=${hit.i} J=${hit.j}<br>湖底 ${hit.bottom!=null?hit.bottom.toFixed(2)+' m':'—'}` +
+                  `<br>水深 ${hit.depth!=null?hit.depth.toFixed(2)+' m':'—'}` +
+                  `<br>网格 ${hit.dx!=null?hit.dx+' m':'—'}`;
+});
+$('grid').addEventListener('mouseleave', ()=> $('hover').style.display='none');
+window.addEventListener('resize', ()=>{ drawGrid(); drawChart(); });
+$('chkColor').addEventListener('change', drawGrid);
+
+/* ---------------- 运行 / 停止 ---------------- */
+$('btnRun').onclick = async ()=>{
+  if (!SEL) return;
+  const r = await jpost('/api/run', {path: SEL.path});
+  if (!r.ok) alert('启动失败：' + (r.error||''));
+  poll();
+};
+$('btnStop').onclick = async ()=>{ await jpost('/api/stop'); poll(); };
+
+/* ---------------- 轮询状态 ---------------- */
+async function poll(){
+  const st = await jget('/api/status');
+  $('btnRun').disabled = st.running;
+  $('btnStop').disabled = !st.running;
+  $('bState').textContent = st.running ? '运行中' : (st.finished ? '已结束' : '空闲');
+  $('bState').className = 'badge ' + (st.running ? 'ok' : '');
+  $('bPerp').style.display = st.perpetual ? '' : 'none';
+  $('sProg').textContent = (st.progress||0) + '%';
+  $('pbar').style.width = (st.progress||0) + '%';
+  $('sEl').textContent = (st.elapsed_min||0) + ' min';
+  $('sEta').textContent = st.eta!=null ? st.eta.toFixed(2) + ' hr' : '—';
+  const s = st.series || {t:[]};
+  $('sDay').textContent = s.t.length ? s.t[s.t.length-1] : '—';
+  $('sN').textContent = s.t.length;
+  $('sExit').textContent = (st.finished && st.exit!=null) ? ('退出码 ' + st.exit) : '';
+  const log = $('log');
+  log.textContent = (st.lines||[]).slice(-120).join('\n');
+  log.scrollTop = log.scrollHeight;
+  drawChart(st.series||LAST_SERIES);
+  if (st.running) TIMER = setTimeout(poll, 1200);
+  else if (TIMER){ clearTimeout(TIMER); TIMER=null; }
+}
+
+/* ---------------- 曲线 ---------------- */
+let LAST_SERIES = {t:[],elev:[],vele:[],veln:[]};
+function drawChart(series){
+  if (series) LAST_SERIES = series; else series = LAST_SERIES;
+  const cv = $('chart'), box = $('chartbox');
+  const W = box.clientWidth, H = box.clientHeight;
+  const dpr = window.devicePixelRatio||1;
+  cv.width = W*dpr; cv.height = H*dpr; cv.style.width=W+'px'; cv.style.height=H+'px';
+  const g = cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0);
+  g.clearRect(0,0,W,H);
+  const padL=42, padR=8, padT=8, padB=20;
+  const pw = W-padL-padR, ph = H-padT-padB;
+  g.strokeStyle='#232a34'; g.lineWidth=1;
+  for (let i=0;i<=4;i++){
+    const y = padT + ph*i/4;
+    g.beginPath(); g.moveTo(padL,y); g.lineTo(padL+pw,y); g.stroke();
+  }
+  if (!series || !series.t || !series.t.length){
+    g.fillStyle='#8b949e'; g.font='11px sans-serif';
+    g.fillText('运行模型后显示实时曲线', padL+6, padT+ph/2);
+    return;
+  }
+  const t = series.t, el = series.elev, ve = series.vele, vn = series.veln;
+  const t0 = t[0], t1 = t[t.length - 1] || t0 + 1;
+  const X = v => padL + (t1 === t0 ? pw / 2 : (v - t0) / (t1 - t0) * pw);
+
+  function scaleOf(arr) {
+    const a = arr.filter(v => isFinite(v));
+    if (!a.length) return null;
+    const lo = Math.min.apply(null, a), hi = Math.max.apply(null, a);
+    if (hi - lo < 1e-6) return null;   // 常数曲线不画，避免把噪声放大成锯齿
+    return [lo, hi];
+  }
+
+  const defs = [
+    {arr: el, color: '#58a6ff', name: '水位'}
+  ];
+
+  const eSc = scaleOf(el) || [0, 1];
+  g.fillStyle = '#8b949e'; g.font = '10px monospace';
+  g.fillText(eSc[1].toFixed(2), 3, padT + 8);
+  g.fillText(eSc[0].toFixed(2), 3, padT + ph);
+  g.fillText('水位(m)', 3, padT + ph + 12);
+
+  defs.forEach(function (def, di) {
+    const arr = def.arr;
+    if (!arr || !arr.length) return;
+    const sc = scaleOf(arr);
+    if (!sc) {   // 该曲线全程为常数 -> 只在图例标数值
+      const lv = arr[arr.length - 1];
+      if (isFinite(lv)) {
+        g.fillStyle = def.color; g.font = '10px monospace';
+        g.fillText(def.name + ' ' + lv.toFixed(2) + ' (恒定)', padL + 4, padT + 12 * (di + 1));
+      }
+      return;
+    }
+    const lo = sc[0], hi = sc[1];
+    g.beginPath(); g.strokeStyle = def.color; g.lineWidth = 1.6;
+    arr.forEach(function (v, i) {
+      const y = padT + ph - (isFinite(v) ? (v - lo) / (hi - lo) * ph : ph / 2);
+      if (i) g.lineTo(X(t[i]), y); else g.moveTo(X(t[i]), y);
+    });
+    g.stroke();
+    const last = arr[arr.length - 1];
+    if (isFinite(last)) {
+      g.fillStyle = def.color;
+      g.font = '10px monospace';
+      g.fillText(def.name + ' ' + last.toFixed(2), padL + 4, padT + 12 * (di + 1));
+    }
+  });
+
+  // 流速/浓度：只显示末端数值（量级差异太大，不画在同一条轴上）
+  const veLast = ve.length ? ve[ve.length-1] : NaN;
+  const vnLast = vn.length ? vn[vn.length-1] : NaN;
+  g.font = '10px monospace';
+  g.fillStyle = '#3fb950';
+  g.fillText('东向流速 ' + (isFinite(veLast)? veLast.toFixed(2):'—') + ' cm/s', padL+4, padT + 26);
+  g.fillStyle = '#d29922';
+  g.fillText('北向流速 ' + (isFinite(vnLast)? vnLast.toFixed(2):'—') + ' cm/s', padL+4, padT + 40);
+
+  g.fillStyle = '#8b949e'; g.font = '10px monospace';
+  g.fillText('t=' + t0.toFixed(1) + 'd', padL, H - 6);
+  g.fillText(t1.toFixed(1) + 'd', W - 52, H - 6);
+}
+
+/* ---------------- 时钟 ---------------- */
+setInterval(()=>{ $('clock').textContent = new Date().toLocaleString('zh-CN'); }, 1000);
+
+loadModels().then(poll);
+</script>
+</body>
+</html>
+

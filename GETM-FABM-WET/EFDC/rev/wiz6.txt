@@ -1,0 +1,5 @@
+﻿[js]      0 diag51 ready
+[js]      0 diag97 ready
+pid 33624
+[js]   3118 [wait1] show 0xc4136a title="Activation Wizard" prev=24 vis=1
+saved (643, 489)

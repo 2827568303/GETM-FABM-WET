@@ -1,0 +1,48 @@
+﻿[js]      3 diag7 ready
+pid 28624
+[  1.02] CPU  13.8%
+[  2.02] CPU  15.5%
+[js]   2070 NtWaitForSingleObject 2007ms tid=41484 h=0x478 KERNELBASE.dll+0x15e808 <- ntdll.dll+0x61160 <- KERNEL32.DLL+0x15d49 <- ntdll.dll+0x6c75b <- ntdll.dll+0x6c6e1
+[  3.03] CPU  10.9%
+[  4.03] CPU   4.7%
+[  5.03] CPU   0.0%
+[  6.04] CPU   0.0%
+[  7.05] CPU   0.0%
+[  8.05] CPU   0.0%
+[  9.05] CPU   0.0%
+[ 10.06] CPU   0.0%
+[ 11.07] CPU   0.0%
+[ 12.08] CPU   0.0%
+[ 13.09] CPU   0.0%
+[ 14.10] CPU   0.0%
+[ 15.10] CPU   0.0%
+[ 16.12] CPU   0.0%
+[ 17.13] CPU   0.0%
+[js]  17153 NtDelayExecution 15015ms tid=31964 h=0x1 ntdll.dll+0x93dc9 <- KERNELBASE.dll+0x16a1f0 <- KERNELBASE.dll+0x16a236 <- ntdll.dll+0x7830c <- KERNEL32.DLL+0x15d49 <- ntdll.dll+0x6c75b <- ntdll.dll+0x6c6e1
+[ 18.14] CPU   6.2%
+[ 19.15] CPU   0.0%
+[ 20.15] CPU   0.0%
+[js]  20778 NtWaitForMultipleObjects 19378ms tid=52780 h=0x2 KERNELBASE.dll+0x15f67f <- ntdll.dll+0xb154b <- ntdll.dll+0x323b9 <- ntdll.dll+0x95f9e <- ntdll.dll+0x4e1fe <- ntdll.dll+0x95f9e <- ntdll.dll+0x41ccf <- ntdll.dll+0x78efc <- KERNELBASE.dll+0x16bf40
+[ 21.15] CPU   0.0%
+[ 22.15] CPU   0.0%
+[ 23.16] CPU   0.0%
+[ 24.17] CPU   0.0%
+[ 25.18] CPU   0.0%
+[ 26.19] CPU   0.0%
+[ 27.20] CPU   0.0%
+[ 28.20] CPU   0.0%
+[ 29.21] CPU   0.0%
+[ 30.22] CPU   0.0%
+[ 31.23] CPU   0.0%
+[js]  32068 NtDelayExecution 30003ms tid=50804 h=0x0 ntdll.dll+0x93dc9 <- KERNELBASE.dll+0x16a1f0 <- KERNELBASE.dll+0x16a18f <- ntdll.dll+0x57c47 <- ntdll.dll+0x57cf9 <- ntdll.dll+0x5530b <- KERNEL32.DLL+0x15d49 <- ntdll.dll+0x6c75b <- ntdll.dll+0x6c6e1
+[js]  32157 NtDelayExecution 15003ms tid=31964 h=0x1 ntdll.dll+0x93dc9 <- KERNELBASE.dll+0x16a1f0 <- KERNELBASE.dll+0x16a236 <- ntdll.dll+0x7830c <- KERNEL32.DLL+0x15d49 <- ntdll.dll+0x6c75b <- ntdll.dll+0x6c6e1
+[js]  32157 NtWaitForSingleObject 14950ms tid=38480 h=0x928 KERNELBASE.dll+0x15e808 <- KERNEL32.DLL+0x15d49 <- ntdll.dll+0x6c75b <- ntdll.dll+0x6c6e1
+[ 32.24] CPU   6.2%
+[ 33.25] CPU   0.0%
+[ 34.26] CPU   0.0%
+[ 35.28] CPU   0.0%
+[ 36.28] CPU   0.0%
+[ 37.29] CPU   0.0%
+[ 38.29] CPU   0.0%
+[ 39.29] CPU   0.0%
+done; leaving process alive

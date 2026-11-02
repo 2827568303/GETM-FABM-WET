@@ -1,0 +1,3 @@
+﻿[ 8.93] forced show hwnd=0x12c0ff4 prev=0 vis=0 title='EFDC_Explore8.0'
+[ 8.93] EXITED code=0
+alive=True

@@ -1,0 +1,6 @@
+﻿[js]      0 diag51 ready
+pid 3440
+[js]   2317 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8
+[ 9.13] SHOW 0x1d6c120e title='' prev=0 vis=0
+[ 9.13] EXITED code=0
+alive=False

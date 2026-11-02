@@ -1,0 +1,14 @@
+ansi 0x27d130 http://www.w3.org/1999/02/22-rdf-syntax-ns
+ansi 0x27d189 http://ns.adobe.com/xap/1.0/mm/
+ansi 0x27d1b7 http://ns.adobe.com/xap/1.0/sType/ResourceRef
+ansi 0x27d1f2 http://ns.adobe.com/xap/1.0/
+ansi 0x33cfa1 http://ns.adobe.com/iX/1.0/
+ansi 0x1462446 https://secure.comodo.net/CPS0C
+ansi 0x1462476 http://crl.comodoca.com/COMODORSACodeSigningCA.crl0t
+ansi 0x14624c6 http://crt.comodoca.com/COMODORSACodeSigningCA.crt0
+ansi 0x1462506 http://ocsp.comodoca.com0
+ansi 0x1462978 http://crl.comodoca.com/COMODORSACertificationAuthority.crl0q
+ansi 0x14629d1 http://crt.comodoca.com/COMODORSAAddTrustCA.crt0
+ansi 0x1463062 http://www.usertrust.com1
+ansi 0x14632f7 http://crl.usertrust.com/UTN-USERFirst-Object.crl05
+ansi 0x1463346 http://ocsp.usertrust.com0

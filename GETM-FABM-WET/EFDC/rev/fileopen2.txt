@@ -1,0 +1,95 @@
+﻿[js] ready
+pid 44304
+python : Traceback (most recent call last):
+所在位置 行:16 字符: 60
++ ... ; Set-Content .\rev\diag48.js -Value $js -Encoding UTF8; python -c @"
++                                                              ~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "<string>", line 6, in <lambda>
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud285' in position 117: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "<string>", line 6, in <lambda>
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud285' in position 117: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "<string>", line 6, in <lambda>
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud285' in position 117: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "<string>", line 6, in <lambda>
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud285' in position 117: illegal multibyte sequence
+[js] [js] [js] [js] [js] a0=0x1  a1=0xffffffff  a2=0x1a0001  a3=0x1d548d4 ["C:\Users\Public\DSI\EEMS8.3\EEMS.ini"]  a4=0x602a5560  a5=0x602bd8b1
+[js] a0=0x1  a1=0xffffffff  a2=0x1d30001  a3=0x8e3d42c ["C:\Users\Public\DSI\EFDC_Explorer8.0\EFDC_Explorer.ini"]  a4=0x0  a5=0x602bd8b1
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "<string>", line 6, in <lambda>
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud285' in position 118: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "<string>", line 6, in <lambda>
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud285' in position 109: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "<string>", line 6, in <lambda>
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud285' in position 118: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "<string>", line 6, in <lambda>
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud285' in position 118: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "<string>", line 6, in <lambda>
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud285' in position 118: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "<string>", line 6, in <lambda>
+UnicodeEncodeError: 'gbk' codec can't encode character '\u0845' in position 119: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "<string>", line 6, in <lambda>
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud285' in position 118: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "<string>", line 6, in <lambda>
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud285' in position 118: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "<string>", line 6, in <lambda>
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud285' in position 118: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "<string>", line 6, in <lambda>
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud285' in position 118: illegal multibyte sequence
+[js] [js] [js] [js] [js] [js] [js] [js] [js] [js] 

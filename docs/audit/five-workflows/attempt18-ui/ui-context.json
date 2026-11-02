@@ -1,0 +1,40 @@
+{
+  "seed": 2026101501,
+  "version": "077d44b8fc866dc369369fdb05f73992977a54ae64ff3e43c4dfa2b9eb73b5b5",
+  "round_status_at_preparation": "running",
+  "intended_model_root": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261015-attempt18\\external\\3DWET",
+  "raw_input_manifest": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261015-attempt18\\external\\external_data\\manifest.json",
+  "raw_input_manifest_sha256": "81bb61d208d60f66258e7b394327a8fd27716a3793ab016ea7c1279b0c72e9e6",
+  "ui_case_name": "UI_2026101501",
+  "archives": {
+    "boundary.zip": {
+      "sha256": "8a408283e2f21986452f62eaafcb21ce0fa5af148369313c4caefb575eb49ee4",
+      "source_files": [
+        "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261015-attempt18\\external\\external_data\\boundary.shp",
+        "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261015-attempt18\\external\\external_data\\boundary.shx",
+        "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261015-attempt18\\external\\external_data\\boundary.dbf",
+        "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261015-attempt18\\external\\external_data\\boundary.prj"
+      ]
+    },
+    "depth_polygons.zip": {
+      "sha256": "207030bb746c95e58a5d4a3082de8841c22c099a26c77571ab2f8de6f64a4c61",
+      "source_files": [
+        "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261015-attempt18\\external\\external_data\\depth_polygons.shp",
+        "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261015-attempt18\\external\\external_data\\depth_polygons.shx",
+        "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261015-attempt18\\external\\external_data\\depth_polygons.dbf",
+        "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261015-attempt18\\external\\external_data\\depth_polygons.prj"
+      ]
+    },
+    "depth_points.zip": {
+      "sha256": "0acab7837f022301de8f920d8b2e6c66fe0f17d22eb50fc466c9f723d21c35df",
+      "source_files": [
+        "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261015-attempt18\\external\\external_data\\depth_points.shp",
+        "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261015-attempt18\\external\\external_data\\depth_points.shx",
+        "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261015-attempt18\\external\\external_data\\depth_points.dbf",
+        "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261015-attempt18\\external\\external_data\\depth_points.prj"
+      ]
+    }
+  },
+  "ui_checks_completed": [],
+  "note": "Preparation only. No UI check is passed by these files."
+}

@@ -1,0 +1,3 @@
+     0 diag51 ready
+     0 ready
+  3007 wizard obj=0x79a7f90 splash obj=0xc9c89c8

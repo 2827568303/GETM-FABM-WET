@@ -1,0 +1,279 @@
+- img "3DWET"
+- heading "3DWET Studio" [level=1]
+- paragraph: 湖泊生态 · 三维建模工作台
+- generic: 总览
+- generic: 📊
+- text: 仪表盘
+- generic: 📁
+- text: 案例管理
+- generic: 前处理
+- generic: 🛠️
+- text: 前处理
+- generic: ▦
+- text: 交互网格编辑
+- generic: 📥
+- text: 输入数据
+- generic: 🧩
+- text: 模块配置
+- generic: ⚙️
+- text: 参数编辑
+- generic: 🧪
+- text: 初始条件
+- generic: ⏱️
+- text: 时间设置
+- generic: 运行
+- generic: ▶️
+- text: 运行控制
+- generic: 后处理
+- generic: 🌐
+- text: 地图视图
+- generic: 🗺️
+- text: 2D 可视化
+- generic: 🧊
+- text: 3D 可视化
+- generic: 🔥
+- text: 垂向热图
+- generic: 📈
+- text: 时间序列
+- generic: 率定
+- generic: 🎯
+- text: 率定分析
+- generic: 🔄
+- text: 自动率定
+- generic: 工作台
+- generic: ◉
+- text: 环境与启动诊断
+- generic: 📋
+- text: 项目导入与物理设置
+- generic: "案例: Round4 UI Lake 1302"
+- menubar "工作台菜单":
+  - button "项目"
+  - button "编辑"
+  - button "视图"
+  - button "图层"
+  - button "运行"
+  - button "设置"
+  - button "帮助"
+  - button "语言"
+  - generic: 3DWET Studio · GIS 工作台
+- toolbar "常用工具":
+  - button "▣ 案例":
+    - generic: ▣
+    - generic: 案例
+  - button "⚒ 前处理":
+    - generic: ⚒
+    - generic: 前处理
+  - button "▦ 网格":
+    - generic: ▦
+    - generic: 网格
+  - button "▶ 运行":
+    - generic: ▶
+    - generic: 运行
+  - button "⌖ 地图":
+    - generic: ⌖
+    - generic: 地图
+  - button "▤ 2D":
+    - generic: ▤
+    - generic: 2D
+  - button "◇ 3D":
+    - generic: ◇
+    - generic: 3D
+  - button "⚙ 诊断":
+    - generic: ⚙
+    - generic: 诊断
+- generic: 运行控制
+- generic: Round4 UI Lake 1302
+- button "100%"
+- generic: 已完成
+- generic: 运行控制
+- generic: 启动/停止模型，查看运行日志和进度
+- generic: 状态
+- generic: 已完成
+- generic: 进度
+- generic: 100.0%
+- generic: 已用时间
+- generic: 7s
+- generic: 预计剩余
+- generic: "-"
+- generic: "步数: 600 / 600 · 82.5 步/秒 · 预编译串行求解器"
+- generic: 100.0%
+- text: 运行控制
+- button "🩺 运行前体检"
+- button "▶️ 开始运行"
+- button "⏹️ 停止" [disabled]
+- generic: ✅ 可以运行（1 条提醒）
+- generic: 体检只读取输入。修复仅执行按钮描述的修改，保存原文件备份后重新检查。CFL 通过后仍需短时试运行检查输出。
+- generic: ✅ 地形
+- generic: 165 个水格（bathymetry.nc）
+- generic: bathymetry · bathymetry.nc
+- generic: ✅ 时间步长
+- generic: 2s ≤ 重力波 CFL 估计上限 3.01687s；此检查不保证生态过程稳定，需短时试运行检查输出。
+- generic: configuration · getm.inp
+- generic: ⚠️ 输出全部变量
+- generic: "source: * 会写出模型注册的每一个变量。预计约 0.05 GB。（滇池 362 天实测 17.9 GB）"
+- generic: 建议：改用“标准”订阅：水动力 + 关键生态模块。
+- generic: output-all · output.yaml
+- button "定位设置"
+- button "采用当前案例的标准输出订阅"
+- generic: ✅ 磁盘空间
+- generic: 预计输出 0.05 GB，可用 484.2 GB
+- generic: disk-space · output.yaml
+- generic: "2020-DOY001 00:15:00: saving 3D ...."
+- generic: "2020-DOY001 00:16:00: saving 2D ...."
+- generic: "2020-DOY001 00:16:00: saving 3D ...."
+- generic: 12:52:19.439 n= 500
+- generic: "2020-DOY001 00:17:00: saving 2D ...."
+- generic: "2020-DOY001 00:17:00: saving 3D ...."
+- generic: "2020-DOY001 00:18:00: saving 2D ...."
+- generic: "2020-DOY001 00:18:00: saving 3D ...."
+- generic: "2020-DOY001 00:19:00: saving 2D ...."
+- generic: "2020-DOY001 00:19:00: saving 3D ...."
+- generic: 12:52:19.989 n= 600
+- generic: "2020-DOY001 00:20:00: saving 2D ...."
+- generic: "2020-DOY001 00:20:00: saving 3D ...."
+- generic: "------------------------------------------------------------------------"
+- generic: Cleaning up....
+- generic: "------------------------------------------------------------------------"
+- generic: "SEED_IN: 3.5383801460266113E-004 10^6 m3"
+- generic: "SEED_OUT: -3.5383801460266113E-004 10^6 m3"
+- generic: clean_input
+- generic: "------------------------------------------------------------------------"
+- generic: "getm: Completed on 20261013 125220.076"
+- generic: "Memory used (global 2D and 3D arrays):"
+- generic: "2D: 68 kbytes"
+- generic: "3D: 421 kbytes"
+- generic: "Total CPU-time was: 3.96875000 seconds"
+- generic: "Number of time steps: 600"
+- generic: "Number of calc-points: 165"
+- generic: "CPU-time/calc-point: 4.00883837E-05 seconds"
+- generic: "Sim-time/CPU-time: 302.36220472440942"
+- generic: "------------------------------------------------------------------------"
+- generic: GETM timers in seconds ( 10000000 tics per second)
+- generic: "wall #sysclocks % of total"
+- generic: Timername time (s) calls clocked time
+- generic: initialize 0.51 2 12.68
+- generic: bottom_friction 0.00 36 0.00
+- generic: momentum 0.00 1200 0.04
+- generic: uv_depths 0.00 2 0.00
+- generic: sum uv_advect 0.00 1400 0.11
+- generic: sum uv_diffusion 0.00 1400 0.06
+- generic: depth_update 0.00 1202 0.02
+- generic: sealevel 0.00 1200 0.01
+- generic: gotm 0.00 200 0.09
+- generic: uv_advect_3d 0.01 200 0.27
+- generic: uv_diffusion_3d 0.00 200 0.04
+- generic: vv_momentum_3d 0.00 200 0.07
+- generic: uu_momentum_3d 0.00 200 0.07
+- generic: ww_momentum_3d 0.00 200 0.01
+- generic: ss_nn 0.00 202 0.02
+- generic: bottom_friction_3d 0.00 200 0.01
+- generic: stresses_3d 0.00 200 0.01
+- generic: slow_terms 0.00 200 0.01
+- generic: slow_bottom_friction 0.00 200 0.01
+- generic: do_temperature 0.01 200 0.20
+- generic: do_salinity 0.00 0 0.00
+- generic: coordinates 0.00 202 0.02
+- generic: do_internal_pressure 0.00 200 0.02
+- generic: start_macro 0.00 202 0.01
+- generic: eq_state 0.00 202 0.01
+- generic: calc_mean_fields 0.00 0 0.00
+- generic: do_meteo 0.01 1202 0.25
+- generic: getm_fabm 2.48 200 61.71
+- generic: integrate_2d other 0.01 2400 0.16
+- generic: integrate_3d other 0.00 1200 0.04
+- generic: do_input 0.00 1200 0.01
+- generic: do_output 0.51 1202 12.82
+- generic: output_manager_save 0.46 2400 11.40
+- generic: do_output_processing 0.00 1200 0.00
+- generic: sum do_advection 0.09 74800 2.16
+- generic: sum do_advection_3d 0.31 12000 7.74
+- generic: sum check_3d_fields 0.00 400 0.01
+- generic: numerical mixing analysi 0.00 0 0.00
+- generic: advection getm_fabm 0.29 200 7.23
+- generic: TIMERS SUM 4.01 112854 100.00
+- generic: "------------------------------------------------------------------------"
+- generic: Copyright (C) Karsten Bolding and Hans Burchard.
+- generic: under the General Public License (GPL) - http://www.gnu.org
+- generic: "------------------------------------------------------------------------"
+- generic: "[INFO] 结果有效性检查通过（2.428秒）"
+- generic: "[INFO] 输出已归档到 output/：ROUND4_UI_LAKE_1302_WET.2d.nc, ROUND4_UI_LAKE_1302_WET.3d.nc, output.nc"
+- generic: "[INFO] 模型运行完成！耗时: 4.7秒 (0.1分钟)"
+- heading "结果文件与磁盘清理" [level=3]
+- generic: 当前案例：C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261013-attempt04\external\3DWET\case\Round4 UI Lake 1302
+- generic: 运行写入目录：C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261013-attempt04\external\3DWET\case\Round4 UI Lake 1302
+- generic: 完成后归档目录：C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261013-attempt04\external\3DWET\case\Round4 UI Lake 1302\output
+- generic: 运行中结果写入案例根目录；成功完成后归档至 output，表格列出当前实际位置。
+- button "打开输出目录"
+- button "打开运行目录"
+- button "复制输出目录"
+- button "刷新文件"
+- button "扫描完全相同的副本"
+- button "选中重复副本" [disabled]
+- button "全选结果"
+- button "清理所选（移至回收区）" [disabled]
+- generic: 只列出受支持的模型结果和日志；输入、配置与掩膜文件受到保护。
+- generic: 重复扫描会读取文件全部内容，较大输出可能需要较长时间。扫描后每组保留修改时间最新的一份。
+- generic: 4 个文件 · 137.0 MB · 已选择 0 个
+- table:
+  - row "选择 当前完整路径 类型 大小 修改时间 副本":
+    - columnheader "选择"
+    - columnheader "当前完整路径"
+    - columnheader "类型"
+    - columnheader "大小"
+    - columnheader "修改时间"
+    - columnheader "副本"
+  - row "选择 model_run.log C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261013-attempt04\\external\\3DWET\\case\\Round4 UI Lake 1302\\model_run.log 复制路径 日志 284.8 KB 2026/10/13 12:52:20":
+    - cell "选择 model_run.log":
+      - checkbox "选择 model_run.log"
+    - cell "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261013-attempt04\\external\\3DWET\\case\\Round4 UI Lake 1302\\model_run.log 复制路径":
+      - generic: C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261013-attempt04\external\3DWET\case\Round4 UI Lake 1302\model_run.log
+      - button "复制路径"
+    - cell "日志"
+    - cell "284.8 KB"
+    - cell "2026/10/13 12:52:20"
+    - cell
+  - row "选择 output/ROUND4_UI_LAKE_1302_WET.2d.nc C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261013-attempt04\\external\\3DWET\\case\\Round4 UI Lake 1302\\output\\ROUND4_UI_LAKE_1302_WET.2d.nc 复制路径 结果 77.9 KB 2026/10/13 12:52:20":
+    - cell "选择 output/ROUND4_UI_LAKE_1302_WET.2d.nc":
+      - checkbox "选择 output/ROUND4_UI_LAKE_1302_WET.2d.nc"
+    - cell "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261013-attempt04\\external\\3DWET\\case\\Round4 UI Lake 1302\\output\\ROUND4_UI_LAKE_1302_WET.2d.nc 复制路径":
+      - generic: C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261013-attempt04\external\3DWET\case\Round4 UI Lake 1302\output\ROUND4_UI_LAKE_1302_WET.2d.nc
+      - button "复制路径"
+    - cell "结果"
+    - cell "77.9 KB"
+    - cell "2026/10/13 12:52:20"
+    - cell
+  - row "选择 output/ROUND4_UI_LAKE_1302_WET.3d.nc C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261013-attempt04\\external\\3DWET\\case\\Round4 UI Lake 1302\\output\\ROUND4_UI_LAKE_1302_WET.3d.nc 复制路径 结果 73.3 MB 2026/10/13 12:52:20":
+    - cell "选择 output/ROUND4_UI_LAKE_1302_WET.3d.nc":
+      - checkbox "选择 output/ROUND4_UI_LAKE_1302_WET.3d.nc"
+    - cell "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261013-attempt04\\external\\3DWET\\case\\Round4 UI Lake 1302\\output\\ROUND4_UI_LAKE_1302_WET.3d.nc 复制路径":
+      - generic: C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261013-attempt04\external\3DWET\case\Round4 UI Lake 1302\output\ROUND4_UI_LAKE_1302_WET.3d.nc
+      - button "复制路径"
+    - cell "结果"
+    - cell "73.3 MB"
+    - cell "2026/10/13 12:52:20"
+    - cell
+  - row "选择 output/output.nc C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261013-attempt04\\external\\3DWET\\case\\Round4 UI Lake 1302\\output\\output.nc 复制路径 结果 63.4 MB 2026/10/13 12:52:20":
+    - cell "选择 output/output.nc":
+      - checkbox "选择 output/output.nc"
+    - cell "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261013-attempt04\\external\\3DWET\\case\\Round4 UI Lake 1302\\output\\output.nc 复制路径":
+      - generic: C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261013-attempt04\external\3DWET\case\Round4 UI Lake 1302\output\output.nc
+      - button "复制路径"
+    - cell "结果"
+    - cell "63.4 MB"
+    - cell "2026/10/13 12:52:20"
+    - cell
+- generic: 案例回收区：0 个文件 · 0 B（占用磁盘，可恢复）
+- button "恢复最近一次清理" [disabled]
+- button "清空回收区并释放磁盘" [disabled]
+- status
+- status:
+  - generic: 项目
+  - strong: Round4 UI Lake 1302
+  - generic: 网格
+  - strong: 待加载
+  - generic: 运行
+  - strong: 已完成
+  - generic: 视图
+  - strong: 100%
+  - generic: 坐标系
+  - strong: —

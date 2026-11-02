@@ -1,0 +1,6 @@
+﻿[js]      0 diag37 ready
+pid 1824
+[js]     83 ShowWindow hwnd=0xb781144 cmd=4 from MSVBVM60.DLL+0x2d961
+[js]  10159 EXIT code=0 from KERNEL32.DLL+0x2b6f3
+[js]  10306   ACC: KERNEL32.DLL+0x2b6f3 <- ntdll.dll+0x322c0 <- MSVBVM60.DLL+0x2ad05 <- EFDC_Explorer8.4.exe+0x5195e <- ntdll.dll+0x6c75b <- ntdll.dll+0x6c6e1
+done

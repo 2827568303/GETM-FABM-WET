@@ -1,0 +1,4 @@
+﻿[js] ready
+pid 42308
+[js] rtcErrObj @ 0x602ab728
+[js] err: Error: access violation accessing 0x20

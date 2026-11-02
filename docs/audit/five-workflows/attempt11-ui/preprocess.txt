@@ -1,0 +1,141 @@
+- img "3DWET"
+- heading "3DWET Studio" [level=1]
+- paragraph: 湖泊生态 · 三维建模工作台
+- generic: 总览
+- generic: 📊
+- text: 仪表盘
+- generic: 📁
+- text: 案例管理
+- generic: 前处理
+- generic: 🛠️
+- text: 前处理
+- generic: ▦
+- text: 交互网格编辑
+- generic: 📥
+- text: 输入数据
+- generic: 🧩
+- text: 模块配置
+- generic: ⚙️
+- text: 参数编辑
+- generic: 🧪
+- text: 初始条件
+- generic: ⏱️
+- text: 时间设置
+- generic: 运行
+- generic: ▶️
+- text: 运行控制
+- generic: 后处理
+- generic: 🌐
+- text: 地图视图
+- generic: 🗺️
+- text: 2D 可视化
+- generic: 🧊
+- text: 3D 可视化
+- generic: 🔥
+- text: 垂向热图
+- generic: 📈
+- text: 时间序列
+- generic: 率定
+- generic: 🎯
+- text: 率定分析
+- generic: 🔄
+- text: 自动率定
+- generic: 工作台
+- generic: ◉
+- text: 环境与启动诊断
+- generic: 📋
+- text: 项目导入与物理设置
+- generic: "案例: Round11 UI Lake 1401"
+- menubar "工作台菜单":
+  - button "项目"
+  - button "编辑"
+  - button "视图"
+  - button "图层"
+  - button "运行"
+  - button "设置"
+  - button "帮助"
+  - button "语言"
+  - generic: 3DWET Studio · GIS 工作台
+- toolbar "常用工具":
+  - button "▣ 案例":
+    - generic: ▣
+    - generic: 案例
+  - button "⚒ 前处理":
+    - generic: ⚒
+    - generic: 前处理
+  - button "▦ 网格":
+    - generic: ▦
+    - generic: 网格
+  - button "▶ 运行":
+    - generic: ▶
+    - generic: 运行
+  - button "⌖ 地图":
+    - generic: ⌖
+    - generic: 地图
+  - button "▤ 2D":
+    - generic: ▤
+    - generic: 2D
+  - button "◇ 3D":
+    - generic: ◇
+    - generic: 3D
+  - button "⚙ 诊断":
+    - generic: ⚙
+    - generic: 诊断
+- generic: 前处理
+- generic: Round11 UI Lake 1401
+- button "100%"
+- generic: 空闲
+- generic: 前处理
+- generic: 从湖泊边界 + 底部高程 shapefile 生成 bathymetry.nc，创建新案例
+- generic: 0. 模型模块
+- generic: 1. 湖泊边界
+- generic: 2. 底部高程
+- generic: 3. 网格生成
+- generic: 4. 插值与保存
+- generic: 💾 插值并保存 bathymetry.nc
+- generic: 插值方法（仅 Point 几何生效）
+- combobox:
+  - option "linear（线性插值，推荐）" [selected]
+  - option "nearest（最近邻）"
+- button "插值水深"
+- generic: ✓ 插值完成
+- separator
+- generic: 新案例名（将在 case/ 下创建）
+- 'textbox "例如: MyLake"': Round11 UI Lake 1401
+- generic: 湖泊显示名（写入 bathymetry.nc 标题，可留空）
+- 'textbox "例如: 某湖"': Seed 2026101401 Point Lake
+- button "保存 bathymetry.nc 并加载案例" [active]
+- generic: ✓ 已保存到 C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261014-attempt11\ui\3DWET\case\Round11 UI Lake 1401\bathymetry.nc
+- separator
+- generic: 🏞️ 河流标记（入流/出流位置）
+- generic: 插值后，在右侧图中滚轮缩放、拖拽平移；开启标记模式后点击水域格点添加河流。 方向由流量数据正负决定（正=入流，负=出流），此处只标位置。
+- 'button "🖱️ 标记模式: 关"'
+- button "🔄 复位视图"
+- generic: 暂无河流标记。开启标记模式后在图上点击水域格点。
+- generic: 🗺️ 水深预览（滚轮缩放 / 拖拽平移）
+- group "图形视图控制":
+  - button "恢复完整图形范围": 复位
+  - button "全屏 / 退出全屏": ⛶
+- text: "水域格数:"
+- strong: "166"
+- text: "水深范围:"
+- strong: 2.41 ~ 8.94 m
+- text: "平均水深:"
+- strong: 5.52 m
+- text: 案例
+- strong: Round11 UI Lake 1401
+- text: 已加载
+- generic: "水域格数: 166，面积 0.415 km²"
+- generic: "下一步: 进入\"输入数据\"检查其它必需文件"
+- status:
+  - generic: 项目
+  - strong: Round11 UI Lake 1401
+  - generic: 网格
+  - strong: 待加载
+  - generic: 运行
+  - strong: 空闲
+  - generic: 视图
+  - strong: 100%
+  - generic: 坐标系
+  - strong: —
+- generic: "已加载案例: Round11 UI Lake 1401"

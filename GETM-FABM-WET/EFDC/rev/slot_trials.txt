@@ -1,0 +1,29 @@
+
+===== SLOT 0x310 =====
+     1 diag51 ready
+     0 diag66 ready
+  2795 form obj=0x8fd5238 vtable=0x163c1f4  calling slot 0x310
+  2795   slot call returned (1 arg)
+  2796 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8
+  8964   [t+400ms] 0x1990a18|vis=0
+  8965   [t+1600ms] 0x1990a18|vis=0
+  8967   [t+3600ms] 0x1990a18|vis=0
+
+===== SLOT 0x94 =====
+     1 diag51 ready
+     0 diag66 ready
+  2396 form obj=0x87c4438 vtable=0x163c1f4  calling slot 0x94
+
+===== SLOT 0x18 =====
+     0 diag51 ready
+     1 diag66 ready
+  2469 form obj=0x8fd76a0 vtable=0x163c1f4  calling slot 0x18
+  2469   slot call returned (1 arg)
+  2470 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8
+
+===== SLOT 0x10 =====
+     0 diag51 ready
+     0 diag66 ready
+  5107 form obj=0x8f5ba48 vtable=0x163c1f4  calling slot 0x10
+  5107   slot call returned (1 arg)
+  5109 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8

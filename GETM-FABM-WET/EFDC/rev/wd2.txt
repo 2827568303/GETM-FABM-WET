@@ -1,0 +1,14 @@
+﻿pid=43736 alive=True
+cls='VBMsoStdCompMgr'      title=''                                   vis=0 rect=(0,0 0x0) parent=0x0 hwnd=0x1180d10
+cls='#32770'               title='EFDC_Explorer8.4'                   vis=1 rect=(646,484 421x153) parent=0x0 hwnd=0x3020ede
+cls='ThunderRT6Main'       title='EFDC_Explorer8.4'                   vis=1 rect=(853,533 0x0) parent=0x0 hwnd=0x19d0b38
+cls='MSCTFIME UI'          title='MSCTFIME UI'                        vis=0 rect=(0,0 0x0) parent=0xc00be8 hwnd=0x20d0c6e
+cls='IME'                  title='Default IME'                        vis=0 rect=(0,0 0x0) parent=0x3020ede hwnd=0xc00be8
+DIALOG 0x3020ede -> Button:'ȷ��' | Static:'There is an error when checking the license. Error 481 (Invalid picture)'
+--- 3s later ---
+cls='VBMsoStdCompMgr'      title=''                                   vis=0 rect=(0,0 0x0) parent=0x0 hwnd=0x1180d10
+cls='#32770'               title='EFDC_Explorer8.4'                   vis=1 rect=(646,484 421x153) parent=0x0 hwnd=0x3020ede
+cls='ThunderRT6Main'       title='EFDC_Explorer8.4'                   vis=1 rect=(853,533 0x0) parent=0x0 hwnd=0x19d0b38
+cls='MSCTFIME UI'          title='MSCTFIME UI'                        vis=0 rect=(0,0 0x0) parent=0xc00be8 hwnd=0x20d0c6e
+cls='IME'                  title='Default IME'                        vis=0 rect=(0,0 0x0) parent=0x3020ede hwnd=0xc00be8
+exitcode=259

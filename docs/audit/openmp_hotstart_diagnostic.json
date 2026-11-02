@@ -1,0 +1,175 @@
+{
+  "global": {
+    "fabm_memory_version": "2",
+    "fabm_memory_timebase": "GETM Julian-day seconds",
+    "fabm_memory_count": "4"
+  },
+  "fabm_memory_0001_history": {
+    "shape": [
+      27,
+      10,
+      4,
+      10
+    ],
+    "nonzero": 4320,
+    "nan": 0
+  },
+  "fabm_memory_0001_last": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 16,
+    "nan": 0
+  },
+  "fabm_memory_0001_next": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 16,
+    "nan": 0
+  },
+  "fabm_memory_0001_oldest": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 40,
+    "nan": 0
+  },
+  "fabm_memory_0001_valid": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 16,
+    "nan": 0
+  },
+  "fabm_memory_0002_history": {
+    "shape": [
+      27,
+      10,
+      4,
+      10
+    ],
+    "nonzero": 4320,
+    "nan": 0
+  },
+  "fabm_memory_0002_last": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 16,
+    "nan": 0
+  },
+  "fabm_memory_0002_next": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 16,
+    "nan": 0
+  },
+  "fabm_memory_0002_oldest": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 40,
+    "nan": 0
+  },
+  "fabm_memory_0002_valid": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 16,
+    "nan": 0
+  },
+  "fabm_memory_0003_history": {
+    "shape": [
+      27,
+      10,
+      4,
+      10
+    ],
+    "nonzero": 4320,
+    "nan": 0
+  },
+  "fabm_memory_0003_last": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 16,
+    "nan": 0
+  },
+  "fabm_memory_0003_next": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 16,
+    "nan": 0
+  },
+  "fabm_memory_0003_oldest": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 40,
+    "nan": 0
+  },
+  "fabm_memory_0003_valid": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 16,
+    "nan": 0
+  },
+  "fabm_memory_0004_history": {
+    "shape": [
+      27,
+      10,
+      4,
+      10
+    ],
+    "nonzero": 4320,
+    "nan": 0
+  },
+  "fabm_memory_0004_last": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 16,
+    "nan": 0
+  },
+  "fabm_memory_0004_next": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 16,
+    "nan": 0
+  },
+  "fabm_memory_0004_oldest": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 40,
+    "nan": 0
+  },
+  "fabm_memory_0004_valid": {
+    "shape": [
+      4,
+      10
+    ],
+    "nonzero": 16,
+    "nan": 0
+  }
+}

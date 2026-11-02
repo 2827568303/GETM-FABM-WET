@@ -1,0 +1,4 @@
+*********************************************************
+*** ERROR:  CONDITIONS FOR DEMO VERSION ARE NOT SATISFIED !   ***
+*********************************************************
+Fortran Pause - Enter command<CR> or <CR> to continue.

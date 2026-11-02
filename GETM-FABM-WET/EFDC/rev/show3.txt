@@ -1,0 +1,12 @@
+﻿python :   File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\force_show.py", line 39
+所在位置 行:1 字符: 913
++ ... .py -Value $t -Encoding UTF8; python .\rev\force_show.py 2>&1 | Out-F ...
++                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  File "C:\User...ow.py", line 39:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    u32.SetWindowLongW.argtypes=[wt.HWND,ctypes.c_int,ctypes.c_long]\n        u32.SetWindowLongW.restype=ctypes.c_long\
+n        st=u32.SetWindowLongW(h,-16,0)\n        u32.SetWindowLongW(h,-16,(st|0x10000000)&0xFFFFFFFF)\n        r = u32.
+ShowWindow(h, 5)
+                                                                     ^
+SyntaxError: unexpected character after line continuation character

@@ -1,0 +1,5 @@
+﻿[js]      0 diag37 ready
+pid 2992
+[js]     77 ShowWindow hwnd=0x5db3111a cmd=4 from MSVBVM60.DLL+0x2d961
+[js]   9388 EXIT code=0 from KERNEL32.DLL+0x2b6f3
+done

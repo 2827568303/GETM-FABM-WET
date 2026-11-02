@@ -1,0 +1,7 @@
+Command: .\.venv\Scripts\python.exe -m pytest 3DWET/tests tests -q -ra
+Fresh execution on 2026-10-12, session 50747, exit code 0.
+327 passed, 3 skipped in 24.34s
+SKIPPED tests/test_project_api.py:138 Creating symlinks requires Windows developer mode or administrator rights
+SKIPPED tests/test_result_files.py:106 Creating symlinks requires OS privilege
+SKIPPED tests/test_result_files.py:119 Creating symlinks requires OS privilege
+This file transcribes the observed tool result; it is not a full console log.

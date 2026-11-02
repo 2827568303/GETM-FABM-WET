@@ -1,0 +1,21 @@
+{
+  "selected_ui_point": "selected-point-only",
+  "request": {
+    "url": "/api/calibration/auto/start",
+    "body": {
+      "method": "scipy",
+      "iterations": 10,
+      "objective": "rmse",
+      "params": [
+        {
+          "module": "diatoms",
+          "param": "cMuMax",
+          "min": 0.1,
+          "max": 2
+        }
+      ]
+    }
+  },
+  "selection_transmitted": false,
+  "solver_started": false
+}

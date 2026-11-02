@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+    .tinymce-content p {
+        padding: 0;
+        margin: 2px 0;
+    }
+    </style>
+  <script src='js/tinymce/tinymce.min.js'></script>
+  <script type="text/javascript">
+  	function GetContent() {
+  	  return tinyMCE.get('editorcontent').getContent();
+  	}
+	
+  	function SetContent(htmlContent) {
+  	  tinyMCE.get('editorcontent').setContent(htmlContent);
+  	}
+  </script>
+  <script>
+      tinymce.init({
+          selector: '#editorcontent',
+          content_style: "p {margin: 0px; padding: 0px}",
+          height: 500,
+          theme: 'modern',
+          plugins: [
+            'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+            'searchreplace wordcount visualblocks visualchars code fullscreen',
+            'insertdatetime nonbreaking save table contextmenu directionality',
+            'emoticons template paste textcolor colorpicker textpattern imagetools'
+          ],
+          toolbar1: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+          toolbar2: 'print preview | forecolor backcolor emoticons',
+          image_advtab: true,
+          setup: function (ed) {
+              ed.on('init', function (e) {  
+                  ed.execCommand('mceFullScreen');
+                  this.getDoc().body.style.fontSize = '12px';
+              });
+          }
+      });
+  </script>
+</head>
+
+<body>
+	<form method="post">
+	    <textarea id="editorcontent">Loading...</textarea>
+	</form>
+</body>
+</html>

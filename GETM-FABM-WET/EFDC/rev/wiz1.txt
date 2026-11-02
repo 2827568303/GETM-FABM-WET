@@ -1,0 +1,8 @@
+﻿[js]      0 diag51 ready
+[js]      0 ready (ExitProcess blocked)
+pid 18436
+t=5s ['ThunderRT6FormDC|Activation Wizard|vis=0', 'ThunderRT6Main|EFDC_Explorer8.4|vis=1']
+t=9s ['ThunderRT6FormDC|Activation Wizard|vis=0', 'ThunderRT6Main|EFDC_Explorer8.4|vis=1']
+[js]   9613 ExitProcess(0) blocked; sleeping forever on tid=43968
+t=14s ['ThunderRT6FormDC|Activation Wizard|vis=0', 'ThunderRT6Main|EFDC_Explorer8.4|vis=1']
+t=20s ['ThunderRT6FormDC|Activation Wizard|vis=0', 'ThunderRT6Main|EFDC_Explorer8.4|vis=1']

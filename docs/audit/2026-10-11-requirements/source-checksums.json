@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-11",
+  "version": "1.4.1",
+  "sources": {
+    ".trae/documents/3DWET_GUI_完成方案.md": "d69488b2a39831c666d153b812f3470dec5bc90fbbb68f046ea7d14ef1751319",
+    ".trae/documents/preprocess_redesign.md": "8d192f6e799efc684b9409e4eed47047f7ce0852ea29ad15dd6984dcf6855599",
+    "姚杨杰/GETM-FABM-WET_3DWET模型完整说明.docx": "5a47265639702ea494decf39a4c906a5f509c824fa28d617a362477a7eddc23f",
+    "3DWET/app/static/js/app.js": "8943257ee769b71c11b136f95d29c37742029338a61a43bb70fa2d4afdac48d6",
+    "3DWET/app/server.py": "9855283d1d60136ec376a6b2525522ece6e058bdc176c4401678e49c54d2f7f2",
+    "3DWET/app/calibration.py": "8c8d265793ac55b965a1a5eab1b57da68d8618a20b3ba0702bdc6e8283d5b874",
+    "requirements.txt": "0bd314965b57dcd96de852747b55de79540118f8121770e2e0f0e1627d59d5a4"
+  },
+  "scope": "Requirements audit; current implementation probes; no user case edits or annual simulation."
+}

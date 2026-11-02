@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-21",
+  "service": "http://127.0.0.1:8766/",
+  "served_markers": {
+    "viz3d.js": "v68",
+    "viz2d_playback_prefetch.js": "v9",
+    "playback_performance.js": "v7",
+    "app.js": "v58"
+  },
+  "case_path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\real-use-validation-20261021\\erken-real-location-24h\\baseline",
+  "case_generation": 1,
+  "source_sha256": {
+    "3DWET/app/templates/index.html": "b63f9ab4716954cf05096eef5f945af05a5e9788a4bba8af27b3e3e32e1f815f",
+    "3DWET/app/server.py": "48c703cac3da6b2c39f80892e1aea9f96d4e49c28876a0c2f1e3fcd78efe7efb",
+    "3DWET/app/static/js/app.js": "6be34513d4e432a665cbcf37a51eb5ebb6855df84f632b9a4d9d88eafdf8976a",
+    "3DWET/app/static/js/viz3d.js": "b119360b4fbef1defc81fb17002d184ae8a2c38d9ded7f48ee8110eaffca68a3",
+    "3DWET/app/static/js/viz2d_playback_prefetch.js": "837c500d3b298c9f08047f9586b83e2f5da1549f64ecb2575501b639eb9e2d45",
+    "3DWET/app/static/js/playback_performance.js": "25c08198633df8ad527ab07a8905f6e3d07ab248c9b4fb129ee8731400dc7a29"
+  },
+  "served_asset_matches_workspace": {
+    "3DWET/app/static/js/app.js": true,
+    "3DWET/app/static/js/viz3d.js": true,
+    "3DWET/app/static/js/viz2d_playback_prefetch.js": true,
+    "3DWET/app/static/js/playback_performance.js": true
+  },
+  "ui_automation_available": false,
+  "solver_rerun": false
+}

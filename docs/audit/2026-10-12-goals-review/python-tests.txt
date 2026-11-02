@@ -1,0 +1,4 @@
+Command: .\.venv\Scripts\python.exe -m pytest 3DWET/tests tests -q -ra
+Exit: 0
+326 passed, 3 skipped in 20.47s
+Skipped: tests/test_project_api.py:138; tests/test_result_files.py:106; tests/test_result_files.py:119. Windows symlink privilege required.

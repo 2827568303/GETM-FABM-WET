@@ -1,0 +1,2 @@
+     0 fail fpu_cmp Error: unable to intercept function at 00B9C258; please file a bug
+     0 ready

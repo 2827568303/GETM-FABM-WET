@@ -1,0 +1,2989 @@
+{
+ "wet/abiotic_sediment": {
+  "sDIMS": {
+   "kind": "state_variable",
+   "units": "g/m2",
+   "label": "inorganic matter"
+  },
+  "sSiPaS": {
+   "kind": "state_variable",
+   "units": "g/m2",
+   "label": "particulate Si"
+  },
+  "sSiO2S": {
+   "kind": "state_variable",
+   "units": "g/m2",
+   "label": "dissolved SiO2"
+  },
+  "sPO4S": {
+   "kind": "state_variable",
+   "units": "g/m2",
+   "label": "phosphate"
+  },
+  "sPAIMS": {
+   "kind": "state_variable",
+   "units": "g/m2",
+   "label": "absorbed phosphate"
+  },
+  "sNH4S": {
+   "kind": "state_variable",
+   "units": "g/m2",
+   "label": "ammonium"
+  },
+  "sNO3S": {
+   "kind": "state_variable",
+   "units": "g/m2",
+   "label": "nitrate"
+  },
+  "afOxySed": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "fraction of aerobic sediment"
+  },
+  "aPEqIMS": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "equilibrium adsorbed PO4"
+  },
+  "tDAbioO2S": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/d",
+   "label": "O2 consumption"
+  },
+  "tDAbioIMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "IM ROC"
+  },
+  "bPorS": {
+   "kind": "diagnostic_variable",
+   "units": "m3/m3",
+   "label": "sediment porosity"
+  },
+  "bPorCorS": {
+   "kind": "diagnostic_variable",
+   "units": "m3/m3",
+   "label": "sediment porosity corrected for tortuosity"
+  },
+  "cDepthS": {
+   "kind": "diagnostic_variable",
+   "units": "m",
+   "label": "sediment depth"
+  },
+  "fDepthDifS": {
+   "kind": "diagnostic_variable",
+   "units": "m",
+   "label": "diffusion distance as fraction of sediment depth"
+  },
+  "tDPOMdummy": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m2",
+   "label": "dummy total sediment POM increase from biology"
+  },
+  "bot_pel_conv": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "current conversion between m-2 and m-3"
+  },
+  "tPChemPO4": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate chem. loss of diss. P from pore water"
+  },
+  "tPSorpIMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate P sorped to IM"
+  },
+  "tNNitrS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate nitrification"
+  },
+  "tNDenitS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate denitrification"
+  },
+  "tSiMinPaS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate Si particulate mineralization"
+  },
+  "fPEqIMS": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "fraction of PAIMS in equilibrium"
+  }
+ },
+ "wet/abiotic_water": {
+  "sDIMW": {
+   "kind": "state_variable",
+   "units": "g/m3",
+   "label": "inorganic matter"
+  },
+  "sSiPaW": {
+   "kind": "state_variable",
+   "units": "g/m3",
+   "label": "particulate Si"
+  },
+  "sPO4W": {
+   "kind": "state_variable",
+   "units": "g/m3",
+   "label": "phosphate"
+  },
+  "sPAIMW": {
+   "kind": "state_variable",
+   "units": "g/m3",
+   "label": "IM-adsorbed P"
+  },
+  "sNH4W": {
+   "kind": "state_variable",
+   "units": "g/m3",
+   "label": "ammonium"
+  },
+  "sNO3W": {
+   "kind": "state_variable",
+   "units": "g/m3",
+   "label": "nitrate"
+  },
+  "sSiO2W": {
+   "kind": "state_variable",
+   "units": "g/m3",
+   "label": "silica dioxide"
+  },
+  "sO2W": {
+   "kind": "state_variable",
+   "units": "g/m3",
+   "label": "oxygen"
+  },
+  "wind": {
+   "kind": "diagnostic_variable",
+   "units": "m/s",
+   "label": "windspeed"
+  },
+  "extIM": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "extIM"
+  },
+  "extPOM": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "extPOM"
+  },
+  "tO2Aer": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "O2_reareation"
+  },
+  "pO2Sat": {
+   "kind": "diagnostic_variable",
+   "units": "pct",
+   "label": "oxygen saturation"
+  },
+  "wSiMinPaW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate Si particulate mineralization"
+  },
+  "wPSorpIMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P adsorped"
+  },
+  "wNNitrW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate nitrification"
+  },
+  "wNDenitW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate denitrification"
+  },
+  "wO2NitrW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate O2 cons. by nitrification"
+  },
+  "wO2MinOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate O2 cons. by OM biotransformation"
+  },
+  "BTdummy": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m2/d",
+   "label": "bioturbation dummy"
+  },
+  "TMdummy": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m2",
+   "label": "total macrophyte dummy"
+  },
+  "aDSubVegdummy": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m2",
+   "label": "dummy aDSubVeg"
+  },
+  "aCovVegdummy": {
+   "kind": "diagnostic_variable",
+   "units": "%",
+   "label": "dummy aCovVeg"
+  },
+  "afCovSurfVegdummy": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "dummy afCovSurfVeg"
+  },
+  "chladummy": {
+   "kind": "diagnostic_variable",
+   "units": "ug/L",
+   "label": "dummy chlorophyl a"
+  }
+ },
+ "wet/bivalves": {
+  "sD": {
+   "kind": "state_variable",
+   "units": "gDW/m2",
+   "label": "DW"
+  },
+  "sN": {
+   "kind": "state_variable",
+   "units": "gN/m2",
+   "label": "N"
+  },
+  "sP": {
+   "kind": "state_variable",
+   "units": "gP/m2",
+   "label": "P"
+  },
+  "sC": {
+   "kind": "state_variable",
+   "units": "gC/m2",
+   "label": "C"
+  },
+  "sD_PV": {
+   "kind": "state_variable",
+   "units": "gDW/m2",
+   "label": "DW pel. var"
+  },
+  "sN_PV": {
+   "kind": "state_variable",
+   "units": "gN/m2",
+   "label": "N pel. var"
+  },
+  "sP_PV": {
+   "kind": "state_variable",
+   "units": "gP/m2",
+   "label": "P pel. var"
+  },
+  "sC_PV": {
+   "kind": "state_variable",
+   "units": "gC/m2",
+   "label": "C pel. var"
+  },
+  "tDConsBiv_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "consumption rate DW"
+  },
+  "tNConsBiv_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "consumption rate N"
+  },
+  "tPConsBiv_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "consumption rate P"
+  },
+  "tCConsBiv_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "consumption rate C"
+  },
+  "tDBivPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "tDBivPOMS"
+  },
+  "tDConsBivTot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "total prey consumption DW"
+  },
+  "tNConsBivTot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "total prey consumption N"
+  },
+  "tPConsBivTot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "total prey consumption P"
+  },
+  "tCConsBivTot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "total prey consumption C"
+  },
+  "tDAssBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "assimilation rate DW"
+  },
+  "tNAssBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "assimilation rate N"
+  },
+  "tPAssBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "assimilation rate P"
+  },
+  "tCAssBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "assimilation rate C"
+  },
+  "tDEgesBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "egestion rate DW"
+  },
+  "tNEgesBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "egestion rate N"
+  },
+  "tPEgesBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "egestion rate P"
+  },
+  "tCEgesBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "egestion rate C"
+  },
+  "tDRespBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "respiration rate DW"
+  },
+  "tNExcrBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "excretion rate N"
+  },
+  "tPExcrBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "excretion rate P"
+  },
+  "tCRespBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "respiration rate C"
+  },
+  "tDMortBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "mortality rate DW"
+  },
+  "tNMortBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "mortality rate N"
+  },
+  "tPMortBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "mortality rate P"
+  },
+  "tCMortBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "mortality rate C"
+  },
+  "tDAgeBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "aging rate DW"
+  },
+  "tNAgeBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "aging rate N"
+  },
+  "tPAgeBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "aging rate P"
+  },
+  "tCAgeBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "aging rate C"
+  },
+  "tDReprBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "reproduction rate DW"
+  },
+  "tNReprBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "reproduction rate N"
+  },
+  "tPReprBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "reproduction rate P"
+  },
+  "tCReprBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "reproduction rate C"
+  },
+  "tCBivPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate CPOMS"
+  },
+  "tDpseudofaecesBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "pseudofaeces production rate DW"
+  },
+  "f_food": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "limitation function for food"
+  },
+  "f_temp": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "limitation function for temperature"
+  },
+  "f_dens": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "limitation function for density"
+  },
+  "f_SS": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "limitation function for SS IM"
+  },
+  "f_DOmort": {
+   "kind": "diagnostic_variable",
+   "units": "/sec",
+   "label": "mortality function DO"
+  },
+  "FR": {
+   "kind": "diagnostic_variable",
+   "units": "m3/gDW/s",
+   "label": "water filtration rate"
+  },
+  "weight": {
+   "kind": "diagnostic_variable",
+   "units": "g DW",
+   "label": "weight"
+  },
+  "Imax": {
+   "kind": "diagnostic_variable",
+   "units": "g DW/g DW/s",
+   "label": "maximum potential ingestion rate"
+  },
+  "tSiO2EgestBiv": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "SiO2W egestion rate"
+  }
+ },
+ "wet/bot_pel_interface": {
+  "bot_pel_conv": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "current conversion between m-2 and m-3"
+  }
+ },
+ "wet/burial": {
+  "tDBurPOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate D POM buried"
+  },
+  "tPBurPOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate P POM buried"
+  },
+  "tNBurPOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate N POM buried"
+  },
+  "tCBurPOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C POM buried"
+  },
+  "tDBurDOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate D DOM buried"
+  },
+  "tPBurDOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate P DOM buried"
+  },
+  "tNBurDOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate N DOM buried"
+  },
+  "tCBurDOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C DOM buried"
+  },
+  "VDeltaS": {
+   "kind": "diagnostic_variable",
+   "units": "m",
+   "label": "sediment turnover depth"
+  },
+  "tDBurIM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate IM burial"
+  },
+  "tSiBurPa": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate Si particulate burial"
+  },
+  "tPBurPO4": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PO4 burial"
+  },
+  "tPBurAIM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate P adsorped to IM burial"
+  },
+  "tNBurNH4": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NH4 burial"
+  },
+  "tNBurNO3": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NO3 burial"
+  },
+  "tDBurHum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DW humus burial"
+  },
+  "tPBurHum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate P humus burial"
+  },
+  "tNBurHum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate N humus burial"
+  },
+  "tCBurHum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C humus burial"
+  }
+ },
+ "wet/fish": {
+  "sD": {
+   "kind": "state_variable",
+   "units": "gDW/m3",
+   "label": "DW"
+  },
+  "sP": {
+   "kind": "state_variable",
+   "units": "gP/m3",
+   "label": "P"
+  },
+  "sN": {
+   "kind": "state_variable",
+   "units": "gN/m3",
+   "label": "N"
+  },
+  "sC": {
+   "kind": "state_variable",
+   "units": "gC/m3",
+   "label": "C"
+  },
+  "fVul": {
+   "kind": "state_variable",
+   "units": "-",
+   "label": "biomass fraction vulnerable to predation"
+  },
+  "sFRes": {
+   "kind": "state_variable",
+   "units": "gDW/m3",
+   "label": "reserve fraction of biomass"
+  },
+  "sDSiz": {
+   "kind": "state_variable",
+   "units": "gDW/ind",
+   "label": "average individual fish size"
+  },
+  "pred_dummy": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "predation dummy"
+  },
+  "tDConsFiPlan_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate plankton D consumed"
+  },
+  "tPConsFiPlan_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate plankton P consumed"
+  },
+  "tNConsFiPlan_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate plankton N consumed"
+  },
+  "tCConsFiPlan_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate plankton C consumed"
+  },
+  "Bioturbation": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m3/d",
+   "label": "Bioturbation"
+  },
+  "tDConsFiBent_*": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m2/s",
+   "label": "rate benthic D consumed"
+  },
+  "tNConsFiBent_*": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m2",
+   "label": "rate benthic N consumed"
+  },
+  "tPConsFiBent_*": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m2",
+   "label": "rate benthic P consumed"
+  },
+  "tCConsFiBent_*": {
+   "kind": "diagnostic_variable",
+   "units": "gC/m2",
+   "label": "rate benthic C consumed"
+  },
+  "tDConsFiPisc_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate fish D consumed"
+  },
+  "tPConsFiPisc_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate fish P consumed"
+  },
+  "tNConsFiPisc_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate fish N consumed"
+  },
+  "tCConsFiPisc_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate fish C consumed"
+  },
+  "tDMigrFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW migration"
+  },
+  "tNMigrFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N migration"
+  },
+  "tPMigrFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P migration"
+  },
+  "tCMigrFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate C migration"
+  },
+  "tDEgesFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW egested"
+  },
+  "tNEgesFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N egested"
+  },
+  "tPEgesFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P egested"
+  },
+  "tCEgesFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate C egested"
+  },
+  "tDMortFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW from mortality"
+  },
+  "tNMortFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N from mortality"
+  },
+  "tPMortFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P from mortality"
+  },
+  "tCMortFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate C from mortality"
+  },
+  "tDRespFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW respired"
+  },
+  "tCRespFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate C respired"
+  },
+  "tDAssFiTot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW assimilated"
+  },
+  "tDFiPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DPOMW egested"
+  },
+  "tDFiDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DDOMW egested"
+  },
+  "tDMortFiBot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW bone lost from system"
+  },
+  "tNMortFiBot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N bone lost from system"
+  },
+  "tPMortFiBot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P bone lost from system"
+  },
+  "tCMortFiBot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate C bone lost from system"
+  },
+  "tNExcrFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NH4 excreted"
+  },
+  "tNFiNH4W": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NH4 out"
+  },
+  "tNFiPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NPOMW out"
+  },
+  "tNFiDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NDOMW out"
+  },
+  "tPExcrFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PO4 excreted"
+  },
+  "tPFiPO4W": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PO4 out"
+  },
+  "tPFiPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PPOMW out"
+  },
+  "tPFiDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PDOMW out"
+  },
+  "tCFiPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate CPOMW out"
+  },
+  "tCFiDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate CDOMW out"
+  },
+  "tDAgeFish": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW ageing"
+  },
+  "tNAgeFish": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N ageing"
+  },
+  "tPAgeFish": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P ageing"
+  },
+  "tCAgeFish": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate C ageing"
+  },
+  "tDConsFiPlanSum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate total plankton consumed"
+  },
+  "tDConsFiBentSum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate total benthos consumed"
+  },
+  "tDConsFiPiscSum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate total fish consumed"
+  },
+  "aFeedLvlPlan": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "feeding level planktivore"
+  },
+  "aFeedLvlBent": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "feeding level benthivore"
+  },
+  "aFeedLvlPisc": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "feeding level piscivore"
+  },
+  "fFishPlan": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "time fraction on planktivory"
+  },
+  "fFishBent": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "time fraction on benthivory"
+  },
+  "fFishPisc": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "time fraction on piscivory"
+  },
+  "tDReproPOM": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m3",
+   "label": "absolute reproduction flux to DPOMW"
+  },
+  "tNReproPOM": {
+   "kind": "diagnostic_variable",
+   "units": "gN/m3",
+   "label": "absolute reproduction flux to NPOMW"
+  },
+  "tPReproPOM": {
+   "kind": "diagnostic_variable",
+   "units": "gP/m3",
+   "label": "absolute reproduction flux to PPOMW"
+  },
+  "tCReproPOM": {
+   "kind": "diagnostic_variable",
+   "units": "gC/m3",
+   "label": "absolute reproduction flux to CPOMW"
+  },
+  "PStar": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "extent of risk-reducing behaviors employed"
+  },
+  "Day_last": {
+   "kind": "diagnostic_variable",
+   "units": "d",
+   "label": "last time step day"
+  }
+ },
+ "wet/fish_pclake": {
+  "sD": {
+   "kind": "state_variable",
+   "units": "gDW/m3",
+   "label": "DW"
+  },
+  "sP": {
+   "kind": "state_variable",
+   "units": "gP/m3",
+   "label": "P"
+  },
+  "sN": {
+   "kind": "state_variable",
+   "units": "gN/m3",
+   "label": "N"
+  },
+  "tDConsFiZoo_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate Zoo D consumed"
+  },
+  "tPConsFiZoo_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate Zoo P consumed"
+  },
+  "tNConsFiZoo_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate Zoo N consumed"
+  },
+  "Bioturbation": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m3/d",
+   "label": "Bioturbation"
+  },
+  "tDConsFiBen_*": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m2",
+   "label": "rate tDConsFiBen"
+  },
+  "tNConsFiBen_*": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m2",
+   "label": "rate sNConsFiBen"
+  },
+  "tPConsFiBen_*": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m2",
+   "label": "rate sPConsFiBen"
+  },
+  "tDConsFiPisc_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate Pisc D consumed"
+  },
+  "tPConsFiPisc_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate Pisc P consumed"
+  },
+  "tNConsFiPisc_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate Pisc N consumed"
+  },
+  "tDMigrFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW migration"
+  },
+  "tNMigrFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N migration"
+  },
+  "tPMigrFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P migration"
+  },
+  "tDConsFiZooSum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW zooplankton consumed"
+  },
+  "tNConsFiZooSum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N zooplankton consumed"
+  },
+  "tPConsFiZooSum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P zooplankton consumed"
+  },
+  "tDConsFiBenSum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW zoobenthos consumed"
+  },
+  "tNConsFiBenSum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N zoobenthos consumed"
+  },
+  "tPConsFiBenSum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P zoobenthos consumed"
+  },
+  "tDConsFiPiscSum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW fish consumed"
+  },
+  "tNConsFiPiscSum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N fish consumed"
+  },
+  "tPConsFiPiscSum": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P fish consumed"
+  },
+  "tDEgesFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW egested"
+  },
+  "tNEgesFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N egested"
+  },
+  "tPEgesFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P egested"
+  },
+  "tDMortFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW from mortality"
+  },
+  "tNMortFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N from mortality"
+  },
+  "tPMortFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P from mortality"
+  },
+  "tDRespFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW respired"
+  },
+  "tDFiPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DPOMW egested"
+  },
+  "tDFiDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DDOMW egested"
+  },
+  "tDMortFiBot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW bone lost from system"
+  },
+  "tNMortFiBot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N bone lost from system"
+  },
+  "tPMortFiBot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P bone lost from system"
+  },
+  "tNExcrFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NH4 excreted"
+  },
+  "tNFiNH4W": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NH4 out"
+  },
+  "tNFiPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NPOMW out"
+  },
+  "tNFiDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NDOMW out"
+  },
+  "tPExcrFi": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PO4 excreted"
+  },
+  "tPFiPO4W": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PO4 out"
+  },
+  "tPFiPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PPOMW out"
+  },
+  "tPFiDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PDOMW out"
+  },
+  "tDAgeFish": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW ageing"
+  },
+  "tNAgeFish": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N ageing"
+  },
+  "tPAgeFish": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P ageing"
+  },
+  "tDReprFish": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW reproduced"
+  },
+  "tNReprFish": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N reproduced"
+  },
+  "tPReprFish": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P reproduced"
+  }
+ },
+ "wet/inorganic_carbon": {
+  "sDICW": {
+   "kind": "state_variable",
+   "units": "g/m3",
+   "label": "dissolved inorganic carbon"
+  },
+  "sAlkW": {
+   "kind": "state_variable",
+   "units": "mEq/m3",
+   "label": "total alkalinity"
+  },
+  "pH": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "pH (freshwater carbonate system"
+  },
+  "pCO2W": {
+   "kind": "diagnostic_variable",
+   "units": "ppm",
+   "label": "CO2 partial pressure in water"
+  },
+  "sCO2W": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3",
+   "label": "free dissolved CO2"
+  },
+  "sHCO3W": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3",
+   "label": "bicarbonate C"
+  },
+  "sCO3W": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3",
+   "label": "carbonate C"
+  },
+  "tCO2Flux": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "air-water CO2 flux (positive into water"
+  },
+  "k600": {
+   "kind": "diagnostic_variable",
+   "units": "m/d",
+   "label": "gas transfer velocity k600"
+  }
+ },
+ "wet/macrophytes": {
+  "sD": {
+   "kind": "state_variable",
+   "units": "gDW/m2",
+   "label": "DW"
+  },
+  "sN": {
+   "kind": "state_variable",
+   "units": "gN/m2",
+   "label": "N"
+  },
+  "sP": {
+   "kind": "state_variable",
+   "units": "gP/m2",
+   "label": "P"
+  },
+  "sC": {
+   "kind": "state_variable",
+   "units": "gC/m2",
+   "label": "P"
+  },
+  "sD_PV": {
+   "kind": "state_variable",
+   "units": "gDW/m2",
+   "label": "DW pel. var"
+  },
+  "sP_PV": {
+   "kind": "state_variable",
+   "units": "gP/m2",
+   "label": "P pel. var"
+  },
+  "sN_PV": {
+   "kind": "state_variable",
+   "units": "gN/m2",
+   "label": "N pel. var"
+  },
+  "sC_PV": {
+   "kind": "state_variable",
+   "units": "gC/m2",
+   "label": "C pel. var"
+  },
+  "bfRootVeg_PV": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m2",
+   "label": "bfRootVeg"
+  },
+  "aDSubVeg_PV": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m2",
+   "label": "aDSubVeg_PV"
+  },
+  "aCovVeg_PV": {
+   "kind": "diagnostic_variable",
+   "units": "%",
+   "label": "aCovVeg_PV"
+  },
+  "afCovSurfVeg_PV": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "afCovSurfVeg"
+  },
+  "aDSubVeg": {
+   "kind": "diagnostic_variable",
+   "units": "gDW/m2",
+   "label": "aDSubVeg"
+  },
+  "aCovVeg": {
+   "kind": "diagnostic_variable",
+   "units": "%",
+   "label": "aCovVeg"
+  },
+  "afCovSurfVeg": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "afCovSurfVeg"
+  },
+  "aNutLimVeg": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "nutrient limitation factor"
+  },
+  "macroextinction": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "macroextinction"
+  },
+  "aLLimVeg": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "light limitation factor"
+  },
+  "aLPAR1Veg": {
+   "kind": "diagnostic_variable",
+   "units": "W/m2",
+   "label": "light at top of the macrophytes"
+  },
+  "aLPAR2Veg": {
+   "kind": "diagnostic_variable",
+   "units": "W/m2",
+   "label": "light at bottom of the macrophytes"
+  },
+  "tDBedPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "tDBedPOMS"
+  },
+  "tDBedVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "DVeg exchange"
+  },
+  "tNBedVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "NVeg exchange"
+  },
+  "tPBedVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "PVeg exchange"
+  },
+  "tCBedVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "CVeg exchange"
+  },
+  "tO2BedW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "tO2BedW exchange"
+  },
+  "ufDay": {
+   "kind": "diagnostic_variable",
+   "units": "d",
+   "label": "day length"
+  },
+  "aMuVeg": {
+   "kind": "diagnostic_variable",
+   "units": "1/s",
+   "label": "rate DW actual growth"
+  },
+  "tDEnvProdVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "logistic correction of production"
+  },
+  "tDMigrVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DW migration"
+  },
+  "tDProdVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DW production"
+  },
+  "tDMortVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DW mortality"
+  },
+  "wDBedPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DPOMW from mortality"
+  },
+  "wDBedDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DDOMW from mortality"
+  },
+  "tDRespVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DW respiration"
+  },
+  "tNMigrVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate N migration"
+  },
+  "tNUptVegW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate N uptake from water"
+  },
+  "tNExcrVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate N excretion"
+  },
+  "tNUptNH4VegW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NH4W uptake"
+  },
+  "tNExcrVegW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NH4W excreted"
+  },
+  "tNMortVegNH4W": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NH4W from mortality"
+  },
+  "tNUptNO3VegW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NO3W uptake"
+  },
+  "wNBedPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NPOMW from mortality"
+  },
+  "wNBedDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NDOMW from mortality"
+  },
+  "tPMigrVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate P migration"
+  },
+  "tPUptVegW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PO4W uptake from water"
+  },
+  "tPExcrVegW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PO4W excreted"
+  },
+  "tPMortVegPO4W": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PO4W from mortality"
+  },
+  "wPBedPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PPOMW from mortality"
+  },
+  "wPBedDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PDOMW from mortality"
+  },
+  "tO2ProdVegW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate O2W production"
+  },
+  "tO2RespVegW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate O2W respiration"
+  },
+  "tO2UptNO3VegW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate O2W release due to NO3 uptake"
+  },
+  "tCMigrVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C migration"
+  },
+  "tCProdVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C production"
+  },
+  "tCMortVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C mortality"
+  },
+  "wCBedPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate CPOMW from mortality"
+  },
+  "wCBedDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate CDOMW from mortality"
+  },
+  "tCRespVeg": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C respiration"
+  },
+  "tDBedDOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DDOMS from mortality"
+  },
+  "tNUptNH4VegS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NH4S uptake"
+  },
+  "tNUptVegS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate N uptake from sediment"
+  },
+  "tNExcrVegS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NH4S excreted"
+  },
+  "tNMortVegNH4S": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NH4S from mortality"
+  },
+  "tNUptNO3VegS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NO3S uptake"
+  },
+  "tNBedPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NPOMS from mortality"
+  },
+  "tNBedDOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NDOMS from mortality"
+  },
+  "tPUptVegS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PO4S uptake from sediment"
+  },
+  "tPExcrVegS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PO4S excreted"
+  },
+  "tPMortVegPO4S": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PO4S from mortality"
+  },
+  "tPBedPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PPOMS from mortality"
+  },
+  "tPBedDOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PDOMS from mortality"
+  },
+  "tO2ProdVegS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate O2S production"
+  },
+  "tCBedPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate CPOMS from mortality"
+  },
+  "tCBedDOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate CDOMS from mortality"
+  },
+  "aDayInitVeg": {
+   "kind": "diagnostic_variable",
+   "units": "d",
+   "label": "aDayInitVeg"
+  }
+ },
+ "wet/methane": {
+  "sCH4W": {
+   "kind": "state_variable",
+   "units": "g/m3",
+   "label": "methane C in water"
+  },
+  "wCH4Oxid": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "CH4 oxidation rate in water"
+  },
+  "tCH4Prod": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "CH4 production in sediment"
+  },
+  "tCH4Ebul": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "CH4 ebullition flux"
+  },
+  "tCH4Diff": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "CH4 diffusive emission at surface"
+  }
+ },
+ "wet/om_pool": {
+  "sDW": {
+   "kind": "state_variable",
+   "units": "gDW/m3",
+   "label": "water column DW"
+  },
+  "sPW": {
+   "kind": "state_variable",
+   "units": "gP/m3",
+   "label": "water column P"
+  },
+  "sNW": {
+   "kind": "state_variable",
+   "units": "gN/m3",
+   "label": "water column N"
+  },
+  "sCW": {
+   "kind": "state_variable",
+   "units": "gC/m3",
+   "label": "water column C"
+  },
+  "sDS": {
+   "kind": "state_variable",
+   "units": "gDW/m2",
+   "label": "sediment DW"
+  },
+  "sPS": {
+   "kind": "state_variable",
+   "units": "gP/m2",
+   "label": "sediment P"
+  },
+  "sNS": {
+   "kind": "state_variable",
+   "units": "gN/m2",
+   "label": "sediment N"
+  },
+  "sCS": {
+   "kind": "state_variable",
+   "units": "gC/m2",
+   "label": "sediment C"
+  },
+  "sDS_PV": {
+   "kind": "state_variable",
+   "units": "gDW/m2",
+   "label": "sediment DW PV"
+  },
+  "sPS_PV": {
+   "kind": "state_variable",
+   "units": "gP/m2",
+   "label": "sediment P  PV"
+  },
+  "sNS_PV": {
+   "kind": "state_variable",
+   "units": "gN/m2",
+   "label": "sediment N  PV"
+  },
+  "sCS_PV": {
+   "kind": "state_variable",
+   "units": "gC/m2",
+   "label": "sediment C  PV"
+  },
+  "rPDW": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "P/D ratio water"
+  },
+  "rNDW": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "N/D ratio water"
+  },
+  "rCDW": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "C/D ratio water"
+  },
+  "wCMin": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "C bio-transformation in water"
+  },
+  "extinction": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "extinction"
+  },
+  "rPDS": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "P/D ratio sediment"
+  },
+  "rNDS": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "N/D ratio sediment"
+  },
+  "rCDS": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "C/D ratio sediment"
+  },
+  "tDPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "ROC DW OM pool in sediment"
+  },
+  "tDTrans": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DW biotrans. minus refraction"
+  },
+  "tCTrans": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C biotrans. minus refraction"
+  },
+  "wDMin": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate D OM bio-transform. in water"
+  },
+  "wNMin": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N OM bio-transform. in water"
+  },
+  "wPMin": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P OM bio-transform. in water"
+  },
+  "wNDenitW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate denitrification in water"
+  },
+  "wO2Min": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate O2 cons. by OM biotransformation in water"
+  },
+  "wO2Prod": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate O2 production"
+  },
+  "tDMin": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DW biotransform. in sediment"
+  },
+  "tNMin": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate N biotransform. in sediment"
+  },
+  "tPMin": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate P biotransform. in sediment"
+  },
+  "tCMin": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C biotransform. in sediment"
+  },
+  "tNTrans": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate N biotrans. minus refraction"
+  },
+  "tPTrans": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate P biotrans. minus refraction"
+  },
+  "tDRefr": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DW refraction"
+  },
+  "tNRefr": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate N refraction"
+  },
+  "tPRefr": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate P refraction"
+  },
+  "tCRefr": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C refraction"
+  },
+  "tDRefr_PV": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW refraction pelagic mirror"
+  },
+  "tNRefr_PV": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N refraction pelagic mirror"
+  },
+  "tPRefr_PV": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P refraction pelagic mirror"
+  },
+  "tCRefr_PV": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate C refraction pelagic mirror"
+  }
+ },
+ "wet/phytoplankton": {
+  "sDW": {
+   "kind": "state_variable",
+   "units": "gDW/m3",
+   "label": "water column DW"
+  },
+  "sPW": {
+   "kind": "state_variable",
+   "units": "gP/m3",
+   "label": "water column P"
+  },
+  "sNW": {
+   "kind": "state_variable",
+   "units": "gN/m3",
+   "label": "water column N"
+  },
+  "sCW": {
+   "kind": "state_variable",
+   "units": "gC/m3",
+   "label": "water column C"
+  },
+  "sDS": {
+   "kind": "state_variable",
+   "units": "gDW/m2",
+   "label": "sediment DW"
+  },
+  "sPS": {
+   "kind": "state_variable",
+   "units": "gP/m2",
+   "label": "sediment P"
+  },
+  "sNS": {
+   "kind": "state_variable",
+   "units": "gN/m2",
+   "label": "sediment N"
+  },
+  "sCS": {
+   "kind": "state_variable",
+   "units": "gC/m2",
+   "label": "sediment C"
+  },
+  "sDS_PV": {
+   "kind": "state_variable",
+   "units": "gDW/m2",
+   "label": "sediment DW PV"
+  },
+  "sPS_PV": {
+   "kind": "state_variable",
+   "units": "gP/m2",
+   "label": "sediment P  PV"
+  },
+  "sNS_PV": {
+   "kind": "state_variable",
+   "units": "gN/m2",
+   "label": "sediment N  PV"
+  },
+  "sCS_PV": {
+   "kind": "state_variable",
+   "units": "gC/m2",
+   "label": "sediment C  PV"
+  },
+  "oSiW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3 ",
+   "label": "Si"
+  },
+  "oSiS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "oSiS"
+  },
+  "oChla": {
+   "kind": "diagnostic_variable",
+   "units": "mg/m3",
+   "label": "chlorophyll a"
+  },
+  "rPDW": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "P/D ratio"
+  },
+  "rNDW": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "N/D ratio"
+  },
+  "rCDW": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "C/D ratio"
+  },
+  "ext": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "phytoextinction factor"
+  },
+  "extinction": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "extinction"
+  },
+  "rPDS": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "rPDS"
+  },
+  "rNDS": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "rNDS"
+  },
+  "rCDS": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "rCDS"
+  },
+  "aLLim": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "light limitation factor"
+  },
+  "aNutLim": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "nutrient limitation factor"
+  },
+  "aPLim": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "P limitation factor"
+  },
+  "aNLim": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "N limitation factor"
+  },
+  "tDPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DPOMS from mortality"
+  },
+  "Swim": {
+   "kind": "diagnostic_variable",
+   "units": "m/s",
+   "label": "rate Swim speed"
+  },
+  "wDAss": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW assimilation"
+  },
+  "wDRespW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW respiration"
+  },
+  "wDPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DPOMW from mortality"
+  },
+  "wDDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DDOMW from mortality"
+  },
+  "wPUpt": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P abs. uptake"
+  },
+  "wPExcrW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PO4W excreted"
+  },
+  "wPMortPO4W": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PO4W dead"
+  },
+  "wPPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PPOMW from mortality"
+  },
+  "wPDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PDOMW from mortality"
+  },
+  "wNUptNH4": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NH4W uptake"
+  },
+  "wNUptNO3": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NO3W uptake"
+  },
+  "wNFix": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N fixation"
+  },
+  "wNExcrW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NH4W excreted"
+  },
+  "wNMortNH4W": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NH4W from mortality"
+  },
+  "wNPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NPOMW from mortality"
+  },
+  "wNDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NDOMW from mortality"
+  },
+  "wSiUpt": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate SiW uptake"
+  },
+  "wSiExcrW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate SiW excreted"
+  },
+  "wSiPaW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate Si part. W from mortality"
+  },
+  "wSiO2MortW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate SiDOMW dead"
+  },
+  "wO2Prod": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate O2 production"
+  },
+  "wO2RespW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate O2 respiration"
+  },
+  "wCO2UptW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate CO2 uptake"
+  },
+  "wCO2RespW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate CO2 production"
+  },
+  "wCPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate CPOMW from mortality"
+  },
+  "wCDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate CDOMW from mortality"
+  },
+  "meanparout": {
+   "kind": "diagnostic_variable",
+   "units": "W",
+   "label": "mean par for light"
+  },
+  "tDSed": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW sedimentation"
+  },
+  "tPSed": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P sedimentation"
+  },
+  "tNSed": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N sedimentation"
+  },
+  "tDResus": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW resuspension"
+  },
+  "tPResus": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P resuspension"
+  },
+  "tNResus": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N resuspension"
+  },
+  "tDDOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DDOMS from mortality"
+  },
+  "tNMortNH4S": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate HN4S from mortality"
+  },
+  "tNExcrS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate HN4S excreted"
+  },
+  "tNPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NPOMS from mortality"
+  },
+  "tNDOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NDOMS from mortality"
+  },
+  "tPMortPO4S": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PO4S from mortality"
+  },
+  "tPExcrS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PO4S excreted"
+  },
+  "tPPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PPOMS from mortality"
+  },
+  "tPDOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PDOMS from mortality"
+  },
+  "tCRespS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate CO2 respired"
+  },
+  "tCPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate CPOMS from mortality"
+  },
+  "tCDOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate CDOMS from mortality"
+  },
+  "tSiPaS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate Si part. S from mortality"
+  },
+  "tSiO2S": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate SiDOMS from mortality"
+  },
+  "tSiExcrS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate SiS excreted"
+  }
+ },
+ "wet/resus_sed": {
+  "tDResusDead": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "tDResusDead"
+  },
+  "aFunTauTmSet": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "basic settling rate"
+  },
+  "tDAbioIMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "IM abiotic update"
+  },
+  "tDAbioPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "POM abiotic update"
+  },
+  "tDResusIM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate IM resuspended"
+  },
+  "tDResusPOM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DPOM resuspended"
+  },
+  "tNResusPOM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DPOM resuspended"
+  },
+  "tPResusPOM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DPOM resuspended"
+  },
+  "tSiResusPa": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate Si particulate resuspended"
+  },
+  "tPResusPO4": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PO4 resuspended"
+  },
+  "tPResusAIM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PAIM resuspended"
+  },
+  "tNResusNO3": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NO3 resuspended"
+  },
+  "tNResusNH4": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NH4 resuspended"
+  },
+  "tDSetIM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate IM sedimented"
+  },
+  "tDSetPOM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DPOM sedimented"
+  },
+  "tNSetPOM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DPOM sedimented"
+  },
+  "tPSetPOM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DPOM sedimented"
+  },
+  "tPSetAIM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PAIM sedimented"
+  },
+  "tSiSetPa": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate Si particulate sedimented"
+  }
+ },
+ "wet/sediment_exchange": {
+  "tDExchPOMS_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "ROC DPOM exchange"
+  },
+  "tDResusPOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DPOM resuspended"
+  },
+  "tPResusPOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PPOM resuspended"
+  },
+  "tNResusPOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NPOM resuspended"
+  },
+  "tCResusPOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate CPOM resuspended"
+  },
+  "tDSedPOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DPOM sedimented"
+  },
+  "tPSedPOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PPOM sedimented"
+  },
+  "tNSedPOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NPOM sedimented"
+  },
+  "tCSedPOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate CPOM sedimented"
+  },
+  "tDResusDOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DDOM resuspended"
+  },
+  "tPResusDOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PDOM resuspended"
+  },
+  "tNResusDOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NDOM resuspended"
+  },
+  "tCResusDOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate CDOM resuspended"
+  },
+  "tDDifDOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DDOM diffussion"
+  },
+  "tPDifDOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PDOM diffussion"
+  },
+  "tNDifDOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NDOM diffussion"
+  },
+  "tCDifDOM_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate CDOM diffussion"
+  },
+  "tDResusDead": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "tDResusDead"
+  },
+  "aFunTauTmSet": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "basic settling rate"
+  },
+  "tDAbioIMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "IM abiotic update"
+  },
+  "tDAbioTotPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "Total POM abiotic update"
+  },
+  "tDResusIM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate IM resuspended"
+  },
+  "tSiResusPa": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate Si particulate resuspended"
+  },
+  "tPResusPO4": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PO4 resuspended"
+  },
+  "tPResusAIM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PAIM resuspended"
+  },
+  "tNResusNO3": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NO3 resuspended"
+  },
+  "tNResusNH4": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NH4 resuspended"
+  },
+  "tDSedIM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate IM sedimented"
+  },
+  "tPSedAIM": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PAIM sedimented"
+  },
+  "tSiSedPa": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate Si particulate sedimented"
+  },
+  "tPDifPO4": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PO4 diffusion"
+  },
+  "tNDifNO3": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NO3 diffusion"
+  },
+  "tNDifNH4": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NH4 diffusion"
+  },
+  "tSiDifSiO2": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate SiO2 diffusion"
+  }
+ },
+ "wet/zoobenthos": {
+  "sD": {
+   "kind": "state_variable",
+   "units": "gDW/m2",
+   "label": "DW"
+  },
+  "sP": {
+   "kind": "state_variable",
+   "units": "gP/m2",
+   "label": "P"
+  },
+  "sN": {
+   "kind": "state_variable",
+   "units": "gN/m2",
+   "label": "N"
+  },
+  "sC": {
+   "kind": "state_variable",
+   "units": "gC/m2",
+   "label": "C"
+  },
+  "sD_PV": {
+   "kind": "state_variable",
+   "units": "gDW/m2",
+   "label": "DW pel. var"
+  },
+  "sP_PV": {
+   "kind": "state_variable",
+   "units": "gP/m2",
+   "label": "P pel. var"
+  },
+  "sN_PV": {
+   "kind": "state_variable",
+   "units": "gN/m2",
+   "label": "N pel. var"
+  },
+  "sC_PV": {
+   "kind": "state_variable",
+   "units": "gC/m2",
+   "label": "C pel. var"
+  },
+  "tDBentPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "tDBentPOMS"
+  },
+  "rPDBent": {
+   "kind": "diagnostic_variable",
+   "units": "gP/gDW",
+   "label": "P/D ratio"
+  },
+  "rNDBent": {
+   "kind": "diagnostic_variable",
+   "units": "gN/gDW",
+   "label": "N/D ratio"
+  },
+  "rCDBent": {
+   "kind": "diagnostic_variable",
+   "units": "gC/gDW",
+   "label": "C/D ratio"
+  },
+  "tDMigrBent": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DW migrated"
+  },
+  "tNMigrBent": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate N migrated"
+  },
+  "tPMigrBent": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate P migrated"
+  },
+  "tCMigrBent": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C migrated"
+  },
+  "tDConsBentTot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate D prey consumed"
+  },
+  "tNConsBentTot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate N prey consumed"
+  },
+  "tPConsBentTot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate P prey consumed"
+  },
+  "tCConsBentTot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C prey consumed"
+  },
+  "tDEgesBent": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DW egested"
+  },
+  "tNEgesBent": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate N egested"
+  },
+  "tPEgesBent": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate P egested"
+  },
+  "tCEgesBent": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C egested"
+  },
+  "tDRespBent": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DW respired"
+  },
+  "tCRespBent": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C respired"
+  },
+  "tPBentPO4S": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PO4S out"
+  },
+  "tNBentNH4S": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NH4S out"
+  },
+  "tDBentTPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DPOMS out"
+  },
+  "tDBentDOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DDOMS out"
+  },
+  "tNBentTPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NPOMS out"
+  },
+  "tNBentDOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate NDOMS out"
+  },
+  "tPBentTPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PPOMS out"
+  },
+  "tPBentDOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate PDOMS out"
+  },
+  "tCBentPOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate CPOMS out"
+  },
+  "tCBentDOMS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate CDOMS out"
+  },
+  "tDMortBent": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DW from mortality"
+  },
+  "tNMortBent": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate N from mortality"
+  },
+  "tPMortBent": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate P from mortality"
+  },
+  "tCMortBent": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate C from mortality"
+  },
+  "tDMortO2": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate DW from mort. due to O2"
+  },
+  "fO2": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "oxygen stress fraction"
+  },
+  "tSiO2BentS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate SiO2W egested"
+  },
+  "tSiBentPaS": {
+   "kind": "diagnostic_variable",
+   "units": "g/m2/s",
+   "label": "rate Si partic. S egested"
+  },
+  "tDConsBent_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate D consumed"
+  },
+  "tPConsBent_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P consumed"
+  },
+  "tNConsBent_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N consumed"
+  },
+  "tCConsBent_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate C consumed"
+  }
+ },
+ "wet/zooplankton": {
+  "sD": {
+   "kind": "state_variable",
+   "units": "gDW/m3",
+   "label": "DW"
+  },
+  "sP": {
+   "kind": "state_variable",
+   "units": "gP/m3",
+   "label": "P"
+  },
+  "sN": {
+   "kind": "state_variable",
+   "units": "gN/m3",
+   "label": "N"
+  },
+  "sC": {
+   "kind": "state_variable",
+   "units": "gC/m3",
+   "label": "C"
+  },
+  "wDConsZoo_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate D consumed"
+  },
+  "wPConsZoo_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P consumed"
+  },
+  "wNConsZoo_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N consumed"
+  },
+  "wCConsZoo_*": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate C consumed"
+  },
+  "rPDZoo": {
+   "kind": "diagnostic_variable",
+   "units": "gP/gDW",
+   "label": "P/D ratio"
+  },
+  "rNDZoo": {
+   "kind": "diagnostic_variable",
+   "units": "gN/gDW",
+   "label": "N/D ratio"
+  },
+  "rCDZoo": {
+   "kind": "diagnostic_variable",
+   "units": "gC/gDW",
+   "label": "C/D ratio"
+  },
+  "wDConsZooTot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate D prey consumed"
+  },
+  "wNConsZooTot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N prey consumed"
+  },
+  "wPConsZooTot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P prey consumed"
+  },
+  "wCConsZooTot": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate C prey consumed"
+  },
+  "aFeedLvlZoo": {
+   "kind": "diagnostic_variable",
+   "units": "-",
+   "label": "feeding level"
+  },
+  "wDEgesZoo": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW egested"
+  },
+  "wNEgesZoo": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N egested"
+  },
+  "wPEgesZoo": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P egested"
+  },
+  "wCEgesZoo": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate C egested"
+  },
+  "wDMortZoo": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW from mortality"
+  },
+  "wNMortZoo": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate N from mortality"
+  },
+  "wPMortZoo": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate P from mortality"
+  },
+  "wCMortZoo": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate C from mortality"
+  },
+  "wDZooPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DPOMW out"
+  },
+  "wNZooPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NPOMW out"
+  },
+  "wPZooPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PPOMW out"
+  },
+  "wCZooPOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate CPOMW out"
+  },
+  "wDZooDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DDOMW out"
+  },
+  "wNZooDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NDOMW out"
+  },
+  "wPZooDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PDOMW out"
+  },
+  "wCZooDOMW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate CDOMW out"
+  },
+  "wDRespZoo": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate DW respired"
+  },
+  "wCRespZoo": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate C respired"
+  },
+  "wNZooNH4W": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate NH4W out"
+  },
+  "wPZooPO4W": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate PO4W out"
+  },
+  "wSiO2ZooW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate SiO2W out"
+  },
+  "wSiPaZooW": {
+   "kind": "diagnostic_variable",
+   "units": "g/m3/s",
+   "label": "rate Si particulate W egested"
+  }
+ }
+}

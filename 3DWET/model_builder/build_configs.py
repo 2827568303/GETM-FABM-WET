@@ -194,10 +194,10 @@ def build_getm_inp(config: LakeConfig, output_dir: str) -> str:
     save_taub = .false.
     first_2d = 1
     step_2d = 1440
-    sync_2d = 1440
+    sync_2d = 1
     first_3d = 1
     step_3d = 1440
-    sync_3d = 1440
+    sync_3d = 1
     save_meteo = .false.
     save_numerical_analyses = .false.
 /

@@ -40,7 +40,7 @@
 #endif
 #ifdef _FABM_
    use getm_fabm, only: fabm_init_method
-   use getm_fabm, only: fabm_pel,fabm_ben
+   use getm_fabm, only: fabm_pel,fabm_ben,read_temporal_memory
 #endif
 #endif
 #ifdef SPM
@@ -423,6 +423,7 @@
 #endif
 #ifdef _FABM_
       if(allocated(fabm_pel) .and. fabm_init_method .eq. 0) then
+         call read_temporal_memory(ncid,istart,jstart,ilen,jlen,start(1),start(2))
          start(4) = 1;  edges(4) = size(fabm_pel,4)
          status = &
          nf90_get_var(ncid,fabm_pel_id,fabm_pel(istart:istop,jstart:jstop,0:kmax,:),start(1:3),edges(1:3))

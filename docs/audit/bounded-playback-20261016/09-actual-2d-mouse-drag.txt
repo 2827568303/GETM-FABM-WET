@@ -1,0 +1,6 @@
+{
+  "time": "18",
+  "summary": "水温 · Celsius · 2020-DOY001 00:19:00 · 层 5",
+  "status": "显示当前模型结果",
+  "playing": "false"
+}

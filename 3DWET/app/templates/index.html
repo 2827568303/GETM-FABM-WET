@@ -4,12 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3DWET 生态水动力模型系统</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='brand/3dwet.svg') }}?v=2">
+    <link rel="alternate icon" href="{{ url_for('static', filename='brand/3dwet.ico') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='brand/3dwet-192.png') }}">
     <link rel="stylesheet" href="/static/css/style.css?v=11">
+    <link rel="stylesheet" href="/static/css/studio.css?v=11">
+    <link rel="stylesheet" href="/static/css/view_controls.css?v=1">
+    <link rel="stylesheet" href="/static/css/scientific_results.css?v=3">
+    <link rel="stylesheet" href="/static/css/i18n.css?v=1">
     <link rel="stylesheet" href="/static/vendor/leaflet.css">
+    <link rel="stylesheet" href="/static/css/scientific_workspace.css?v=14">
+    <link rel="stylesheet" href="/static/css/workflow_navigation.css?v=3">
+    <link rel="stylesheet" href="/static/css/scientific_colormap_editor.css?v=1">
+    <link rel="stylesheet" href="/static/css/workbench.css?v=9">
+    <link rel="stylesheet" href="/static/css/academic_ui.css?v=9">
     <!-- Vendored locally so the GUI works fully offline; CDN used only as fallback. -->
     <script src="/static/vendor/chart.umd.min.js"></script>
     <script src="/static/vendor/plotly-2.35.2.min.js" charset="utf-8"></script>
     <script src="/static/vendor/leaflet.js"></script>
+    <script src="/static/js/view_controls.js?v=8"></script>
+    <script src="/static/js/studio_icons.js?v=5"></script>
     <script>
     (function () {
         function need(global, url) {
@@ -22,44 +36,133 @@
         need('L', 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js');
     })();
     </script>
-    <script src="/static/js/calibration_metrics.js?v=1"></script>
-    <script src="/static/js/viz3d.js?v=4"></script>
-    <script src="/static/js/preprocess.js?v=5"></script>
+    <script src="/static/js/model_dates.js?v=2"></script>
+    <script src="/static/js/scientific_style.js?v=4"></script>
+    <script src="/static/js/scientific_heatmap.js?v=6"></script>
+    <script src="/static/js/scientific_workspace.js?v=19"></script>
+    <script src="/static/js/scientific_colormap_editor.js?v=1"></script>
+    <script src="/static/js/calibration_metrics.js?v=2"></script>
+    <script src="/static/js/viz3d.js?v=173"></script>
+    <script src="/static/js/preprocess.js?v=12"></script>
 </head>
 <body>
+<svg class="studio-icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <symbol id="studio-icon-dashboard" viewBox="0 0 24 24"><path d="M3 4H11V11H3Z M13 4H21V9H13Z M13 11H21V20H13Z M3 13H11V20H3Z"/><path d="M7 7H7.1 M16 6H18 M16 15H18 M6 17H8"/></symbol>
+    <symbol id="studio-icon-folder" viewBox="0 0 24 24"><path d="M3 6H9L11 8H21V19H3Z"/><path d="M3 10H21"/></symbol>
+    <symbol id="studio-icon-tools" viewBox="0 0 24 24"><path d="M4 20L13 11 M14 4A5 5 0 0 0 20 10L16.5 13.5L10.5 7.5L14 4Z"/><path d="M3 4H9V10H3Z"/></symbol>
+    <symbol id="studio-icon-import" viewBox="0 0 24 24"><path d="M4 4H14V17H4Z"/><path d="M7 7H11 M7 10H11 M19 8V20 M16 17L19 20L22 17"/></symbol>
+    <symbol id="studio-icon-settings" viewBox="0 0 24 24"><path d="M4 5H20 M4 12H20 M4 19H20"/><path d="M9 3V7 M15 10V14 M7 17V21"/></symbol>
+    <symbol id="studio-icon-modules" viewBox="0 0 24 24"><path d="M4 4H20V20H4Z"/><path d="M4 10H20 M4 15H20 M10 4V20"/></symbol>
+    <symbol id="studio-icon-foodweb" viewBox="0 0 24 24"><path d="M3.5 5.5A2 2 0 1 0 7.5 5.5A2 2 0 1 0 3.5 5.5Z M16.5 5.5A2 2 0 1 0 20.5 5.5A2 2 0 1 0 16.5 5.5Z M10 18A2 2 0 1 0 14 18A2 2 0 1 0 10 18Z"/><path d="M8 5.5H15 M12 3.5L15 5.5L12 7.5 M17 8L14 14 M17 12L14 14L13 10 M10 15L7 9 M7 13L7 9L10 10"/></symbol>
+    <symbol id="studio-icon-flask" viewBox="0 0 24 24"><path d="M9 3H15 M10 3V10L5 18V21H19V18L14 10V3"/><path d="M7 15H17"/></symbol>
+    <symbol id="studio-icon-clock" viewBox="0 0 24 24"><path d="M6 4V2 M12 3V2 M18 4V2 M4 7H20V21H4Z"/><path d="M12 11V15L16 17"/></symbol>
+    <symbol id="studio-icon-play" viewBox="0 0 24 24"><path d="M4 4H12V20H4Z"/><path d="M15 8L21 12L15 16Z"/></symbol>
+    <symbol id="studio-icon-globe" viewBox="0 0 24 24"><path d="M12 3A9 9 0 1 0 12 21A9 9 0 1 0 12 3Z"/><path d="M3 12H21 M12 3C8 6 8 18 12 21 M12 3C16 6 16 18 12 21 M5 8H19 M5 16H19"/></symbol>
+    <symbol id="studio-icon-map" viewBox="0 0 24 24"><path d="M3 5L9 3L15 5L21 3V19L15 21L9 19L3 21Z"/><path d="M9 3V19 M15 5V21"/></symbol>
+    <symbol id="studio-icon-cube" viewBox="0 0 24 24"><path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5Z"/><path d="M4 7.5L12 12L20 7.5 M12 12V21 M8 5.3L16 9.8"/></symbol>
+    <symbol id="studio-icon-chart" viewBox="0 0 24 24"><path d="M4 4V20H21"/><path d="M7 16L11 12L14 14L20 7"/></symbol>
+    <symbol id="studio-icon-target" viewBox="0 0 24 24"><path d="M12 3V7 M12 17V21 M3 12H7 M17 12H21"/><path d="M12 8A4 4 0 1 0 12 16A4 4 0 1 0 12 8Z"/></symbol>
+    <symbol id="studio-icon-refresh" viewBox="0 0 24 24"><path d="M20 8V3 M20 8H15 M4 16V21 M4 16H9"/><path d="M7 7A8 8 0 0 1 20 8 M17 17A8 8 0 0 1 4 16"/></symbol>
+    <symbol id="studio-icon-add" viewBox="0 0 24 24"><path d="M12 3V21 M3 12H21"/></symbol>
+    <symbol id="studio-icon-upload" viewBox="0 0 24 24"><path d="M4 15V20H20V15"/><path d="M12 16V3 M8 7L12 3L16 7"/></symbol>
+    <symbol id="studio-icon-download" viewBox="0 0 24 24"><path d="M4 15V20H20V15"/><path d="M12 3V17 M8 13L12 17L16 13"/></symbol>
+    <symbol id="studio-icon-check" viewBox="0 0 24 24"><path d="M3 12L9 18L21 5"/></symbol>
+    <symbol id="studio-icon-error" viewBox="0 0 24 24"><path d="M12 3A9 9 0 1 0 12 21A9 9 0 1 0 12 3Z"/><path d="M9 9L15 15 M15 9L9 15"/></symbol>
+    <symbol id="studio-icon-warning" viewBox="0 0 24 24"><path d="M12 3L21 20H3Z"/><path d="M12 8V13 M12 16V16.1"/></symbol>
+    <symbol id="studio-icon-info" viewBox="0 0 24 24"><path d="M12 3A9 9 0 1 0 12 21A9 9 0 1 0 12 3Z"/><path d="M12 11V16 M12 8V8.1"/></symbol>
+    <symbol id="studio-icon-list" viewBox="0 0 24 24"><path d="M8 5H21 M8 10H21 M8 15H21 M8 20H21"/><path d="M4 4V6 M4 9V11 M4 14V16 M4 19V21"/></symbol>
+    <symbol id="studio-icon-water" viewBox="0 0 24 24"><path d="M3 6C6 4 9 8 12 6S18 4 21 6 M3 12C6 10 9 14 12 12S18 10 21 12 M3 18C6 16 9 20 12 18S18 16 21 18"/></symbol>
+    <symbol id="studio-icon-bio" viewBox="0 0 24 24"><path d="M4 12C4 7 7 4 12 4C17 4 20 7 20 12C20 17 17 20 12 20C7 20 4 17 4 12Z"/><path d="M12 6V18 M8 9H12 M12 15H16"/></symbol>
+    <symbol id="studio-icon-cloud" viewBox="0 0 24 24"><path d="M4 5H20V19H4Z"/><path d="M7 8H17 M7 12H11 M14 12H17 M7 16H17 M10 8V16 M14 12V16"/></symbol>
+    <symbol id="studio-icon-file" viewBox="0 0 24 24"><path d="M5 3H14L19 8V21H5Z"/><path d="M14 3V8H19 M8 12H16 M8 16H16"/></symbol>
+    <symbol id="studio-icon-ruler" viewBox="0 0 24 24"><path d="M3 8H21V16H3Z"/><path d="M6 8V13 M10 8V15 M14 8V13 M18 8V15"/></symbol>
+    <symbol id="studio-icon-save" viewBox="0 0 24 24"><path d="M4 4H17L20 7V20H4Z"/><path d="M7 4V10H16V4 M7 20V13H17V20"/></symbol>
+    <symbol id="studio-icon-river" viewBox="0 0 24 24"><path d="M4 3C10 6 14 18 20 21 M20 3C14 6 10 18 4 21"/><path d="M7 8H17 M8 12H16 M7 16H17"/></symbol>
+    <symbol id="studio-icon-pointer" viewBox="0 0 24 24"><path d="M4 3L19 12L12 14L9 21Z"/><path d="M12 14L17 20"/></symbol>
+    <symbol id="studio-icon-weather" viewBox="0 0 24 24"><path d="M4 5H20V18H4Z"/><path d="M7 9H17 M7 13H11 M14 13H17 M8 18L6 22 M15 18L13 22"/></symbol>
+    <symbol id="studio-icon-build" viewBox="0 0 24 24"><path d="M3 20H21 M5 18V10L12 4L19 10V18Z"/><path d="M9 18V13H15V18"/></symbol>
+    <symbol id="studio-icon-droplet" viewBox="0 0 24 24"><path d="M12 3C9 7 6 10 6 14A6 6 0 0 0 18 14C18 10 15 7 12 3Z"/><path d="M8 14H16 M9 17C10 18 11 19 12 19"/></symbol>
+    <symbol id="studio-icon-leaf" viewBox="0 0 24 24"><path d="M4 20C4 9 10 4 20 4C20 14 15 20 4 20Z"/><path d="M5 19L16 8 M10 14L10 11 M10 14L14 14"/></symbol>
+    <symbol id="studio-icon-health" viewBox="0 0 24 24"><path d="M3 4H21V20H3Z"/><path d="M5 13H8L10 9L13 17L16 11H19"/></symbol>
+    <symbol id="studio-icon-stop" viewBox="0 0 24 24"><path d="M5 5H19V19H5Z"/></symbol>
+    <symbol id="studio-icon-search" viewBox="0 0 24 24"><path d="M10 4A6 6 0 1 0 10 16A6 6 0 1 0 10 4Z"/><path d="M14.5 14.5L21 21 M7 10H13 M10 7V13"/></symbol>
+    <symbol id="studio-icon-pin" viewBox="0 0 24 24"><path d="M12 21L6 14V10A6 6 0 0 1 18 10V14Z"/><path d="M9 10H15 M12 7V14"/></symbol>
+    <symbol id="studio-icon-draw" viewBox="0 0 24 24"><path d="M4 20L8 19L19 8L15 4L4 15Z"/><path d="M13 6L17 10 M4 15L9 20 M4 4H9"/></symbol>
+    <symbol id="studio-icon-previous" viewBox="0 0 24 24"><path d="M5 4V20 M20 5L10 12L20 19Z"/></symbol>
+    <symbol id="studio-icon-next" viewBox="0 0 24 24"><path d="M19 4V20 M4 5L14 12L4 19Z"/></symbol>
+    <symbol id="studio-icon-edit" viewBox="0 0 24 24"><path d="M4 17L15 6L19 10L8 21H4Z"/><path d="M13 8L17 12 M4 21L6 17 M16 5L18 7"/></symbol>
+    <symbol id="studio-icon-menu" viewBox="0 0 24 24"><path d="M4 5H20 M4 10H20 M4 15H20 M4 20H20"/></symbol>
+    <symbol id="studio-icon-close" viewBox="0 0 24 24"><path d="M4 4L20 20 M20 4L4 20"/></symbol>
+    <symbol id="studio-icon-chevron" viewBox="0 0 24 24"><path d="M8 4L16 12L8 20"/></symbol>
+    <symbol id="studio-icon-up" viewBox="0 0 24 24"><path d="M12 20V4 M7 9L12 4L17 9"/></symbol>
+    <symbol id="studio-icon-external" viewBox="0 0 24 24"><path d="M13 4H20V11 M20 4L10 14"/><path d="M18 13V20H4V6H11 M4 10H9"/></symbol>
+    <symbol id="studio-icon-undo" viewBox="0 0 24 24"><path d="M8 7L4 11L8 15 M4 11H14V18H18"/></symbol>
+    <symbol id="studio-icon-redo" viewBox="0 0 24 24"><path d="M16 7L20 11L16 15 M20 11H10V18H6"/></symbol>
+    <symbol id="studio-icon-pause" viewBox="0 0 24 24"><path d="M5 4H10V20H5Z M14 4H19V20H14Z"/></symbol>
+    <symbol id="studio-icon-expand" viewBox="0 0 24 24"><path d="M4 9V4H9 M15 4H20V9 M20 15V20H15 M9 20H4V15"/></symbol>
+    <symbol id="studio-icon-zoom-in" viewBox="0 0 24 24"><path d="M3 4H15V16H3Z"/><path d="M15 15L21 21 M9 7V13 M6 10H12"/></symbol>
+    <symbol id="studio-icon-zoom-out" viewBox="0 0 24 24"><path d="M3 4H15V16H3Z"/><path d="M15 15L21 21 M6 10H12"/></symbol>
+    <symbol id="studio-icon-down" viewBox="0 0 24 24"><path d="M12 4V20 M7 15L12 20L17 15"/></symbol>
+    <symbol id="studio-icon-grid" viewBox="0 0 24 24"><path d="M3 3H21V21H3Z M9 3V21 M15 3V21 M3 9H21 M3 15H21"/></symbol>
+    <symbol id="studio-icon-layers" viewBox="0 0 24 24"><path d="M4 6L12 3L20 6L12 9Z M4 12L12 9L20 12 M4 18L12 15L20 18L12 21Z"/></symbol>
+</svg>
+<style>
+    .readonly-gotm .getm-case-only,
+    .readonly-gotm .getm-observation-only { display: none !important; }
+    .readonly-gotm #page-autocal { display: none !important; }
+    .gotm-single-column .nav-item[data-page="viz2d"],
+    .gotm-single-column .nav-item[data-page="viz3d"],
+    .gotm-single-column .qgis-tool-btn[title="2D 可视化"],
+    .gotm-single-column .qgis-tool-btn[title="3D 可视化"],
+    .gotm-single-column .workflow-strip button[onclick*="navigate('viz3d')"],
+    .gotm-single-column .getm-case-only,
+    .gotm-single-column .getm-observation-only,
+    .gotm-single-column #page-autocal { display: none !important; }
+</style>
 <div class="app-layout">
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="studio-navigation" role="navigation" aria-label="建模工作流">
         <div class="sidebar-header">
-            <h1>🌊 3DWET Studio</h1>
-            <p>生态水动力模型平台</p>
+            <button type="button" id="studio-nav-close" aria-label="关闭导航"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-close"></use></svg></button>
+            <div class="studio-mark"><img src="{{ url_for('static', filename='brand/3dwet.svg') }}?v=2" alt="3DWET" width="38" height="38"></div>
+            <h1>3DWET <span>Studio</span></h1>
+            <p>湖泊生态 · 三维建模工作台</p>
         </div>
         <div class="nav-menu">
-            <div class="nav-section">总览</div>
-            <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span>仪表盘</div>
-            <div class="nav-item" data-page="cases"><span class="nav-icon">📁</span>案例管理</div>
-
-            <div class="nav-section">前处理</div>
-            <div class="nav-item" data-page="preprocess"><span class="nav-icon">🛠️</span>前处理</div>
-            <div class="nav-item" data-page="input"><span class="nav-icon">📥</span>输入数据</div>
-            <div class="nav-item" data-page="modules"><span class="nav-icon">🧩</span>模块配置</div>
-            <div class="nav-item" data-page="parameters"><span class="nav-icon">⚙️</span>参数编辑</div>
-            <div class="nav-item" data-page="initial"><span class="nav-icon">🧪</span>初始条件</div>
-            <div class="nav-item" data-page="time"><span class="nav-icon">⏱️</span>时间设置</div>
-
-            <div class="nav-section">运行</div>
-            <div class="nav-item" data-page="run"><span class="nav-icon">▶️</span>运行控制</div>
-
-            <div class="nav-section">后处理</div>
-            <div class="nav-item" data-page="map"><span class="nav-icon">🌐</span>地图视图</div>
-            <div class="nav-item" data-page="viz2d"><span class="nav-icon">🗺️</span>2D 可视化</div>
-            <div class="nav-item" data-page="viz3d"><span class="nav-icon">🧊</span>3D 可视化</div>
-            <div class="nav-item" data-page="vheat"><span class="nav-icon">🔥</span>垂向热图</div>
-            <div class="nav-item" data-page="timeseries"><span class="nav-icon">📈</span>时间序列</div>
-
-            <div class="nav-section">率定</div>
-            <div class="nav-item" data-page="calibrate"><span class="nav-icon">🎯</span>率定分析</div>
-            <div class="nav-item" data-page="autocal"><span class="nav-icon">🔄</span>自动率定</div>
+            <details class="nav-group" data-workflow="case-data" open>
+                <summary><span aria-hidden="true"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg></span> 案例与数据</summary>
+                <div class="nav-group-items" data-group-items="case-data">
+                    <button type="button" class="nav-item active" data-page="dashboard"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-dashboard"></use></svg></span>仪表盘</button>
+                    <button type="button" class="nav-item" data-page="cases"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg></span>案例管理</button>
+                    <button type="button" class="nav-item getm-case-only" data-page="preprocess"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-tools"></use></svg></span>前处理</button>
+                    <button type="button" class="nav-item getm-case-only" data-page="input"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-import"></use></svg></span>输入数据</button>
+                    <button type="button" class="nav-item getm-case-only" data-page="gridstudio"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-grid"></use></svg></span>交互网格编辑</button>
+                </div>
+            </details>
+            <details class="nav-group" data-workflow="configuration">
+                <summary><span aria-hidden="true"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-settings"></use></svg></span> 模型配置</summary>
+                <div class="nav-group-items" data-group-items="configuration">
+                    <button type="button" class="nav-item getm-case-only" data-page="modules"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-modules"></use></svg></span>模块配置</button>
+                    <button type="button" class="nav-item getm-case-only" data-page="ecology"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-foodweb"></use></svg></span>生态网络与食物网</button>
+                    <button type="button" class="nav-item getm-case-only" data-page="parameters"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-settings"></use></svg></span>参数编辑</button>
+                    <button type="button" class="nav-item getm-case-only" data-page="initial"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-flask"></use></svg></span>初始条件</button>
+                    <button type="button" class="nav-item getm-case-only" data-page="time"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-clock"></use></svg></span>时间设置</button>
+                </div>
+            </details>
+            <details class="nav-group" data-workflow="run-review">
+                <summary><span aria-hidden="true"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-play"></use></svg></span> 运行与复核</summary>
+                <div class="nav-group-items" data-group-items="run-review">
+                    <button type="button" class="nav-item getm-case-only" data-page="run"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-play"></use></svg></span>运行控制</button>
+                    <button type="button" class="nav-item getm-case-only" data-page="system"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-health"></use></svg></span>环境与启动诊断</button>
+                    <button type="button" class="nav-item" data-page="map"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-globe"></use></svg></span>地图视图</button>
+                    <button type="button" class="nav-item" data-page="viz2d"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-map"></use></svg></span>2D 可视化</button>
+                    <button type="button" class="nav-item" data-page="viz3d"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-cube"></use></svg></span>3D 可视化</button>
+                    <button type="button" class="nav-item" data-page="vheat"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-chart"></use></svg></span>垂向热图</button>
+                    <button type="button" class="nav-item" data-page="timeseries"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-chart"></use></svg></span>时间序列</button>
+                    <button type="button" class="nav-item" data-page="calibrate"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-target"></use></svg></span>率定分析</button>
+                    <button type="button" class="nav-item getm-case-only" data-page="autocal"><span class="nav-icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-refresh"></use></svg></span>自动率定</button>
+                </div>
+            </details>
         </div>
         <div class="sidebar-footer">
             <div id="footer-status">状态: 就绪</div>
@@ -67,9 +170,34 @@
     </div>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" role="main" tabindex="-1">
+        <div class="qgis-menu-bar" role="menubar" aria-label="工作台菜单">
+            <button type="button" class="qgis-menu-item" onclick="navigate('cases')">项目</button>
+            <button type="button" class="qgis-menu-item" onclick="navigate('gridstudio')">编辑</button>
+            <button type="button" class="qgis-menu-item" onclick="navigate('dashboard')">视图</button>
+            <button type="button" class="qgis-menu-item" onclick="navigate('map')">图层</button>
+            <button type="button" class="qgis-menu-item" onclick="navigate('run')">运行</button>
+            <button type="button" class="qgis-menu-item" onclick="navigate('system')">设置</button>
+            <button type="button" class="qgis-menu-item" onclick="navigate('system')">帮助</button>
+            <button type="button" id="studio-language-button" class="qgis-menu-item" onclick="StudioI18n.openDialog()">语言</button>
+            <span class="qgis-menu-spacer"></span>
+            <span class="qgis-build-label">3DWET Studio · GIS 工作台</span>
+        </div>
+        <div class="qgis-tool-bar" role="toolbar" aria-label="常用工具">
+            <button type="button" class="qgis-tool-btn" title="打开案例" onclick="navigate('cases')"><span><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg></span><small>案例</small></button>
+            <button type="button" class="qgis-tool-btn" title="前处理" onclick="navigate('preprocess')"><span><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-tools"></use></svg></span><small>前处理</small></button>
+            <button type="button" class="qgis-tool-btn" title="交互网格编辑" onclick="navigate('gridstudio')"><span><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-grid"></use></svg></span><small>网格</small></button>
+            <span class="qgis-tool-separator"></span>
+            <button type="button" class="qgis-tool-btn" title="运行模型" onclick="navigate('run')"><span><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-play"></use></svg></span><small>运行</small></button>
+            <button type="button" class="qgis-tool-btn" title="地图视图" onclick="navigate('map')"><span><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-pin"></use></svg></span><small>地图</small></button>
+            <button type="button" class="qgis-tool-btn" title="2D 可视化" onclick="navigate('viz2d')"><span><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-layers"></use></svg></span><small>2D</small></button>
+            <button type="button" class="qgis-tool-btn" title="3D 可视化" onclick="navigate('viz3d')"><span><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-cube"></use></svg></span><small>3D</small></button>
+            <span class="qgis-tool-separator"></span>
+            <button type="button" class="qgis-tool-btn" title="环境与启动诊断" onclick="navigate('system')"><span><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-settings"></use></svg></span><small>诊断</small></button>
+        </div>
         <div class="topbar">
             <div class="topbar-left">
+                <button type="button" id="studio-nav-toggle" aria-label="打开导航" aria-controls="studio-navigation" aria-expanded="false"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-menu"></use></svg></button>
                 <div class="topbar-title" id="page-title">仪表盘</div>
                 <span class="case-badge" id="case-badge" style="display:none;">未加载案例</span>
             </div>
@@ -79,42 +207,62 @@
         </div>
 
         <!-- Global output.yaml warning banner -->
-        <div id="output-warning-banner" style="display:none;background:#fef3c7;border-left:4px solid #f59e0b;padding:10px 16px;font-size:13px;color:#92400e;"></div>
+        <div id="output-warning-banner" class="status-warning"></div>
 
         <div class="content-area">
             <!-- Dashboard -->
-            <div class="page active" id="page-dashboard">
-                <div class="page-header">
-                    <div class="page-title">模型仪表盘</div>
-                    <div class="page-desc">关键状态变量总览与模型运行状态</div>
-                </div>
-                <div class="grid-4" id="dashboard-stats">
-                    <div class="stat-card"><div class="stat-label">水域格数</div><div class="stat-value" id="stat-water">-</div></div>
-                    <div class="stat-card"><div class="stat-label">垂向层数</div><div class="stat-value" id="stat-nlev">-</div></div>
-                    <div class="stat-card"><div class="stat-label">生态模块</div><div class="stat-value" id="stat-modules">-</div></div>
-                    <div class="stat-card"><div class="stat-label">输出时步</div><div class="stat-value" id="stat-timesteps">-</div></div>
-                </div>
-                <div class="grid-2" style="margin-top:16px;">
-                    <div class="card">
-                        <div class="card-title">🌡️ 主要状态变量（最新时步表层均值）</div>
-                        <div id="dashboard-vars" class="empty-state"><div class="icon">📊</div>加载案例并运行模型后显示</div>
+            <div class="page active workbench-home" id="page-dashboard">
+                <div class="workbench-home-heading">
+                    <div><div class="page-title">湖泊模型工作台</div><div class="page-desc">以空间结果为主视图；案例与运行状态始终显示在顶部。</div></div>
+                    <div class="workbench-primary-actions" role="group" aria-label="主视图选择">
+                        <button type="button" class="btn" onclick="navigate('map')">地图</button>
+                        <button type="button" class="btn" onclick="navigate('viz2d')">二维结果</button>
+                        <button type="button" class="btn" onclick="navigate('viz3d')">三维结果</button>
                     </div>
-                    <div class="card">
-                        <div class="card-title">🗺️ 状态变量空间分布（mini-heatmap）</div>
-                        <div id="dashboard-mini-heatmaps" class="empty-state"><div class="icon">🗺️</div>加载案例并运行模型后显示</div>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">📋 快速操作</div>
-                        <div style="display:flex;flex-direction:column;gap:10px;">
-                            <button class="btn btn-success" onclick="navigate('preprocess')">🛠️ 新建模型（前处理）</button>
-                            <button class="btn btn-primary" onclick="navigate('cases')">📁 选择/加载案例</button>
-                            <button class="btn" onclick="navigate('parameters')">⚙️ 编辑模型参数</button>
-                            <button class="btn" onclick="navigate('time')">⏱️ 设置运行时间</button>
-                            <button class="btn btn-success" onclick="navigate('run')">▶️ 运行模型</button>
-                            <button class="btn" onclick="navigate('viz2d')">🗺️ 查看2D结果</button>
-                            <button class="btn" onclick="navigate('timeseries')">📈 提取时间序列</button>
+                </div>
+                <div class="workbench-home-grid">
+                    <section class="card workbench-primary-canvas" id="dashboard-canvas" aria-label="空间结果预览">
+                        <div id="proxy-dashboard-notice" class="proxy-case-notice" hidden></div>
+                        <div class="workbench-canvas-heading">
+                            <div><h2>空间结果预览</h2><p>当前案例的表层变量分布；选择地图、二维或三维结果可进入对应的完整视图。</p></div>
+                            <div class="workbench-canvas-actions">
+                                <label for="dashboard-variable-select">主变量</label>
+                                <select id="dashboard-variable-select" class="form-select" aria-label="选择首页主结果变量"></select>
+                                <button type="button" class="btn btn-sm" onclick="navigate('map')">打开地图工作区 <svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-external"></use></svg></button>
+                            </div>
                         </div>
-                    </div>
+                        <div id="dashboard-mini-heatmaps" class="workbench-result-canvas empty-state">
+                            <div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-map"></use></svg></div><div>加载案例并运行模型后，此处显示空间结果预览。</div>
+                            <button type="button" class="btn btn-sm" onclick="navigate('cases')">选择或加载案例</button>
+                        </div>
+                    </section>
+                    <aside class="workbench-inspector" aria-label="工作区检查器">
+                        <details id="dashboard-inspector" open>
+                            <summary>工作区检查器</summary>
+                            <div class="workbench-inspector-content">
+                                <section aria-labelledby="dashboard-stats-title">
+                                    <h2 id="dashboard-stats-title">模型概况</h2>
+                                    <div class="workbench-stat-grid" id="dashboard-stats">
+                                        <div class="stat-card"><div class="stat-label">水域格数</div><div class="stat-value" id="stat-water">-</div></div>
+                                        <div class="stat-card"><div class="stat-label">垂向层数</div><div class="stat-value" id="stat-nlev">-</div></div>
+                                        <div class="stat-card"><div class="stat-label">生态模块</div><div class="stat-value" id="stat-modules">-</div></div>
+                                        <div class="stat-card"><div class="stat-label">输出时步</div><div class="stat-value" id="stat-timesteps">-</div></div>
+                                    </div>
+                                </section>
+                                <section class="workbench-summary" aria-labelledby="dashboard-vars-title">
+                                    <h2 id="dashboard-vars-title">最新时步表层均值</h2>
+                                    <div id="dashboard-vars" class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-dashboard"></use></svg></div>加载案例并运行模型后显示</div>
+                                </section>
+                                <section class="workbench-inspector-actions" aria-label="常用工作流操作">
+                                    <h2>常用操作</h2>
+                                    <button class="btn btn-primary" onclick="navigate('cases')">选择/加载案例</button>
+                                    <button class="btn" onclick="navigate('preprocess')">新建模型与网格</button>
+                                    <button class="btn" onclick="navigate('parameters')">编辑模型参数</button>
+                                    <button class="btn btn-success" onclick="navigate('run')">运行模型</button>
+                                </section>
+                            </div>
+                        </details>
+                    </aside>
                 </div>
             </div>
 
@@ -125,15 +273,15 @@
                     <div class="page-desc">选择要配置和运行的模型案例</div>
                 </div>
                 <div style="margin-bottom:16px;display:flex;gap:10px;">
-                    <button class="btn btn-success" onclick="navigate('preprocess')">➕ 新建模型</button>
+                    <button class="btn btn-success" onclick="navigate('preprocess')"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-add"></use></svg> 新建模型</button>
                     <span style="font-size:12px;color:var(--text-muted);align-self:center;">从湖泊边界 + 底部高程 shapefile 生成新案例</span>
                 </div>
                 <div class="card" style="margin-bottom:16px;">
-                    <div class="card-title">📂 按路径打开案例（任意位置）</div>
+                    <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg> 按路径打开案例（任意位置）</div>
                     <div style="display:flex;gap:10px;flex-wrap:wrap;">
                         <input class="form-input" id="open-case-path" style="flex:1;min-width:260px;" placeholder="输入案例目录绝对路径，如 D:\\mycases\\LakeX（须含 getm.inp 或 bathymetry.nc）">
-                        <button class="btn btn-primary" onclick="pickCaseFolder()">📁 选择文件夹…</button>
-                        <button class="btn" onclick="toggleDirBrowser(true)" title="不弹窗，直接在页面里逐级浏览本机目录">📂 浏览目录</button>
+                        <button class="btn btn-primary" onclick="pickCaseFolder()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg> 选择文件夹…</button>
+                        <button class="btn" onclick="toggleDirBrowser(true)" title="不弹窗，直接在页面里逐级浏览本机目录"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg> 浏览目录</button>
                         <button class="btn" onclick="openCaseByPath()">打开</button>
                     </div>
                     <div id="pick-folder-status" class="pp-status" style="display:none;"></div>
@@ -143,10 +291,10 @@
                     </div>
                     <div class="dir-browser" id="dir-browser" style="display:none;margin-top:10px;">
                         <div class="db-bar">
-                            <button class="btn btn-sm" onclick="dirBrowserUp()">⬆ 上级</button>
+                            <button class="btn btn-sm" onclick="dirBrowserUp()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-up"></use></svg> 上级</button>
                             <input class="form-input" id="db-path" readonly>
-                            <button class="btn btn-sm btn-primary" onclick="dirBrowserUse()">✅ 使用此目录</button>
-                            <button class="btn btn-sm" onclick="toggleDirBrowser()">✕ 收起</button>
+                            <button class="btn btn-sm btn-primary" onclick="dirBrowserUse()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-check"></use></svg> 使用此目录</button>
+                            <button class="btn btn-sm" onclick="toggleDirBrowser()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-close"></use></svg> 收起</button>
                         </div>
                         <div class="db-list" id="db-list"></div>
                         <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">
@@ -180,7 +328,7 @@
                 <!-- Tab 0: 模型模块（新建模型之前先选） -->
                 <div class="pp-tab-content active" id="pp-tab-engines">
                     <div class="card">
-                        <div class="card-title">🧩 模型模块组合（新建模型时启用哪些模块）</div>
+                        <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-modules"></use></svg> 模型模块组合（新建模型时启用哪些模块）</div>
                         <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.7;">
                             在这里决定这个<b>新模型</b>要包含哪些功能模块；设置会保存为默认组合，稍后在「输入数据 → 一键构建」时自动应用。
                             已加载案例时可随时回到「模块配置」页修改该案例的模块。
@@ -188,17 +336,18 @@
                         <div id="pp-engines-badge" style="margin-bottom:8px;"></div>
                         <div class="grid-3" id="pp-engines-container"></div>
                         <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-                            <button class="btn btn-primary" onclick="loadEngines()">🔄 重新读取</button>
-                            <button class="btn btn-success" onclick="navigate('modules')">🧩 前往模块配置页</button>
+                            <button class="btn btn-primary" onclick="loadEngines()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-refresh"></use></svg> 重新读取</button>
+                            <button class="btn btn-success" onclick="navigate('modules')"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-modules"></use></svg> 前往模块配置页</button>
                             <span id="pp-engines-status" style="font-size:11px;color:var(--text-muted);"></span>
                         </div>
                     </div>
                     <div class="card">
-                        <div class="card-title">📋 模块选择说明</div>
+                        <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-list"></use></svg> 模块选择说明</div>
                         <div class="format-help-card">
-                            <div style="margin-bottom:6px;"><b>🌊 水动力（GETM 三维流动）</b> —— 必选内核，提供水位、流速、水温与环流。</div>
-                            <div style="margin-bottom:6px;"><b>🦠 水质生态（FABM-WET 食物网）</b> —— 关闭后模型只跑物理水动力，不计算藻类/营养盐/ DO 等。</div>
-                            <div><b>🌫️ 温室气体（CO₂/CH₄）</b> —— 启用后新增无机碳与甲烷状态变量并闭合碳循环；首次启用会自动编译模型程序。</div>
+                            <div style="margin-bottom:6px;"><b><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-water"></use></svg> 水动力（GETM 三维流动）</b> —— 必选内核，提供水位、流速、水温与环流。</div>
+                            <div style="margin-bottom:6px;"><b><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-bio"></use></svg> 生态网络（FABM-WET 食物网）</b> —— 藻类、浮游动物、底栖动物、水生植物与鱼类。</div>
+                            <div style="margin-bottom:6px;"><b><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-flask"></use></svg> 水质化学（FABM-WET）</b> —— 水体/底泥营养盐、有机质及沉积物过程，可独立于生态网络运行。</div>
+                            <div><b><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-cloud"></use></svg> 温室气体（CO₂/CH₄）</b> —— 启用后新增无机碳与甲烷状态变量并闭合碳循环；首次启用会自动编译模型程序。</div>
                         </div>
                     </div>
                 </div>
@@ -207,13 +356,14 @@
                 <div class="pp-tab-content" id="pp-tab-boundary">
                     <div class="grid-2">
                         <div class="card">
-                            <div class="card-title">📁 上传湖泊边界 shapefile</div>
+                            <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg> 上传湖泊边界 shapefile</div>
                             <div class="format-help-card">
                                 <div style="font-weight:600;margin-bottom:4px;">格式要求</div>
-                                <div>· 几何类型: <strong>Polygon</strong>（多边形）</div>
+                                <div>· 几何类型: <strong>Polygon / MultiPolygon</strong>（多边形或多部件湖界）</div>
                                 <div>· 必需文件: <code>.shp</code> + <code>.shx</code> + <code>.dbf</code></div>
                                 <div>· 推荐带 <code>.prj</code> 投影文件（UTM 或 WGS84 经纬度）</div>
-                                <div>· 第一个多边形的外环即湖岸线</div>
+                                <div>· 所有顺时针外环作为湖岸片区，逆时针内环作为干洞；多个岛/湖区与洞都会保留</div>
+                                <div>· 预览中橙色虚线表示干洞，生成网格后可再核对陆地/水域格点</div>
                                 <div>· CRS 不明时后端按经纬度处理</div>
                             </div>
                             <div class="form-group" style="margin-top:12px;">
@@ -242,7 +392,7 @@
                             <div id="pp-boundary-status" class="pp-status"></div>
                         </div>
                         <div class="card">
-                            <div class="card-title">🗺️ 边界预览</div>
+                            <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-map"></use></svg> 边界预览</div>
                             <div class="pp-canvas-wrap">
                                 <canvas id="pp-boundary-canvas" width="500" height="400"></canvas>
                             </div>
@@ -255,19 +405,20 @@
                 <div class="pp-tab-content" id="pp-tab-bathymetry">
                     <div class="grid-2">
                         <div class="card">
-                            <div class="card-title">📊 上传底部高程 shapefile</div>
+                            <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-dashboard"></use></svg> 上传底部高程 shapefile</div>
                             <div class="format-help-card">
                                 <div style="font-weight:600;margin-bottom:4px;">格式要求</div>
-                                <div>· 几何类型: <strong>Point</strong>（散点测深）或 <strong>Polygon</strong>（等深区）</div>
+                                <div>· 几何类型: <strong>Point</strong>（散点测深）、<strong>Polygon</strong>（等深区）或 <strong>PolyLine</strong>（等深线，如 SITES 的 CONTOUR）</div>
                                 <div>· 必需文件: <code>.shp</code> + <code>.shx</code> + <code>.dbf</code></div>
-                                <div>· 属性表中必须有一个数值字段表示水深(m)，正值=水深</div>
+                                <div>· 必须明确填写表示水深（m）的数值字段名，正值=水深；系统不会猜字段，也不会把 OBJECTID 当水深</div>
                                 <div>· Point: 后端用 scipy.griddata 插值到网格</div>
                                 <div>· Polygon: 网格中心落在哪个多边形就取该 depth</div>
+                                <div>· PolyLine: 每条线按所选字段的等深值采样；预览会显示字段、CRS、范围和有效采样点，插值时按网格间距加密</div>
                                 <div>· 坐标系不一致时：在下方选择真实坐标系即可自动转换对齐</div>
                             </div>
                             <div class="form-group" style="margin-top:12px;">
-                                <label class="form-label">水深字段名（留空后端自动猜测）</label>
-                                <input type="text" id="pp-depth-field" class="form-input" placeholder="例如: depth / ELEV / Z / 水深">
+                                <label class="form-label">必填：水深字段名</label>
+                                <input type="text" id="pp-depth-field" class="form-input" placeholder="例如: depth / ELEV / Z / CONTOUR">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">数据坐标系（与边界不一致时选择真实坐标系，自动转换对齐）</label>
@@ -298,7 +449,7 @@
                             <div id="pp-bathy-status" class="pp-status"></div>
 
                             <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px;">
-                                <div class="card-title" style="padding:0;margin-bottom:8px;">📄 或：用文本格式（CSV / TXT / .dat）导入水深</div>
+                                <div class="card-title" style="padding:0;margin-bottom:8px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-file"></use></svg> 或：用文本格式（CSV / TXT / .dat）导入水深</div>
                                 <div class="format-help-card" style="margin-bottom:8px;">
                                     <div style="font-weight:600;margin-bottom:4px;">为什么还需要 .nc？</div>
                                     <div>GETM 的地形读取只实现了 NetCDF 分支（<code>read_topo_file.F90</code> 中 ASCII 直接报错），
@@ -318,11 +469,11 @@
                                 <div class="form-group">
                                     <input type="file" id="pp-bathy-xyz-file" class="form-input" accept=".csv,.txt,.dat,.xyz">
                                 </div>
-                                <button class="btn" onclick="uploadBathymetryXyz()">📤 导入文本文件</button>
+                                <button class="btn" onclick="uploadBathymetryXyz()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-upload"></use></svg> 导入文本文件</button>
                             </div>
 
                             <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px;">
-                                <div class="card-title" style="padding:0;margin-bottom:8px;">📉 或：从深度-面积曲线（hypsograph）生成湖泊</div>
+                                <div class="card-title" style="padding:0;margin-bottom:8px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-chart"></use></svg> 或：从深度-面积曲线（hypsograph）生成湖泊</div>
                                 <div class="format-help-card" style="margin-bottom:8px;">
                                     <div>与 QWET/GOTM 的 <code>hypsograph.dat</code> 相同格式：每行 <code>z  面积</code>，
                                         z = 距湖底的高度(m)，面积 = 该高度处的湖面面积(m²)。
@@ -337,11 +488,11 @@
                                 <div class="form-group">
                                     <input type="file" id="pp-hyp-file" class="form-input" accept=".dat,.txt,.csv">
                                 </div>
-                                <button class="btn" onclick="uploadHypsograph()">📤 从曲线生成</button>
+                                <button class="btn" onclick="uploadHypsograph()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-upload"></use></svg> 从曲线生成</button>
                             </div>
                         </div>
                         <div class="card">
-                            <div class="card-title">🗺️ 高程预览</div>
+                            <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-map"></use></svg> 高程预览</div>
                             <div class="pp-canvas-wrap">
                                 <canvas id="pp-bathy-canvas" width="500" height="400"></canvas>
                             </div>
@@ -354,7 +505,7 @@
                 <div class="pp-tab-content" id="pp-tab-grid">
                     <div class="grid-2">
                         <div class="card">
-                            <div class="card-title">📐 网格参数</div>
+                            <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-ruler"></use></svg> 网格参数</div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">dx (米)</label>
@@ -379,7 +530,7 @@
                             <div id="pp-grid-status" class="pp-status"></div>
                         </div>
                         <div class="card">
-                            <div class="card-title">🗺️ 网格预览（蓝色=水域，灰色=陆地）</div>
+                            <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-map"></use></svg> 网格预览（蓝色=水域，灰色=陆地）</div>
                             <div class="pp-canvas-wrap">
                                 <canvas id="pp-grid-canvas" width="500" height="400"></canvas>
                             </div>
@@ -392,7 +543,7 @@
                 <div class="pp-tab-content" id="pp-tab-save">
                     <div class="grid-2">
                         <div class="card">
-                            <div class="card-title">💾 插值并保存 bathymetry.nc</div>
+                            <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-save"></use></svg> 插值并保存 bathymetry.nc</div>
                             <div class="form-group">
                                 <label class="form-label">插值方法（仅 Point 几何生效）</label>
                                 <select id="pp-method" class="form-select">
@@ -414,19 +565,19 @@
                             <button class="btn btn-success" onclick="saveBathymetry()">保存 bathymetry.nc 并加载案例</button>
                             <div id="pp-save-status" class="pp-status"></div>
                             <hr style="border-color:var(--border);margin:16px 0;">
-                            <div class="card-title" style="font-size:13px;">🏞️ 河流标记（入流/出流位置）</div>
+                            <div class="card-title" style="font-size:13px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-river"></use></svg> 河流标记（入流/出流位置）</div>
                             <div style="font-size:11px;color:var(--text-muted);margin:4px 0 8px;">
                                 插值后，在右侧图中滚轮缩放、拖拽平移；开启标记模式后点击水域格点添加河流。
                                 方向由流量数据正负决定（正=入流，负=出流），此处只标位置。
                             </div>
                             <div style="display:flex;gap:8px;margin-bottom:8px;">
-                                <button class="btn" id="pp-river-mode-btn" onclick="toggleRiverMarkMode()">🖱️ 标记模式: 关</button>
-                                <button class="btn" onclick="resetDepthView()">🔄 复位视图</button>
+                                <button class="btn" id="pp-river-mode-btn" onclick="toggleRiverMarkMode()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-pointer"></use></svg> 标记模式: 关</button>
+                                <button class="btn" onclick="resetDepthView()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-refresh"></use></svg> 复位视图</button>
                             </div>
                             <div id="pp-river-list" style="max-height:140px;overflow-y:auto;font-size:12px;"></div>
                         </div>
                         <div class="card">
-                            <div class="card-title">🗺️ 水深预览（滚轮缩放 / 拖拽平移）</div>
+                            <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-map"></use></svg> 水深预览（滚轮缩放 / 拖拽平移）</div>
                             <div class="pp-canvas-wrap">
                                 <canvas id="pp-depth-canvas" width="500" height="400"></canvas>
                             </div>
@@ -443,7 +594,7 @@
                     <div class="page-desc">录入气象/河流时间序列数据，一键构建完整可运行案例</div>
                 </div>
                 <div class="card">
-                    <div class="card-title">📁 输入文件清单</div>
+                    <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg> 输入文件清单</div>
                     <table class="data-table" id="input-files-table">
                         <thead><tr><th>文件</th><th>状态</th><th>大小</th><th>修改时间</th><th>变量数</th><th>说明</th><th>操作</th></tr></thead>
                         <tbody></tbody>
@@ -451,24 +602,30 @@
                 </div>
                 <div class="grid-2" style="margin-top:16px;">
                     <div class="card">
-                        <div class="card-title">🌦️ 气象强迫数据（meteo.nc）</div>
+                        <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-weather"></use></svg> 气象强迫数据（meteo.nc）</div>
                         <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">
-                            CSV 列（别名自动识别）: <code>date,u10,v10,slp,t2,rh,tcc,precip,evap</code>。
-                            单位: 风速 m/s、气压 hPa、气温 ℃、湿度/云量 0-1（或 %）、降雨/蒸发 mm/day。站点数据将广播到全湖网格。
+                            支持通用列 <code>date,u10,v10,slp,t2,rh,tcc,precip,evap</code>，也识别 PROGNOS/SITES Malma 列 <code>TMSTAMP,SW_Rad_Avg,Air_Temp_AS_Avg,RelHumidity_Avg,MeanWS,WindDir,Rain_Total,AirPressure_hPa_Avg</code>。日期可用日历时间或 <code>2020-DOY001</code>；Malma 时间标准默认为固定 UTC+1。气象站的风速（m/s）与气象风向（来向角）会换算为东/北分量；<code>Rain_Total</code> 按小时累计 mm 换成 m/s，通用降雨列仍按 mm/day。存在有效 <code>SW_Rad_Avg</code> 时，将原始入射短波（W/m²）保存为 <code>meteo.nc:swr</code> 并启用 GETM 实测短波路径；云量仍单独驱动长波，缺云量时使用标注的 0.5 固定代理。没有短波列时维持原云量计算路径。单站序列将<strong>空间均匀广播到全格点</strong>，不做空间插值。任何已提供列中的缺测都会被拒绝；请先用有来源标记的数据补齐，不会自动向前填充。
                         </div>
                         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-                            <button class="btn" onclick="downloadMeteoTemplate()">⬇️ 下载 CSV 模板</button>
+                            <button class="btn" onclick="downloadMeteoTemplate()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-download"></use></svg> 下载 CSV 模板</button>
                             <input type="file" id="meteo-csv-file" class="form-input" style="max-width:280px;" accept=".csv,.txt">
-                            <button class="btn btn-primary" onclick="uploadMeteoCsv()">📤 上传 CSV</button>
-                            <button class="btn btn-success" onclick="saveMeteoNc()">💾 生成 meteo.nc</button>
+                            <button class="btn btn-primary" onclick="uploadMeteoCsv()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-upload"></use></svg> 上传 CSV</button>
+                            <button class="btn btn-success" onclick="saveMeteoNc()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-save"></use></svg> 生成 meteo.nc</button>
+                        </div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin:8px 0;">
+                            <div><label class="form-label" for="meteo-source-lat">来源纬度</label><input id="meteo-source-lat" class="form-input" type="number" min="-90" max="90" step="any" style="width:130px" placeholder="位置未知"></div>
+                            <div><label class="form-label" for="meteo-source-lon">来源经度</label><input id="meteo-source-lon" class="form-input" type="number" min="-180" max="180" step="any" style="width:130px" placeholder="位置未知"></div>
+                            <div style="flex:1;min-width:260px"><label class="form-label" for="meteo-source-url">来源 URL / DOI</label><input id="meteo-source-url" class="form-input" type="text" style="width:100%" placeholder="数据集来源链接"></div>
+                            <div><label class="form-label" for="meteo-source-license">许可</label><input id="meteo-source-license" class="form-input" type="text" style="width:160px" placeholder="如 CC BY 4.0"></div>
+                            <div><label class="form-label" for="meteo-source-time-standard">时间标准</label><input id="meteo-source-time-standard" class="form-input" type="text" style="width:190px" placeholder="如 UTC+01:00 fixed"></div>
                         </div>
                         <div id="meteo-upload-status" class="pp-status"></div>
                         <div id="meteo-preview" style="margin-top:8px;"></div>
                     </div>
                     <div class="card">
-                        <div class="card-title">🏞️ 河流数据（rivers.nc + riverinfo.dat）</div>
+                        <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-river"></use></svg> 河流数据（rivers.nc + riverinfo.dat）</div>
                         <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">
-                            CSV 列: <code>date,Q,temp,nh4,no3,po4</code>。Q 单位 m³/s，<strong>正值=入流、负值=出流</strong>；营养盐 g/m³（列缺失用默认值填充）。
+                            CSV 列: <code>date,Q,temp,nh4,no3,po4</code>。日期采用 <code>2020-DOY001</code>（兼容已有日历日期文件）。Q 单位 m³/s，<strong>正值=入流、负值=出流</strong>；营养盐 g/m³（列缺失用默认值填充）。
                             河流位置来自前处理标记，也可在下方手动添加。
                         </div>
                         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:flex-end;">
@@ -478,14 +635,14 @@
                                 <input type="number" id="river-add-i" class="form-input" style="width:70px;" min="1"></div>
                             <div><label class="form-label" style="font-size:11px;">j 行号</label>
                                 <input type="number" id="river-add-j" class="form-input" style="width:70px;" min="1"></div>
-                            <button class="btn" onclick="addRiverManually()">➕ 添加河流</button>
+                            <button class="btn" onclick="addRiverManually()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-add"></use></svg> 添加河流</button>
                         </div>
                         <div id="river-list-panel"></div>
-                        <button class="btn btn-success" style="margin-top:8px;" onclick="saveRiversNc()">💾 生成 rivers.nc + riverinfo.dat</button>
+                        <button class="btn btn-success" style="margin-top:8px;" onclick="saveRiversNc()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-save"></use></svg> 生成 rivers.nc + riverinfo.dat</button>
                         <div id="rivers-save-status" class="pp-status"></div>
                         <div id="river-series-panel" style="display:none;margin-top:12px;border:1px solid var(--border);border-radius:6px;padding:10px;background:var(--bg-secondary);">
                             <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-                                <strong style="font-size:13px;">📈 <span id="river-series-title"></span> 输入数据时间序列</strong>
+                                <strong style="font-size:13px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-chart"></use></svg> <span id="river-series-title"></span> 输入数据时间序列</strong>
                                 <select id="river-series-var" class="form-input" style="width:auto;padding:3px 6px;font-size:12px;" onchange="drawRiverSeries()"></select>
                                 <button class="btn btn-sm" style="margin-left:auto;" onclick="$('river-series-panel').style.display='none'">收起</button>
                             </div>
@@ -495,39 +652,40 @@
                     </div>
                 </div>
                 <div class="card" style="margin-top:16px;">
-                    <div class="card-title">🏗️ 构建完整案例（getm.inp / fabm.yaml 等 9 个文件）</div>
+                    <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-build"></use></svg> 构建完整案例（getm.inp / fabm.yaml 等 9 个文件）</div>
                     <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.7;">
                         配齐气象/河流数据后，设定模拟时段，一键生成全部配置文件，案例即可运行。重复构建会覆盖配置文件（数据文件保留）。
                         <br>模块的启用状态取自「模块配置」页所选组合；水质/水位初值请在
-                        <a href="#" onclick="navigate('initial');return false;" style="color:var(--accent-light);"><b>🧪 初始条件</b></a>
+                        <a href="#" onclick="navigate('initial');return false;" style="color:var(--accent-light);"><b><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-flask"></use></svg> 初始条件</b></a>
                         页设置（预设构建时一并写入，之后可随时改）。
                     </div>
+                    <div class="form-hint" id="build-date-help">年内儒略日 DOY：平年 001–365，闰年 001–366；格式 YYYY-DOYDDD HH:mm:ss。</div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">开始时间</label>
-                            <input type="text" id="build-start" class="form-input" placeholder="2020-01-01 00:00:00">
+                            <label class="form-label" for="build-start">开始时间（年份 + 年内儒略日）</label>
+                            <input type="text" id="build-start" class="form-input" placeholder="2020-DOY001 00:00:00" aria-describedby="build-date-help">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">结束时间</label>
-                            <input type="text" id="build-stop" class="form-input" placeholder="2020-12-30 00:00:00">
+                            <label class="form-label" for="build-stop">结束时间（年份 + 年内儒略日）</label>
+                            <input type="text" id="build-stop" class="form-input" placeholder="2020-DOY365 00:00:00" aria-describedby="build-date-help">
                         </div>
                         <div class="form-group">
                             <label class="form-label">时间步长 (秒)</label>
-                            <input type="number" id="build-dt" class="form-input" value="15" min="1">
+                            <input type="number" id="build-dt" class="form-input" value="15" min="0" step="any">
                         </div>
                         <div class="form-group">
                             <label class="form-label">垂向层数</label>
                             <input type="number" id="build-nlev" class="form-input" value="10" min="1">
                         </div>
                         <div class="form-group" style="align-self:flex-end;">
-                            <button class="btn btn-success" onclick="buildCase()">🏗️ 一键构建</button>
+                            <button class="btn btn-success" onclick="buildCase()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-build"></use></svg> 一键构建</button>
                         </div>
                     </div>
                     <div id="build-status" class="pp-status"></div>
                 </div>
                 <div class="card" style="margin-top:16px;">
-                    <div class="card-title">📊 数据概览</div>
-                    <div id="input-overview" class="empty-state"><div class="icon">📂</div>请先加载案例</div>
+                    <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-dashboard"></use></svg> 数据概览</div>
+                    <div id="input-overview" class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg></div>请先加载案例</div>
                 </div>
             </div>
 
@@ -538,9 +696,9 @@
                     <div class="page-desc">启用/禁用模型引擎与生态模块，查看模块分类和参数数量</div>
                 </div>
                 <div class="card" style="margin-bottom:16px;">
-                    <div class="card-title">🚀 功能模块（引擎）</div>
+                    <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-play"></use></svg> 功能模块（引擎）</div>
                     <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.7;">
-                        <b>未加载案例也能选</b>：此时设置会保存为「新建模型默认模块组合」，之后在前处理/输入数据里「一键构建」时自动应用。
+                        <b>未加载案例也能选</b>：此时设置会保存为「新建模型默认模块组合」，之后在前处理/输入数据里「一键构建」时自动应用。生态网络与水质化学可分别启用。
                         已加载案例时，勾选会直接写入该案例的 <code>getm.inp</code> 与 <code>fabm.yaml</code>。
                         <span id="modules-source-badge" style="margin-left:6px;"></span>
                     </div>
@@ -548,7 +706,7 @@
                     <div id="modules-warning" style="margin-top:10px;"></div>
                 </div>
                 <div class="card" style="margin-bottom:16px;">
-                    <div class="card-title">🧩 FABM 生态模块清单</div>
+                    <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-modules"></use></svg> FABM 生态模块清单</div>
                     <div class="form-row">
                         <div class="form-group" style="flex:2;">
                             <label class="form-label">搜索模块</label>
@@ -564,7 +722,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="modules-container" class="empty-state"><div class="icon">🧩</div>加载案例后显示模块列表</div>
+                <div id="modules-container" class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-modules"></use></svg></div>加载案例后显示模块列表</div>
             </div>
 
             <!-- Parameters -->
@@ -595,18 +753,18 @@
             <div class="page" id="page-time">
                 <div class="page-header">
                     <div class="page-title">时间设置</div>
-                    <div class="page-desc">配置时间步长、运行周期和冷/热启动</div>
+                    <div class="page-desc">配置时间步长、运行周期和冷/热启动。所有日期使用年份 + 年内儒略日（DOY）。</div>
                 </div>
-                <div class="grid-2">
+                <div class="grid-2 getm-case-only">
                     <div class="card">
-                        <div class="card-title">⏱️ 时间步长与周期</div>
+                        <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-clock"></use></svg> 时间步长与周期</div>
                         <div class="form-group">
-                            <label class="form-label">开始时间</label>
-                            <input class="form-input" id="time-start" type="text" placeholder="2000-01-01 00:00:00">
+                            <label class="form-label" for="time-start">开始时间（年份 + 年内儒略日）</label>
+                            <input class="form-input" id="time-start" type="text" placeholder="2000-DOY001 00:00:00" aria-describedby="time-date-help">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">结束时间</label>
-                            <input class="form-input" id="time-stop" type="text" placeholder="2000-12-31 00:00:00">
+                            <label class="form-label" for="time-stop">结束时间（年份 + 年内儒略日）</label>
+                            <input class="form-input" id="time-stop" type="text" placeholder="2000-DOY366 00:00:00" aria-describedby="time-date-help">
                         </div>
                         <div class="form-row">
                             <div class="form-group">
@@ -618,10 +776,11 @@
                                 <input class="form-input" id="time-step2d" type="number">
                             </div>
                         </div>
-                        <button class="btn btn-primary" onclick="saveTimeSettings()">💾 保存时间设置</button>
+                        <div class="form-hint" id="time-date-help">年内儒略日 DOY：平年 001–365，闰年 001–366；格式 YYYY-DOYDDD HH:mm:ss（模型时间）。</div>
+                        <button class="btn btn-primary" onclick="saveTimeSettings()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-save"></use></svg> 保存时间设置</button>
                     </div>
                     <div class="card">
-                        <div class="card-title">🔥 冷启动 / 热启动</div>
+                        <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-chart"></use></svg> 冷启动 / 热启动</div>
                         <div class="form-group">
                             <label class="form-label">启动方式</label>
                             <div style="display:flex;gap:20px;align-items:center;margin-top:6px;">
@@ -635,19 +794,21 @@
                         </div>
                         <div class="form-group" id="hotstart-file-group" style="display:none;">
                             <label class="form-label">热启动文件</label>
-                            <input class="form-input" id="hotstart-file" placeholder="hotstart.nc">
+                            <input class="form-input" id="hotstart-file" placeholder="restart.out">
+                            <div class="form-hint" data-i18n-skip="true">案例内相对路径；将验证并复制为 restart.in，开始时间自动设为检查点时间。 / Path within this case; validated and copied to restart.in. Start time follows the checkpoint.</div>
                         </div>
-                        <button class="btn btn-primary" onclick="saveHotstart()">💾 保存启动设置</button>
+                        <label class="form-group" data-i18n-skip="true"><input type="checkbox" id="hotstart-save" checked> 结束时保存重启检查点 / Save restart checkpoint at completion</label>
+                        <button class="btn btn-primary" onclick="saveHotstart()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-save"></use></svg> 保存启动设置</button>
                         <div style="margin-top:16px;padding:12px;background:var(--bg-tertiary);border-radius:6px;font-size:12px;color:var(--text-secondary);">
                             <strong>说明：</strong><br>
                             • 冷启动：从初始条件开始运行（首次运行使用）<br>
-                            • 热启动：从之前的运行结果继续（需提供 hotstart 文件）<br>
+                            • 热启动：从之前保存的 restart.out 检查点继续；结束时间必须晚于检查点<br>
                             • 热启动可用于延长模拟时间或做情景分析
                         </div>
                     </div>
                 </div>
                 <div class="card">
-                    <div class="card-title">📤 输出配置 (output.yaml)</div>
+                    <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-upload"></use></svg> 输出配置 (output.yaml)</div>
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">时间单位</label>
@@ -666,18 +827,18 @@
                             <input class="form-input" id="output-sync-interval" type="number" min="1" value="1">
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="saveOutputConfig()">💾 保存输出配置</button>
+                    <button class="btn btn-primary" onclick="saveOutputConfig()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-save"></use></svg> 保存输出配置</button>
                     <div style="margin-top:8px;font-size:11px;color:var(--text-muted);">
                         sync_interval=0 会导致输出文件 time 维度为 0，所有模拟结果丢失。建议设为 1（每个时间步同步）。
                     </div>
 
                     <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px;">
                         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                            <strong style="font-size:13px;">🧾 输出变量订阅</strong>
+                            <strong style="font-size:13px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-file"></use></svg> 输出变量订阅</strong>
                             <button class="btn btn-sm" onclick="applyOutputPreset('minimal')">精简（仅水动力）</button>
                             <button class="btn btn-sm" onclick="applyOutputPreset('standard')">标准（水动力+关键生态）</button>
                             <button class="btn btn-sm btn-danger" onclick="applyOutputPreset('all')">全部（source: *）</button>
-                            <button class="btn btn-sm btn-success" style="margin-left:auto;" onclick="saveOutputSubscription()">💾 保存订阅</button>
+                            <button class="btn btn-sm btn-success" style="margin-left:auto;" onclick="saveOutputSubscription()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-save"></use></svg> 保存订阅</button>
                         </div>
                         <div style="font-size:11px;color:var(--text-muted);margin:6px 0 8px;">
                             FABM 按“模块分类”订阅：<code>模块名/*</code>。默认 <code>source: *</code> 会写出模型注册的每一个变量
@@ -688,8 +849,8 @@
                     </div>
                 </div>
                 <div class="card">
-                    <div class="card-title">📊 运行预估</div>
-                    <div id="run-estimate" class="empty-state"><div class="icon">⏱️</div>加载案例后显示预估</div>
+                    <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-dashboard"></use></svg> 运行预估</div>
+                    <div id="run-estimate" class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-clock"></use></svg></div>加载案例后显示预估</div>
                 </div>
             </div>
 
@@ -699,12 +860,12 @@
                     <div class="page-title">初始条件</div>
                     <div class="page-desc">设置初始水位、水温与各类水质变量的初始状态（冷启动初值）</div>
                 </div>
-                <div id="ic-loading" class="empty-state"><div class="icon">🧪</div>加载案例后显示初始条件</div>
+                <div id="ic-loading" class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-flask"></use></svg></div>加载案例后显示初始条件</div>
                 <div id="ic-body" style="display:none;">
                     <!-- 1. 水量 / 水位 -->
                     <div class="ic-section open" id="ic-sec-hydro">
                         <div class="ic-head" onclick="toggleIcSection('hydro')">
-                            <span class="caret">▶</span>💧 初始水位与水温
+                            <span class="caret"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-play"></use></svg></span><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-droplet"></use></svg> 初始水位与水温
                         </div>
                         <div class="ic-body">
                             <div class="ic-grid">
@@ -727,7 +888,7 @@
                             </div>
                             <div id="ic-geo-info" style="font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.7;"></div>
                             <div style="font-size:11px;color:var(--info);margin-top:6px;line-height:1.7;">
-                                💡 <b>水位怎么填？</b> GETM 的 <code>m2d/elev_const</code> 是「相对地形零点」的水面高度，和
+                                <svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-info"></use></svg> <b>水位怎么填？</b> GETM 的 <code>m2d/elev_const</code> 是「相对地形零点」的水面高度，和
                                 <code>bathymetry.nc</code> 用同一个零点。若你的地形文件是滇池那种「相对 1884 m 基准面的水深」，
                                 则湖面就在 1884 m，<b>elev_const 填 0</b>；填 1884 会把水面抬到 3788 m。
                                 用上面的「湖面绝对高程 − 地形基准面绝对高程」两栏也能自动算出 elev_const。
@@ -737,7 +898,7 @@
                     <!-- 2. 营养状态 -->
                     <div class="ic-section open" id="ic-sec-trophic">
                         <div class="ic-head" onclick="toggleIcSection('trophic')">
-                            <span class="caret">▶</span>🌱 营养状态预设（一键填充水质初值）
+                            <span class="caret"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-play"></use></svg></span><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-leaf"></use></svg> 营养状态预设（一键填充水质初值）
                         </div>
                         <div class="ic-body">
                             <div class="trophic-pick" id="ic-trophic-pick"></div>
@@ -756,23 +917,23 @@
                     <!-- 3. 水质初始条件 -->
                     <div class="ic-section" id="ic-sec-wq">
                         <div class="ic-head" onclick="toggleIcSection('wq')">
-                            <span class="caret">▶</span>🧫 水质初始条件（按模块，单位 g/m³）
+                            <span class="caret"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-play"></use></svg></span><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-flask"></use></svg> 水质初始条件（按模块，单位 g/m³）
                         </div>
                         <div class="ic-body">
                             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center;">
                                 <input class="form-input" id="ic-wq-search" style="max-width:280px;" placeholder="搜索变量，如 NH4 / O2 / 藻" oninput="renderIcWaterQuality()">
-                                <button class="btn btn-sm" onclick="applyTrophicToFields()">↩ 按当前营养状态回填</button>
-                                <button class="btn btn-sm btn-primary" onclick="applyPresetToFields()">📐 套用预设数值</button>
+                                <button class="btn btn-sm" onclick="applyTrophicToFields()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-previous"></use></svg> 按当前营养状态回填</button>
+                                <button class="btn btn-sm btn-primary" onclick="applyPresetToFields()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-ruler"></use></svg> 套用预设数值</button>
                             </div>
                             <div id="ic-wq-modules"></div>
                         </div>
                     </div>
                     <!-- 4. 保存 -->
                     <div class="card">
-                        <div class="card-title">💾 应用初始条件</div>
+                        <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-save"></use></svg> 应用初始条件</div>
                         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-                            <button class="btn btn-success" onclick="saveInitConditions()">💾 保存到案例</button>
-                            <button class="btn" onclick="loadInitConditions()">🔄 重新读取</button>
+                            <button class="btn btn-success" onclick="saveInitConditions()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-save"></use></svg> 保存到案例</button>
+                            <button class="btn" onclick="loadInitConditions()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-refresh"></use></svg> 重新读取</button>
                             <span id="ic-save-status" style="font-size:11px;color:var(--text-muted);"></span>
                         </div>
                         <div style="margin-top:8px;font-size:11px;color:var(--text-muted);line-height:1.7;">
@@ -789,31 +950,92 @@
                     <div class="page-title">运行控制</div>
                     <div class="page-desc">启动/停止模型，查看运行日志和进度</div>
                 </div>
+                <div id="proxy-run-notice" class="proxy-case-notice" hidden></div>
                 <div class="grid-4" id="run-stats">
                     <div class="stat-card"><div class="stat-label">状态</div><div class="stat-value" id="run-stat-status" style="font-size:16px;">空闲</div></div>
-                    <div class="stat-card"><div class="stat-label">进度</div><div class="stat-value" id="run-stat-progress">0%</div></div>
-                    <div class="stat-card"><div class="stat-label">已用时间</div><div class="stat-value" id="run-stat-elapsed">0s</div></div>
+                    <div class="stat-card"><div class="stat-label">进度</div><div class="stat-value" id="run-stat-progress">未知</div></div>
+                    <div class="stat-card"><div class="stat-label" title="包含求解及求解结束后的结果检查、压缩等后处理">任务总用时（含后处理）</div><div class="stat-value" id="run-stat-elapsed">0s</div></div>
                     <div class="stat-card"><div class="stat-label">预计剩余</div><div class="stat-value" id="run-stat-eta">-</div></div>
                 </div>
                 <div class="card" style="margin-top:16px;">
-                    <div class="progress-bar"><div class="progress-fill" id="run-progress-fill" style="width:0%"></div></div>
+                    <div class="progress-bar" role="progressbar" aria-label="运行进度" aria-valuemin="0" aria-valuemax="100"><div class="progress-fill" id="run-progress-fill" style="width:0%"></div></div>
                     <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--text-secondary);">
                         <span id="run-step-info">未开始</span>
-                        <span id="run-percent">0%</span>
+                        <span id="run-percent">未知</span>
                     </div>
                 </div>
                 <div class="card">
+                    <section class="run-physics-summary" aria-labelledby="run-physics-title">
+                        <h3 id="run-physics-title" data-i18n="GETM 实时水动力">GETM 实时水动力</h3>
+                        <div id="run-physics-status" role="status" aria-live="polite" data-i18n="等待求解器物理诊断。">等待求解器物理诊断。</div>
+                        <div id="run-physics-point" class="run-physics-point" aria-live="polite">—</div>
+                        <dl class="run-physics-values">
+                            <div><dt data-i18n="水面高程 z（m）">水面高程 z（m）</dt><dd id="run-physics-z">—</dd></div>
+                            <div><dt data-i18n="静水深 H（m）">静水深 H（m）</dt><dd id="run-physics-h">—</dd></div>
+                            <div><dt data-i18n="总水深 D（m）">总水深 D（m）</dt><dd id="run-physics-d">—</dd></div>
+                        </dl>
+                        <div class="run-physics-velocity" aria-label="表层和底层局部网格速度">
+                            <section class="run-physics-velocity-layer" aria-labelledby="run-physics-surface-title">
+                                <h4 id="run-physics-surface-title"><span data-i18n="表层流速">表层流速</span> <span id="run-physics-velocity-surface-k">—</span></h4>
+                                <dl class="run-physics-velocity-values">
+                                    <div><dt data-i18n="局部网格 x（m/s）">局部网格 x（m/s）</dt><dd id="run-physics-velocity-surface-x">—</dd></div>
+                                    <div><dt data-i18n="局部网格 y（m/s）">局部网格 y（m/s）</dt><dd id="run-physics-velocity-surface-y">—</dd></div>
+                                    <div><dt data-i18n="合速度（m/s）">合速度（m/s）</dt><dd id="run-physics-velocity-surface-speed">—</dd></div>
+                                </dl>
+                            </section>
+                            <section class="run-physics-velocity-layer" aria-labelledby="run-physics-bottom-title">
+                                <h4 id="run-physics-bottom-title"><span data-i18n="底层流速">底层流速</span> <span id="run-physics-velocity-bottom-k">—</span></h4>
+                                <dl class="run-physics-velocity-values">
+                                    <div><dt data-i18n="局部网格 x（m/s）">局部网格 x（m/s）</dt><dd id="run-physics-velocity-bottom-x">—</dd></div>
+                                    <div><dt data-i18n="局部网格 y（m/s）">局部网格 y（m/s）</dt><dd id="run-physics-velocity-bottom-y">—</dd></div>
+                                    <div><dt data-i18n="合速度（m/s）">合速度（m/s）</dt><dd id="run-physics-velocity-bottom-speed">—</dd></div>
+                                </dl>
+                            </section>
+                        </div>
+                        <div id="run-physics-velocity-status" role="status" aria-live="polite" data-i18n="等待速度诊断。">等待速度诊断。</div>
+                        <div class="run-physics-source" data-i18n="数值来自求解器内存态的代表性中心湿格点；未读取运行中的 NetCDF。">数值来自求解器内存态的代表性中心湿格点；未读取运行中的 NetCDF。</div>
+                    </section>
                     <div class="card-title">
                         运行控制
                         <span style="margin-left:auto;display:flex;gap:8px;">
-                            <button class="btn btn-sm" onclick="runPreflightCheck()">🩺 运行前体检</button>
-                            <button class="btn btn-success btn-sm" id="btn-start-run" onclick="startRun()">▶️ 开始运行</button>
-                            <button class="btn btn-danger btn-sm" id="btn-stop-run" onclick="stopRun()" disabled>⏹️ 停止</button>
+                            <button class="btn btn-sm" onclick="runPreflightCheck()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-health"></use></svg> 运行前体检</button>
+                            <button class="btn btn-success btn-sm" id="btn-start-run" onclick="startRun()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-play"></use></svg> 开始运行</button>
+                            <button class="btn btn-danger btn-sm" id="btn-stop-run" onclick="stopRun()" disabled><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-stop"></use></svg> 停止</button>
                         </span>
                     </div>
                     <div id="run-check-panel" style="display:none;margin-bottom:10px;"></div>
-                    <div class="log-panel" id="run-log"></div>
+                    <div style="margin:0 0 10px;font-size:13px;">
+                        <label title="求解结束后进行 NetCDF4 Classic 无损压缩，并逐块核对全部变量和值；完整复制和核验可能显著延长任务完成时间，原文件仅在核验通过后替换。压缩结果可能增加打开时间。">
+                            <input id="compress-run-results" type="checkbox" checked>
+                            求解后压缩结果并逐值核验（减少磁盘占用；可能显著延长完成时间）
+                        </label>
+                    </div>
+                    <div id="mpi-run-control" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px;">
+                        <label><input id="mpi-run-enabled" type="checkbox" disabled> MPI</label>
+                        <label for="mpi-process-count">Processes</label>
+                        <select class="form-control" id="mpi-process-count" style="width:88px;" disabled></select>
+                        <button class="btn btn-sm" id="mpi-detect-recommendation" type="button" onclick="detectAndApplyMpiRecommendation()" disabled title="在隔离副本上测量多种进程数，包含求解与结果合并时间；仅在明确点击后运行">实测选择最快</button>
+                        <button class="btn btn-sm" id="mpi-tuning-cancel" type="button" onclick="cancelMpiTuning()" style="display:none;">取消测量</button>
+                        <span id="mpi-run-capability" role="status" style="flex:1;min-width:260px;font-size:12px;color:var(--text-muted,#777);"></span>
+                    </div>
+                    <div id="run-repair-summary" role="status" aria-live="polite" style="margin:0 0 10px;color:var(--text-muted,#777);font-size:12px;">FABM 状态检查汇总：未提供。</div>
+                    <div class="run-console-toolbar">
+                        <div class="run-console-meta">
+                            <div class="run-console-state-line" role="status" aria-live="polite">
+                                <strong>运行状态：</strong><span id="run-console-state">空闲</span>
+                                <span id="run-console-case" class="run-console-case">尚未加载案例</span>
+                            </div>
+                            <div id="run-console-source" class="run-console-source">日志来源：当前案例目录中的 model_run.log。此处由应用读取日志文件展示，不是原生命令提示符。</div>
+                        </div>
+                        <div class="run-console-actions" role="group" aria-label="日志操作">
+                            <button class="btn btn-sm" id="run-console-load-more" type="button" onclick="loadMoreRunLogs()" aria-controls="run-log" disabled>加载更早日志</button>
+                            <button class="btn btn-sm" id="run-console-copy" type="button" onclick="copyRunLogs()" aria-controls="run-log">复制已加载日志</button>
+                        </div>
+                    </div>
+                    <div id="run-console-log-status" class="sr-only" role="status" aria-live="polite"></div>
+                    <div class="log-panel" id="run-log" role="log" aria-label="模型运行日志" aria-live="off" aria-relevant="additions" aria-atomic="false" tabindex="0"></div>
                 </div>
+                <div id="result-files-panel" class="card">正在读取当前案例的结果保存位置…</div>
             </div>
 
             <!-- Map view (Leaflet + model grid overlay) -->
@@ -824,66 +1046,162 @@
                 </div>
                 <div class="card">
                     <div class="card-title">
-                        🌐 湖泊与模型网格
+                        <svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-globe"></use></svg> 湖泊与模型网格
                         <span style="margin-left:auto;display:flex;gap:8px;align-items:center;">
                             <select class="form-select" id="map-layer" style="width:auto;min-width:150px;" onchange="updateMapLayer()">
                                 <option value="depth">图层: 水深</option>
                                 <option value="result">图层: 结果场</option>
                             </select>
                             <select class="form-select" id="map-field-var" style="width:auto;min-width:170px;display:none;" onchange="updateMapLayer()"></select>
-                            <button class="btn btn-sm" onclick="loadMapGrid()">🔄 刷新</button>
+                            <button class="btn btn-sm" onclick="loadMapGrid()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-refresh"></use></svg> 刷新</button>
                         </span>
                     </div>
                     <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">
                         底图需要联网（OpenStreetMap 瓦片）；离网时网格仍会绘制，只是没有底图。
                     </div>
-                    <div id="map-container" style="width:100%;height:520px;border:1px solid var(--border);border-radius:6px;overflow:hidden;"></div>
-                    <div id="map-status" style="margin-top:8px;font-size:12px;color:var(--text-secondary);">进入本页会自动加载当前案例的网格；切换案例后请重新进入或点“刷新”</div>
-                    <div id="map-picked" style="margin-top:6px;font-size:12px;"></div>
+                    <div class="map-workbench-layout">
+                        <div id="map-container" style="width:100%;height:520px;border:1px solid var(--border);border-radius:6px;overflow:hidden;"></div>
+                        <details class="map-workbench-inspector" open>
+                            <summary>地图检查器</summary>
+                            <div id="map-status" role="status" aria-live="polite">进入本页会自动加载当前案例的网格；切换案例后请重新进入或点“刷新”</div>
+                            <div id="map-picked" aria-live="polite"></div>
+                        </details>
+                    </div>
                 </div>
             </div>
 
             <!-- 2D Visualization -->
-            <div class="page" id="page-viz2d">
-                <div class="page-header">
+            <div class="page scientific-workspace sw-settings-open" id="page-viz2d">
+                <div class="page-header sw-heading">
                     <div class="page-title">2D 可视化</div>
-                    <div class="page-desc">平面空间分布可视化，支持所有输出变量</div>
+                    <span class="page-desc">平面空间分布</span>
                 </div>
-                <div class="viz-container">
-                    <div class="viz-controls">
-                        <label>变量:</label>
-                        <select id="viz2d-var" onchange="onViz2dVarChange()"></select>
-                        <label>时步:</label>
-                        <input type="range" class="time-slider" id="viz2d-time" min="0" max="0" value="0" oninput="updateViz2d()">
-                        <span id="viz2d-time-label">0</span>
-                        <label>垂向层:</label>
-                        <select id="viz2d-level" onchange="updateViz2d()"></select>
-                        <span style="margin-left:8px;color:var(--text-muted);">|</span>
-                        <label>工具:</label>
-                        <div class="btn-group" id="viz2d-tools">
-                            <button class="btn btn-sm active" data-tool="inspect" onclick="setViz2dTool('inspect')">🔍 查看</button>
-                            <button class="btn btn-sm" data-tool="cell" onclick="setViz2dTool('cell')">📍 单格时序</button>
-                            <button class="btn btn-sm" data-tool="polygon" onclick="setViz2dTool('polygon')">✏️ 绘制区域</button>
-                            <button class="btn btn-sm" data-tool="calibpt" onclick="setViz2dTool('calibpt')">🎯 添加率定点</button>
+                <div id="proxy-viz2d-notice" class="proxy-case-notice" hidden></div>
+                <div class="viz-container sw-shell">
+                    <div class="sw-command" role="group" aria-label="二维主图控制">
+                        <details class="sw-navigation">
+                            <summary title="工作台导航" aria-label="打开工作台导航"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-menu"></use></svg></summary>
+                            <nav aria-label="工作台页面">
+                                <button type="button" onclick="navigate('dashboard')">仪表盘</button>
+                                <button type="button" onclick="navigate('cases')">案例管理</button>
+                                <button type="button" onclick="navigate('preprocess')">前处理</button>
+                                <button type="button" onclick="navigate('gridstudio')">交互网格编辑</button>
+                                <button type="button" onclick="navigate('input')">输入数据</button>
+                                <button type="button" onclick="navigate('modules')">模块配置</button>
+                                <button type="button" onclick="navigate('parameters')">参数编辑</button>
+                                <button type="button" onclick="navigate('initial')">初始条件</button>
+                                <button type="button" onclick="navigate('time')">时间设置</button>
+                                <button type="button" onclick="navigate('run')">运行控制</button>
+                                <button type="button" onclick="navigate('map')">地图视图</button>
+                                <button type="button" onclick="navigate('vheat')">垂向热图</button>
+                                <button type="button" onclick="navigate('timeseries')">时间序列</button>
+                                <button type="button" onclick="navigate('calibrate')">率定分析</button>
+                                <button type="button" onclick="navigate('autocal')">自动率定</button>
+                                <button type="button" onclick="navigate('system')">环境与启动诊断</button>
+                            </nav>
+                        </details>
+                        <div class="sw-view-switch" role="group" aria-label="结果视图">
+                            <button type="button" class="btn btn-sm active" aria-current="page" title="二维空间分布">2D</button>
+                            <button type="button" class="btn btn-sm" onclick="navigate('viz3d')" title="切换到三维结构">3D</button>
                         </div>
-                        <button class="btn btn-sm" id="viz2d-clear-poly" style="display:none;" onclick="clearViz2dPolygon()">清除多边形</button>
-                        <button class="btn btn-sm btn-success" id="viz2d-submit-poly" style="display:none;" onclick="submitViz2dPolygon()">提交区域时序</button>
-                    </div>
-                    <canvas id="viz2d-canvas" class="viz-canvas" width="800" height="500" style="cursor:crosshair;"></canvas>
-                    <div style="padding:10px;">
-                        <div class="colorbar" id="viz2d-colorbar"></div>
-                        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary);">
-                            <span id="viz2d-min">-</span><span id="viz2d-max">-</span>
+                        <div class="sw-command-actions">
+                            <button type="button" class="btn btn-sm" id="viz2d-export" title="导出主图、色标与当前时刻" aria-label="导出二维结果图"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-download"></use></svg><span>导出</span></button>
+                            <button type="button" class="btn btn-sm" id="viz2d-inspector-toggle" aria-controls="viz2d-settings" aria-expanded="true" title="展开或收起变量、图例与显示控制"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-list"></use></svg> <span>检查器</span></button>
+                            <button type="button" class="btn btn-sm" id="viz2d-settings-toggle" aria-controls="viz2d-settings-panel" aria-expanded="true" title="展开或收起二维显示设置"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-settings"></use></svg> <span>设置</span></button>
                         </div>
-                        <div id="viz2d-info" style="margin-top:8px;font-size:12px;color:var(--text-secondary);"></div>
-                        <div id="viz2d-coord" style="margin-top:4px;font-size:11px;color:var(--text-muted);"></div>
                     </div>
+                    <div class="sw-summary" id="viz2d-summary" aria-label="当前二维变量与图层">选择变量后显示当前图层与单位</div>
+                    <div class="sw-empty-state" id="viz2d-single-column-message" role="status" hidden>
+                        <strong>此结果是单水柱（x=1、y=1），没有水平二维空间分布。</strong>
+                        <p>请使用纵剖面、深度–时间图或时间序列查看真实垂向和时间变化。</p>
+                        <div class="sw-command-actions">
+                            <button type="button" class="btn btn-sm" onclick="navigate('vheat')">深度–时间图</button>
+                            <button type="button" class="btn btn-sm" onclick="navigate('timeseries')">时间序列</button>
+                        </div>
+                    </div>
+                    <div class="sw-main">
+                        <div class="sw-viewport" aria-label="二维主图区域">
+                            <canvas id="viz2d-canvas" class="viz-canvas" width="800" height="500" style="cursor:crosshair;" role="img" aria-label="当前变量的二维空间分布；数值读数见图例与坐标信息"></canvas>
+                            <div id="viz2d-coord" class="sw-coordinate" aria-live="off"></div>
+                        </div>
+                        <aside class="sw-rail" id="viz2d-settings" aria-label="二维图例与显示设置">
+                            <section class="sw-inspector-controls" aria-labelledby="viz2d-inspector-title">
+                                <h3 id="viz2d-inspector-title">变量与图层</h3>
+                                <div class="sw-field"><label for="viz2d-var">变量 · 单位</label><input id="viz2d-var-search" type="search" class="form-input" hidden aria-label="搜索二维变量名称、代码、单位或说明" aria-describedby="viz2d-var-search-status" placeholder="搜索名称、代码、单位…"><div id="viz2d-var-search-status" class="form-hint" role="status" aria-live="polite"></div><select id="viz2d-var" aria-describedby="viz2d-var-search-status" onchange="updateResultVariableSearch('viz2d-var');onViz2dVarChange()"></select></div>
+                                <div class="sw-field"><label for="viz2d-level">垂向层</label><select id="viz2d-level" onchange="updateViz2d()"></select></div>
+                            </section>
+                            <section class="sw-legend" aria-labelledby="viz2d-legend-title">
+                                <h3 id="viz2d-legend-title">图例</h3>
+                                <div class="colorbar" id="viz2d-colorbar"></div>
+                                <div class="sw-legend-extents"><span id="viz2d-min">—</span><span id="viz2d-max">—</span></div>
+                                <div class="sw-legend-key"><span><i class="sw-land-key" aria-hidden="true"></i>陆地（湿掩膜）</span><span><i class="sw-missing-key" aria-hidden="true"></i>湿格缺测</span></div>
+                            </section>
+                            <div class="sw-settings-panel" id="viz2d-settings-panel">
+                                <fieldset class="sw-setting-group">
+                                    <legend>颜色与范围</legend>
+                                    <div class="sw-field"><label for="viz2d-palette">色图</label><select id="viz2d-palette"><option value="lake">湖蓝</option><option value="cividis">Cividis</option><option value="viridis">Viridis</option><option value="blueRed">蓝—红</option><option value="custom">自定义</option></select></div>
+                                    <button type="button" class="btn btn-sm" data-colormap-edit="viz2d">编辑色标…</button>
+                                    <div class="sw-field"><label for="viz2d-range-mode">范围模式</label><select id="viz2d-range-mode"><option value="auto">当前帧自动（逐帧缩放）</option><option value="locked">锁定范围</option><option value="custom">自定义范围</option></select></div>
+                                    <div class="sw-range-fields">
+                                        <div class="sw-field"><label for="viz2d-range-min">下限</label><input id="viz2d-range-min" type="number" step="any" inputmode="decimal" placeholder="自动" aria-describedby="viz2d-range-status"></div>
+                                        <div class="sw-field"><label for="viz2d-range-max">上限</label><input id="viz2d-range-max" type="number" step="any" inputmode="decimal" placeholder="自动" aria-describedby="viz2d-range-status"></div>
+                                    </div>
+                                    <div class="sw-range-status" id="viz2d-range-status" role="status" aria-live="polite"></div>
+                                    <div class="form-hint">自动范围按当前显示帧的有效值更新；播放时每帧重新缩放。不同帧颜色不宜直接作定量比较。跨帧比较可选择“锁定范围”或“自定义范围”。2D/3D相同变量共用范围设置。</div>
+                                    <label class="sw-checkbox" for="viz2d-show-grid"><input id="viz2d-show-grid" type="checkbox">显示内部网格</label>
+                                </fieldset>
+                                <fieldset class="sw-setting-group">
+                                    <legend>选取与分析</legend>
+                                    <div class="btn-group sw-tool-grid" id="viz2d-tools" role="group" aria-label="二维选取工具">
+                                        <button type="button" class="btn btn-sm active" data-tool="inspect" onclick="setViz2dTool('inspect')" title="查看网格数值"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-search"></use></svg> 查看</button>
+                                        <button type="button" class="btn btn-sm" data-tool="cell" onclick="setViz2dTool('cell')" title="提取单格时间序列"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-pin"></use></svg> 单格时序</button>
+                                        <button type="button" class="btn btn-sm" data-tool="polygon" onclick="setViz2dTool('polygon')" title="绘制区域并提取时间序列"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-draw"></use></svg> 绘制区域</button>
+                                        <button type="button" class="btn btn-sm" data-tool="calibpt" onclick="setViz2dTool('calibpt')" title="添加所选网格为率定点"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-target"></use></svg> 添加率定点</button>
+                                    </div>
+                                    <div class="sw-tool-actions"><button type="button" class="btn btn-sm" id="viz2d-clear-poly" style="display:none;" onclick="clearViz2dPolygon()">清除多边形</button><button type="button" class="btn btn-sm btn-success" id="viz2d-submit-poly" style="display:none;" onclick="submitViz2dPolygon()">提交区域时序</button></div>
+                                </fieldset>
+                                <details class="sw-details sw-size-details">
+                                    <summary>画布尺寸与操作</summary>
+                                    <div class="viz-size-controls">
+                                        <label for="viz2d-width">宽度（px）</label><input id="viz2d-width" type="number" min="120" max="4000" placeholder="自动" oninput="ViewControls.setCanvasSize('viz2d-canvas',Number(this.value),Number(document.getElementById('viz2d-height').value))">
+                                        <label for="viz2d-height">高度（px）</label><input id="viz2d-height" type="number" min="180" max="1600" value="500" oninput="ViewControls.setCanvasSize('viz2d-canvas',Number(document.getElementById('viz2d-width').value),Number(this.value))">
+                                        <button type="button" class="btn btn-sm" onclick="document.getElementById('viz2d-width').value='';ViewControls.fitCanvas('viz2d-canvas')">适应窗口</button>
+                                        <span>拖动图形右下角调整大小；滚轮缩放，中键平移。图内工具栏可复位、全屏。</span>
+                                    </div>
+                                </details>
+                            </div>
+                        </aside>
+                    </div>
+                    <div class="sw-timeline" role="group" aria-label="二维结果时间控制">
+                        <div class="sw-playback">
+                            <button type="button" class="btn btn-sm" id="viz2d-prev" title="上一输出帧" aria-label="二维上一输出帧"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-previous"></use></svg></button>
+                            <button type="button" class="btn btn-sm btn-primary" id="viz2d-play" title="播放实际输出帧" aria-label="播放二维输出帧" aria-pressed="false"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-play"></use></svg></button>
+                            <button type="button" class="btn btn-sm" id="viz2d-next" title="下一输出帧" aria-label="二维下一输出帧"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-next"></use></svg></button>
+                        </div>
+                        <label class="sw-sr-only" for="viz2d-time">输出时步</label><input type="range" class="time-slider" id="viz2d-time" min="0" max="0" value="0">
+                        <span class="sw-time-label" id="viz2d-time-label">尚无输出时刻</span>
+                        <div class="sw-speed"><label for="viz2d-speed">速度</label><select id="viz2d-speed" title="播放速度（帧/秒，目标上限）"><option value="0.5">0.5 帧/秒</option><option value="1" selected>1 帧/秒</option><option value="2">2 帧/秒</option><option value="4">4 帧/秒</option><option value="8">8 帧/秒</option><option value="12">12 帧/秒</option></select></div>
+                        <div class="sw-play-range" role="group" aria-label="选择实际输出播放范围">
+                            <div class="sw-play-endpoint"><label for="viz2d-play-start">起始帧</label><input class="form-input" type="number" id="viz2d-play-start" min="0" max="0" step="1" value="0" aria-describedby="viz2d-play-start-label viz2d-play-range-status"><span id="viz2d-play-start-label">尚无输出时刻</span></div>
+                            <div class="sw-play-endpoint"><label for="viz2d-play-end">结束帧</label><input class="form-input" type="number" id="viz2d-play-end" min="0" max="0" step="1" value="0" aria-describedby="viz2d-play-end-label viz2d-play-range-status"><span id="viz2d-play-end-label">尚无输出时刻</span></div>
+                            <span class="sw-play-range-status" id="viz2d-play-range-status" role="status" aria-live="polite"></span>
+                            <span class="sw-play-range-status" id="viz2d-play-perf" role="status" aria-live="polite"></span>
+                        </div>
+                    </div>
+                    <div class="sw-status" id="viz2d-status" role="status" aria-live="polite" aria-atomic="true">等待当前案例数据</div>
                 </div>
+                <details class="sw-details sw-source-details">
+                    <summary>变量说明、参考值与数据来源</summary>
+                    <section id="viz2d-var-guide" class="results-variable-card" hidden></section>
+                    <div id="viz2d-info" class="sw-data-info"></div>
+                    <p>参考值用于辅助解释，可在上方变量说明中查看来源并设置本案例参考。初始基线与水质标准分别标注；显示范围不代表水质标准。</p>
+                    <p>陆地由地形湿掩膜确定，湿格内无效值单独标为缺测。只有坐标可靠时显示物理距离；否则使用 I/J 网格索引。</p>
+                </details>
                 <!-- Cell time series modal -->
-                <div class="modal" id="modal-cell-ts">
+                <div class="modal" id="modal-cell-ts" role="dialog" aria-modal="true" aria-labelledby="cell-ts-title">
                     <div class="modal-backdrop" onclick="closeModal('modal-cell-ts')"></div>
                     <div class="modal-content" style="max-width:700px;">
-                        <div class="modal-header"><h3 id="cell-ts-title">单格时间序列</h3><button onclick="closeModal('modal-cell-ts')">×</button></div>
+                        <div class="modal-header"><h3 id="cell-ts-title">单格时间序列</h3><button type="button" onclick="closeModal('modal-cell-ts')" title="关闭单格时间序列" aria-label="关闭单格时间序列"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-close"></use></svg></button></div>
                         <div class="modal-body">
                             <div class="chart-container" style="height:300px;"><canvas id="cell-ts-chart"></canvas></div>
                             <div id="cell-ts-stats" style="margin-top:8px;font-size:12px;color:var(--text-secondary);"></div>
@@ -891,95 +1209,184 @@
                     </div>
                 </div>
                 <!-- Add calibration point modal (linked from viz2d calibpt tool) -->
-                <div class="modal" id="modal-add-calib">
+                <div class="modal" id="modal-add-calib" role="dialog" aria-modal="true" aria-labelledby="calib-add-title">
                     <div class="modal-backdrop" onclick="closeModal('modal-add-calib')"></div>
                     <div class="modal-content">
-                        <div class="modal-header"><h3>添加率定点位</h3><button onclick="closeModal('modal-add-calib')">×</button></div>
+                        <div class="modal-header"><h3 id="calib-add-title">添加率定点位</h3><button type="button" onclick="closeModal('modal-add-calib')" title="关闭添加率定点位" aria-label="关闭添加率定点位"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-close"></use></svg></button></div>
                         <div class="modal-body">
-                            <div class="form-group"><label class="form-label">点位名称</label><input class="form-input" id="calib-add-name" placeholder="如：湖心点A"></div>
+                            <div class="form-group"><label class="form-label" for="calib-add-name">点位名称</label><input class="form-input" id="calib-add-name" placeholder="如：湖心点A"></div>
                             <div class="form-row">
-                                <div class="form-group"><label class="form-label">网格 i</label><input class="form-input" id="calib-add-i" type="number" readonly></div>
-                                <div class="form-group"><label class="form-label">网格 j</label><input class="form-input" id="calib-add-j" type="number" readonly></div>
+                                <div class="form-group"><label class="form-label" for="calib-add-i">网格 i</label><input class="form-input" id="calib-add-i" type="number" readonly></div>
+                                <div class="form-group"><label class="form-label" for="calib-add-j">网格 j</label><input class="form-input" id="calib-add-j" type="number" readonly></div>
                             </div>
-                            <div class="form-group"><label class="form-label">率定变量（可多选）</label><input class="form-input" id="calib-add-vars" placeholder="如: temp, abiotic_water_sO2W, wet_chla" value="temp"></div>
-                            <button class="btn btn-primary" onclick="confirmAddCalibPoint()">💾 确认添加</button>
+                            <div class="form-group"><label class="form-label" for="calib-add-vars">率定变量（可多选）</label><select class="form-select" id="calib-add-vars" multiple size="6"><option value="temp" selected>水温 / Water temperature · temp</option></select><div class="form-hint">Ctrl / Cmd + 点击选择多个变量</div></div>
+                            <button type="button" class="btn btn-primary" onclick="confirmAddCalibPoint()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-save"></use></svg> 确认添加</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 3D Visualization -->
-            <div class="page" id="page-viz3d">
-                <div class="page-header">
+            <div class="page scientific-workspace sw-settings-open" id="page-viz3d">
+                <div class="page-header sw-heading">
                     <div class="page-title">3D 可视化</div>
-                    <div class="page-desc">垂向剖面、三维结构、Plotly 体渲染</div>
+                    <span class="page-desc">湖盆结构与关联剖面</span>
                 </div>
-                <div class="card">
-                    <div class="card-title">🧊 3D 立体水体</div>
-                    <div class="form-row">
-                        <div class="form-group"><label class="form-label">变量</label><select class="form-select" id="viz3d-iso-var" onchange="updateViz3dIso()"></select></div>
-                        <div class="form-group"><label class="form-label">时步</label><input class="form-input" id="viz3d-iso-time" type="number" value="0" min="0" onchange="updateViz3dIso()"></div>
-                        <div class="form-group"><label class="form-label">渲染方式</label>
-                            <select class="form-select" id="viz3d-iso-render" onchange="updateViz3dIso()">
-                                <option value="waterbody" selected>立体水体（湖底+分层+剖面墙）</option>
-                                <option value="isosurface">等值面 (isosurface)</option>
-                                <option value="cloud">点云 (scatter3d)</option>
-                                <option value="surface2d">2D 场作为 3D 表面</option>
-                            </select>
+                <div id="proxy-viz3d-notice" class="proxy-case-notice" hidden></div>
+                <div class="sw-shell">
+                    <div class="sw-command" role="group" aria-label="三维主图控制">
+                        <details class="sw-navigation">
+                            <summary title="工作台导航" aria-label="打开工作台导航"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-menu"></use></svg></summary>
+                            <nav aria-label="工作台页面">
+                                <button type="button" onclick="navigate('dashboard')">仪表盘</button>
+                                <button type="button" onclick="navigate('cases')">案例管理</button>
+                                <button type="button" onclick="navigate('preprocess')">前处理</button>
+                                <button type="button" onclick="navigate('gridstudio')">交互网格编辑</button>
+                                <button type="button" onclick="navigate('input')">输入数据</button>
+                                <button type="button" onclick="navigate('modules')">模块配置</button>
+                                <button type="button" onclick="navigate('parameters')">参数编辑</button>
+                                <button type="button" onclick="navigate('initial')">初始条件</button>
+                                <button type="button" onclick="navigate('time')">时间设置</button>
+                                <button type="button" onclick="navigate('run')">运行控制</button>
+                                <button type="button" onclick="navigate('map')">地图视图</button>
+                                <button type="button" onclick="navigate('vheat')">垂向热图</button>
+                                <button type="button" onclick="navigate('timeseries')">时间序列</button>
+                                <button type="button" onclick="navigate('calibrate')">率定分析</button>
+                                <button type="button" onclick="navigate('autocal')">自动率定</button>
+                                <button type="button" onclick="navigate('system')">环境与启动诊断</button>
+                            </nav>
+                        </details>
+                        <div class="sw-view-switch" role="group" aria-label="结果视图">
+                            <button type="button" class="btn btn-sm" onclick="navigate('viz2d')" title="切换到二维空间分布">2D</button>
+                            <button type="button" class="btn btn-sm active" aria-current="page" title="三维结构">3D</button>
                         </div>
-                        <div class="form-group"><label class="form-label">质量</label>
-                            <select class="form-select" id="viz3d-iso-quality" onchange="updateViz3dIso()">
-                                <option value="16">低 (更快)</option>
-                                <option value="26" selected>中</option>
-                                <option value="34">高 (更精细)</option>
-                            </select>
+                        <div class="sw-command-actions">
+                            <button type="button" class="btn btn-sm" id="viz3d-export" title="导出主图、色标、时刻与垂向倍数" aria-label="导出三维结果图"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-download"></use></svg><span>导出</span></button>
+                            <button type="button" class="btn btn-sm" id="viz3d-inspector-toggle" aria-controls="viz3d-settings" aria-expanded="true" title="展开或收起变量、镜头与图层控制"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-list"></use></svg> <span>检查器</span></button>
+                            <button type="button" class="btn btn-sm" id="viz3d-settings-toggle" aria-controls="viz3d-settings-panel" aria-expanded="false" title="展开或收起三维显示设置"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-settings"></use></svg> <span>设置</span></button>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group"><label class="form-label">选定层（-1=最上层）</label><input class="form-input" id="viz3d-iso-layer" type="number" value="-1" min="-1" onchange="updateViz3dIso()"></div>
-                        <div class="form-group"><label class="form-label">垂向放大</label>
-                            <select class="form-select" id="viz3d-iso-ve" onchange="updateViz3dIso()">
-                                <option value="1">1× (真实比例)</option>
-                                <option value="20">20×</option>
-                                <option value="50">50×</option>
-                                <option value="100" selected>100×</option>
-                                <option value="200">200×</option>
-                                <option value="400">400×</option>
-                            </select>
+                    <div class="sw-summary"><span id="viz3d-summary">选择变量后显示当前图层与单位</span><span id="viz3d-ve-label">垂向倍数：自动</span></div>
+                    <div class="sw-main">
+                        <div class="sw-viewport" aria-label="三维主图区域">
+                            <div id="viz3d-plotly" style="width:100%;height:520px;" aria-label="当前变量的三维结构，真实深度以米表示"></div>
                         </div>
-                        <div class="form-group"><label class="form-label">分层显示</label>
-                            <label style="display:flex;align-items:center;gap:6px;height:34px;">
-                                <input type="checkbox" id="viz3d-iso-stack" checked onchange="updateViz3dIso()" style="width:auto;">
-                                <span style="font-size:12px;">叠层看内部结构</span>
-                            </label>
-                        </div>
-                        <div class="form-group"><label class="form-label">层（仅2D表面）</label><input class="form-input" id="viz3d-iso-level" type="number" value="0" min="0" onchange="updateViz3dIso()"></div>
-                        <button class="btn btn-primary" onclick="updateViz3dIso()">🔄 刷新</button>
+                        <aside class="sw-rail" id="viz3d-settings" aria-label="三维图例与显示设置">
+                            <section class="sw-inspector-controls" aria-labelledby="viz3d-inspector-title">
+                                <h3 id="viz3d-inspector-title">变量与视图</h3>
+                                <div class="sw-field"><label for="viz3d-iso-var">变量 · 单位</label><input id="viz3d-iso-var-search" type="search" class="form-input" hidden aria-label="搜索三维变量名称、代码、单位或说明" aria-describedby="viz3d-iso-var-search-status" placeholder="搜索名称、代码、单位…"><div id="viz3d-iso-var-search-status" class="form-hint" role="status" aria-live="polite"></div><select class="form-select" id="viz3d-iso-var" aria-describedby="viz3d-iso-var-search-status" onchange="updateResultVariableSearch('viz3d-iso-var');updateViz3dIso()"></select></div>
+                                <div class="sw-field"><label for="viz3d-iso-layer">选定层（-1=表层）</label><input class="form-input" id="viz3d-iso-layer" type="number" value="-1" min="-1" onchange="updateViz3dIso()"></div>
+                                <div class="sw-field"><label for="viz3d-iso-ve">垂向放大</label><select class="form-select" id="viz3d-iso-ve" onchange="updateViz3dIso()"><option value="0" selected>自动适配湖盆</option><option value="1">1× (真实比例)</option><option value="20">20×</option><option value="50">50×</option><option value="100">100×</option><option value="200">200×</option><option value="400">400×</option></select></div>
+                                <div class="sw-camera" role="group" aria-label="镜头与透明度">
+                                    <div class="sw-field"><label for="viz3d-camera">镜头</label><select id="viz3d-camera"><option value="oblique">斜视</option><option value="top">俯视</option><option value="bottom">仰视</option><option value="front">正面</option><option value="side">侧面</option><option value="reset">复位</option></select></div>
+                                    <div class="sw-field"><label for="viz3d-camera-elevation">镜头仰角 <output id="viz3d-camera-elevation-value">34°</output></label><input id="viz3d-camera-elevation" type="range" min="-89" max="89" step="1" value="34" oninput="set3DCameraElevation(this.value)" aria-describedby="viz3d-camera-elevation-hint"></div>
+                                    <div class="form-hint" id="viz3d-camera-elevation-hint">0°为水平视线，正值从水面上方看向湖盆，负值从水面下方仰看湖底。滑块限于±89°以避开垂直镜头奇异值；俯视/仰视预设为±90°，并会同步到最近滑块位置。这里只改变镜头仰角；垂向放大单独控制。</div>
+                                    <div class="form-hint" id="viz3d-camera-gesture-hint">拖动旋转，滚轮缩放；镜头仰角控制视角，垂向放大只改变显示比例。</div>
+                                    <div class="sw-field"><label for="viz3d-camera-position">模型上下位置 <output id="viz3d-camera-position-value">0%</output></label><input id="viz3d-camera-position" type="range" min="-100" max="100" step="1" value="0" oninput="set3DCameraVerticalPosition(this.value)" aria-describedby="viz3d-camera-position-hint"></div>
+                                    <div class="form-hint" id="viz3d-camera-position-hint">正值让画面中的模型上移，负值下移。只平移镜头，不改变数据或模型几何；与镜头仰角、垂向放大分别控制。恢复视图会回中。</div>
+                                    <div class="sw-field"><label for="viz3d-opacity">数据层</label><select id="viz3d-opacity"><option value="1" selected>不透明 · 定量读色</option><option value="0.55">半透明 · 结构探索</option></select></div>
+                                </div>
+                                <div class="sw-3d-display-controls" role="group" aria-label="三维水体与岸陆图层">
+                                    <div class="sw-field sw-3d-mesh-control"><label for="viz3d-mesh-mode">显示剖分</label><select class="form-select" id="viz3d-mesh-mode" onchange="updateViz3dIso()"><option value="continuous" selected>连续曲面</option><option value="orthogonal">正交网格线</option><option value="triangles">三角网格（显示剖分）</option><option value="hidden">隐藏网格线</option></select></div>
+                                    <label class="sw-checkbox sw-3d-land-control" for="viz3d-show-land"><input type="checkbox" id="viz3d-show-land" onchange="updateViz3dIso()">显示岸陆示意</label>
+                                    <button type="button" class="btn btn-sm" id="viz3d-volume-preset" aria-pressed="false" title="体网格预设" data-i18n="体网格预设"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-layers"></use></svg> <span>体网格预设</span></button>
+                                </div>
+                                <div class="form-hint" data-i18n="此预设临时启用派生三角显示剖分与全部可用垂向层。再次点击后恢复预设前的剖分与叠层选择。">此预设临时启用派生三角显示剖分与全部可用垂向层。再次点击后恢复预设前的剖分与叠层选择。</div>
+                            </section>
+                            <section class="sw-legend" aria-labelledby="viz3d-legend-title">
+                                <h3 id="viz3d-legend-title">图例</h3>
+                                <div class="colorbar scientific-colorbar" id="viz3d-main-colorbar"></div>
+                                <div class="sw-legend-extents"><span id="viz3d-main-min">—</span><span id="viz3d-main-max">—</span></div>
+                                <p class="sw-legend-note">静态预览隐藏湖底；半透明蓝色水面与湿网格侧壁展示体积；岸线为代理，未验证；陆地高程未提供</p>
+                            </section>
+                            <div class="sw-settings-panel" id="viz3d-settings-panel">
+                                <fieldset class="sw-setting-group">
+                                    <legend>颜色与范围</legend>
+                                    <div class="sw-field"><label for="viz3d-palette">色图</label><select id="viz3d-palette"><option value="lake">湖蓝</option><option value="cividis">Cividis</option><option value="viridis">Viridis</option><option value="blueRed">蓝—红</option><option value="custom">自定义</option></select></div>
+                                    <button type="button" class="btn btn-sm" data-colormap-edit="viz3d">编辑色标…</button>
+                                    <div class="sw-field"><label for="viz3d-range-mode">范围模式</label><select id="viz3d-range-mode"><option value="auto">当前帧自动（逐帧缩放）</option><option value="locked">锁定范围</option><option value="custom">自定义范围</option></select></div>
+                                    <div class="sw-range-fields"><div class="sw-field"><label for="viz3d-range-min">下限</label><input id="viz3d-range-min" type="number" step="any" inputmode="decimal" placeholder="自动" aria-describedby="viz3d-range-status"></div><div class="sw-field"><label for="viz3d-range-max">上限</label><input id="viz3d-range-max" type="number" step="any" inputmode="decimal" placeholder="自动" aria-describedby="viz3d-range-status"></div></div>
+                                    <div class="sw-range-status" id="viz3d-range-status" role="status" aria-live="polite"></div>
+                                    <div class="form-hint">自动范围按当前显示帧的有效值更新；播放时每帧重新缩放。不同帧颜色不宜直接作定量比较。跨帧比较可选择“锁定范围”或“自定义范围”。2D/3D相同变量共用范围设置。</div>
+                                </fieldset>
+                                <fieldset class="sw-setting-group">
+                                    <legend>图层与质量</legend>
+                                    <div class="sw-field"><label for="viz3d-iso-render">渲染方式</label><select class="form-select" id="viz3d-iso-render" onchange="updateViz3dIso()"><option value="waterbody" selected>立体水体（湖底+分层+剖面墙）</option><option value="isosurface">等值面 (isosurface)</option><option value="cloud">点云 (scatter3d)</option><option value="surface2d">变量高度表面（非真实水面）</option></select><div id="viz3d-iso-render-hint" class="form-hint" role="status" hidden></div></div>
+                                    <div class="sw-field"><label for="viz3d-iso-quality">质量</label><select class="form-select" id="viz3d-iso-quality" onchange="updateViz3dIso()"><option value="32">低 (更快)</option><option value="64">中等</option><option value="96" selected>高 (更精细)</option></select></div>
+                                    <div class="form-hint">本案例为结构四边形网格；默认以稳定对角线将当前有效湿四边形显示为三角面。这是派生的显示剖分，不是求解器原生三角网；原始单元值、坐标和湿掩膜保持不变。图例随当前帧列出实际参与绘制的湿单元与显示边；缺少可信拓扑时拒绝绘制。连续曲面可作为大型网格或播放场景的轻量替代；单元中心悬停值保持不变。</div>
+                                    <div class="sw-field"><label for="viz3d-line-density">网格线间距（单元）</label><input class="form-input" id="viz3d-line-density" type="number" min="1" max="20" step="1" value="1" onchange="updateViz3dIso()"></div>
+                                    <div class="sw-field"><label for="viz3d-line-opacity">网格线透明度</label><input id="viz3d-line-opacity" type="range" min="0" max="1" step="0.05" value="0.9" oninput="updateViz3dIso()"></div>
+                                    <label class="sw-checkbox" for="viz3d-mesh-nodes"><input type="checkbox" id="viz3d-mesh-nodes" onchange="updateViz3dIso()">显示网格节点（辅助）</label>
+                                    <p class="sw-range-status">拓扑说明：求解器的有效水体单元为四边形；三角模式按单元索引稳定选择对角线。单层 3D 播放默认每个湿四边形显示 2 个三角面；显式设置细分后才增加显示三角面。图例数值取自本帧实际参与绘制的网格。这是可审计的显示剖分，不是求解器原生三角拓扑；没有可信湿网格时拒绝绘制。此设置不改变求解器拓扑或变量原值。降采样时标为采样显示网格。陆地高程未提供时仅已知干单元绘制中性平面。</p>
+                                    <label class="sw-checkbox" for="viz3d-iso-stack"><input type="checkbox" id="viz3d-iso-stack" onchange="updateViz3dIso()" style="width:auto;">叠层看内部结构</label>
+                                    <label class="sw-checkbox" for="viz3d-iso-overlay"><input type="checkbox" id="viz3d-iso-overlay" checked onchange="updateViz3dIso()">水面显示所选变量</label>
+                                    <div class="sw-field"><label for="viz3d-iso-level">层（仅变量高度表面）</label><input class="form-input" id="viz3d-iso-level" type="number" value="0" min="0" onchange="updateViz3dIso()"></div>
+                                    <button type="button" class="btn btn-sm" onclick="updateViz3dIso()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-refresh"></use></svg> 刷新</button>
+                                </fieldset>
+                            </div>
+                        </aside>
                     </div>
-                    <div class="hint" style="margin:0 0 8px 2px;color:var(--text-muted);font-size:12px;">鼠标左键拖动旋转、滚轮缩放、右键平移。立体水体 = 湖底地形 + 逐层半透明分层面（可看到温跃层/分层）+ 四周水体剖面墙；垂向放大用于弥补水深（米级）相对湖面（公里级）过小的问题。</div>
-                    <div id="viz3d-plotly" style="width:100%;height:520px;background:var(--bg-primary);border:1px solid var(--border);border-radius:6px;"></div>
+                    <div class="sw-timeline" role="group" aria-label="三维结果时间控制">
+                        <div class="sw-playback"><button type="button" class="btn btn-sm" id="viz3d-prev" title="上一输出帧" aria-label="三维上一输出帧"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-previous"></use></svg></button><button type="button" class="btn btn-sm btn-primary" id="viz3d-play" title="播放实际输出帧" aria-label="播放三维输出帧" aria-pressed="false"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-play"></use></svg></button><button type="button" class="btn btn-sm" id="viz3d-next" title="下一输出帧" aria-label="三维下一输出帧"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-next"></use></svg></button></div>
+                        <label class="sw-sr-only" for="viz3d-time-slider">输出时步滑块</label><input type="range" class="time-slider" id="viz3d-time-slider" min="0" max="0" value="0">
+                        <span class="sw-time-label" id="viz3d-iso-time-label">尚无输出时刻</span>
+                        <div class="sw-frame-field"><label for="viz3d-iso-time">帧</label><input class="form-input" id="viz3d-iso-time" type="number" value="0" min="0" step="1"></div>
+                        <div class="sw-speed"><label for="viz3d-speed">速度</label><select id="viz3d-speed" title="播放速度（帧/秒，目标上限）"><option value="0.5">0.5 帧/秒</option><option value="1" selected>1 帧/秒</option><option value="2">2 帧/秒</option><option value="4">4 帧/秒</option><option value="8">8 帧/秒</option><option value="12">12 帧/秒</option></select></div>
+                        <div class="sw-play-range" role="group" aria-label="选择实际输出播放范围">
+                            <div class="sw-play-endpoint"><label for="viz3d-play-start">起始帧</label><input class="form-input" type="number" id="viz3d-play-start" min="0" max="0" step="1" value="0" aria-describedby="viz3d-play-start-label viz3d-play-range-status"><span id="viz3d-play-start-label">尚无输出时刻</span></div>
+                            <div class="sw-play-endpoint"><label for="viz3d-play-end">结束帧</label><input class="form-input" type="number" id="viz3d-play-end" min="0" max="0" step="1" value="0" aria-describedby="viz3d-play-end-label viz3d-play-range-status"><span id="viz3d-play-end-label">尚无输出时刻</span></div>
+                            <span class="sw-play-range-status" id="viz3d-play-range-status" role="status" aria-live="polite"></span>
+                            <span class="sw-play-range-status" id="viz3d-play-perf" role="status" aria-live="polite"></span>
+                        </div>
+                    </div>
+                    <div class="sw-status" id="viz3d-status" role="status" aria-live="polite" aria-atomic="true">等待当前案例数据</div>
                 </div>
-                <div class="grid-2">
-                    <div class="card">
-                        <div class="card-title">📏 垂向剖面（指定点位）</div>
-                        <div class="form-row">
-                            <div class="form-group"><label class="form-label">变量</label><select class="form-select" id="viz3d-var" onchange="updateViz3d()"></select></div>
-                            <div class="form-group"><label class="form-label">X (i)</label><input class="form-input" id="viz3d-i" type="number" value="12" onchange="updateViz3d()"></div>
-                            <div class="form-group"><label class="form-label">Y (j)</label><input class="form-input" id="viz3d-j" type="number" value="10" onchange="updateViz3d()"></div>
-                            <div class="form-group"><label class="form-label">时步</label><input class="form-input" id="viz3d-time" type="number" value="0" onchange="updateViz3d()"></div>
-                            <div class="form-group"><label class="form-label">对应日期</label><div class="form-hint" id="viz3d-time-label">-</div></div>
-                        </div>
-                        <div class="chart-container"><canvas id="viz3d-profile-chart"></canvas></div>
+                <details class="sw-details sw-source-details">
+                    <summary>变量说明、参考值与三维显示说明</summary>
+                    <section id="viz3d-iso-var-guide" class="results-variable-card" hidden></section>
+                    <p>垂向放大仅改变显示比例；坐标、悬停读数与导出仍使用真实米数。选择“1×”查看真实比例，实际显示倍数见主图标注。</p>
+                    <p>不透明数据层用于定量读色；半透明叠层用于观察内部结构，叠色会改变视觉颜色。变量高度表面表示变量值，不表示真实水面。</p>
+                    <p>左键拖动旋转，滚轮缩放，右键平移；图内工具栏提供复位、全屏与导出。参考来源及本案例参考设置保留在上方变量说明中。</p>
+                </details>
+                <details class="sw-details sw-analysis sw-section-analysis" open>
+                    <summary data-scientific-zh="空间垂向剖面" data-scientific-en="Spatial vertical section">空间垂向剖面 / Spatial vertical section</summary>
+                    <div class="sw-analysis-body">
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label" for="viz3d-section-axis" data-scientific-zh="剖面方向" data-scientific-en="Section direction">剖面方向 / Section direction</label><select class="form-select" id="viz3d-section-axis" onchange="updateSpatialSection()"><option value="xz">X–Z（固定 j / fixed j）</option><option value="yz">Y–Z（固定 i / fixed i）</option></select></div>
+                        <div class="form-group"><label class="form-label" for="viz3d-section-index" data-scientific-zh="固定格点索引（从0开始）" data-scientific-en="Fixed cell index (zero based)">固定格点索引（从0开始） / Fixed cell index (zero based)</label><input class="form-input" id="viz3d-section-index" type="number" min="0" value="0" onchange="updateSpatialSection()"></div>
+                        <button type="button" class="btn btn-primary" onclick="updateSpatialSection()">生成剖面</button>
                     </div>
-                    <div class="card">
-                        <div class="card-title">🗺️ 垂向平均平面分布</div>
+                    <div class="form-hint">使用上方立体视图所选变量与时步，显示各格点的实际水深与垂向结构。</div>
+                    <div id="viz3d-section-plot" style="width:100%;height:320px;" aria-label="当前变量与时刻的空间垂向剖面"></div>
+                    </div>
+                </details>
+                <div class="grid-2 sw-analysis-grid">
+                    <details class="sw-details sw-analysis">
+                        <summary>垂向剖面（指定点位）</summary>
+                        <div class="sw-analysis-body">
                         <div class="form-row">
-                            <div class="form-group"><label class="form-label">变量</label><select class="form-select" id="viz3d-avg-var" onchange="updateViz3dAvg()"></select></div>
-                            <div class="form-group"><label class="form-label">时步</label><input class="form-input" id="viz3d-avg-time" type="number" value="0" onchange="updateViz3dAvg()"></div>
+                            <div class="form-group"><label class="form-label" for="viz3d-var">变量</label><select class="form-select" id="viz3d-var" onchange="updateViz3d()"></select><div class="form-hint">仅支持真实含垂向层的 4D 变量；无垂向层变量请在 2D 视图查看。 / Only 4D variables with real vertical layers are supported; view other variables in 2D.</div></div>
+                            <div class="form-group"><label class="form-label" for="viz3d-i">X (i)</label><input class="form-input" id="viz3d-i" type="number" value="12" onchange="updateViz3d()"></div>
+                            <div class="form-group"><label class="form-label" for="viz3d-j">Y (j)</label><input class="form-input" id="viz3d-j" type="number" value="10" onchange="updateViz3d()"></div>
+                            <div class="form-group"><label class="form-label" for="viz3d-time">时步</label><input class="form-input" id="viz3d-time" type="number" value="0" onchange="updateViz3d()"></div>
+                            <div class="form-group"><label class="form-label">年份 + 年内儒略日 (DOY)</label><div class="form-hint" id="viz3d-time-label">-</div></div>
                         </div>
-                        <canvas id="viz3d-avg-canvas" class="viz-canvas" width="400" height="300"></canvas>
+                        <details class="sw-details sw-source-details"><summary>点位变量说明与参考值</summary><section id="viz3d-var-guide" class="results-variable-card" hidden></section></details>
+                        <div class="chart-container"><canvas id="viz3d-profile-chart" role="img" aria-label="指定点位的变量垂向剖面"></canvas></div>
+                        </div>
+                    </details>
+                    <details class="sw-details sw-analysis">
+                        <summary>垂向平均平面分布</summary>
+                        <div class="sw-analysis-body">
+                        <div class="form-row">
+                            <div class="form-group"><label class="form-label" for="viz3d-avg-var">变量</label><select class="form-select" id="viz3d-avg-var" onchange="updateViz3dAvg()"></select><div class="form-hint">仅支持真实含垂向层的 4D 变量；无垂向层变量请在 2D 视图查看。 / Only 4D variables with real vertical layers are supported; view other variables in 2D.</div></div>
+                            <div class="form-group"><label class="form-label" for="viz3d-avg-time">时步</label><input class="form-input" id="viz3d-avg-time" type="number" value="0" onchange="updateViz3dAvg()"></div>
+                        </div>
+                        <details class="sw-details sw-source-details"><summary>平均场变量说明与参考值</summary><section id="viz3d-avg-var-guide" class="results-variable-card" hidden></section></details>
+                        <canvas id="viz3d-avg-canvas" class="viz-canvas" width="400" height="300" role="img" aria-label="当前变量的垂向平均平面分布"></canvas>
                         <div class="colorbar" id="viz3d-colorbar"></div>
-                    </div>
+                        </div>
+                    </details>
                 </div>
             </div>
 
@@ -1009,7 +1416,7 @@
                                 <option value="level">层号</option>
                             </select>
                         </div>
-                        <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-primary" onclick="updateVHeat()">🔥 生成垂向热图</button></div>
+                        <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-primary" onclick="updateVHeat()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-chart"></use></svg> 生成垂向热图</button></div>
                     </div>
                     <div class="hint" style="margin:0 0 8px 2px;color:var(--text-muted);font-size:12px;">纵轴为垂向层（顶部=水面，向下为 sigma 增大 / 深度增加），横轴为时间，颜色为变量值。对每个格点直接看其垂向演化，温跃层、分层、底层缺氧等结构一目了然。鼠标悬停可读数值，可框选缩放，工具栏可导出 PNG。</div>
                     <div id="vheat-plotly" style="width:100%;height:440px;background:var(--bg-primary);border:1px solid var(--border);border-radius:6px;"></div>
@@ -1046,7 +1453,7 @@
                         <div class="form-group" id="ts-point-group"><label class="form-label">X (i)</label><input class="form-input" id="ts-i" type="number" value="12"></div>
                         <div class="form-group" id="ts-point-group2"><label class="form-label">Y (j)</label><input class="form-input" id="ts-j" type="number" value="10"></div>
                         <div class="form-group" id="ts-region-group" style="display:none;"><label class="form-label">区域 (i1,i2,j1,j2)</label><input class="form-input" id="ts-region" value="5,18,3,16"></div>
-                        <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-primary" onclick="extractTimeseries()">📈 提取</button></div>
+                        <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-primary" onclick="extractTimeseries()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-chart"></use></svg> 提取</button></div>
                     </div>
                     <div class="hint" style="margin:0 0 4px 2px;color:var(--text-muted);font-size:12px;">"每一层"：对所选范围按层分别提取时间序列（每层一条曲线，色阶由表至底）。仅对含垂向层的 4D 变量有效。</div>
                 </div>
@@ -1064,41 +1471,94 @@
             <div class="page" id="page-calibrate">
                 <div class="page-header">
                     <div class="page-title">率定分析</div>
-                    <div class="page-desc">设置率定点位，输入实测数据，对比模拟-实测结果</div>
+                    <div class="page-desc" id="calibration-page-desc">设置率定点位，输入实测数据，对比模拟-实测结果</div>
                 </div>
-                <div class="grid-2">
+                <div class="grid-2 getm-case-only">
                     <div class="card">
-                        <div class="card-title">🎯 率定点位</div>
-                        <button class="btn btn-primary btn-sm" onclick="showAddPointModal()" style="margin-bottom:10px;">➕ 添加点位</button>
+                        <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-target"></use></svg> 率定点位</div>
+                        <button class="btn btn-primary btn-sm" onclick="showAddPointModal()" style="margin-bottom:10px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-add"></use></svg> 添加点位</button>
                         <table class="data-table" id="cal-points-table">
                             <thead><tr><th>名称</th><th>位置(i,j)</th><th>率定变量</th><th>操作</th></tr></thead>
                             <tbody></tbody>
                         </table>
                     </div>
                     <div class="card">
-                        <div class="card-title">📊 实测-模拟对比</div>
+                        <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-dashboard"></use></svg> 实测-模拟对比</div>
                         <div class="form-row">
                             <div class="form-group"><label class="form-label">选择点位</label><select class="form-select" id="cal-point-select" onchange="updateCalComparison()"></select></div>
                             <div class="form-group"><label class="form-label">变量</label><select class="form-select" id="cal-var-select" onchange="updateCalComparison()"></select></div>
-                            <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-sm" onclick="showScatterModal()">🔬 散点图(1:1)</button></div>
+                            <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-sm" onclick="showScatterModal()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-search"></use></svg> 散点图(1:1)</button></div>
+                            <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-primary" id="cal-run-compare" onclick="runCalModelAndCompare()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-play"></use></svg> 运行模型后对比</button></div>
                         </div>
                         <div class="chart-container" style="height:280px;"><canvas id="cal-chart"></canvas></div>
                         <div id="cal-stats" style="margin-top:10px;font-size:12px;"></div>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-title">📝 实测数据输入</div>
+                <div class="card getm-case-only">
+                    <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-edit"></use></svg> 实测数据输入</div>
                     <div class="form-row">
                         <div class="form-group"><label class="form-label">点位</label><select class="form-select" id="cal-data-point"></select></div>
                         <div class="form-group"><label class="form-label">变量</label><select class="form-select" id="cal-data-var"></select></div>
                         <div class="form-group"><label class="form-label">默认变量(若文件未含)</label><input class="form-input" id="cal-data-default-var" placeholder="temp" value="temp"></div>
-                        <div class="form-group" style="flex:2;"><label class="form-label">上传 CSV/XLSX 文件 (列: time, value[, variable])</label><input type="file" id="cal-data-file" accept=".csv,.xlsx,.xls"></div>
-                        <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-primary" onclick="uploadCalData()">📤 上传</button></div>
+                        <div class="form-group" style="flex:2;"><label class="form-label">上传 CSV/XLSX 文件 (列: time, value[, variable]；time 为 YYYY-DOYDDD)</label><input type="file" id="cal-data-file" accept=".csv,.xlsx,.xls"></div>
+                        <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-primary" onclick="uploadCalData()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-upload"></use></svg> 上传</button></div>
                     </div>
                     <div style="margin-top:10px;font-size:12px;color:var(--text-secondary);">
-                        或手动输入 JSON: <input class="form-input" id="cal-data-values" placeholder='[{"time":"2000-01-01","value":15}]' style="margin-top:4px;">
-                        <button class="btn btn-sm" onclick="saveCalData()" style="margin-left:6px;">💾 保存JSON</button>
+                        或手动输入 JSON（年份 + 年内儒略日；兼容已有日历日期文件）: <input class="form-input" id="cal-data-values" placeholder='[{"time":"2000-DOY001","value":15}]' style="margin-top:4px;">
+                        <button class="btn btn-sm" onclick="saveCalData()" style="margin-left:6px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-save"></use></svg> 保存JSON</button>
                     </div>
+                </div>
+                <div class="card" id="obs-manager">
+                    <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-search"></use></svg> 官方观测文件导入（当前案例）</div>
+                    <div class="hint" style="margin-bottom:8px;">从本机现有案例或数据目录选择 .obs / CSV / XLSX 文件。系统只读取所选原文件；逐文件明确选择模型变量和单位，先预览映射与诊断，再显式应用到当前案例。.obs 文件不从文件名推断模型变量或单位。</div>
+                    <div class="getm-observation-only"><b>已有案例目录</b><div id="obs-case-examples" style="margin:6px 0 10px;">正在读取…</div></div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex:2;"><label class="form-label">本机数据目录</label><input class="form-input" id="obs-source-dir" placeholder="可选：填写目录路径，或使用系统目录选择器"></div>
+                        <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-sm" id="obs-browse-native" type="button"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg> 选择目录</button></div>
+                        <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-sm" id="obs-list-path" type="button">列出文件</button></div>
+                    </div>
+                    <div id="obs-directory-list" style="max-height:190px;overflow:auto;padding:8px;border:1px solid var(--border);border-radius:6px;margin-bottom:8px;"></div>
+                    <div class="form-group"><label class="form-label">已选文件绝对路径（可编辑，每行一个）</label><textarea class="form-input" id="obs-file-paths" rows="3" placeholder="从上方目录清单勾选文件，或粘贴本机文件完整路径"></textarea></div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">最大时间差（小时，必填）</label><input class="form-input" id="obs-max-gap" type="number" min="0.000001" step="any" placeholder="例如 3"></div>
+                        <div class="form-group"><label class="form-label">默认湖泊 ID</label><input class="form-input" id="obs-map-lake" placeholder="必须与当前模型湖泊匹配"></div>
+                        <div class="form-group getm-observation-only"><label class="form-label">默认站位 ID</label><input class="form-input" id="obs-map-station" placeholder="可留空，但将无法按站配对"></div>
+                        <div class="form-group"><label class="form-label">默认观测组 ID</label><input class="form-input" id="obs-map-point" placeholder=".obs 剖面比较用；仅作为记录分组键"></div>
+                        <div class="form-group getm-observation-only"><label class="form-label">CSV/XLSX 默认变量</label><input class="form-input" id="obs-map-variable" placeholder="文件缺少变量列时使用"></div>
+                        <div class="form-group getm-observation-only"><label class="form-label">CSV/XLSX 默认单位</label><input class="form-input" id="obs-map-unit" placeholder="文件缺少单位列时使用"></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">逐文件变量与单位映射</label><div class="page-desc">每行把源文件显式映射到模型变量并填写源单位；.obs 必须逐文件填写。CSV/XLSX 可留空以使用其列或上方默认值。</div><div id="obs-file-mappings"></div></div>
+                    <details class="getm-observation-only" style="margin:8px 0;"><summary>CSV / XLSX 列映射与深度审核选项</summary>
+                        <div class="form-hint">CSV/XLSX 不会自动识别前置说明行、变量、单位或深度。请按源文件明确选择表头行与单个数值列；没有深度列时，先清空“深度列”再填写恒定深度。</div>
+                        <div class="form-row" style="margin-top:8px;">
+                            <div class="form-group"><label class="form-label">表头行（1-based）</label><input class="form-input" id="obs-header-row" type="number" min="1" step="1" value="1"></div>
+                            <div class="form-group"><label class="form-label">时间列</label><input class="form-input" id="obs-col-time" value="time"></div>
+                            <div class="form-group"><label class="form-label">数值列</label><input class="form-input" id="obs-col-value" value="value"></div>
+                            <div class="form-group"><label class="form-label">深度列</label><input class="form-input" id="obs-col-depth" value="depth_m"></div>
+                            <div class="form-group"><label class="form-label">单位列</label><input class="form-input" id="obs-col-unit" value="unit"></div>
+                            <div class="form-group"><label class="form-label">变量列</label><input class="form-input" id="obs-col-variable" value="variable"></div>
+                            <div class="form-group"><label class="form-label">湖泊列</label><input class="form-input" id="obs-col-lake" value="lake_id"></div>
+                            <div class="form-group"><label class="form-label">站位列</label><input class="form-input" id="obs-col-station" value="station_id"></div>
+                            <div class="form-group"><label class="form-label">观测点 ID 列</label><input class="form-input" id="obs-col-point" value="point_id"></div>
+                            <div class="form-group"><label class="form-label">质量标记列</label><input class="form-input" id="obs-col-quality" value="quality"></div>
+                            <div class="form-group"><label class="form-label">恒定深度（m）</label><input class="form-input" id="obs-depth-constant" type="number" step="any" placeholder="留空则使用深度列"></div>
+                            <div class="form-group"><label class="form-label">深度方向</label><select class="form-select" id="obs-depth-sign"><option value="positive_down">正值向下</option><option value="negative_down">负值向下</option></select></div>
+                            <div class="form-group"><label class="form-label">复核深度上限（m）</label><input class="form-input" id="obs-review-depth" type="number" min="0" step="any" placeholder="留空则不设复核阈值"></div>
+                        </div>
+                    </details>
+                    <div class="form-row getm-observation-only"><button class="btn btn-primary" id="obs-preview" type="button">预览与质量诊断</button><button class="btn btn-success" id="obs-apply" type="button" disabled>应用到当前案例</button><span id="obs-manager-status" aria-live="polite"></span></div>
+                    <div id="obs-preview-result" class="getm-observation-only" style="max-height:320px;overflow:auto;margin-top:8px;"></div>
+                    <div class="card" style="margin-top:12px;">
+                        <div class="card-title">只读配对：1D GOTM 代表性水柱</div>
+                        <div class="form-hint">仅对当前已打开且输出元数据确认的 GOTM 单水柱结果有效。使用所选本机 .obs 文件和逐文件变量/单位映射，不应用或写入当前案例观测；需显式填写湖泊 ID 与观测组 ID。此目标不代表站点坐标，也不映射到 GETM 网格单元。</div>
+                        <div class="form-row" style="margin-top:8px;">
+                            <div class="form-group"><label class="form-label" for="obs-column-variable">比较模型变量</label><select class="form-select" id="obs-column-variable"></select></div>
+                            <div class="form-group"><label class="form-label">已用最大时间差</label><span id="obs-column-gap" class="form-input" style="display:block;min-height:36px;"></span></div>
+                            <div class="form-group"><label class="form-label">&nbsp;</label><button class="btn btn-primary" id="obs-column-compare" type="button">只读配对并查看</button></div>
+                        </div>
+                        <div id="obs-column-result" style="margin-top:8px;" aria-live="polite"></div>
+                    </div>
+                    <details class="getm-observation-only" style="margin-top:10px;"><summary>当前案例已应用观测</summary><div id="obs-current-records" style="max-height:260px;overflow:auto;"></div></details>
                 </div>
             </div>
 
@@ -1106,50 +1566,68 @@
             <div class="page" id="page-autocal">
                 <div class="page-header">
                     <div class="page-title">自动率定</div>
-                    <div class="page-desc">配置自动率定参数，支持 parsac / PEST / 贝叶斯方法</div>
+                    <div class="page-desc">配置参数边界，使用 SciPy L-BFGS-B 或 pyABC ABC-SMC 进行自动率定</div>
                 </div>
                 <div class="grid-2">
                     <div class="card">
-                        <div class="card-title">⚙️ 率定配置</div>
+                        <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-settings"></use></svg> 率定配置</div>
                         <div class="form-group">
                             <label class="form-label">率定方法</label>
-                            <select class="form-select" id="ac-method">
-                                <option value="parsac">parsac (GLUE/蒙特卡洛)</option>
-                                <option value="pest">PEST (梯度优化)</option>
-                                <option value="bayesian">贝叶斯 (MCMC)</option>
-                                <option value="sensitivity">敏感性分析</option>
+                            <select class="form-select" id="ac-method" onchange="toggleAutoCalMethod()">
+                                <option value="scipy" data-scientific-zh="SciPy L-BFGS-B（有界优化）" data-scientific-en="SciPy L-BFGS-B (Bounded optimization)">SciPy L-BFGS-B（有界优化）</option>
+                                <option value="pyabc" data-scientific-zh="pyABC ABC-SMC（近似贝叶斯计算）" data-scientific-en="pyABC ABC-SMC (Approximate Bayesian computation)">pyABC ABC-SMC（近似贝叶斯计算）</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label class="form-label">目标函数</label>
                             <select class="form-select" id="ac-objective">
-                                <option value="rmse">RMSE (均方根误差)</option>
-                                <option value="nse">NSE (Nash-Sutcliffe效率)</option>
-                                <option value="r2">R² (决定系数)</option>
-                                <option value="mae">MAE (平均绝对误差)</option>
+                                <option value="rmse" data-scientific-zh="均方根误差" data-scientific-en="RMSE (Root mean square error)">均方根误差 / RMSE (Root mean square error)</option>
+                                <option value="nse" data-scientific-zh="Nash-Sutcliffe效率" data-scientific-en="NSE (Nash-Sutcliffe efficiency)">Nash-Sutcliffe效率 / NSE (Nash-Sutcliffe efficiency)</option>
+                                <option value="r2" data-scientific-zh="决定系数" data-scientific-en="R² (Coefficient of determination)">决定系数 / R² (Coefficient of determination)</option>
+                                <option value="mae" data-scientific-zh="平均绝对误差" data-scientific-en="MAE (Mean absolute error)">平均绝对误差 / MAE (Mean absolute error)</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label class="form-label">迭代次数</label>
                             <input class="form-input" id="ac-iterations" type="number" value="100">
+                            <div class="form-hint" id="ac-iterations-hint">SciPy: 优化器迭代次数；每次迭代可包含多次模型评估。</div>
+                        </div>
+                        <div class="form-group"><label class="form-label" data-scientific-zh="探索阶段模型评估上限" data-scientific-en="Exploratory model-evaluation cap">探索阶段模型评估上限 / Exploratory model-evaluation cap</label><input class="form-input" id="ac-max-simulations" type="number" min="1" max="10000000" value="100"><div class="form-hint">SciPy 与 ABC-SMC 均受此上限约束；每次评估都会运行一次完整模型。100 是可调整的探索上限，不是收敛保证或科学充分性判断。</div></div>
+                        <div id="ac-abc-controls" style="display:none;">
+                            <div class="form-group"><label class="form-label" data-scientific-zh="种群规模" data-scientific-en="Population size">种群规模 / Population size</label><input class="form-input" id="ac-population-size" type="number" min="2" max="200" value="10"></div>
+                            <div class="form-group"><label class="form-label" data-scientific-zh="最小容差" data-scientific-en="Minimum epsilon">最小容差 / Minimum epsilon</label><input class="form-input" id="ac-minimum-epsilon" type="number" min="0" step="any" value="0"></div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">率定点位</label>
                             <select class="form-select" id="ac-points" multiple style="height:80px;"></select>
                         </div>
-                        <button class="btn btn-success" onclick="startAutoCal()">🚀 开始自动率定</button>
+                        <div class="form-group">
+                            <label class="form-label" data-scientific-zh="点位与变量权重、尺度" data-scientific-en="Point and variable weights, scales">点位与变量权重、尺度 / Point and variable weights, scales</label>
+                            <div class="form-hint">仅 RMSE：残差除以正尺度，再按非负权重对各点位变量序列的均方误差求加权平均并开方。留空默认 1；权重 0 排除该序列。仅提交已选择点位的配置。</div>
+                            <div id="ac-objective-weights" style="max-height:220px;overflow:auto;"></div>
+                        </div>
+                        <button class="btn btn-success" onclick="startAutoCal()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-play"></use></svg> 开始自动率定</button>
                     </div>
                     <div class="card">
-                        <div class="card-title">🎚️ 率定参数选择</div>
+                        <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-settings"></use></svg> 率定参数选择</div>
                         <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">选择需要率定的参数并设置范围</div>
                         <div id="ac-params-list" style="max-height:350px;overflow-y:auto;"></div>
                     </div>
                 </div>
                 <div class="card">
-                    <div class="card-title">📈 率定进度与结果</div>
-                    <div id="ac-progress" class="empty-state"><div class="icon">🔄</div>配置参数后开始自动率定</div>
+                    <div class="card-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-chart"></use></svg> 率定进度与结果</div>
+                    <div id="ac-progress" class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-refresh"></use></svg></div>配置参数后开始自动率定</div>
+                    <div class="chart-container" style="height:260px;"><canvas id="ac-convergence-chart"></canvas></div>
                 </div>
             </div>
+        </div>
+        <div class="qgis-status-bar" role="status" aria-live="polite">
+            <span class="qgis-status-item qgis-status-project"><b>项目</b><strong id="qgis-status-case">未加载案例</strong></span>
+            <span class="qgis-status-item"><b>网格</b><strong id="qgis-status-grid">待加载</strong></span>
+            <span class="qgis-status-item"><b>运行</b><strong id="qgis-status-run">空闲</strong></span>
+            <span class="qgis-status-spacer"></span>
+            <span class="qgis-status-item"><b>视图</b><strong id="qgis-status-view">100%</strong></span>
+            <span class="qgis-status-item"><b>坐标系</b><strong id="qgis-status-crs">—</strong></span>
         </div>
     </div>
 </div>
@@ -1163,7 +1641,7 @@
             <div class="form-group"><label class="form-label">X (i)</label><input class="form-input" id="new-point-i" type="number" value="12"></div>
             <div class="form-group"><label class="form-label">Y (j)</label><input class="form-input" id="new-point-j" type="number" value="10"></div>
         </div>
-        <div class="form-group"><label class="form-label">率定变量 (逗号分隔)</label><input class="form-input" id="new-point-vars" placeholder="temp, chla, NO3, PO4"></div>
+        <div class="form-group"><label class="form-label">率定变量（可多选）</label><select class="form-select" id="new-point-vars" multiple size="6"><option value="temp" selected>水温 / Water temperature · temp</option></select><div class="form-hint">Ctrl / Cmd + 点击选择多个变量</div></div>
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
             <button class="btn" onclick="closeModal('modal-add-point')">取消</button>
             <button class="btn btn-primary" onclick="addCalPoint()">添加</button>
@@ -1179,7 +1657,7 @@
         <div class="form-group"><label class="form-label">目标目录（绝对路径，须不存在或为空目录）</label>
             <input class="form-input" id="save-as-dest" placeholder="如 D:\mycases\LakeX_backup"></div>
         <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;">
-            <input type="checkbox" id="save-as-include-results"> 包含模拟结果文件（*.3d.nc / output.nc 等，可能达数 GB、耗时数分钟）
+            <input type="checkbox" id="save-as-include-results"> <span id="save-as-include-label">包含模拟结果文件（*.3d.nc / output.nc 等，可能达数 GB、耗时数分钟）</span>
         </label>
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
             <button class="btn" onclick="closeModal('modal-save-as')">取消</button>
@@ -1204,17 +1682,50 @@
 <!-- Right-click context menu for the case table -->
 <div id="case-ctx-menu" class="ctx-menu" style="display:none;">
     <div class="ctx-menu-title" id="case-ctx-title">案例</div>
-    <div class="ctx-item" onclick="ctxAction('explore')">📂 在资源管理器中打开</div>
-    <div class="ctx-item" onclick="ctxAction('pick', true)">📁 选择此目录的上级目录</div>
-    <div class="ctx-item" onclick="ctxAction('pick', false)">🔄 重新选择其他案例目录</div>
+    <div class="ctx-item" onclick="ctxAction('explore')"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg> 在资源管理器中打开</div>
+    <div class="ctx-item" onclick="ctxAction('pick', true)"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg> 选择此目录的上级目录</div>
+    <div class="ctx-item" onclick="ctxAction('pick', false)"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-refresh"></use></svg> 重新选择其他案例目录</div>
     <div class="ctx-sep"></div>
-    <div class="ctx-item" onclick="ctxAction('load')">✅ 加载此案例</div>
-    <div class="ctx-item" onclick="ctxAction('saveas')">💾 另存为…</div>
+    <div class="ctx-item" onclick="ctxAction('load')"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-check"></use></svg> 加载此案例</div>
+    <div class="ctx-item" onclick="ctxAction('saveas')"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-save"></use></svg> 另存为…</div>
 </div>
 
 <!-- Toast container -->
 <div id="toast-container"></div>
+<aside id="run-notification-center" class="run-notification-center" aria-label="运行通知" hidden>
+    <div class="run-notification-heading"><strong>运行通知</strong><span><button type="button" id="run-notification-enable" class="btn btn-sm" onclick="enableRunNotifications()">启用桌面通知</button> <button type="button" class="btn btn-sm" onclick="clearRunNotifications()">清空记录</button></span></div>
+    <p id="run-notification-status" role="status" aria-live="polite"></p>
+    <ol id="run-notification-list" aria-label="运行通知记录" aria-live="polite"></ol>
+</aside>
+<button type="button" id="studio-nav-backdrop" aria-label="关闭导航" tabindex="-1" hidden></button>
 
-<script src="/static/js/app.js?v=19"></script>
+<div class="modal-overlay" id="studio-confirm" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="studio-confirm-title" aria-describedby="studio-confirm-message">
+    <div class="modal">
+        <div class="modal-title" id="studio-confirm-title">确认操作</div>
+        <p id="studio-confirm-message" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:55vh;overflow:auto"></p>
+        <input class="form-input" id="studio-confirm-input" aria-label="输入内容" hidden>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+            <button class="btn" id="studio-confirm-cancel">取消</button>
+            <button class="btn btn-primary" id="studio-confirm-accept">确认</button>
+        </div>
+    </div>
+</div>
+
+    <script src="/static/js/i18n.js?v=18"></script>
+<script src="/static/js/confirm_dialog.js?v=1"></script>
+<script src="/static/js/variable_guide.js?v=2"></script>
+    <script src="/static/js/result_files.js?v=3"></script>
+<script src="/static/js/observation_manager.js?v=6"></script>
+<script src="/static/js/viz2d_playback_prefetch.js?v=9"></script>
+<script src="/static/js/playback_performance.js?v=7"></script>
+<script src="/static/js/viz3d_mesh_mode_preference.js?v=3"></script>
+    <script src="/static/js/run_physics.js?v=6"></script>
+    <script src="/static/js/app.js?v=102"></script>
+<script src="/static/js/viz3d_volume_preset.js?v=1"></script>
+<script src="/static/js/projects_studio.js?v=5"></script>
+<script src="/static/js/studio.js?v=1"></script>
+<script src="/static/js/gridstudio.js?v=3"></script>
+    <script src="/static/js/ecology_network.js?v=34"></script>
+<script src="/static/js/workflow_navigation.js?v=2"></script>
 </body>
 </html>

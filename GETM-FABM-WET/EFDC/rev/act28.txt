@@ -1,0 +1,2 @@
+     0 diag51 ready
+Error: unable to intercept function at 0156AB98; please file a bug

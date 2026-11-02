@@ -437,9 +437,9 @@ subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
          !----------------------------------------------------------------------------------------------------------!
          tCBentCO2S = tCRespBent                                                                                    ! calculate total CO2 flux to the sediment
          tCBentTOMS = tCEgesBent + tCMortBent                                                                       ! calculate total organic C flux to the sediment
-         tCBentTPOMS = tCBentTPOMS * (1.0_rk -self%fBentDOMS)                                                       ! calculate particulate organic C flux from zoobenthos
+         tCBentTPOMS = tCBentTOMS * (1.0_rk -self%fBentDOMS)                                                       ! calculate particulate organic C flux from zoobenthos
          tCBentPOMS =  tCBentTPOMS                                                                                  ! calculate particulate fraction of C flux
-         tCBentDOMS = tCBentTPOMS * self%fBentDOMS                                                                  ! calculate dissolved fraction of organic C flux to the sediment
+         tCBentDOMS = tCBentTOMS * self%fBentDOMS                                                                  ! calculate dissolved fraction of organic C flux to the sediment
          !::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!
          ! 6.2.5 silica                                                                                             !
          !----------------------------------------------------------------------------------------------------------!

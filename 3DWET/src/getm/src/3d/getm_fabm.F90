@@ -26,7 +26,7 @@
    use advection_3d, only: print_adv_settings_3d,do_advection_3d
    use variables_2d, only: D
    use meteo, only: swr,u10,v10,evap,precip,tcc
-   use time, only: month,yearday,secondsofday,timestr
+   use time, only: month,yearday,secondsofday,timestr,julianday
    use halo_zones, only: update_3d_halo,wait_halo,D_TAG,H_TAG
    use exceptions
 ! JORN_FABM
@@ -50,6 +50,9 @@
    use fabm_types,only: output_instantaneous, output_none, type_bulk_standard_variable
    use fabm, only: fabm_link_scalar_data, fabm_get_scalar_variable_id, type_scalar_variable_id
    use fabm_standard_variables, only: standard_variables
+   use fabm, only: fabm_get_bulk_diagnostic_data
+   use fabm_types, only: type_expression
+   use fabm_expressions, only: type_bulk_temporal_mean,type_horizontal_temporal_mean
 
    IMPLICIT NONE
    private
@@ -59,6 +62,7 @@
    public init_getm_fabm_fields
    public init_getm_fabm, do_getm_fabm, model, output_none
    public register_fabm_variables
+   public define_temporal_memory, read_temporal_memory, write_temporal_memory
    integer, public :: fabm_init_method=0
    character(len=PATH_MAX)   :: fabm_init_file
    integer                   :: fabm_init_format, fabm_field_no
@@ -71,6 +75,7 @@
    REALTYPE        :: fabm_AH=-_ONE_
    type (type_horizontal_variable_id) :: id_bottom_depth_below_geoid,id_bottom_depth
    REALTYPE, allocatable :: bot_pel_conv_col(:)
+#include "fabm_temporal_memory_types.h"
 
    type type_input_variable
       integer                              :: ncid  = -1
@@ -118,6 +123,42 @@ interface
 end interface
 
    contains
+#include "fabm_temporal_memory.h"
+#include "fabm_temporal_restart.h"
+
+   subroutine initialize_wet_benthic_mirrors()
+      integer :: i,j,x,y,element,instance
+      character(len=32), parameter :: instances(9) = &
+         [character(len=32) :: 'macrophytes','zoobenthos','bivalves', &
+                               'POM','DOM','humus','cyanobacteria','diatoms','greens']
+      character(len=1), parameter :: elements(4) = ['D','N','P','C']
+      character(len=48) :: pel_name,bottom_name
+
+      do instance=1,size(instances)
+         do element=1,size(elements)
+            if (instance<=3) then
+               pel_name=trim(instances(instance))//'_s'//elements(element)//'_PV'
+               bottom_name=trim(instances(instance))//'_s'//elements(element)
+            else
+               pel_name=trim(instances(instance))//'_s'//elements(element)//'S_PV'
+               bottom_name=trim(instances(instance))//'_s'//elements(element)//'S'
+            end if
+            do i=1,size(model%state_variables)
+               if (trim(model%state_variables(i)%name)/=trim(pel_name)) cycle
+               do j=1,size(model%bottom_state_variables)
+                  if (trim(model%bottom_state_variables(j)%name)/=trim(bottom_name)) cycle
+                  do y=jmin,jmax
+                     do x=imin,imax
+                        if (az(x,y)>=1) fabm_pel(x,y,1,i)=fabm_ben(x,y,j)
+                     end do
+                  end do
+                  exit
+               end do
+               exit
+            end do
+         end do
+      end do
+   end subroutine initialize_wet_benthic_mirrors
 
 !-----------------------------------------------------------------------
 !BOP
@@ -186,7 +227,10 @@ end interface
    call configure_gotm_fabm(branch)
 #endif
    call gotm_fabm_create_model(NAMLST2, kmax, .true.)
-   call init_gotm_fabm(kmax, dt)
+   ! GETM supplies absolute model time in seconds to do_gotm_fabm; the
+   ! optional FABM seconds_per_time_unit therefore must be 1, not the
+   ! physical 3-D timestep (dt), which can span multiple seconds.
+   call init_gotm_fabm(kmax, 1.0d0)
 #else
    call init_gotm_fabm(kmax,NAMLST2,'gotm_fabm.nml')
 #endif
@@ -351,6 +395,7 @@ end interface
                                  fabm_ben(ill:ihl,jll:jhl,n))
                end do
             end if
+            call initialize_wet_benthic_mirrors()
          case default
             FATAL 'Not valid fabm_init_method specified'
             stop 'init_getm_fabm_fields()'
@@ -639,15 +684,18 @@ end interface
             end do
 
 #ifndef _OLD_FABM_
+            call restore_temporal_memory(i,j)
             if (model%status < status_start_done) call start_gotm_fabm(kmax)
 #else
+            call restore_temporal_memory(i,j)
             if (model%state < 3) call start_gotm_fabm(kmax)
 #endif
 
 !           Update biogeochemical variable values.
 !           Pass elapsed simulation time (seconds) so FABM temporal_mean
 !           (e.g. WET phytoplankton 24h-averaged PAR) can advance its window.
-            call do_gotm_fabm(kmax, real((yearday-1)*86400+secondsofday,kind(_ONE_)))
+            call do_gotm_fabm(kmax, real(julianday,kind(_ONE_))*86400+real(secondsofday,kind(_ONE_)))
+            call store_temporal_memory(i,j)
 
 !           Copy updated column values of biogeochemical variables to full 3D field.
             do n=1,size(model%state_variables)

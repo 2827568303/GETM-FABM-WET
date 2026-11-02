@@ -17,6 +17,7 @@ import struct
 import subprocess
 import argparse
 import time
+import re
 from datetime import datetime
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -25,6 +26,9 @@ PROJECT_ROOT = os.path.dirname(WORKFLOW_DIR)
 sys.path.insert(0, os.path.join(WORKFLOW_DIR, '4_run'))
 
 from validate_inputs import validate_case
+
+sys.path.insert(0, os.path.join(PROJECT_ROOT, 'app'))
+from run_output_health import validate_current_run_outputs
 
 # Default model executable
 MODEL_EXE = os.path.join(PROJECT_ROOT, 'install', 'bin', 'getm_cartesian')
@@ -63,40 +67,181 @@ def _parse_getm_inp(case_dir):
 
 
 def _auto_patch_numrecs(case_dir, run_id):
-    """Automatically patch numrecs in output NetCDF3 files after model run."""
-    params = _parse_getm_inp(case_dir)
-    if not params:
-        print("  WARNING: Could not parse getm.inp for numrecs patching")
-        return
+    """Restore only physically complete records in classic NetCDF files.
 
-    try:
-        timestep = float(params.get('timestep', '30'))
-        start = datetime.strptime(params['start'], '%Y-%m-%d %H:%M:%S')
-        stop = datetime.strptime(params['stop'], '%Y-%m-%d %H:%M:%S')
-        total_seconds = (stop - start).total_seconds()
-        total_steps = int(total_seconds / timestep)
-        step_2d = int(params.get('step_2d', '1440'))
-        step_3d = int(params.get('step_3d', '1440'))
-        n_2d = total_steps // step_2d
-        n_3d = total_steps // step_3d
-        n_fabm = int(total_seconds / 86400)  # FABM daily output
-    except (KeyError, ValueError) as e:
-        print(f"  WARNING: Could not calculate record counts: {e}")
-        return
-
+    The simulation dates do not prove that output records were written. The
+    count is derived from each file's record-variable layout and byte length.
+    Unsupported or malformed headers are left untouched and reported.
+    """
     patched = []
-    for filename, n_recs in [
-        (f'{run_id}.2d.nc', n_2d),
-        (f'{run_id}.3d.nc', n_3d),
-        ('output.nc', n_fabm),
-    ]:
+    for filename in (f'{run_id}.2d.nc', f'{run_id}.3d.nc', 'output.nc'):
         path = os.path.join(case_dir, filename)
-        if os.path.exists(path) and n_recs > 0:
-            _patch_numrecs(path, n_recs)
-            patched.append(f"{filename}({n_recs} records)")
+        if not os.path.exists(path):
+            continue
+        try:
+            n_recs = _physical_numrecs(path)
+            if n_recs is None:
+                print(f"  WARNING: Skipped numrecs patch for {filename}: unsupported or indeterminate NetCDF layout; header unchanged")
+                continue
+            with open(path, 'rb') as f:
+                f.seek(4)
+                old_recs = struct.unpack('>I', f.read(4))[0]
+            if old_recs != n_recs:
+                _patch_numrecs(path, n_recs)
+                patched.append(f"{filename}({old_recs}->{n_recs} complete records)")
+        except (OSError, ValueError, struct.error) as e:
+            print(f"  WARNING: Skipped numrecs patch for {filename}: {e}; header unchanged")
 
     if patched:
         print(f"  Patched numrecs: {', '.join(patched)}")
+
+
+def _physical_numrecs(filepath):
+    """Return complete physical record count for a CDF-1/2 file, or None.
+
+    Only classic NetCDF layouts are recognized. The last record variable's
+    unpadded data size is used so a legal unpadded final record is retained;
+    any trailing partial record is excluded.
+    """
+    def read_u32(f):
+        raw = f.read(4)
+        if len(raw) != 4:
+            raise ValueError('truncated NetCDF header')
+        return struct.unpack('>I', raw)[0]
+
+    def read_name(f):
+        length = read_u32(f)
+        raw = f.read(length)
+        if len(raw) != length:
+            raise ValueError('truncated NetCDF name')
+        f.seek((-length) % 4, 1)
+        return raw.decode('utf-8', errors='strict')
+
+    type_sizes = {1: 1, 2: 1, 3: 2, 4: 4, 5: 4, 6: 8}
+    with open(filepath, 'rb') as f:
+        magic = f.read(4)
+        if magic not in (b'CDF\x01', b'CDF\x02'):
+            return None
+        begin_size = 8 if magic == b'CDF\x02' else 4
+        read_u32(f)  # Header numrecs may be stale or zero.
+
+        tag, count = read_u32(f), read_u32(f)
+        dims = []
+        if (tag, count) != (0, 0):
+            if tag != 10:
+                raise ValueError('invalid dimension list')
+            for _ in range(count):
+                read_name(f)
+                dims.append(read_u32(f))
+        unlimited = next((i for i, size in enumerate(dims) if size == 0), None)
+
+        def skip_attributes():
+            tag, count = read_u32(f), read_u32(f)
+            if (tag, count) == (0, 0):
+                return
+            if tag != 12:
+                raise ValueError('invalid attribute list')
+            for _ in range(count):
+                read_name(f)
+                xtype, n = read_u32(f), read_u32(f)
+                if xtype not in type_sizes:
+                    raise ValueError('unsupported attribute type')
+                size = type_sizes[xtype] * n
+                f.seek(size + (-size) % 4, 1)
+
+        skip_attributes()
+        tag, count = read_u32(f), read_u32(f)
+        if (tag, count) == (0, 0):
+            return None
+        if tag != 11:
+            raise ValueError('invalid variable list')
+        records = []
+        for _ in range(count):
+            read_name(f)
+            ndims = read_u32(f)
+            dimids = [read_u32(f) for _ in range(ndims)]
+            skip_attributes()
+            xtype = read_u32(f)
+            vsize = read_u32(f)
+            begin = struct.unpack('>Q' if begin_size == 8 else '>I', f.read(begin_size))[0]
+            if len(dimids) and dimids[0] == unlimited:
+                if xtype not in type_sizes or any(d >= len(dims) for d in dimids):
+                    raise ValueError('unsupported record variable')
+                elements = 1
+                for dimid in dimids[1:]:
+                    elements *= dims[dimid]
+                raw_size = elements * type_sizes[xtype]
+                if raw_size > vsize or vsize == 0:
+                    raise ValueError('invalid record variable size')
+                records.append((begin, vsize, raw_size))
+
+        if not records:
+            return None
+        records.sort(key=lambda item: item[0])
+        start = records[0][0]
+        for previous, current in zip(records, records[1:]):
+            if current[0] != previous[0] + previous[1]:
+                raise ValueError('record variables are not contiguous')
+        stride = sum(item[1] for item in records)
+        final_size = sum(item[1] for item in records[:-1]) + records[-1][2]
+        if stride <= 0 or final_size <= 0:
+            raise ValueError('invalid record size')
+        file_size = os.path.getsize(filepath)
+        first_end = start + final_size
+        if file_size < first_end:
+            return 0
+        return 1 + (file_size - first_end) // stride
+
+
+def _eof_completion_status(case_dir, run_id, started_at):
+    """Require stop-time coverage and healthy current outputs for meteo EOF."""
+    params = _parse_getm_inp(case_dir) or {}
+    try:
+        stop = datetime.strptime(params['stop'], '%Y-%m-%d %H:%M:%S')
+    except (KeyError, ValueError) as exc:
+        return False, f'cannot determine configured stop time: {exc}'
+
+    try:
+        import netCDF4
+        output_names = [f'{run_id}.2d.nc', f'{run_id}.3d.nc', 'output.nc']
+        found = []
+        for filename in output_names:
+            path = os.path.join(case_dir, filename)
+            if not os.path.isfile(path):
+                continue
+            physical = _physical_numrecs(path)
+            if physical is None or physical <= 0:
+                return False, f'{filename} has no verifiable complete physical records'
+            with netCDF4.Dataset(path, 'r') as ds:
+                time_name = next((name for name in ds.variables if name.lower() == 'time'), None)
+                if time_name is None:
+                    return False, f'{filename} has no time coordinate'
+                time_var = ds.variables[time_name]
+                if 'units' not in time_var.ncattrs():
+                    return False, f'{filename} time coordinate has no units'
+                time_axis = time_var.dimensions.index(time_name) if time_name in time_var.dimensions else 0
+                if time_var.shape[time_axis] != physical:
+                    return False, f'{filename} time coordinate does not match complete physical records'
+                last_value = time_var[tuple(slice(None) if axis != time_axis else physical - 1
+                                            for axis in range(time_var.ndim))]
+                last_value = netCDF4.num2date(last_value, time_var.units,
+                    getattr(time_var, 'calendar', 'standard'), only_use_cftime_datetimes=False)
+                if hasattr(last_value, 'item'):
+                    last_value = last_value.item()
+                last_time = datetime.fromisoformat(str(last_value).replace(' ', 'T'))
+                if last_time < stop:
+                    return False, f'{filename} ends at {last_time}, before configured stop {stop}'
+                found.append(filename)
+        if not found:
+            return False, 'no output files with verifiable time records were produced'
+
+        health = validate_current_run_outputs(case_dir, netCDF4.Dataset, started_at=started_at)
+        if not health.get('ready'):
+            errors = health.get('errors', []) + [item.get('reason', '') for item in health.get('bad_variables', [])]
+            return False, 'output health check failed: ' + '; '.join(errors[:4])
+        return True, f'outputs cover {stop} and pass health checks'
+    except Exception as exc:
+        return False, f'could not verify output completion: {exc}'
 
 
 def run_model(case_dir, threads=8, no_validate=False, filter_warnings=True):
@@ -131,13 +276,6 @@ def run_model(case_dir, threads=8, no_validate=False, filter_warnings=True):
     env['OMP_NUM_THREADS'] = str(threads)
     env['OMP_SCHEDULE'] = 'dynamic'
 
-    # Build command with optional warning filter
-    if filter_warnings:
-        # Filter Patankar "small pi" warnings and state variable errors
-        cmd = f'cd "{case_dir}" && "{MODEL_EXE}" 2>&1 | grep -v -E "small pi|Error: state variable|Warning:" > run.log; echo "EXIT_CODE:$?" >> run.log'
-    else:
-        cmd = f'cd "{case_dir}" && "{MODEL_EXE}" > run.log 2>&1; echo "EXIT_CODE:$?" >> run.log'
-
     print(f"\nStarting model run ...")
     print(f"  Log file: {os.path.join(case_dir, 'run.log')}")
     print(f"  Warning filter: {'ON (small pi/Warning filtered)' if filter_warnings else 'OFF'}")
@@ -145,41 +283,30 @@ def run_model(case_dir, threads=8, no_validate=False, filter_warnings=True):
 
     start_time = time.time()
 
-    # Run model
-    result = subprocess.run(
-        ['bash', '-c', cmd],
-        env=env,
-        capture_output=False,
-    )
+    # Filter output in Python so the reported status always comes from GETM,
+    # never from the last command in a shell pipeline.
+    log_path = os.path.join(case_dir, 'run.log')
+    filter_pattern = re.compile(r'small pi|Warning:', re.IGNORECASE)
+    with open(log_path, 'w', encoding='utf-8', errors='replace') as log:
+        process = subprocess.Popen(
+            [MODEL_EXE], cwd=case_dir, env=env,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True, encoding='utf-8', errors='replace',
+        )
+        for line in process.stdout:
+            if not filter_warnings or not filter_pattern.search(line):
+                log.write(line)
+                log.flush()
+        exit_code = process.wait()
+        log.write(f'EXIT_CODE:{exit_code}\n')
 
     elapsed = time.time() - start_time
     minutes = int(elapsed // 60)
     seconds = int(elapsed % 60)
 
-    # Check exit code from log
-    log_path = os.path.join(case_dir, 'run.log')
-    exit_code = -1
-    if os.path.exists(log_path):
-        with open(log_path, 'r') as f:
-            content = f.read()
-            if 'EXIT_CODE:' in content:
-                line = [l for l in content.split('\n') if 'EXIT_CODE:' in l][-1]
-                exit_code = int(line.split('EXIT_CODE:')[1].strip())
+    with open(log_path, 'r', encoding='utf-8', errors='replace') as f:
+        content = f.read()
 
-    # Summary
-    print("\n" + "=" * 70)
-    print("Model Run Summary")
-    print("=" * 70)
-    print(f"  Elapsed time: {minutes}m {seconds}s")
-    print(f"  Exit code: {exit_code}")
-
-    if exit_code == 0:
-        print(f"  Status: SUCCESS")
-    else:
-        print(f"  Status: FAILED (exit code {exit_code})")
-        print(f"  Check run.log for details")
-
-    # Get run_id from getm.inp
     run_id = None
     getm_inp = os.path.join(case_dir, 'getm.inp')
     if os.path.exists(getm_inp):
@@ -188,11 +315,47 @@ def run_model(case_dir, threads=8, no_validate=False, filter_warnings=True):
                 if 'runid' in line.lower() and '=' in line:
                     run_id = line.split('=')[1].strip().strip("'").strip()
                     break
-
-    # Auto-patch numrecs (NetCDF3 bug: GETM exits on meteo EOF without flushing header)
     if run_id:
-        print(f"\n  Patching NetCDF3 numrecs ...")
+        print(f"\n  Patching NetCDF3 numrecs from complete physical records ...")
         _auto_patch_numrecs(case_dir, run_id)
+
+    eof_match = re.search(r'FATAL\s+ERROR\s*:\s*Reached\s+eof\s+in\s*:\s*meteo_input\.txt',
+                          content, re.IGNORECASE)
+    other_log = content
+    if eof_match:
+        other_log = content[:eof_match.start()] + content[eof_match.end():]
+    fatal_match = re.search(
+        r'\bFATAL(?:\s+ERROR)?\b|FATAL\s+GETM\s+ERROR|Reached\s+eof\s+in\s*:|'
+        r'out-of-bound values encountered|IEEE_INVALID(?:_FLAG)?|'
+        r'IEEE_DIVIDE_BY_ZERO(?:_FLAG)?|Floating invalid|forrtl:|'
+        r'^\s*STOP\s+[1-9]\d*\b|'
+        r'^\s*Error:\s*state variable\s+\d+\s+is zero and has negative derivative!|'
+        r'\bNaN\s+(?:detected|found|at|in)\b|\b(?:is|contains)\s+NaN\b',
+        other_log, re.IGNORECASE | re.MULTILINE)
+    eof_valid = False
+    eof_reason = ''
+    if eof_match and exit_code == 0 and not fatal_match:
+        eof_valid, eof_reason = _eof_completion_status(case_dir, run_id, start_time)
+        if not eof_valid:
+            print(f"  Meteo EOF completion rejected: {eof_reason}")
+    fatal_detected = fatal_match is not None or (eof_match is not None and not eof_valid)
+
+    # Summary
+    print("\n" + "=" * 70)
+    print("Model Run Summary")
+    print("=" * 70)
+    print(f"  Elapsed time: {minutes}m {seconds}s")
+    print(f"  Exit code: {exit_code}")
+
+    if exit_code == 0 and not fatal_detected:
+        print(f"  Status: SUCCESS")
+        if eof_valid:
+            print(f"  Completion: {eof_reason}")
+    else:
+        reason = (f"fatal log signature: {fatal_match.group(0)}" if fatal_match else
+                  f"incomplete meteo EOF: {eof_reason}" if eof_match else f"exit code {exit_code}")
+        print(f"  Status: FAILED ({reason})")
+        print(f"  Check run.log for details")
 
     # Check output files
     print(f"\n  Output files:")
@@ -210,17 +373,17 @@ def run_model(case_dir, threads=8, no_validate=False, filter_warnings=True):
 
     print(f"\n  Log file: {log_path}")
 
-    if exit_code == 0:
+    if exit_code == 0 and not fatal_detected:
         print(f"\nNext step:")
         print(f"  python workflow/5_postprocess/extract_timeseries.py {case_dir}")
     else:
         print(f"\nTroubleshooting:")
         print(f"  1. Check run.log for error messages")
         print(f"  2. Common issues:")
-        print(f"     - meteo EOF at end of simulation (expected, exit code may still be 0)")
+        print(f"     - meteo EOF is accepted only when output reaches stop time and passes health checks")
         print(f"     - NaN in output (check initial conditions)")
 
-    return exit_code == 0
+    return exit_code == 0 and not fatal_detected
 
 
 def main():

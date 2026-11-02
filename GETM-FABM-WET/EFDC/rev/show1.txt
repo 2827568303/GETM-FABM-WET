@@ -1,0 +1,3 @@
+﻿[ 9.36] ShowWindow(0x12e60da0, SW_SHOW) prev=0 vis_now=0 title=''
+[ 9.36] EXITED code=0
+alive=True

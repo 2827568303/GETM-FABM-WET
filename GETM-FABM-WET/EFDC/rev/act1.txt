@@ -1,0 +1,11 @@
+     0 diag51 ready
+     1 no module winhttp.dll
+     1 no module winhttp.dll
+     1 no module winhttp.dll
+     1 no module wininet.dll
+     1 diag90 ready
+  2400 Open C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+  2400 Open C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+  2400 Open C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+  2401 Open C:\Users\23801\AppData\Local\Temp\\~DF9B965BEB5AF8BDF2.TMP
+  2401 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8

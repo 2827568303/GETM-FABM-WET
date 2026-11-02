@@ -1,0 +1,95 @@
+﻿pid=48420 exe=C:\EFDC84_STOCK\EFDC_Explorer8.4.exe
+[ 0.16] WIN hwnd=0x1450A72 cls=VBMsoStdCompMgr      title=''                               vis=0 en=1 rect=(0, 0, 0, 0) parent=0x0
+[ 0.16] WIN hwnd=0xB0452 cls=ThunderRT6Main       title='EFDC_Explorer8.4'               vis=1 en=1 rect=(853, 533, 853, 533) parent=0x0
+[ 0.16] WIN hwnd=0x2009BC cls=IME                  title='Default IME'                    vis=0 en=0 rect=(0, 0, 0, 0) parent=0xB0452
+[ 1.08] shot stock_010.png
+[ 2.11] shot stock_021.png
+[ 3.13] shot stock_031.png
+[ 4.15] shot stock_041.png
+[ 4.55] WIN hwnd=0x2940502 cls=ThunderRT6FormDC     title='EFDC_Explore8.0'                vis=0 en=1 rect=(0, 5, 815, 644) parent=0x0
+[ 5.02] shot stock_050.png
+[ 6.04] shot stock_060.png
+[ 7.06] shot stock_070.png
+[ 8.09] shot stock_080.png
+[ 9.11]   hung hwnd=0x2940502 EFDC_Explore8.0
+[ 9.11]   hung hwnd=0x1450A72 
+[ 9.11]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[ 9.11]   hung hwnd=0x2009BC Default IME
+[ 9.11] shot stock_091.png
+[ 9.36]   hung hwnd=0x2940502 EFDC_Explore8.0
+[ 9.36]   hung hwnd=0x1450A72 
+[ 9.36]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[ 9.36]   hung hwnd=0x2009BC Default IME
+[ 9.52]   hung hwnd=0x2940502 EFDC_Explore8.0
+[ 9.52]   hung hwnd=0x1450A72 
+[ 9.52]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[ 9.52]   hung hwnd=0x2009BC Default IME
+[ 9.67]   hung hwnd=0x2940502 EFDC_Explore8.0
+[ 9.67]   hung hwnd=0x1450A72 
+[ 9.67]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[ 9.67]   hung hwnd=0x2009BC Default IME
+[ 9.83]   hung hwnd=0x2940502 EFDC_Explore8.0
+[ 9.83]   hung hwnd=0x1450A72 
+[ 9.83]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[ 9.83]   hung hwnd=0x2009BC Default IME
+[ 9.98]   hung hwnd=0x2940502 EFDC_Explore8.0
+[ 9.98]   hung hwnd=0x1450A72 
+[ 9.98]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[ 9.98]   hung hwnd=0x2009BC Default IME
+[10.14]   hung hwnd=0x2940502 EFDC_Explore8.0
+[10.14]   hung hwnd=0x1450A72 
+[10.14]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[10.14]   hung hwnd=0x2009BC Default IME
+[10.14] shot stock_101.png
+[10.39]   hung hwnd=0x2940502 EFDC_Explore8.0
+[10.39]   hung hwnd=0x1450A72 
+[10.39]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[10.39]   hung hwnd=0x2009BC Default IME
+[10.54]   hung hwnd=0x2940502 EFDC_Explore8.0
+[10.54]   hung hwnd=0x1450A72 
+[10.54]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[10.54]   hung hwnd=0x2009BC Default IME
+[10.70]   hung hwnd=0x2940502 EFDC_Explore8.0
+[10.70]   hung hwnd=0x1450A72 
+[10.70]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[10.70]   hung hwnd=0x2009BC Default IME
+[10.85]   hung hwnd=0x2940502 EFDC_Explore8.0
+[10.85]   hung hwnd=0x1450A72 
+[10.85]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[10.85]   hung hwnd=0x2009BC Default IME
+[11.01]   hung hwnd=0x2940502 EFDC_Explore8.0
+[11.01]   hung hwnd=0x1450A72 
+[11.01]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[11.01]   hung hwnd=0x2009BC Default IME
+[11.01] shot stock_110.png
+[11.25]   hung hwnd=0x2940502 EFDC_Explore8.0
+[11.25]   hung hwnd=0x1450A72 
+[11.25]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[11.25]   hung hwnd=0x2009BC Default IME
+[11.40]   hung hwnd=0x2940502 EFDC_Explore8.0
+[11.40]   hung hwnd=0x1450A72 
+[11.40]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[11.40]   hung hwnd=0x2009BC Default IME
+[11.56]   hung hwnd=0x2940502 EFDC_Explore8.0
+[11.56]   hung hwnd=0x1450A72 
+[11.56]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[11.56]   hung hwnd=0x2009BC Default IME
+[11.72]   hung hwnd=0x2940502 EFDC_Explore8.0
+[11.72]   hung hwnd=0x1450A72 
+[11.72]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[11.72]   hung hwnd=0x2009BC Default IME
+[11.87]   hung hwnd=0x2940502 EFDC_Explore8.0
+[11.87]   hung hwnd=0x1450A72 
+[11.87]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[11.87]   hung hwnd=0x2009BC Default IME
+[12.03]   hung hwnd=0x2940502 EFDC_Explore8.0
+[12.03]   hung hwnd=0x1450A72 
+[12.03]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[12.03]   hung hwnd=0x2009BC Default IME
+[12.03] shot stock_120.png
+[12.27]   hung hwnd=0x2940502 EFDC_Explore8.0
+[12.27]   hung hwnd=0x1450A72 
+[12.27]   hung hwnd=0xB0452 EFDC_Explorer8.4
+[12.27]   hung hwnd=0x2009BC Default IME
+[12.43] EXITED code=0
+final exit=0

@@ -1,0 +1,428 @@
+﻿[js]      2 diag9 ready
+[js] pid 50808
+python : Traceback (most recent call last):
+所在位置 行:1 字符: 625
++ ... tlyContinue; python .\rev\diag2_run.py .\rev\diag9.js 20 2>&1 | Out-F ...
++                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u37f8' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\uc718' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ue6e0' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\x9a' in position 18: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u38f0' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u38f0' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud1f8' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud1bc' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ufc20' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ufa78' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ufaf0' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u01dd' in position 21: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ufc08' in position 22: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\uc9d8' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u01dd' in position 21: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\uc860' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u01dd' in position 21: illegal multibyte sequence
+[js] [js] [js] [js] [js] [js] [js] [js] [js] [js] [js] [js] [js] [js] [js] [js] [js]     31 LoadTypeLibEx "C:\WINDOWS\SYSTEM32\MSVBVM60.DLL"
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ucb20' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ucb20' in position 20: illegal multibyte sequence
+[js] [js] [js]     31 CLSIDFromProgIDEx "WScript.Shell"
+[js]     32 CLSIDFromProgID "WScript.Shell" from combase.dll+0x73086
+[js]     32 CoCreateInstance d54dc2720ad78b438a4298424b88afb8 from AudioDevProps2.dll+0x21283
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u2d80' in position 20: illegal multibyte sequence
+[js] [js]     35 CoCreateInstance 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]     35 CoCreateInstanceEx 4b03000000000000c000000000000046 from OLEAUT32.dll+0x14827
+[js]     35 LoadTypeLibEx "C:\Windows\SysWOW64\wshom.ocx"
+[js]     35 CLSIDFromProgIDEx "Scripting.FileSystemObject"
+[js]     35 CLSIDFromProgID "Scripting.FileSystemObject" from combase.dll+0x73086
+[js]     35 CoCreateInstance 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u2ea0' in position 20: illegal multibyte sequence
+[js] [js]     35 CoCreateInstance 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]     37 LoadTypeLibEx "C:\Windows\SysWOW64\scrrun.dll"
+[js]     37 CLSIDFromProgIDEx "Scripting.FileSystemObject"
+[js]     37 CLSIDFromProgID "Scripting.FileSystemObject" from combase.dll+0x73086
+[js]     37 CoCreateInstance 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]     37 CoCreateInstance 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]     37 LoadTypeLibEx "C:\Windows\SysWOW64\scrrun.dll"
+[js]     37 CLSIDFromProgIDEx "Scripting.FileSystemObject"
+[js]     37 CLSIDFromProgID "Scripting.FileSystemObject" from combase.dll+0x73086
+[js]     37 CoCreateInstance 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]     37 CoCreateInstance 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]     38 LoadTypeLibEx "C:\Windows\SysWOW64\scrrun.dll"
+[js]     38 CLSIDFromProgIDEx "Scripting.FileSystemObject"
+[js]     38 CLSIDFromProgID "Scripting.FileSystemObject" from combase.dll+0x73086
+[js]     39 CoCreateInstance 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]     39 CoCreateInstance 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]     39 LoadTypeLibEx "C:\Windows\SysWOW64\scrrun.dll"
+[js]     39 CoCreateInstanceEx 01fe430d93f0cf11894000a0c9054228 from MSVBVM60.DLL+0x1b11a
+[js]     39 CoCreateInstance 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]     39 LoadTypeLibEx "C:\Windows\SysWOW64\scrrun.dll"
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u01dd' in position 21: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u244c' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ucba0' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\uc8e0' in position 20: illegal multibyte sequence
+[js] [js] [js] [js] [js]     43 CoCreateInstanceEx c8e29963e463314f823cd256c17e7a13 from MSVBVM60.DLL+0x1b11a
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ucba0' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ua068' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ue340' in position 20: illegal multibyte sequence
+[js] [js] [js] [js]     46 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+Traceback (most recent call last):
+[js]     46 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+[js] [js]     46 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+[js] [js] [js] [js] [js] [js] [js]     51 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+[js]     51 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+[js]     51 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+[js]     51 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+[js] [js]     51 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u27a0' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u2670' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ua310' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ubb08' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ue27c' in position 24: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\uc600' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u01df' in position 21: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ufbb0' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u1354' in position 20: illegal multibyte sequence
+[js] [js]     51 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u01df' in position 21: illegal multibyte sequence
+[js] [js]     52 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+[js]     52 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+[js]     52 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud764' in position 20: illegal multibyte sequence
+[js] [js]     52 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+[js]     53 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u2d64' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\xd0' in position 18: illegal multibyte sequence
+[js] [js] [js]     56 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+[js]     56 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\x9c' in position 18: illegal multibyte sequence
+[js] [js]     56 LdrLoadDll <bad> from KERNELBASE.dll+0x1505a3
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ue34c' in position 24: illegal multibyte sequence
+[js] [js]     59 CreateFileW C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\EFDC ��ҵ��8.4\DSILIC1.dll from clr.dll+0x92a4d
+[js]     59 CreateFileW C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\EFDC ��ҵ��8.4\DSILIC1.dll from clr.dll+0x91972
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ud4d0' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ufb20' in position 22: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ue148' in position 22: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\u01e0' in position 21: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\uf110' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\uecb8' in position 20: illegal multibyte sequence
+Traceback (most recent call last):
+  File "C:\Users\23801\AppData\Local\Programs\Python\Python310\lib\site-packages\frida\__init__.py", line 1800, in _on_
+message
+    handler(message, data)
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\diag2_run.py", line 52, in on_message
+    print("[js]", msg.get("payload"), flush=True)
+UnicodeEncodeError: 'gbk' codec can't encode character '\ueecc' in position 22: illegal multibyte sequence
+[js] [js] [js] [js] [js] [js] [js] [  1.00] CPU   4.7%
+[  2.00] CPU   0.0%
+[  3.01] CPU   0.0%
+[  4.01] CPU   0.0%
+[  5.02] CPU   0.0%
+[  6.03] CPU   0.0%
+[  7.04] CPU   0.0%
+[  8.04] CPU   0.0%
+[  9.05] CPU   0.0%
+[ 10.06] CPU   0.0%
+[ 11.07] CPU   0.0%
+[ 12.07] CPU   0.0%
+[ 13.08] CPU   0.0%
+[ 14.09] CPU   0.0%
+[ 15.11] CPU   0.0%
+[ 16.12] CPU   0.0%
+[ 17.12] CPU   0.0%
+[ 18.14] CPU   0.0%
+[ 19.15] CPU   0.0%
+done; leaving process alive

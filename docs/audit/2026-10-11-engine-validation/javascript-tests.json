@@ -1,0 +1,97 @@
+[
+  {
+    "file": "test_calibration_param_baseline.js",
+    "exit_code": 0,
+    "output": "parameter baseline: saved case values are clean; save refreshes baseline; reset remains PASS"
+  },
+  {
+    "file": "test_calibration_real_scientific_language.js",
+    "exit_code": 0,
+    "output": "real scientific language: catalog translation preserves Chinese and imported terminology PASS"
+  },
+  {
+    "file": "test_calibration_scientific_charts.js",
+    "exit_code": 0,
+    "output": "scientific charts: retain both languages without duplicate terms on locale change PASS"
+  },
+  {
+    "file": "test_calibration_spatial_controls.js",
+    "exit_code": 0,
+    "output": "spatial section controls: selected variable, time, fixed axis/index PASS"
+  },
+  {
+    "file": "test_calibration_ui.js",
+    "exit_code": 0,
+    "output": "calibration UI: selected station payload and zero objective rendering PASS"
+  },
+  {
+    "file": "test_calibration_workflow.js",
+    "exit_code": 0,
+    "output": "calibration workflow: actual variables, run completion, failure isolation, zero convergence, weights PASS"
+  },
+  {
+    "file": "test_chart_language.js",
+    "exit_code": 0,
+    "output": "chart language: existing dataset/title switches both ways, numeric arrays and dates preserved PASS"
+  },
+  {
+    "file": "test_dashboard_scientific_language.js",
+    "exit_code": 0,
+    "output": "dashboard scientific language: summary and six-field labels preserve Chinese/original pairs PASS"
+  },
+  {
+    "file": "test_i18n.js",
+    "exit_code": 0,
+    "output": "i18n: locale persistence, reversible source translation, unknown fallback and safe language packs PASS"
+  },
+  {
+    "file": "test_model_dates_ui.js",
+    "exit_code": 0,
+    "output": "model dates UI: charts, heatmap hover, inputs and solver ISO compatibility PASS"
+  },
+  {
+    "file": "test_model_dates.js",
+    "exit_code": 0,
+    "output": "model dates: ordinal conversions, validation, UTC and chart spacing PASS"
+  },
+  {
+    "file": "test_parameter_types.js",
+    "exit_code": 0,
+    "output": "parameter types: boolean/string/number save, invalid rejection, empty-string reset PASS"
+  },
+  {
+    "file": "test_scientific_language.js",
+    "exit_code": 0,
+    "output": "scientific language: Chinese, English and imported translation retain original terminology PASS"
+  },
+  {
+    "file": "test_spatial_sections.js",
+    "exit_code": 0,
+    "output": "Spatial section rendering passed"
+  },
+  {
+    "file": "test_variable_guide.js",
+    "exit_code": 0,
+    "output": "Variable guide: missing values, lower bounds, initial comparison PASS"
+  },
+  {
+    "file": "test_view_controls.js",
+    "exit_code": 0,
+    "output": "view controls: bounds and cursor-anchored zoom PASS"
+  },
+  {
+    "file": "test_viz_geometry.js",
+    "exit_code": 0,
+    "output": "lake geometry: shoreline, holes, disconnected cells, masks, scale and sigma PASS"
+  },
+  {
+    "file": "test_viz_render.js",
+    "exit_code": 0,
+    "output": "lake render: masks, true depth labels, volume arrays, empty data and preview PASS"
+  },
+  {
+    "file": "test_viz_scientific_language.js",
+    "exit_code": 0,
+    "output": "Plotly scientific terms retain originals in real English, Chinese and imported i18n PASS"
+  }
+]

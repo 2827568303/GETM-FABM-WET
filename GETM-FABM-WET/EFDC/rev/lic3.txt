@@ -1,0 +1,3 @@
+     0 solve_lic1 ready
+    84 [WriteFile] "*** ERROR:  RUNNING EFDCPlus WITHOUT LICENSE !        ***\r\n"
+   169    stack: EFDCPlus_084_OMP_180718.exe+0x7ed0f0 <- KERNELBASE.dll+0x160980 <- EFDCPlus_084_OMP_180718.exe+0x7ee088 <- EFDCPlus_084_OMP_180718.exe+0x79c25b <- EFDCPlus_084_OMP_180718.exe+0x79ab96 <- EFDCPlus_084_OMP_180718.exe+0x250891 <- EFDCPlus_084_OMP_180718.exe+0x69fed2 <- EFDCPlus_084_OMP_180718.exe+0x8d7d13 <- EFDCPlus_084_OMP_180718.exe+0x8d8a40 <- KERNEL32.DLL+0x15d49 <- ntdll.dll+0x6c75b <- ntdll.dll+0x6c6e1

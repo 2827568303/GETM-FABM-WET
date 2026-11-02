@@ -1,0 +1,8 @@
+﻿[js] {"hooked": "user32.dll!CreateWindowExA", "at": "0x774675a0"}
+[js] {"hooked": "user32.dll!CreateWindowExW", "at": "0x773ce930"}
+pid=55592
+[js] {"n": 1, "api": "CreateWindowExW", "cls": "?", "bt": ["combase.dll+0x128446", "combase.dll+0xe22fc", "combase.dll+0xe1bbf", "ntdll.dll+0x6b8da", "combase.dll+0x13bb52", "combase.dll+0xe169a", "ntdll.dll+0x3744b", "ole32.dll+0x2736e", "ntdll.dll+0x374f1", "KERNELBASE.dll+0x1489e2"]}
+[js] {"n": 2, "api": "CreateWindowExA", "cls": "ThunderRT6Main", "bt": ["MSVBVM60.DLL+0x2d910", "MSVBVM60.DLL+0x2d6ec", "MSVBVM60.DLL+0x20f2f", "MSVBVM60.DLL+0x2ade6", "EFDC_Explorer8.4.exe+0x51954", "MSVBVM60.DLL+0x2acec", "EFDC_Explorer8.4.exe+0x51954", "EFDC_Explorer8.4.exe+0x51954", "EFDC_Explorer8.4.exe+0x51954", "EFDC_Explorer8.4.exe+0x5195e"]}
+[js] {"n": 3, "api": "CreateWindowExA", "cls": "VBMsoStdCompMgr", "bt": ["MSVBVM60.DLL+0x310cd", "MSVBVM60.DLL+0x31046", "MSVBVM60.DLL+0x31019", "MSVBVM60.DLL+0x2e019", "MSVBVM60.DLL+0x2def8", "MSVBVM60.DLL+0x2d7bd", "MSVBVM60.DLL+0x20f2f", "MSVBVM60.DLL+0x2ade6", "EFDC_Explorer8.4.exe+0x51954", "MSVBVM60.DLL+0x2acec"]}
+[js] {"totalCreations": 655}
+done

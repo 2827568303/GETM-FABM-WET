@@ -1,0 +1,11 @@
+﻿[js]      0 diag15 ready (Sub Main replaced)
+pid 55356
+[js]     26 SUBMAIN-STUB ����
+[js]     26   New2(00482c3c) -> 0x1e285e8
+[js]     26   vtable=0x163ba98
+[js]     29   [after New2 00482c3c] ThunderRT6Main|"EFDC_Explorer8.4"|vis=1|0x82093e ;; ThunderRT6Main|"EFDC_Explorer8.4"|vis=1|0xaef0534
+[js]     29   New2(004d5204) -> 0x1e28e20
+[js]     29   vtable=0x163c1f4
+[js]     30   [after New2 004d5204] ThunderRT6Main|"EFDC_Explorer8.4"|vis=1|0x82093e ;; ThunderRT6Main|"EFDC_Explorer8.4"|vis=1|0xaef0534
+[js]     32   [final] ThunderRT6Main|"EFDC_Explorer8.4"|vis=1|0x82093e ;;   shown->1 ;; ThunderRT6Main|"EFDC_Explorer8.4"|vis=1|0xaef0534 ;;   shown->1
+done

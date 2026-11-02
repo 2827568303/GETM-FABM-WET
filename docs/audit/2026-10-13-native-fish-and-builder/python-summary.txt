@@ -1,0 +1,5 @@
+Command: .venv/Scripts/python.exe -m pytest 3DWET/tests tests -q -ra
+Exit code: 0
+344 passed, 3 skipped in 37.53s
+Skipped: tests/test_project_api.py:138 and tests/test_result_files.py:106,119 (Windows symlink privilege).
+This is the terminal-result summary; not a full raw pytest log.

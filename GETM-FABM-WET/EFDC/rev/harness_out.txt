@@ -1,0 +1,7 @@
+     0 ready v6
+[ 0.16] WIN 'VBMsoStdCompMgr' '' vis=0 rect=(0,0,0,0)
+[ 0.16] WIN 'ThunderRT6Main' 'EFDC_Explorer8.4' vis=1 rect=(853,533,853,533)
+[ 0.16] WIN 'IME' 'Default IME' vis=0 rect=(0,0,0,0)
+  7408 LoadEx#0 substituted
+[ 7.48] WIN '#32770' 'EFDC_Explorer8.4' vis=1 rect=(627,484,1086,637)
+[ 7.48] WIN 'MSCTFIME UI' 'MSCTFIME UI' vis=0 rect=(0,0,0,0)

@@ -26,7 +26,7 @@
    use bio_var, only: numc
 #endif
 #ifdef _FABM_
-   use getm_fabm, only: fabm_pel,fabm_ben
+   use getm_fabm, only: fabm_pel,fabm_ben,write_temporal_memory
 #endif
 #endif
 #ifdef SPM
@@ -216,6 +216,11 @@
 #endif
 #ifdef _FABM_
       if (allocated(fabm_pel)) then
+#ifdef _WRITE_HOT_HALOS_
+         call write_temporal_memory(ncid,HALO+1,HALO+1)
+#else
+         call write_temporal_memory(ncid,1,1)
+#endif
          start(4) = 1; edges(4) = size(fabm_pel,4)
          status = &
          nf90_put_var(ncid,fabm_pel_id,fabm_pel(_3D_W_HOT_,:),start,edges)

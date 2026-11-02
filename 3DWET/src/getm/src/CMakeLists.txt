@@ -66,6 +66,14 @@ if(GETM_USE_PROFILING)
    add_definitions(-DPROF)
 endif(GETM_USE_PROFILING)
 
+# Emit sparse, read-only point diagnostics for the live run console. Parallel
+# output remains explicitly unsupported until distributed station ownership is
+# validated independently.
+option(GETM_USE_RUNTIME_PHYSICS_DIAGNOSTICS "Emit representative point hydrodynamics to stderr" OFF)
+if(GETM_USE_RUNTIME_PHYSICS_DIAGNOSTICS)
+   add_definitions(-DGETM_RUNTIME_PHYSICS_DIAGNOSTICS)
+endif(GETM_USE_RUNTIME_PHYSICS_DIAGNOSTICS)
+
 option(GETM_USE_STATIC "Static compilation (domain size specified at compile time)" OFF)
 if(GETM_USE_STATIC)
    add_definitions(-DSTATIC)

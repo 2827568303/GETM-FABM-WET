@@ -22,7 +22,7 @@ module wet_macrophytes
       type (type_horizontal_diagnostic_variable_id)                   :: id_aDSubVeg,id_aCovVeg
       type (type_horizontal_diagnostic_variable_id)                   :: id_afCovSurfVeg, id_tDBedPOMS
       type (type_diagnostic_variable_id)                              :: id_aDayInitVeg_out
-      type (type_dependency_id)                                       :: id_aDayInitVeg, id_aDSubVeg_PV_in
+      type (type_dependency_id)                                       :: id_aDayInitVeg
       ! diagnostic variables for local output--------------------------------------------------------------------------------------------------------------------------------------------------------
       type (type_horizontal_diagnostic_variable_id)                   :: id_tO2BedW,id_tDBedVeg, id_ufDay
       type (type_horizontal_diagnostic_variable_id)                   :: id_tNBedVeg,id_tPBedVeg, id_tCBedVeg
@@ -173,7 +173,6 @@ subroutine initialize(self,configunit)
    call self%register_diagnostic_variable(self%id_bfRootVeg_PV,     'bfRootVeg_PV',   'gDW/m2','bfRootVeg',                         output=output_instantaneous,missing_value=0.0_rk,source=source_do)
                                                                                       
    call self%register_diagnostic_variable(self%id_aDSubVeg_PV,      'aDSubVeg_PV',    'gDW/m2','aDSubVeg_PV',                       output=output_instantaneous,missing_value=0.0_rk,source=source_do)
-   call self%register_dependency(self%id_aDSubVeg_PV_in,            'aDSubVeg_PV',    'gDW/m2','aDSubVeg')   
                                                                                       
    call self%register_diagnostic_variable(self%id_aCovVeg_PV,       'aCovVeg_PV',     '%',     'aCovVeg_PV',                        output=output_instantaneous,missing_value=0.0_rk,source=source_do)
    call self%register_diagnostic_variable(self%id_afCovSurfVeg_PV,  'afCovSurfVeg_PV','-',     'afCovSurfVeg',                      output=output_none,         missing_value=0.0_rk,source=source_do)                                                                                                                                                                                                                         
@@ -350,7 +349,8 @@ subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
         _GET_GLOBAL_(self%id_Day,Day)                                                                               !
         _GET_(self%id_extc,extc)                                                                                    !
         _GET_HORIZONTAL_(self%id_sDepthW,sDepthW)                                                                   !
-        _GET_HORIZONTAL_(self%id_lat,lat)                                                                           !
+        _GET_HORIZONTAL_(self%id_lat,lat)
+        flush(0)                                                                           !
         do i = 1,self%nCompts                                                                                       ! for each competitor
            _GET_HORIZONTAL_(self%id_Compts(i),sDCompts_all(i))                                                      !
         end do                                                                                                      !
@@ -417,7 +417,8 @@ subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
         uhLVeg = self%hLRefVeg * uFunTmProdVeg                                                                      ! half-sat. light at current temp.
         par_bott= meanpar                                                                                           !
         aLPAR2Veg = par_bott*exp(- extc *dz/2.0_rk)                                                                 !
-        aLPAR1Veg = aLPAR2Veg / exp(- extc * min(self%cHeightVeg,sDepthW-dz/2.0_rk))                                !
+        aLPAR1Veg = aLPAR2Veg / exp(- extc * min(self%cHeightVeg,sDepthW-dz/2.0_rk))
+        flush(0)                                !
         aLLimShootVeg = self%fEmergVeg + self%fFloatVeg * (1.0 - afCovEmergVeg) &                                   !
                  + bfSubVeg* (1.0 - afCovSurfVeg) * 1.0 / (extc * self%cHeightVeg) &                                !
                  * log( (1.0 + aLPAR1Veg / uhLVeg) / (1.0 + aLPAR2Veg / uhLVeg))                                    !
@@ -426,8 +427,8 @@ subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
         !===========================================================================================================!
         ! 2.5 nutrient limitation function                                                                          !
         !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!
-        aPLimVeg = max(0.0_rk,(1.0_rk - self%cPDVegMin/rPDVeg) * self%cPDVegMax / (self%cPDVegMax - self%cPDVegMin))! Droop function (P) for macrophytes
-        aNLimVeg = max(0.0_rk,(1.0_rk - self%cNDVegMin/rNDVeg) * self%cNDVegMax / (self%cNDVegMax - self%cNDVegMin))! Droop function (N) for macrophytes
+        aPLimVeg = min(1.0_rk,max(0.0_rk,(1.0_rk - self%cPDVegMin/rPDVeg) * self%cPDVegMax / (self%cPDVegMax - self%cPDVegMin)))! Droop function (P) for macrophytes
+        aNLimVeg = min(1.0_rk,max(0.0_rk,(1.0_rk - self%cNDVegMin/rNDVeg) * self%cNDVegMax / (self%cNDVegMax - self%cNDVegMin)))! Droop function (N) for macrophytes
         aNutLimVeg = min(aPLimVeg,aNLimVeg)                                                                         ! nutrient limitation function of macrophytes
         aMuVeg = aMuTmLVeg * aNutLimVeg                                                                             ! actual growth rate of macrophytes
    !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%!                                    
@@ -807,15 +808,23 @@ subroutine get_light_extinction(self,_ARGUMENTS_GET_EXTINCTION_)
    class (type_wet_macrophytes), intent(in) :: self
    _DECLARE_ARGUMENTS_GET_EXTINCTION_
    !DECLARE LOCAL VARIABLES::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-   real(rk):: aDSubVeg 
+   real(rk):: aDSubVeg, aCovVeg, afCovSurfVeg, sDVeg, uTm, Day, lat, aDayInitVeg, aDShootVeg, aDRootVeg, aDEmergVeg, aDFloatVeg, bfShootVeg, bfRootVeg, bfSubVeg
 
    _LOOP_BEGIN_  !!! BEGINNING OF MODEL CODE::
    !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%!
-   !  1. retrieve variable values                                                                                   !
+   !  1. retrieve current state and environmental variables                                                         !
    !================================================================================================================!
-   _GET_(self%id_aDSubVeg_PV_in,aDSubVeg)
+   _GET_(self%id_sDVeg_PV,sDVeg)
+   _GET_(self%id_uTm,uTm)
+   _GET_GLOBAL_(self%id_Day,Day)
+   _GET_HORIZONTAL_(self%id_lat,lat)
+   _GET_(self%id_aDayInitVeg,aDayInitVeg)
    !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%!
-   !  2. Self-shading with explicit contribution from background phytoplankton concentration.                       !
+   !  2. Recompute submerged biomass from current state, not the previous do() diagnostic.                          !
+   !================================================================================================================!
+   call self%calc_veg_fractions(Day,sDVeg,uTm,lat,aDSubVeg,aCovVeg,afCovSurfVeg,aDayInitVeg,aDShootVeg,aDRootVeg,aDEmergVeg,aDFloatVeg,bfShootVeg,bfRootVeg,bfSubVeg)
+   !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%!
+   !  3. Self-shading with explicit contribution from background phytoplankton concentration.                       !
    !================================================================================================================!
    _SET_EXTINCTION_(self%cExtSpVeg*aDSubVeg)                                                                   !
    !================================================================================================================!
@@ -839,7 +848,7 @@ subroutine do(self,_ARGUMENTS_DO_)
    !================================================================================================================!
    _GET_(self%id_uTm,uTm)                                                                                           !
    _GET_GLOBAL_(self%id_Day,Day)                                                                                    !
-   _GET_HORIZONTAL_(self%id_lat,lat)                                                                                !
+   _GET_HORIZONTAL_(self%id_lat,lat)
    _GET_(self%id_aDayInitVeg,aDayInitVeg)                                                                           !
    _GET_(self%id_sDVeg_PV,sDVeg)                                                                                    !
    !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%!
@@ -871,9 +880,11 @@ subroutine calc_veg_fractions(self,Day,sDVeg,uTm,lat,aDSubVeg,aCovVeg,afCovSurfV
    !DECLARE LOCAL VARIABLES::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
    real(rk)  :: aDShootVeg_int,aDRootVeg_int,bfShootVeg_int,bfRootVeg_int,bfSubVeg_int,aDFloatVeg_int,aDEmergVeg_int
    integer   :: season
-   logical   :: yeartrans=.false.
+   logical   :: yeartrans
    
    !!! BEGINNING OF MODEL CODE::
+   yeartrans = .false. ! Local state must not persist across calls.
+   if (aDayInitVeg < -1.0_rk) aDayInitVeg = -1.0_rk ! Normalize external missing sentinels to the no-onset state.
    !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%!
    !  1. the germination, allocation and reallocation processes                                                     !  NOTE: This section only really works for northern hemisphere temperate regions
    !================================================================================================================!

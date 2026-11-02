@@ -1,0 +1,6 @@
+﻿pid=49716
+[js] {"alive": true}
+[js] {"type": "access-violation", "addr": "0x7609fb04", "at": "OLEAUT32.dll+0x1fb04", "regs": {"eip": "0x7609fb04", "esp": "0x1afab8", "ebp": "0x1afac0", "eax": "0x1d7b780", "ebx": "0x80020004", "ecx": "0x1d7b780", "edx": "0x0", "esi": "0x12", "edi": "0x1afab0"}, "bt": ["0xc930a74", "MSVBVM60.DLL+0x1d870", "EFDC_Explorer8.4.exe+0x41c9f9", "EFDC_Explorer8.4.exe+0x41cdc4", "MSVBVM60.DLL+0x31639", "combase.dll+0x10ac0c", "OLEAUT32.dll+0x1fb97", "MSVBVM60.DLL+0x1d8dd", "combase.dll+0x10ac0c", "OLEAUT32.dll+0x1fb97", "OLEAUT32.dll+0x1fb18", "MSVBVM60.DLL+0x1d8dd", "EFDC_Explorer8.4.exe+0xc10e5e", "EFDC_Explorer8.4.exe+0xc10e5f", "MSVBVM60.DLL+0xdbef", "MSVBVM60.DLL+0x4e96"], "range": {"base": "0x76081000", "size": 593920, "prot": "r-x", "file": null}, "disasm": "mov eax, dword ptr [esi]", "code": ["0x7609fb04  mov eax, dword ptr [esi]", "0x7609fb06  add eax, 0x15", "0x7609fb09  cmp eax, 0x15", "0x7609fb0c  jb 0x7609fade", "0x7609fb0e  and eax, 0xfffffff0", "0x7609fb11  push eax", "0x7609fb12  push esi", "0x7609fb13  call 0x7609fb60"], "stack": {}}
+[ 7.36] CHILD pid=45272 EFDC_Explorer8.4.exe
+[ 7.36] CHILD pid=52344 WerFault.exe
+done

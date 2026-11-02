@@ -1,0 +1,3 @@
+     0 diag51 ready
+pid 23900
+  2426 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8

@@ -1,0 +1,5 @@
+     1 diag51 ready
+     0 diag98 ready
+  3155 BEFORE hwnd=0x2910ad6 title="Activation Wizard" style=0x6c80000 vis=0
+  3163 AFTER  vis=1 style=0x16c80000
+  3163 children(5): ThunderRT6Frame,ThunderRT6CommandButton,ThunderRT6CheckBox,ThunderRT6Frame,ThunderRT6TextBox

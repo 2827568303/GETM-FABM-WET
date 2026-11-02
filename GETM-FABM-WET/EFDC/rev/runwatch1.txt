@@ -1,0 +1,2 @@
+﻿pid 23548 exe C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\EFDC ��ҵ��8.4\EFDC_Explorer8.4.exe
+alive= True

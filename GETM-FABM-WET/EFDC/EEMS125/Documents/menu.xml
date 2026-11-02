@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<root>
+  <category title='General' tooltip='For sub-items, LMC for Report, RMC to Edit' report='GeneralReport'>
+    <record title='Description' report='DescriptionReport'/>
+    <record title='Change Log' report='RunLogReport'/>
+  </category>
+  <category title='Model Grid' tooltip='For sub-items, LMC for Report, RMC to Edit' report='DomainReport'>
+    <record title='Grid' report='HorizontalGridReport'/>
+    <record title='Layers' report='VerticalGridReport'/>
+  </category>
+  <category title='Modules' tooltip='LMC for report, RMC top level to setup modules' report='ActiveModuleReport'>
+    <folder title='Hydrodynamics' report='HydrodynamicReport'>
+      <record title='Turbulence' flag='IsSalinityOn'/>
+      <record title='Roughness' />
+      <record title='Shallow Water' />
+      <record title='Vegetation' />
+      <record title='Coriolis Effect' />
+      <record title='Density Effects Factor' />
+      <record title='Numerical Options' />
+      <record title='Wind Forcing' />
+    </folder>
+    <record title='Salinity' flag='IsSalinityOn'/>
+    <record title='Temperature' flag='IsTemperatureOn'/>
+    <record title='Dye' flag='IsDyeOn'/>
+    <record title='Sediment' flag='IsSedimentOn'/>
+    <record title='Chemical Fate and Transport' flag='IsToxicsOn'/>
+    <folder title='Water Quality' flag='IsWaterQualityOn'>
+      <record title='Kinetics' />
+      <record title='Sediment Fluxes' />
+      <record title='RPEM' />
+    </folder>
+    <record title='Shellfish Farm' flag='IsShellfishFarmOn'/>
+    <record title='Waves' flag='IsIceOn'/>
+    <record title='Ice' flag='IsWaveOn'/>
+    <record title='LPT' flag='IsLPTOn'/>
+  </category>
+  <category title='Timing / Linkage' tooltip='For sub-items, LMC for Report, RMC to Edit' report='TimingReport'>
+    <record title='Timing' />
+    <record title='Linkages' />
+    <record title='Restart Options' />
+    <record title='Ramp-Up Options' />
+  </category>
+  <category title='Initial Conditions' tooltip='For sub-items, LMC for Report, RMC to Edit' report='InitialConditionsReport'> 
+    <record title='Bathymetry' />
+    <record title='Water Depth/Elevation' />
+    <record title='Temperature' flag='IsTemperatureOn'/>
+    <record title='Sediment - Water Column' flag='IsSedimentOn'/>
+    <record title='Sediment - Bed' flag='IsSedimentOn'/>
+    <record title='Contaminant - Water Column' flag='IsToxicsOn'/>
+    <record title='Contaminant - Bed' flag='IsToxicsOn'/>
+    <record title='Water Quality' flag='IsWaterQualityOn'/>
+  </category>
+  <category title='External Forcing Data' tooltip='For sub-items, LMC for Report, RMC to Edit'>
+    <folder title='Wind' data='WindModule.WSER' ></folder>
+    <folder title='Atmospheric' data='AtmModule.ASER'></folder>
+    <folder title='Water Level' data='PSER'></folder>
+    <folder title='Harmonic Tides' data='HARSER'></folder>
+    <folder title='Flow' data='QSER'></folder>
+    <folder title='Withdrawal/Return' data='QWRSR'></folder>
+    <folder title='Rating Curves' data='STRSER'></folder>
+    <folder title='Hydraulic Structures' data='HYDSTR'></folder>
+    <folder title='Control Time Series' data='QCTLSER'></folder>
+    <folder title='Groundwater' data='GWSER'></folder>
+    <folder title='Control Rules' data='QCTRULES'></folder>
+    <folder title='Salinity' data='SSER'></folder>
+    <folder title='Temperature' data='TSER'></folder>
+    <folder title='Dye'  data='DSER'></folder>
+    <folder title='Suspended Sediments'  data='SDSER' flag='IsSedZLJ'></folder>
+    <folder title='Cohesive Sediment'  data='SDSER'></folder>
+    <folder title='Non-Cohesive Sediments'  data='SNSER'></folder>
+    <folder title='Contaminant Data'  data='TXSER'></folder>
+    <folder title='Contaminant Dry Deposition'  data='TXDRY'></folder>
+    <folder title='Contaminant Wet Deposition'  data='TXWET'></folder>
+    <folder title='Water Quality'  data='CWQSR'></folder>
+    <folder title='Ice'  data='ISER'></folder>
+    <folder title='Time Varying Fields'  data='WSER'>
+      <folder title='Bathymetry'></folder>
+      <folder title='Roughness'></folder>
+      <folder title='Shading'></folder>
+      <folder title='Pressure'></folder>
+      <folder title='Precipitation'></folder>
+      <folder title='Evaporation'></folder>
+      <folder title='Groundwater'></folder>
+    </folder>
+  </category>
+  <category title='Boundary Conditions' tooltip='For sub-items, LMC for Report, RMC to Edit' report='BoundaryReport'>
+    <BoundaryGroup title='Water Level' data='BcGroupLevel'>
+      <menu>
+        <menuItem handler="EditBoundaryClick">Edit Boundary Group</menuItem>
+        <menuItem handler="DeleteBoundaryClick">Delete Boundary Group</menuItem>
+      </menu>
+    </BoundaryGroup>
+    <BoundaryGroup title='Flow' data='BcGroupFlow'>
+      <menu>
+        <menuItem handler="EditBoundaryClick" action="edit">Edit Boundary Group</menuItem>
+        <menuItem handler="DeleteBoundaryClick" action="delete">Delete Boundary Group</menuItem>
+        <menuItem handler="SetUniformLayerFlowClick">Set Uniform Layer Flows</menuItem>
+      </menu>
+    </BoundaryGroup>
+    <BoundaryGroup title='Withdrawal/Return' data='BcGroupWR'>
+      <menu>
+        <menuItem handler="EditBoundaryClick" action="edit">Edit Boundary Group</menuItem>
+        <menuItem handler="DeleteBoundaryClick" action="delete">Delete Boundary Group</menuItem>
+      </menu>
+    </BoundaryGroup>
+    <BoundaryGroup title='Hydraulic Structures' data='BcGroupStruct'>
+      <menu>
+        <menuItem handler="EditBoundaryClick" action="edit">Edit Boundary Group</menuItem>
+        <menuItem handler="DeleteBoundaryClick" action="delete">Delete Boundary Group</menuItem>
+      </menu>
+    </BoundaryGroup>
+    <BoundaryGroup title='Jet/Plume' data='BcGroupJet'>
+      <menu>
+        <menuItem handler="EditBoundaryClick" action="edit">Edit Boundary Group</menuItem>
+        <menuItem handler="DeleteBoundaryClick" action="delete">Delete Boundary Group</menuItem>
+      </menu>
+    </BoundaryGroup>
+    <BoundaryGroup title='Groundwater'>
+      <menu>
+        <menuItem handler="EditBoundaryClick" action="edit">Edit Boundary Group</menuItem>
+        <menuItem handler="DeleteBoundaryClick" action="delete">Delete Boundary Group</menuItem>
+      </menu>
+    </BoundaryGroup>
+  </category>
+  <category title='Model Analysis' tooltip='For sub-items, LMC for Report, RMC to Edit' report='ModelAnalysisReport'>
+    <folder title='Calibration Time Series' data='CalTS'></folder>
+    <folder title='High-Frequency Time Series' data='CalHF'></folder>
+    <folder title='Vertical Profiles' data='CalVP'></folder>
+    <folder title='Flux Transects' data='CalFlux'></folder>
+    <folder title='Cruise Tracks' data='CalTrack'></folder>
+    <folder title='Habitat Analysis'>
+      <folder title='Habitat Suitability Analysis'></folder>
+      <folder title='Critical Limits Time Series'></folder>
+    </folder>
+  </category>
+
+</root>

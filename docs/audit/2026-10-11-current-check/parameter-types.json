@@ -1,0 +1,17 @@
+[
+  {
+    "input": "false",
+    "sent_value": "false",
+    "sent_type": "string"
+  },
+  {
+    "input": "true",
+    "sent_value": "true",
+    "sent_type": "string"
+  },
+  {
+    "input": "",
+    "sent_value": 0,
+    "sent_type": "number"
+  }
+]

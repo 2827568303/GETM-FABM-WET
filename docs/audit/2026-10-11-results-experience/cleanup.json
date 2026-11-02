@@ -1,0 +1,52 @@
+[
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\results-guide-source",
+    "bytes": 59350200.0,
+    "method": "Windows Recycle Bin"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\results-guide-frozen",
+    "bytes": 59725197.0,
+    "method": "Windows Recycle Bin"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\results-guide-final",
+    "bytes": 59731031.0,
+    "method": "Windows Recycle Bin"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\results-guide-external",
+    "bytes": 216118565.0,
+    "method": "Windows Recycle Bin"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\results-guide-installed",
+    "bytes": 59731351.0,
+    "method": "Windows Recycle Bin"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\language-frozen",
+    "bytes": 60192117.0,
+    "method": "Windows Recycle Bin"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\language-installed",
+    "bytes": 60192351.0,
+    "method": "Windows Recycle Bin"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\language-test",
+    "bytes": 242.0,
+    "method": "Windows Recycle Bin"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\pyinstaller",
+    "bytes": 30797099.0,
+    "method": "Windows Recycle Bin"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\release\\stage",
+    "bytes": 478922152.0,
+    "method": "Windows Recycle Bin"
+  }
+]

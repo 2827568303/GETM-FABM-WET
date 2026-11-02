@@ -1,0 +1,43 @@
+     0 diag51 ready
+     0 ready
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+  3006 MsgWaitForMultipleObjectsEx 1655ms tid=45760 undefined ret=1 from USER32.DLL+0x38b1f
+  3006 MsgWaitForMultipleObjects 1655ms tid=45760 undefined ret=1 from winhttpcom.dll+0xa23b
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+RangeError: invalid array index
+  3091 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8

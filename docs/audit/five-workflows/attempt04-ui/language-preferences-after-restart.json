@@ -1,0 +1,17 @@
+{
+  "locale": "en-US",
+  "packs": [
+    {
+      "locale": "fr-FR",
+      "name": "Français (vérification)",
+      "messages": {
+        "仪表盘": "Tableau de bord",
+        "取消": "Annuler",
+        "应用": "Appliquer",
+        "水温": "Température de l’eau",
+        "界面语言": "Langue de l’interface",
+        "选择界面语言": "Choisir la langue"
+      }
+    }
+  ]
+}

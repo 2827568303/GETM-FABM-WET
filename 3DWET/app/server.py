@@ -7,6 +7,7 @@ import sys
 import io
 import csv
 import json
+import math
 import re
 import time
 import uuid
@@ -15,10 +16,12 @@ import subprocess
 import tempfile
 import threading
 import functools
+import hashlib
+from psutil import TimeoutExpired as ProcessTimeoutExpired
 from contextlib import contextmanager
 from pathlib import Path
-from datetime import datetime, timedelta
-from collections import defaultdict
+from datetime import datetime, timedelta, timezone
+from collections import OrderedDict, defaultdict
 
 import numpy as np
 import netCDF4 as nc
@@ -26,20 +29,68 @@ import yaml
 import shapefile  # pyshp
 import crs_utils
 import fish_support
+from model_dates import parse_ordinal_date, parse_calendar_date, format_model_time
+from solver_runtime import solver_environment, inspect_runtime, explain_exit_code, log_has_solver_failure
+from run_metrics import IncrementalLogReader, RunMetrics, read_rank_zero_stderr
+from run_diagnostics import inspect_forcing_coverage, register_run_diagnostic_routes
+from run_output_health import validate_current_run_outputs
+from gotm_working_copy import (KIND as _GOTM_WORKING_KIND, create_working_copy as _create_gotm_working_copy,
+                               load_or_create_key as _load_gotm_manifest_key,
+                               validate_gotm_output as _validate_gotm_output,
+                               validate_working_copy as _validate_gotm_working_copy)
+from netcdf_io import open_dataset
+from output_subscriptions import resolve_sources as _resolve_output_sources, preset_sources as _output_preset_sources, model_sources as _output_model_sources
+from lake_points_api import effective_calibration_points, register_lake_points_routes
 from scipy.interpolate import griddata
 from scipy.spatial import cKDTree
 from flask import Flask, render_template, request, jsonify, send_from_directory
+from werkzeug.utils import secure_filename
+from variable_api import metadata as _annotated_output, register_variable_routes
+from result_files import register_result_file_routes
+from result_inventory_cache import ResultInventoryCache, inventory_key as _result_inventory_key
+from case_storage import (case_request_is_read_only_allowed, is_system_drive,
+                          resolve_case_storage, resolve_state_storage)
+from calibration_storage import migrate_missing_files, load_json_with_seed
+from proxy_engineering import load_manifest as _load_proxy_manifest
 
 # ── Paths ──────────────────────────────────────────────────────────────
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(os.environ.get("WET_MODEL_ROOT", Path(__file__).resolve().parent.parent)).resolve()
 APP_DIR = Path(__file__).resolve().parent
-CASE_DIR = BASE_DIR / "case"
-DATA_DIR = APP_DIR / "data"
-EXTERNAL_CASES_FILE = DATA_DIR / "external_cases.json"  # registry of cases opened from arbitrary paths
+LEGACY_CASE_DIR = BASE_DIR / "case"
+CASE_DIR, _case_storage_source, _case_storage_warning = resolve_case_storage(BASE_DIR)
+# Source-backed proxy engineering attempts are separate from user cases and
+# are visible to the case manager without being merged into CASE_DIR.
+PROXY_CASE_DIR = BASE_DIR.parent / "build" / "proxy-engineering-20261027-attempt03"
+CASE_STORAGE_SOURCE = os.environ.get("WET_CASE_STORAGE_SOURCE", _case_storage_source)
+STATE_DIR, _state_storage_warning = resolve_state_storage(CASE_DIR)
+CASE_STATE_DIR = STATE_DIR
+CASE_STORAGE_WARNING = " ".join(filter(None, (
+    os.environ.get("WET_CASE_STORAGE_WARNING", _case_storage_warning),
+    _state_storage_warning))) or None
+APP_LOG_DIR = CASE_DIR / ".logs"
+APP_TEMP_DIR = CASE_DIR / ".temp"
+APP_LOG_DIR.mkdir(parents=True, exist_ok=True)
+APP_TEMP_DIR.mkdir(parents=True, exist_ok=True)
+STATE_DIR.mkdir(parents=True, exist_ok=True)
+# Python upload/calibration scratch files and child processes inherit these
+# process-local temp roots, keeping transient generated data beside D: cases.
+tempfile.tempdir = str(APP_TEMP_DIR)
+os.environ["TMP"] = str(APP_TEMP_DIR)
+os.environ["TEMP"] = str(APP_TEMP_DIR)
+DATA_DIR = STATE_DIR / "data"
+EXTERNAL_CASES_FILE = CASE_STATE_DIR / "external_cases.json"  # registry of cases opened from arbitrary paths
 
 # ── Pre-process cache (in-memory store for uploaded shapes / generated grids) ─
 # Holds boundary / bathymetry / grid artifacts between upload → generate → save steps.
 _preprocess_cache = {"boundary": {}, "bathymetry": {}, "grid": {}}
+_result_inventory_cache = ResultInventoryCache(max_entries=8)
+_result_window_range_cache = OrderedDict()
+_output_selection_cache = OrderedDict()
+_output_selection_cache_lock = threading.RLock()
+_native_attestation_cache = OrderedDict()
+_native_attestation_cache_lock = threading.RLock()
+_result_horizontal_geometry_cache = OrderedDict()
+_result_horizontal_geometry_cache_lock = threading.RLock()
 
 def _pp_cache_id(prefix):
     """Stable short id for cached pre-process artifacts."""
@@ -55,6 +106,13 @@ EXE_PATH = _NATIVE_EXE if _NATIVE_EXE.exists() else BIN_DIR / "getm_cartesian"
 MSYS_UCRT_BIN = Path.home() / ".local" / "share" / "msys64" / "ucrt64" / "bin"
 
 DATA_DIR.mkdir(exist_ok=True)
+_CALIBRATION_FILES = ("calibration_points.json", "calibration_data.json",
+                      "auto_calib_config.json")
+# Older installs stored user calibration edits beside the source tree. Copy
+# each file once into D: state storage when no user copy exists there; packaged
+# app/data remains an immutable read-only seed and is never edited.
+migrate_missing_files(APP_DIR / "data", DATA_DIR, _CALIBRATION_FILES)
+_GOTM_MANIFEST_KEY = _load_gotm_manifest_key(CASE_STATE_DIR / ".gotm-working-copy.key")
 
 # ── Guard: redirect stdout/stderr to log file if no console (e.g. pythonw) ──
 class _SafeLog:
@@ -78,7 +136,7 @@ class _SafeLog:
 for _stream_name in ("stdout", "stderr"):
     _s = getattr(sys, _stream_name, None)
     if _s is None or not hasattr(_s, "write"):
-        setattr(sys, _stream_name, _SafeLog(str(APP_DIR / f"server_{_stream_name}.log")))
+        setattr(sys, _stream_name, _SafeLog(str(APP_LOG_DIR / f"server_{_stream_name}.log")))
 
 import logging
 import traceback
@@ -86,13 +144,14 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s %(levelname)s %(message)s',
     handlers=[
-        logging.FileHandler(str(APP_DIR / "server_debug.log"), mode='w', encoding='utf-8'),
+        logging.FileHandler(str(APP_LOG_DIR / "server_debug.log"), mode='a', encoding='utf-8'),
     ]
 )
 
 app = Flask(__name__,
             template_folder=str(APP_DIR / "templates"),
             static_folder=str(APP_DIR / "static"))
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable static file caching
 
 # ── NaN-safe JSON (CRITICAL) ──────────────────────────────────────────
@@ -119,7 +178,7 @@ app.json = SafeJSONProvider(app)
 
 # ── NetCDF thread-safety (CRITICAL) ───────────────────────────────────
 # libnetcdf C 库不是线程安全的。waitress 是多线程服务器：浏览器并行发起的
-# 多个请求同时 nc.Dataset() 打开（不同或相同的）NetCDF 文件时，netcdf.dll
+# 多个请求同时 open_dataset() 打开（不同或相同的）NetCDF 文件时，netcdf.dll
 # 内部全局状态竞争 → 0xC0000005 秒杀整个服务进程，前端表现为
 # "[XHR_DEBUG] Network error (XHR) - cannot connect to server"。
 # （2026-09-22 21:46 事故，Windows Event Log：faulting module=netcdf.dll，
@@ -132,7 +191,7 @@ _NC_LOCK = threading.RLock()
 def nc_open(path, mode="r"):
     """Thread-safe netCDF4.Dataset open. ALWAYS use this instead of nc.Dataset."""
     with _NC_LOCK:
-        ds = nc.Dataset(str(path), mode)
+        ds = open_dataset(str(path), mode)
         try:
             yield ds
         finally:
@@ -157,30 +216,125 @@ def _output_locked():
         return False
     return str(Path(run_case_path).resolve()).lower() == str(Path(active_case_path).resolve()).lower()
 
+def _active_case_snapshot():
+    """Atomically capture the current case path and its switch generation."""
+    with _ACTIVE_CASE_LOCK:
+        if not active_case_path:
+            return None, _active_case_generation
+        return Path(active_case_path).resolve(), _active_case_generation
+
+def _same_case_snapshot(case_path, generation):
+    current_path, current_generation = _active_case_snapshot()
+    return (current_path == Path(case_path).resolve()
+            and current_generation == generation)
+
 # ── Global State ───────────────────────────────────────────────────────
 active_case = None          # case directory name
 active_case_path = None     # full path
+_active_case_generation = 0  # monotonic identity for active-case switches
+_ACTIVE_CASE_LOCK = threading.RLock()
 run_case_path = None        # case dir of the currently running model (delete/save-as guard)
 cached_getm_config = None   # cached to avoid GC crashes with YAML C ext
 cached_fabm_info = None
+active_case_read_only = None  # lazily identified once for a restored case
+active_case_kind_path = None
 run_process = None
 run_thread = None
 run_logs = []
 run_status = "idle"         # idle, running, completed, failed, stopped
 run_start_time = None
 run_config = {}             # snapshot of config at run start
+run_metrics = RunMetrics()
+_run_identity = None
+_run_log_case_path = None
+_mpi_tuning_lock = threading.Lock()
+_mpi_tuning_state = {"status": "idle", "progress": None, "result": None,
+                     "error": None, "cancel": None, "signature": None}
+_run_repair_summary_counts = None
+_run_repair_summary_case_path = None
+_run_repair_summary_status = None
 calibration_points = []     # loaded from data/calibration_points.json
 calibration_data = {}       # {point_id: {variable: [{time, value}]}}
 
+def _parse_fabm_repair_summary(log_text):
+    """Parse only the complete three-part FABM repair-event footer."""
+    if not isinstance(log_text, str):
+        return None
+    pattern = re.compile(
+        r'^\s*FABM\s+(interior|surface|bottom)\s+state\s+was\s+repaired\s+(\d+)\s+times\.\s*$',
+        re.IGNORECASE)
+    counts = {}
+    for line in log_text.splitlines():
+        match = pattern.match(line)
+        if match:
+            counts[match.group(1).lower()] = int(match.group(2))
+    if set(counts) != {'interior', 'surface', 'bottom'}:
+        return None
+    return counts
+
+def _reset_run_repair_summary():
+    global _run_repair_summary_counts, _run_repair_summary_case_path, _run_repair_summary_status
+    _run_repair_summary_counts = None
+    _run_repair_summary_case_path = None
+    _run_repair_summary_status = None
+
+def _capture_run_repair_summary(case_path, status, log_was_started):
+    """Capture terminal counters only from the log opened by this active run."""
+    global _run_repair_summary_counts, _run_repair_summary_case_path, _run_repair_summary_status
+    _reset_run_repair_summary()
+    if status not in {'completed', 'failed'} or not log_was_started or not run_case_path:
+        return
+    try:
+        case = Path(case_path).resolve()
+        if case != Path(run_case_path).resolve():
+            return
+        text = (case / 'model_run.log').read_text(encoding='utf-8', errors='replace')
+    except (OSError, TypeError, ValueError):
+        return
+    _run_repair_summary_counts = _parse_fabm_repair_summary(text)
+    _run_repair_summary_case_path = case
+    _run_repair_summary_status = status
+
+def _run_repair_summary_payload():
+    if run_status == 'running':
+        return {'state': 'running', 'counts': None}
+    if run_status not in {'completed', 'failed'} or not active_case_path:
+        return {'state': 'not_provided', 'counts': None}
+    if (_run_repair_summary_status != run_status or not _run_repair_summary_counts
+            or _run_repair_summary_case_path is None):
+        return {'state': 'not_provided', 'counts': None}
+    try:
+        if Path(active_case_path).resolve() != Path(_run_repair_summary_case_path).resolve():
+            return {'state': 'not_provided', 'counts': None}
+    except (OSError, TypeError, ValueError):
+        return {'state': 'not_provided', 'counts': None}
+    return {'state': 'available', 'counts': dict(_run_repair_summary_counts)}
+
 # 上次激活的案例持久化：服务重启（改完代码后必做）后自动恢复，
 # 否则所有结果接口都会报“未加载案例”，要用户回 GUI 重新载入一次。
-_LAST_CASE_FILE = APP_DIR / ".active_case.json"
+_LAST_CASE_FILE = CASE_STATE_DIR / ".active_case.json"
+
+def _is_pytest_temporary_case_path(path):
+    """Reject pytest-managed temporary directories from persistent app state."""
+    try:
+        resolved = Path(path).resolve()
+        temp_root = Path(tempfile.gettempdir()).resolve()
+        relative = resolved.relative_to(temp_root)
+    except (OSError, ValueError):
+        return False
+    parts = [part.casefold() for part in relative.parts]
+    return any(part.startswith("pytest-of-") or re.fullmatch(r"pytest-\d+", part)
+               for part in parts)
+
 try:
     _last = json.loads(_LAST_CASE_FILE.read_text(encoding="utf-8"))
     _p = Path(_last["path"])
-    if _p.is_dir():
+    if _is_pytest_temporary_case_path(_p):
+        _LAST_CASE_FILE.unlink(missing_ok=True)
+    elif _p.is_dir():
         active_case = _p.name
         active_case_path = _p
+        _active_case_generation += 1
 except Exception:
     pass
 
@@ -238,8 +392,10 @@ def save_json(path, data):
 
 def load_calibration():
     global calibration_points, calibration_data
-    calibration_points = load_json(DATA_DIR / "calibration_points.json", [])
-    calibration_data = load_json(DATA_DIR / "calibration_data.json", {})
+    calibration_points = load_json_with_seed(
+        DATA_DIR / "calibration_points.json", APP_DIR / "data" / "calibration_points.json", [])
+    calibration_data = load_json_with_seed(
+        DATA_DIR / "calibration_data.json", APP_DIR / "data" / "calibration_data.json", {})
 
 def save_calibration():
     save_json(DATA_DIR / "calibration_points.json", calibration_points)
@@ -253,7 +409,7 @@ def parse_getm_inp(filepath):
     """Parse GETM namelist file into structured dict."""
     config = {}
     current_namelist = None
-    with open(filepath, "r", encoding="utf-8", errors="replace") as f:
+    with open(filepath, "r", encoding="utf-8-sig", errors="replace") as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith("!"):
@@ -298,6 +454,43 @@ def write_getm_inp(filepath, config):
                 else:
                     f.write(f"   {key} = {val}\n")
             f.write("/\n\n")
+
+
+def _enable_getm_meteo_forcing(filepath, use_measured_swr=False):
+    """Atomically enable meteo forcing while preserving the rest of getm.inp."""
+    path = Path(filepath)
+    text = path.read_bytes().decode("utf-8-sig")
+    newline = "\r\n" if "\r\n" in text else "\n"
+    section = re.search(r"(?ims)^\s*&meteo\b(.*?)(^\s*/\s*(?:!.*)?$)", text)
+    if section:
+        body = section.group(1)
+        logical = re.compile(r"(?im)^(\s*metforcing\s*=\s*)(\.(?:true|false|t|f)\.|true|false|t|f)(\s*(?:!.*)?)$")
+        if logical.search(body):
+            body = logical.sub(lambda match: match.group(1) + ".true." + match.group(3), body, count=1)
+        else:
+            body += newline + "   metforcing = .true."
+        measured = re.compile(r"(?im)^(\s*use_measured_swr\s*=\s*)(\.(?:true|false|t|f)\.|true|false|t|f)(\s*(?:!.*)?)$")
+        if measured.search(body):
+            body = measured.sub(lambda match: match.group(1) + (".true." if use_measured_swr else ".false.") + match.group(3), body, count=1)
+        elif use_measured_swr:
+            body += newline + "   use_measured_swr = .true."
+        updated = text[:section.start(1)] + body + text[section.end(1):]
+    else:
+        updated = text.rstrip("\r\n") + newline + "&meteo" + newline + "   metforcing = .true." + newline + "/" + newline
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", newline="",
+                                         prefix="." + path.name + ".meteo-",
+                                         suffix=".tmp", dir=path.parent, delete=False) as handle:
+            temporary = Path(handle.name)
+            handle.write(updated)
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None:
+            try:
+                temporary.unlink(missing_ok=True)
+            except OSError:
+                pass
 
 def get_time_settings(config):
     """Extract time-related settings from getm.inp config."""
@@ -424,6 +617,16 @@ def _fabm_docs():
     return _fabm_docs_cache
 
 
+def _annotate_module(name, long_name, category):
+    """Paired explanations; authored English case names remain the fallback."""
+    docs = _fabm_docs()
+    return {
+        "desc": docs.get("modules", {}).get(name, ""),
+        "desc_en": docs.get("modules_en", {}).get(name, long_name or name),
+        "category_en": docs.get("categories_en", {}).get(category, "Other"),
+    }
+
+
 def _fabm_lookup(model, section, name):
     """Find `name` in docs[model][section], falling back to any other model."""
     docs = _fabm_docs()
@@ -465,7 +668,7 @@ def _annotate_variable(model, name):
             "desc_en": en}
 
 
-def parse_fabm_yaml(filepath):
+def parse_fabm_yaml(filepath, *, persist_defaults=False):
     """Parse fabm.yaml into structured module list with parameters.
 
     Modules under top-level `instances` are considered enabled; disabled
@@ -512,7 +715,7 @@ def parse_fabm_yaml(filepath):
                 param_list.append({
                     "name": pname,
                     "value": pval,
-                    "type": "number" if isinstance(pval, (int, float)) else "string",
+                    "type": "boolean" if isinstance(pval, bool) else "number" if isinstance(pval, (int, float)) else "string",
                     "comment": meta_c.get("comment", ""),
                     "default_value": meta_c.get("default_value"),
                     "unit": ann["unit"],
@@ -529,7 +732,7 @@ def parse_fabm_yaml(filepath):
             "name": name,
             "long_name": inst.get("long_name", name),
             "model": model,
-            "desc": _fabm_docs().get("modules", {}).get(name, ""),
+            **_annotate_module(name, inst.get("long_name", name), meta["category"]),
             "category": meta["category"],
             "color": meta["color"],
             "enabled": enabled,
@@ -563,6 +766,9 @@ def parse_fabm_yaml(filepath):
                     if ref in enabled_names:
                         refs.add(ref)
         m["coupling_refs"] = sorted(refs)
+
+    from parameter_defaults import annotate_defaults
+    annotate_defaults(Path(filepath).parent, modules, persist=persist_defaults)
 
     # Group by category
     categories = defaultdict(list)
@@ -652,10 +858,28 @@ def _fabm_set_value(instance, key, value):
 
 def update_fabm_parameter(filepath, module_name, param_name, value):
     """Update a single parameter in fabm.yaml."""
+    import math
     with open(filepath, "r", encoding="utf-8") as f:
         raw = yaml.safe_load(f)
     if module_name in raw.get("instances", {}):
-        _fabm_set_value(raw["instances"][module_name], param_name, value)
+        instance = raw["instances"][module_name]
+        init = instance.get('initialization', {})
+        parameters = instance.get('parameters', {})
+        target = init if isinstance(init, dict) and param_name in init else parameters
+        if not isinstance(target, dict) or param_name not in target:
+            raise ValueError(f'未知参数: {module_name}.{param_name}')
+        previous = target[param_name]
+        if isinstance(previous, bool):
+            valid = isinstance(value, bool)
+        elif isinstance(previous, (int, float)):
+            valid = type(value) in (int, float) and math.isfinite(value)
+        elif isinstance(previous, str):
+            valid = isinstance(value, str)
+        else:
+            valid = type(value) is type(previous)
+        if not valid:
+            raise ValueError(f'参数 {module_name}.{param_name} 类型不匹配或不是有限数值')
+        _fabm_set_value(instance, param_name, value)
         with open(filepath, "w", encoding="utf-8") as f:
             yaml.dump(raw, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
         return True
@@ -697,8 +921,10 @@ def toggle_fabm_module(filepath, module_name, enabled):
     if "instances" not in raw or not isinstance(raw["instances"], dict):
         raw["instances"] = {}
 
-    legacy = raw.pop("_disabled", None)
-    disabled = _fabm_disabled_store(filepath)
+    # Read without healing legacy state here. A blocked disable must be a
+    # read-only operation, including when the file contains a legacy block.
+    legacy = raw.get("_disabled")
+    disabled = _fabm_disabled_store(filepath, heal=False)
     if isinstance(legacy, dict):
         for k, v in legacy.items():
             disabled.setdefault(k, v)
@@ -708,6 +934,7 @@ def toggle_fabm_module(filepath, module_name, enabled):
         # Restore from the sidecar to instances
         if module_name not in disabled:
             return False, [f"模块 {module_name} 未在禁用列表中找到"]
+        raw.pop("_disabled", None)
         raw["instances"][module_name] = disabled.pop(module_name)
     else:
         # Move from instances to the sidecar
@@ -723,6 +950,13 @@ def toggle_fabm_module(filepath, module_name, enabled):
             for key, val in coupling.items():
                 if isinstance(val, str) and "/" in val and val.split("/", 1)[0] == module_name:
                     warnings.append(f"{other_name} 通过耦合 {key} 引用 {module_name}")
+        # Never remove a referenced instance. The former confirmation flow
+        # wrote the removal before asking the user to confirm, leaving broken
+        # coupling targets behind. References must be rewired in the ecology
+        # editor before the module can be disabled.
+        if warnings:
+            return False, warnings
+        raw.pop("_disabled", None)
         disabled[module_name] = raw["instances"].pop(module_name)
 
     with open(filepath, "w", encoding="utf-8") as f:
@@ -897,8 +1131,6 @@ def toggle_ghg_modules(filepath, enabled):
 
     warnings = []
     if enabled:
-        if GHG_IC_INSTANCE in instances and GHG_CH4_INSTANCE in instances:
-            return True, ["温室气体模块已处于启用状态，配置未改动"]
         scan = _ghg_scan_instances(instances)
         missing = [k for k in ("abiotic_water", "abiotic_sediment", "bot_pel") if not scan[k]]
         if missing:
@@ -923,8 +1155,32 @@ def toggle_ghg_modules(filepath, enabled):
                     flipped.append(n)
         if flipped:
             warnings.append("已开启 " + ", ".join(flipped) + " 的 diagnostics（温室气体模块依赖其诊断通量）")
-        instances[GHG_IC_INSTANCE] = ic
-        instances[GHG_CH4_INSTANCE] = ch4
+        # Refresh generated couplings and structural counts on every enable.
+        # Fish (and other source modules) can be removed while the GHG
+        # instances remain enabled; retaining their old coupling then leaves
+        # FABM with a reference to a target that no longer exists. Preserve
+        # user-tunable parameters and initial values while deriving module
+        # counts, lFish, and all coupling targets from the current instances.
+        structural_parameters = {
+            GHG_IC_INSTANCE: ("nPHYT", "nZOO", "nDOM", "nMAC", "nBENT", "nBIV", "lFish"),
+            GHG_CH4_INSTANCE: ("nOM",),
+        }
+        for name, generated in ((GHG_IC_INSTANCE, ic), (GHG_CH4_INSTANCE, ch4)):
+            previous = instances.get(name)
+            if isinstance(previous, dict):
+                merged = dict(previous)
+                merged["model"] = generated["model"]
+                merged["coupling"] = generated["coupling"]
+                parameters = dict(previous.get("parameters") or {})
+                for key in structural_parameters[name]:
+                    parameters[key] = generated["parameters"][key]
+                merged["parameters"] = parameters
+                initialization = dict(generated.get("initialization") or {})
+                initialization.update(previous.get("initialization") or {})
+                merged["initialization"] = initialization
+                instances[name] = merged
+            else:
+                instances[name] = generated
     else:
         removed = [n for n in (GHG_IC_INSTANCE, GHG_CH4_INSTANCE)
                    if instances.pop(n, None) is not None]
@@ -1088,42 +1344,138 @@ def _ensure_case_dirs(case_path):
         pass  # 目录结构是便利设施，绝不能因为建目录失败而阻断案例加载
 
 
-def find_output_files(case_path):
+def find_output_files(case_path, var_name=None):
     """Find 2D and 3D output NetCDF files.
 
-    GETM 新式运行把全部输出写到 output.nc，*.3d.nc/*.2d.nc 可能只是运行
-    开始时创建的 0 记录空壳（2026-09-22 滇池重跑实锤：.3d.nc 仅 490KB
-    time=0，而 output.nc 17.9GB 含 362 天完整输出）。时间维为 0 的文件
-    视为无效，回退到 output.nc，避免把有数据的输出当不存在。
+    GETM 新式运行把全部输出写到 output.nc，*.3d.nc/*.2d.nc 也可能是
+    运行开始时创建的 0 记录空壳。有效候选按 time 轴末端优先，避免旧
+    output.nc 遮蔽本次运行更新的命名输出；末端相同时保留 output.nc 优先，
+    兼容旧式单文件结果。
     """
     case = Path(case_path)
     result = {"2d": None, "3d": None}
     # 根目录是运行中的写入位置；output/ 是运行成功后的归档位置，两个都要找。
-    # 候选按“根目录优先、归档其次”排列，取第一个有时间记录的有效文件——
-    # 根目录的 0 记录空壳不能遮蔽 output/ 里归档好的有效文件。
+    # 候选按“根目录优先、归档其次”排列；零时间空壳不参与选择。
     cands = {"2d": [], "3d": []}
-    for f in list(case.glob("*.2d.nc")) + list(case.glob("*.3d.nc")) + \
-             list((case / "output").glob("*.2d.nc")) + list((case / "output").glob("*.3d.nc")):
+    discovered = list(case.glob("*.2d.nc")) + list(case.glob("*.3d.nc")) + \
+                 list((case / "output").glob("*.2d.nc")) + list((case / "output").glob("*.3d.nc"))
+    for f in discovered:
         if ".2d.nc" in f.name:
             cands["2d"].append(f)
         elif ".3d.nc" in f.name:
             cands["3d"].append(f)
+    primary = [case / 'output.nc', case / 'output' / 'output.nc']
+    revision_paths = [*discovered, *primary]
+    revisions = []
+    for path in revision_paths:
+        try:
+            stat = path.stat()
+            revisions.append((str(path.resolve()), int(stat.st_size), int(stat.st_mtime_ns), int(getattr(stat, 'st_ino', 0))))
+        except OSError:
+            revisions.append((str(path.resolve()), None))
+    cache_key = (str(case.resolve()), var_name, tuple(revisions))
+    with _output_selection_cache_lock:
+        cached = _output_selection_cache.get(cache_key)
+        if cached is not None:
+            _output_selection_cache.move_to_end(cache_key)
+            return dict(cached)
+
+    def cache_result(value):
+        with _output_selection_cache_lock:
+            _output_selection_cache[cache_key] = dict(value)
+            _output_selection_cache.move_to_end(cache_key)
+            while len(_output_selection_cache) > 32:
+                _output_selection_cache.popitem(last=False)
+        return value
+
+    # Inspect each candidate once. The older selection path reopened a single
+    # output for time length, freshness, variable ownership, and freshness a
+    # second time; on a cold playback request that multiplied NetCDF opens
+    # before the actual frame read.
+    candidate_info = {}
+    candidate_paths = list(dict.fromkeys([*primary, *discovered]))
+    for path in candidate_paths:
+        resolved = path.resolve()
+        try:
+            modified = path.stat().st_mtime
+            with nc_open(path) as ds:
+                records = next((len(dim) for name, dim in ds.dimensions.items()
+                                if "time" in name.lower()), 0)
+                endpoint = None
+                time = ds.variables.get('time')
+                if time is not None and time.size:
+                    try:
+                        value = time[-1]
+                        units = getattr(time, 'units', None)
+                        if units:
+                            date = nc.num2date(value, units,
+                                               calendar=getattr(time, 'calendar', 'standard'))
+                            endpoint = date.isoformat()
+                        else:
+                            endpoint = str(float(value))
+                    except Exception:
+                        # Keep the valid record count and use mtime ranking,
+                        # matching the previous fallback for unreadable clocks.
+                        endpoint = None
+                candidate_info[resolved] = {
+                    'records': int(records), 'endpoint': endpoint,
+                    'modified': modified, 'variables': set(ds.variables),
+                }
+        except Exception:
+            try:
+                modified = path.stat().st_mtime
+            except OSError:
+                modified = 0
+            candidate_info[resolved] = {
+                'records': 0, 'endpoint': None, 'modified': modified,
+                'variables': set(),
+            }
+
+    valid = [p for p in primary
+             if candidate_info.get(p.resolve(), {}).get('records', 0) > 0]
+
+    def freshness(path):
+        """Rank usable results by last model time, falling back to mtime."""
+        info = candidate_info.get(Path(path).resolve(), {})
+        records = info.get('records', 0)
+        endpoint = info.get('endpoint')
+        if endpoint is not None:
+            return (1, endpoint, records, 0)
+        return (0, '', info.get('modified', 0), records)
+
     for key in ("3d", "2d"):
-        for f in cands[key]:
-            if _nc_time_len(f) > 0:
-                result[key] = f
-                break
-    if result["3d"] is None:
-        for out_nc in (case / "output.nc", case / "output" / "output.nc"):
-            if out_nc.exists() and _nc_time_len(out_nc) > 0:
-                result["3d"] = out_nc
-                break
-    return result
+        usable = [f for f in cands[key]
+                  if candidate_info.get(f.resolve(), {}).get('records', 0) > 0]
+        if key == '3d':
+            usable = list(dict.fromkeys(valid + usable))
+        if usable:
+            result[key] = max(usable, key=freshness)
+    # FABM output contains ecology/fish/GHG and physical sigma layers. Native
+    # legacy output may have hydro-only fields and a padded bottom layer.
+    # Keep legacy access for explicitly requested velocity/diagnostic fields.
+    legacy = result['3d']
+    result['legacy3d'] = legacy
+    if var_name:
+        candidates = list(dict.fromkeys(valid + cands['3d'] + cands['2d']))
+        owners = [path for path in candidates
+                  if candidate_info.get(path.resolve(), {}).get('records', 0) > 0
+                  and var_name in candidate_info.get(path.resolve(), {}).get('variables', set())]
+        if owners:
+            result['3d'] = max(owners, key=freshness)
+    # Keep the selected source first, then expose every other readable 3D
+    # result in freshness order for metadata inventory aggregation.
+    valid_3d = [p for p in dict.fromkeys(valid + cands['3d'])
+                if candidate_info.get(p.resolve(), {}).get('records', 0) > 0]
+    selected = result['3d']
+    result['3d_candidates'] = ([selected] if selected in valid_3d else []) + [
+        p for p in sorted(valid_3d, key=freshness, reverse=True) if p != selected]
+    return cache_result(result)
 
 def get_variable_list(nc_path):
     """Get list of variables from a NetCDF file."""
     if not nc_path or not Path(nc_path).exists():
         return []
+    from result_layers import physical_vertical_grid
     with nc_open(nc_path) as ds:
         vars = []
         for vname, var in ds.variables.items():
@@ -1137,56 +1489,129 @@ def get_variable_list(nc_path):
                     "units": getattr(var, "units", ""),
                     "ndim": var.ndim,
                     "dims": dims,
+                    "time_axis": str(Path(nc_path).resolve()),
+                    "ntimesteps": var.shape[0] if dims and 'time' in dims[0].lower() else 0,
+                    "nlev": var.shape[1] - physical_vertical_grid(ds, var)[0] if var.ndim == 4 else 0,
                 })
-        return vars
+        return [_annotated_output(item, active_case_path) for item in vars]
 
-def get_2d_field(nc_path, var_name, timestep=0, level=0):
-    """Extract a 2D field from NetCDF.
+def _get_2d_field_from_dataset(ds, var_name, timestep=0, level=0,
+                              depth_average=False, include_bathymetry=True):
+    """Extract one 2D hyperslab from an already open NetCDF dataset."""
+    from result_layers import physical_vertical_grid, physical_layer_index, depth_weighted_field
+    if var_name not in ds.variables:
+        return None
+    var = ds.variables[var_name]
 
-    只读请求的时步/层（hyperslab），禁止 var[:] 整变量读取——滇池级案例
-    单变量可达数百 MB，整读会让 API 卡死、前端永远"加载中"。
-    """
-    with nc_open(nc_path) as ds:
-        if var_name not in ds.variables:
+    # Find spatial dims
+    dims = list(var.dimensions)
+    time_axes = [i for i, d in enumerate(dims) if "time" in d.lower()]
+    time_idx = time_axes[0] if time_axes else 0
+
+    def _fill(a):
+        return a.filled(np.nan) if isinstance(a, np.ma.MaskedArray) else np.asarray(a, dtype=float)
+
+    aggregation = 'not_applicable' if depth_average else 'layer'
+    weight_source = None
+    if var.ndim == 3 and time_idx == 0:  # time, y, x
+        nt = var.shape[0]
+        if nt == 0:
+            return None  # numrecs=0：异常中断/ sync_interval=0，无任何时间记录
+        t = max(0, min(nt - 1, int(timestep)))
+        field = _fill(var[t, :, :])
+    elif var.ndim == 4 and time_idx == 0:  # time, z, y, x
+        nt = var.shape[0]
+        if nt == 0:
             return None
-        var = ds.variables[var_name]
-
-        # Find spatial dims
-        dims = list(var.dimensions)
-        time_idx = next((i for i, d in enumerate(dims) if "time" in d.lower()), 0)
-
-        def _fill(a):
-            return a.filled(np.nan) if isinstance(a, np.ma.MaskedArray) else np.asarray(a, dtype=float)
-
-        if var.ndim == 3 and time_idx == 0:  # time, y, x
-            nt = var.shape[0]
-            if nt == 0:
-                return None  # numrecs=0：异常中断/ sync_interval=0，无任何时间记录
-            t = max(0, min(nt - 1, int(timestep)))
-            field = _fill(var[t, :, :])
-        elif var.ndim == 4 and time_idx == 0:  # time, z, y, x
-            nt = var.shape[0]
-            if nt == 0:
-                return None
-            t = max(0, min(nt - 1, int(timestep)))
-            lev = max(0, min(var.shape[1] - 1, int(level)))
-            field = _fill(var[t, lev, :, :])
+        t = max(0, min(nt - 1, int(timestep)))
+        if depth_average:
+            field, weight_source = depth_weighted_field(ds, var, t)
+            aggregation = 'depth_weighted_mean'
         else:
-            field = _fill(var[:])
+            start, _ = physical_vertical_grid(ds, var)
+            _, lev = physical_layer_index(level, start, var.shape[1])
+            field = _fill(var[t, lev, :, :])
+    elif var.ndim == 2 and not time_axes:
+        # Static 2D fields (for example bathymetry) are valid map inputs.
+        # Never use an unqualified fallback for other shapes: an unrelated
+        # leading dimension can make var[:] allocate an entire result volume.
+        field = _fill(var[:, :])
+    else:
+        raise ValueError(
+            f"不支持结果变量 {var_name} 的维度形状 {tuple(dims)}；"
+            "仅支持静态二维场、time-first 三维场和 time-first 四维场"
+        )
 
-        # Get coordinates
-        bathy = None
-        if "bathymetry" in ds.variables:
-            bathy = _fill(ds.variables["bathymetry"][:])
+    # Get coordinates
+    bathy = None
+    if include_bathymetry and "bathymetry" in ds.variables:
+        bathy = _fill(ds.variables["bathymetry"][:])
 
-        return {
-            "data": field.tolist(),
-            "shape": list(field.shape),
-            "min": float(np.nanmin(field)) if not np.all(np.isnan(field)) else 0,
-            "max": float(np.nanmax(field)) if not np.all(np.isnan(field)) else 0,
-            "mean": float(np.nanmean(field)) if not np.all(np.isnan(field)) else 0,
-            "bathymetry": bathy.tolist() if bathy is not None else None,
+    return {
+        "data": np.where(np.isfinite(field), field, None).tolist() if depth_average else field.tolist(),
+        "aggregation": aggregation,
+        "weight_source": weight_source,
+        "shape": list(field.shape),
+        "min": float(np.nanmin(field)) if not np.all(np.isnan(field)) else 0,
+        "max": float(np.nanmax(field)) if not np.all(np.isnan(field)) else 0,
+        "mean": float(np.nanmean(field)) if not np.all(np.isnan(field)) else 0,
+        "bathymetry": bathy.tolist() if bathy is not None else None,
+    }
+
+
+def get_2d_field(nc_path, var_name, timestep=0, level=0, depth_average=False, include_bathymetry=True):
+    """Extract one 2D field with a single hyperslab read from NetCDF."""
+    with nc_open(nc_path) as ds:
+        return _get_2d_field_from_dataset(ds, var_name, timestep, level,
+                                          depth_average, include_bathymetry)
+
+
+def get_2d_fields(nc_path, var_name, timesteps, level=0, depth_average=False,
+                  include_bathymetry=True, return_metadata=False):
+    """Read at most four 2D frames while opening the output file only once."""
+    times = list(timesteps)
+    if not times or len(times) > 4 or len(set(times)) != len(times):
+        raise ValueError("一次批量读取须包含 1 至 4 个不同的时步")
+    with nc_open(nc_path) as ds:
+        var = ds.variables.get(var_name)
+        if var is None:
+            return None
+        metadata = {
+            "name": var_name,
+            "units": getattr(var, "units", ""),
+            "long_name": getattr(var, "long_name", var_name),
+            "dims": list(var.dimensions),
+            "ndim": var.ndim,
+            "horizontal_shape": [int(var.shape[-2]), int(var.shape[-1])]
+                if var.ndim >= 2 else None,
         }
+        metadata["single_column"] = metadata["horizontal_shape"] == [1, 1]
+        dims = list(var.dimensions)
+        time_idx = next((i for i, dim in enumerate(dims) if "time" in dim.lower()), 0)
+        if var.ndim in (3, 4) and time_idx == 0:
+            nt = int(var.shape[0])
+            if nt <= 0:
+                return None
+            if any(int(t) < 0 or int(t) >= nt for t in times):
+                raise IndexError("请求的时步超出当前结果帧范围")
+        if not depth_average:
+            if var.ndim == 4 and time_idx == 0:
+                from result_layers import physical_vertical_grid
+                start, _ = physical_vertical_grid(ds, var)
+                layer_count = int(var.shape[1]) - int(start)
+                if level < 0 or level >= layer_count:
+                    raise IndexError(
+                        f"垂向层 {level} 超出变量 {var_name} 的有效范围 0–{layer_count - 1}"
+                    )
+            elif var.ndim == 3 and time_idx == 0:
+                if level != 0:
+                    raise IndexError(f"变量 {var_name} 没有垂向层，只能请求第 0 层")
+            elif level != 0:
+                raise IndexError(f"变量 {var_name} 没有可用垂向层，只能请求第 0 层")
+        frames = {int(t): _get_2d_field_from_dataset(
+            ds, var_name, int(t), level, depth_average, include_bathymetry
+        ) for t in times}
+        return (frames, metadata) if return_metadata else frames
 
 def get_timeseries(nc_path, var_name, i=None, j=None, region=None, lake_avg=False, level=-1, per_layer=False, tstride=None):
     """Extract time series at a point, region, or lake average.
@@ -1200,6 +1625,7 @@ def get_timeseries(nc_path, var_name, i=None, j=None, region=None, lake_avg=Fals
     tstride 指定时按该步长取样；未指定时自动计算使返回点数 ≤ MAX_TS_POINTS（默认 3000）。
     分块读取保证内存有界、对任意大小文件都正确。
     """
+    from result_layers import physical_vertical_grid, physical_layer_index
     MAX_TS_POINTS = 3000
     with nc_open(nc_path) as ds:
         if var_name not in ds.variables:
@@ -1218,16 +1644,63 @@ def get_timeseries(nc_path, var_name, i=None, j=None, region=None, lake_avg=Fals
         def _fill(a):
             return a.filled(np.nan) if isinstance(a, np.ma.MaskedArray) else np.asarray(a, dtype=float)
 
+        def _sampled_spatial_series(value_var, layer=None):
+            """Aggregate only sampled frames, reading large planes in small tiles."""
+            if lake_avg:
+                y_bounds = (0, value_var.shape[-2])
+                x_bounds = (0, value_var.shape[-1])
+                point = False
+            elif region:
+                i0, i1, j0, j1 = region
+                y_bounds = slice(j0, j1).indices(value_var.shape[-2])[:2]
+                x_bounds = slice(i0, i1).indices(value_var.shape[-1])[:2]
+                point = False
+            elif i is not None and j is not None:
+                y_bounds = (j, j + 1)
+                x_bounds = (i, i + 1)
+                point = True
+            else:
+                point = False
+                y_bounds = (0, value_var.shape[-2])
+                x_bounds = (0, value_var.shape[-1])
+
+            tile_size = 128
+            values = []
+            for timestep in ts_idx:
+                prefix = (int(timestep),) if layer is None else (int(timestep), int(layer))
+                if point:
+                    cell = _fill(value_var[prefix + (j, i)])
+                    value = float(cell)
+                    values.append(None if np.isnan(value) else value)
+                    continue
+
+                total = 0.0
+                count = 0
+                y0, y1 = y_bounds
+                x0, x1 = x_bounds
+                for tile_y in range(y0, y1, tile_size):
+                    for tile_x in range(x0, x1, tile_size):
+                        frame = _fill(value_var[
+                            prefix + (slice(tile_y, min(tile_y + tile_size, y1)),
+                                      slice(tile_x, min(tile_x + tile_size, x1)))
+                        ])
+                        valid = ~np.isnan(frame)
+                        if np.any(valid):
+                            total += float(np.sum(frame[valid], dtype=float))
+                            count += int(np.count_nonzero(valid))
+                values.append(total / count if count else None)
+            return values
+
         # Get time values（仅按步长取样的时间标签）
         times = []
         if time_dim in ds.variables:
-            tvals_all = ds.variables[time_dim][:]
+            tvals = ds.variables[time_dim][::tstride]
             tunits = getattr(ds.variables[time_dim], "units", "")
             try:
-                tvals = nc.num2date(tvals_all[::tstride], tunits).tolist()
-                times = [t.strftime("%Y-%m-%d %H:%M:%S") if hasattr(t, "strftime") else str(t) for t in tvals]
+                tvals = nc.num2date(tvals, tunits).tolist()
+                times = [format_model_time(t) for t in tvals]
             except Exception:
-                times = [float(t) for t in tvals_all[::tstride]]
+                times = [float(t) for t in tvals]
         else:
             times = ts_idx
 
@@ -1257,38 +1730,127 @@ def get_timeseries(nc_path, var_name, i=None, j=None, region=None, lake_avg=Fals
                 else:
                     head += "请改选带 sigma 维度（time,sigma,yc,xc）的垂向状态变量。"
                 return {"error": head, "ndim": var.ndim, "dims": list(var.dimensions), "alts_4d": alt4d}
-            nlev = var.shape[1]
-            z_levels = ds.variables["sigma"][:].tolist() if "sigma" in ds.variables else list(range(nlev))
+            start, z_levels = physical_vertical_grid(ds, var)
+            nlev = var.shape[1] - start
             series2d = [[None] * nts for _ in range(nlev)]
             pos = {t: k for k, t in enumerate(ts_idx)}  # 时间索引 -> 输出列
-            chunk = 2000  # 分块读取，避免一次性把整变量读入内存（滇池 3D 文件约百 GB 当量）
-            for t0 in range(0, ntime, chunk):
-                t1 = min(ntime, t0 + chunk)
-                if i is not None and j is not None:
-                    slab = _fill(var[t0:t1, :, j, i])          # (chunk, nlev) 仅该点位列
-                elif region:
-                    i1, i2, j1, j2 = region
-                    slab = _fill(var[t0:t1, :, j1:j2, i1:i2])  # (chunk, nlev, h, w)
-                else:
-                    slab = _fill(var[t0:t1, :, :, :])          # (chunk, nlev, ny, nx) 全湖
-                for t in range(t0, t1):
-                    if t not in pos:
+            tile_size = 128
+            if i is not None and j is not None:
+                y_bounds = slice(j, j + 1).indices(var.shape[-2])[:2]
+                x_bounds = slice(i, i + 1).indices(var.shape[-1])[:2]
+            elif region:
+                i1, i2, j1, j2 = region
+                y_bounds = slice(j1, j2).indices(var.shape[-2])[:2]
+                x_bounds = slice(i1, i2).indices(var.shape[-1])[:2]
+            else:
+                y_bounds, x_bounds = (0, var.shape[-2]), (0, var.shape[-1])
+            for out, timestep in enumerate(ts_idx):
+                for k in range(nlev):
+                    if i is not None and j is not None:
+                        value = _fill(var[int(timestep), start + k, j, i])
+                        value = float(value)
+                        series2d[k][out] = None if np.isnan(value) else value
                         continue
-                    out = pos[t]
+                    total = 0.0
+                    count = 0
+                    for tile_y in range(*y_bounds, tile_size):
+                        for tile_x in range(*x_bounds, tile_size):
+                            frame = _fill(var[
+                                int(timestep), start + k,
+                                slice(tile_y, min(tile_y + tile_size, y_bounds[1])),
+                                slice(tile_x, min(tile_x + tile_size, x_bounds[1]))
+                            ])
+                            valid = ~np.isnan(frame)
+                            if np.any(valid):
+                                total += float(np.sum(frame[valid], dtype=float))
+                                count += int(np.count_nonzero(valid))
+                    series2d[k][out] = total / count if count else None
+            # Physical centers are read at exactly the same native times and
+            # vertical slots as `series2d`. Never reuse a static sigma profile
+            # when GETM writes moving hn/zc geometry.
+            from vertical_geometry import read_vertical_geometry
+            bathy_var = ds.variables.get('bathymetry')
+            bathy_path = None
+            if bathy_var is not None:
+                bathy_units = getattr(bathy_var, 'units', '')
+            else:
+                bathy_path = Path(active_case_path) / 'bathymetry.nc' if active_case_path else None
+                if bathy_path is None or not bathy_path.is_file():
+                    return {'error': '缺少 bathymetry，无法给逐层时间序列提供物理层中心深度'}
+                try:
+                    with nc_open(bathy_path) as bathy_ds:
+                        case_bathy = bathy_ds.variables.get('bathymetry')
+                        if case_bathy is None:
+                            return {'error': '案例 bathymetry.nc 中没有 bathymetry 变量'}
+                        bathy_units = getattr(case_bathy, 'units', '')
+                        if case_bathy.ndim != 2 or case_bathy.shape != var.shape[2:]:
+                            return {'error': '案例 bathymetry 网格与结果文件不一致'}
+                        # Same array shape does not prove same cell alignment.
+                        # Compare the native horizontal coordinates when both
+                        # files provide them, accounting for x/xc and y/yc names.
+                        for axis, input_names in enumerate((('y', 'yc'), ('x', 'xc'))):
+                            out_dim = var.dimensions[axis + 2]
+                            out_coord = ds.variables.get(out_dim)
+                            in_coord = next((bathy_ds.variables[n] for n in input_names
+                                             if n in bathy_ds.variables
+                                             and bathy_ds.variables[n].ndim == 1
+                                             and bathy_ds.variables[n].dimensions == (case_bathy.dimensions[axis],)), None)
+                            if out_coord is not None and in_coord is not None:
+                                if (out_coord.ndim != 1 or out_coord.shape != in_coord.shape
+                                        or not np.allclose(_fill(out_coord[:]), _fill(in_coord[:]), rtol=0, atol=1e-6,
+                                                           equal_nan=True)):
+                                    return {'error': '案例 bathymetry 网格坐标与结果文件不一致'}
+                except (OSError, RuntimeError, ValueError) as exc:
+                    return {'error': f'读取案例 bathymetry.nc 失败：{exc}'}
+            if i is not None and j is not None:
+                ys, xs = slice(j, j + 1), slice(i, i + 1)
+                aggregation = 'exact selected model cell'
+            elif region:
+                i1, i2, j1, j2 = region
+                ys, xs = slice(j1, j2), slice(i1, i2)
+                aggregation = 'arithmetic mean of valid wet-cell layer centers in selected region per layer and time'
+            else:
+                ys, xs = slice(None), slice(None)
+                aggregation = 'arithmetic mean of valid wet-cell layer centers over the full grid per layer and time'
+            layer_centers = [[None] * nts for _ in range(nlev)]
+            geometry_sources = set()
+            try:
+                for out, t in enumerate(ts_idx):
+                    sums = np.zeros(nlev, dtype=float)
+                    counts = np.zeros(nlev, dtype=np.int64)
+                    for tile_y in range(*y_bounds, tile_size):
+                        for tile_x in range(*x_bounds, tile_size):
+                            tile_ys = slice(tile_y, min(tile_y + tile_size, y_bounds[1]))
+                            tile_xs = slice(tile_x, min(tile_x + tile_size, x_bounds[1]))
+                            if bathy_var is not None:
+                                bottom = _fill(bathy_var[tile_ys, tile_xs])
+                            else:
+                                with nc_open(bathy_path) as external_bathy_ds:
+                                    bottom_var = external_bathy_ds.variables['bathymetry']
+                                    bottom = _fill(bottom_var[tile_ys, tile_xs])
+                            geometry = read_vertical_geometry(
+                                ds, var, t, bottom, ys=tile_ys, xs=tile_xs,
+                                bottom_units=bathy_units)
+                            center = np.asarray(geometry['center_depth'], dtype=float)
+                            valid = np.asarray(geometry['valid'], dtype=bool)
+                            geometry_sources.add(str(geometry['source']))
+                            for k in range(nlev):
+                                usable = valid & np.isfinite(center[k])
+                                if np.any(usable):
+                                    sums[k] += float(np.sum(center[k][usable], dtype=float))
+                                    counts[k] += int(np.count_nonzero(usable))
                     for k in range(nlev):
-                        if region:
-                            sub = slab[t - t0, k]
-                            val = float(np.nanmean(sub)) if not np.all(np.isnan(sub)) else None
-                        elif i is not None and j is not None:
-                            v = slab[t - t0, k]
-                            val = float(v) if not np.isnan(v) else None
-                        else:
-                            sub = slab[t - t0, k]
-                            val = float(np.nanmean(sub)) if not np.all(np.isnan(sub)) else None
-                        series2d[k][out] = val
+                        layer_centers[k][out] = sums[k] / counts[k] if counts[k] else None
+            except (ValueError, RuntimeError, KeyError, IndexError) as exc:
+                return {'error': f'读取动态物理层中心失败：{exc}'}
+            if not geometry_sources:
+                return {'error': '没有可用的逐时刻物理层中心几何'}
             return {
                 "times": times,
                 "series": series2d,
+                "layer_center_depth_m": layer_centers,
+                "layer_center_depth_source": '+'.join(sorted(geometry_sources)),
+                "layer_center_depth_aggregation": aggregation,
                 "layers": z_levels,
                 "per_layer": True,
                 "n_layers": nlev,
@@ -1302,36 +1864,11 @@ def get_timeseries(nc_path, var_name, i=None, j=None, region=None, lake_avg=Fals
             series = []
 
         elif var.ndim == 3:  # time, y, x
-            if lake_avg:
-                arr = _fill(var[:, :, :])          # nt*ny*nx*4 ≈ 几 MB，可整段读
-                series = [float(np.nanmean(arr[t])) if not np.all(np.isnan(arr[t])) else None for t in ts_idx]
-            elif region:
-                i1, i2, j1, j2 = region
-                arr = _fill(var[:, j1:j2, i1:i2])
-                series = [float(np.nanmean(arr[t])) if not np.all(np.isnan(arr[t])) else None for t in ts_idx]
-            elif i is not None and j is not None:
-                col = _fill(var[:, j, i])
-                series = [float(v) if not np.isnan(v) else None for v in col[::tstride]]
-            else:
-                arr = _fill(var[:, :, :])
-                series = [float(np.nanmean(arr[t])) if not np.all(np.isnan(arr[t])) else None for t in ts_idx]
+            series = _sampled_spatial_series(var)
         elif var.ndim == 4:  # time, z, y, x
-            nlev = var.shape[1]
-            lev = level if level >= 0 else nlev + level
-            lev = max(0, min(nlev - 1, lev))
-            if lake_avg:
-                arr = _fill(var[:, lev, :, :])
-                series = [float(np.nanmean(arr[t])) if not np.all(np.isnan(arr[t])) else None for t in ts_idx]
-            elif region:
-                i1, i2, j1, j2 = region
-                arr = _fill(var[:, lev, j1:j2, i1:i2])
-                series = [float(np.nanmean(arr[t])) if not np.all(np.isnan(arr[t])) else None for t in ts_idx]
-            elif i is not None and j is not None:
-                col = _fill(var[:, lev, j, i])
-                series = [float(v) if not np.isnan(v) else None for v in col[::tstride]]
-            else:
-                arr = _fill(var[:, lev, :, :])
-                series = [float(np.nanmean(arr[t])) if not np.all(np.isnan(arr[t])) else None for t in ts_idx]
+            start, _ = physical_vertical_grid(ds, var)
+            logical_level, lev = physical_layer_index(level, start, var.shape[1])
+            series = _sampled_spatial_series(var, lev)
         else:
             col = _fill(var[:])
             series = [float(v) if not np.isnan(v) else None for v in col[::tstride]]
@@ -1342,11 +1879,12 @@ def get_timeseries(nc_path, var_name, i=None, j=None, region=None, lake_avg=Fals
             "var_name": var_name,
             "long_name": getattr(var, "long_name", var_name),
             "units": getattr(var, "units", ""),
-            "layer": (lev if var.ndim == 4 and ntime > 0 else None),
+            "layer": (logical_level if var.ndim == 4 and ntime > 0 else None),
             "tstride": tstride,
         }
 
-def _nc_time_labels(nc_path, max_items=2000):
+
+def _nc_time_labels(nc_path, max_items=None):
     """Return human-readable labels for the time axis of a NetCDF output file.
 
     GETM 的 2d/3d 文件按 step_2d/step_3d 抽帧写，间隔常常不是 1 天
@@ -1367,7 +1905,10 @@ def _nc_time_labels(nc_path, max_items=2000):
             try:
                 dates = nc.num2date(vals, units, only_use_cftime_datetimes=False,
                                     only_use_python_datetimes=True)
-                return [d.strftime("%Y-%m-%d") for d in dates[:max_items]]
+                selected = dates[:max_items]
+                include_clock = any(d.hour or d.minute or d.second or d.microsecond for d in selected)
+                pattern = "%Y-%m-%d %H:%M:%S" if include_clock else "%Y-%m-%d"
+                return [d.strftime(pattern) + (f'.{d.microsecond:06d}'.rstrip('0') if d.microsecond else '') for d in selected]
             except Exception:
                 # 无法解码时间单位时退化为原始数值
                 return [f"{float(v):g}" for v in vals[:max_items]]
@@ -1385,46 +1926,62 @@ def get_ntimesteps(nc_path):
     return 0
 
 def _cfl_max_timestep(case_path):
-    """Estimate the maximum numerically sane timestep (seconds) for a case.
+    """Conservative GETM gravity-wave CFL estimate in seconds.
 
-    重力波 CFL: dt_cfl = 0.5 * dx / sqrt(g * h_max)。GETM 半隐式格式允许
-    超过 CFL 若干倍，这里取 15 倍封顶（下限 180s 保护极浅网格）。
-    2026-09-22 事故：滇池 timestep 被改成 8640s（CFL 的 ~300 倍），
-    check_cfl=.false. 下模型静默数值发散——全湖变干、输出全部 NaN，
-    耗时 4 分钟产出 17.9GB 无效数据。
-    Returns (dt_max, dt_cfl)；网格信息缺失时返回 (None, None) 跳过校验。
+    Matches src/2d/cfl_check.F90: dx*dy/(sqrt(2)*sqrt(g*hmax)*hypot(dx,dy)).
+    Use the minimum valid spacing of each axis, with scalar dx/dy overrides.
+    This checks gravity waves only; it does not guarantee ecosystem stability.
+    Return (None, None) when the grid cannot support a finite estimate.
     """
     try:
         bathy = Path(case_path) / "bathymetry.nc"
         if not bathy.exists():
             return None, None
         with nc_open(bathy) as ds:
-            dxs = []
-            for axis in ("x", "y", "xc", "yc"):
-                if axis in ds.variables and ds.variables[axis].size > 1:
-                    diffs = np.abs(np.diff(np.asarray(ds.variables[axis][:]).ravel()))
-                    if diffs.size:
-                        dxs.append(float(diffs.mean()))
-            if "dx" in ds.variables:
-                dxs.append(float(np.ravel(ds.variables["dx"][:])[0]))
-            if "bathymetry" not in ds.variables or not dxs:
+            def spacing(scalar, axes, dimension):
+                if scalar in ds.variables and ds.variables[scalar].size == 1:
+                    value = float(np.ma.filled(ds.variables[scalar][:], np.nan).ravel()[0])
+                    return value if np.isfinite(value) and value > 0 else None
+                candidates = []
+                for axis in axes:
+                    if axis not in ds.variables:
+                        continue
+                    values = np.asarray(np.ma.filled(ds.variables[axis][:], np.nan), dtype=float)
+                    if values.size < 2 or values.ndim not in (1, 2):
+                        continue
+                    diffs = np.abs(np.diff(values, axis=0 if values.ndim == 1 else dimension))
+                    valid = diffs[np.isfinite(diffs) & (diffs > 0)]
+                    if valid.size:
+                        candidates.append(float(valid.min()))
+                return min(candidates) if candidates else None
+
+            dx = spacing('dx', ('x', 'xc'), -1)
+            dy = spacing('dy', ('y', 'yc'), -2)
+            if "bathymetry" not in ds.variables or dx is None or dy is None:
                 return None, None
             b = ds.variables["bathymetry"][:]
             bf = b.filled(np.nan) if np.ma.isMaskedArray(b) else np.asarray(b, dtype=float)
             pos = bf[np.isfinite(bf) & (bf > 0)]
             if not pos.size:
                 return None, None
-            dx = min(dxs)
             hmax = float(pos.max())
-            dt_cfl = 0.5 * dx / (9.81 * hmax) ** 0.5
-            return max(180, int(round(15 * dt_cfl))), dt_cfl
+            # Algebraically equivalent to GETM's formula, avoiding dx*dy overflow.
+            dt_cfl = (min(dx, dy) / np.hypot(1.0, min(dx, dy) / max(dx, dy))) / (2 * 9.81 * hmax) ** 0.5
+            if not np.isfinite(dt_cfl) or dt_cfl <= 0:
+                return None, None
+            return float(dt_cfl), float(dt_cfl)
     except Exception:
         return None, None
 
 # ── Run Control ───────────────────────────────────────────────────────
 
 def estimate_run_time(case_path, config):
-    """Estimate run time based on grid size, timestep, and duration."""
+    """Summarize computational workload without inventing a wall-time estimate.
+
+    Runtime depends on the executable, hardware, enabled processes and output
+    subscriptions. Until this exact setup has a measured calibration, only a
+    representative pilot can support a useful estimate.
+    """
     try:
         bathy_path = Path(case_path) / "bathymetry.nc"
         if bathy_path.exists():
@@ -1439,28 +1996,30 @@ def estimate_run_time(case_path, config):
         stop = datetime.strptime(str(time_cfg["stop"]), "%Y-%m-%d %H:%M:%S")
         duration_sec = (stop - start).total_seconds()
         dt = float(time_cfg["timestep"])
+        if not np.isfinite(dt) or dt <= 0:
+            raise ValueError("timestep 必须为有限的正数")
         nsteps = int(duration_sec / dt)
-
-        # Empirical: ~0.01 sec/step per 100 water cells for serial build
-        est_sec = nsteps * nwater * 0.0001
 
         dt_max, dt_cfl = _cfl_max_timestep(case_path)
 
         return {
             "nsteps": nsteps,
             "nwater": nwater,
+            "nlev": int(config.get("m3d", {}).get("M", 10)),
             "grid": f"{nx}x{ny}",
             "duration_days": duration_sec / 86400,
-            "estimated_seconds": est_sec,
-            "estimated_minutes": est_sec / 60,
-            "estimated_hours": est_sec / 3600,
+            "runtime_estimate": None,
+            "runtime_estimate_status": "uncalibrated",
+            "runtime_estimate_note": "尚未用当前计算机和此案例配置实测校准，不能可靠预测预运行耗时。",
+            "pilot_guidance": "建议先在案例副本上运行代表性窗口，覆盖模型启动/预热及一个目标过程周期（如日变化或混合事件）；记录墙钟时间和完成步数后，仅对相同硬件与配置作粗略外推。",
             "timestep": dt,
             "cfl_max": dt_max,
             "cfl_dt": dt_cfl,
-            "cfl_ok": (dt_max is None or dt <= dt_max),
+            "cfl_ok": None if dt_max is None else dt <= dt_max,
         }
     except Exception as e:
-        return {"error": str(e), "estimated_seconds": 0}
+        return {"error": str(e), "runtime_estimate": None,
+                "runtime_estimate_status": "uncalibrated"}
 
 def _extend_nc_time_coverage(path, need_end):
     """Extend a forcing NetCDF (meteo.nc / rivers.nc) so its time axis covers
@@ -1638,13 +2197,46 @@ def _archive_run_outputs(case_path, run_logs):
         run_logs.append(f"[WARN] 输出归档失败（不影响结果读取）: {e}")
 
 
+def _compress_completed_getm_outputs(case_path, logs):
+    """Optionally compress completed GETM result files with verified replacement."""
+    selected = bool((run_config or {}).get("compress_results"))
+    if not selected:
+        return run_status == "running"
+    from netcdf_compression import compress_netcdf_file, format_compression_result
+    if isinstance(run_config, dict):
+        run_config["phase"] = "compressing"
+    paths = []
+    for pattern in ("*.2d.nc", "*.3d.nc", "output.nc"):
+        paths.extend(Path(case_path).glob(pattern))
+    paths = list(dict.fromkeys(path for path in paths if path.is_file()))
+    if not paths:
+        logs.append("[WARN] 已选择结果压缩，但没有找到可压缩的 GETM 结果文件。")
+        return run_status == "running"
+    logs.append("[INFO] 求解结束，开始压缩 GETM 结果并逐值核验；此后处理可能显著延长任务完成时间，原文件仅在核验通过后替换。")
+    for path in paths:
+        result = compress_netcdf_file(
+            path, cancelled=lambda: run_status != "running", lock=_NC_LOCK)
+        message = f"{path.name}：{format_compression_result(result)}"
+        if result["status"] in {"compressed", "not_smaller", "cancelled", "skipped"}:
+            logs.append(f"[INFO] {message}")
+        else:
+            logs.append(f"[WARN] {message}")
+        if result["status"] == "cancelled":
+            return False
+        if run_status != "running":
+            return False
+    return True
+
+
 def run_model_thread(case_path, exe_path):
     """Run model in background thread, output to log file for stability."""
     global run_process, run_status, run_logs, run_start_time, run_case_path
 
     case_path = Path(case_path)
     model_log = case_path / "model_run.log"
+    model_log_started = False
     is_native = str(exe_path).lower().endswith(".exe")
+    trusted_gotm_copy = globals().get("_is_trusted_gotm_working_copy", lambda _p: False)(case_path)
 
     run_logs.append(f"[INFO] 启动模型运行...")
     run_logs.append(f"[INFO] 案例目录: {case_path.name}")
@@ -1653,42 +2245,48 @@ def run_model_thread(case_path, exe_path):
     run_start_time = time.time()
 
     try:
-        log_fh = open(model_log, "w", encoding="utf-8", errors="replace")
-        if is_native:
-            # Native Windows exe: run directly with MinGW runtime DLLs on PATH.
-            env = os.environ.copy()
-            if MSYS_UCRT_BIN.exists():
-                env["PATH"] = str(MSYS_UCRT_BIN) + os.pathsep + env.get("PATH", "")
-            # Unbuffered stderr so model_run.log tracks real progress; the WET
-            # Patankar solver floods stdout ("is zero and has negative
-            # derivative", GBs over a multi-day run), so stdout is discarded.
-            env["GFORTRAN_UNBUFFERED_PRECONNECTED"] = "y"
-            env["GFORTRAN_UNBUFFERED_ALL"] = "y"
-            run_process = subprocess.Popen(
-                [str(exe_path)],
-                cwd=str(case_path),
-                stdout=subprocess.DEVNULL,
-                stderr=log_fh,
-                env=env,
-                creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
-            )
-        else:
-            # WSL/Linux binary: launch through wsl.exe with shell redirection.
-            case_wsl = wsl_path(case_path)
-            exe_wsl = wsl_path(exe_path)
-            log_wsl = wsl_path(model_log)
-            log_fh.close()
-            run_process = subprocess.Popen(
-                ["wsl.exe", "bash", "-c",
-                 f"cd '{case_wsl}' && '{exe_wsl}' > '{log_wsl}' 2>&1"],
-                creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
-            )
+        with _NC_LOCK:
+            if run_status != "running":
+                return
+            log_fh = open(model_log, "w", encoding="utf-8", errors="replace")
+            model_log_started = True
+            if is_native:
+                # Native Windows exe: run directly with MinGW runtime DLLs on PATH.
+                env = solver_environment(exe_path)
+                if trusted_gotm_copy:
+                    extra_runtime = [BIN_DIR / "runtime", MSYS_UCRT_BIN]
+                    env["PATH"] = os.pathsep.join(str(p) for p in extra_runtime if p.is_dir()) + os.pathsep + env.get("PATH", "")
+                # WET numerical errors use stdout while GETM progress uses
+                # stderr. Preserve both streams so exit code 0 cannot hide a
+                # numerical failure; stop at the first recognized error.
+                env["GFORTRAN_UNBUFFERED_PRECONNECTED"] = "y"
+                env["GFORTRAN_UNBUFFERED_ALL"] = "y"
+                run_process = subprocess.Popen(
+                    [str(exe_path)],
+                    cwd=str(case_path),
+                    stdout=log_fh,
+                    stderr=subprocess.STDOUT,
+                    env=env,
+                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+                )
+            else:
+                # WSL/Linux binary: launch through wsl.exe with shell redirection.
+                case_wsl = wsl_path(case_path)
+                exe_wsl = wsl_path(exe_path)
+                log_wsl = wsl_path(model_log)
+                log_fh.close()
+                run_process = subprocess.Popen(
+                    ["wsl.exe", "bash", "-c",
+                     f"cd '{case_wsl}' && '{exe_wsl}' > '{log_wsl}' 2>&1"],
+                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+                )
         # Poll log file for progress while model runs
         log_read_pos = 0
         # Exit-hang watchdog (native exe only): the MinGW build can freeze in
         # its exit path after the simulation finished; netCDF output is already
         # on disk by then. CPU-time stall -> reclaim as completed.
         finished_by_watchdog = False
+        solver_failed = False
         last_cpu = None
         cpu_stall = 0
         while run_process.poll() is None:
@@ -1698,12 +2296,23 @@ def run_model_thread(case_path, exe_path):
                     f.seek(log_read_pos)
                     new_lines = f.read()
                     log_read_pos = f.tell()
+                run_metrics.observe(new_lines)
+                solver_failed |= log_has_solver_failure(new_lines)
                 for line in new_lines.splitlines():
                     line = line.strip()
                     if line:
                         run_logs.append(line)
                 if len(run_logs) > 5000:
                     run_logs = run_logs[-2000:]
+                if solver_failed:
+                    if run_process.poll() is None:
+                        run_process.terminate()
+                        try:
+                            run_process.wait(timeout=10)
+                        except subprocess.TimeoutExpired:
+                            run_process.kill()
+                            run_process.wait(timeout=10)
+                    break
             except Exception:
                 pass
             if is_native and os.name == "nt":
@@ -1728,7 +2337,10 @@ def run_model_thread(case_path, exe_path):
         try:
             with open(model_log, "r", encoding="utf-8", errors="replace") as f:
                 f.seek(log_read_pos)
-                for line in f.read().splitlines():
+                remaining = f.read()
+                run_metrics.observe(remaining)
+                solver_failed |= log_has_solver_failure(remaining)
+                for line in remaining.splitlines():
                     line = line.strip()
                     if line:
                         run_logs.append(line)
@@ -1739,32 +2351,226 @@ def run_model_thread(case_path, exe_path):
         except Exception:
             pass
         elapsed = time.time() - run_start_time
+        run_logs.append(f"[INFO] 求解器进程耗时: {elapsed:.1f}秒 ({elapsed/60:.1f}分钟)")
         # 看门狗回收或正常退出后，仍需依据日志判定是否真成功：
         # MinGW 构建在 STOP 1 / fatal_error 后会卡在退出路径（CPU≈0），
         # 看门狗会误判为“算完在清理”而标 completed。必须按日志致命字样纠正，
         # 否则会把崩溃伪装成成功并归档空壳。
         _log_blob = "\n".join(run_logs)
-        _crashed = any(k in _log_blob for k in (
-            "STOP 1", "collect_from_categories",
-            "fatal_error", "FATAL GETM ERROR", "FATAL ERROR",
-            "out-of-bound", "IEEE_INVALID", "IEEE_DIVIDE_BY_ZERO",
-            "Floating invalid", "forrtl:", "NaN",
-        ))
-        if (run_process.returncode == 0 or finished_by_watchdog) and not _crashed:
-            run_status = "completed"
-            run_logs.append(f"[INFO] 模型运行完成！耗时: {elapsed:.1f}秒 ({elapsed/60:.1f}分钟)")
-            _archive_run_outputs(case_path, run_logs)
+        _crashed = solver_failed or log_has_solver_failure(_log_blob)
+        _watchdog_completed = finished_by_watchdog and 'getm: Completed on' in _log_blob
+        if run_status == "stopped":
+            return
+        if (run_process.returncode == 0 or _watchdog_completed) and not _crashed:
+            if trusted_gotm_copy:
+                expected = None
+                try:
+                    cfg = yaml.safe_load((case_path / "gotm.yaml").read_text(encoding="utf-8")) or {}
+                    expected = [str(cfg["time"]["start"]), str(cfg["time"]["stop"])]
+                except Exception:
+                    pass
+                health = _validate_gotm_output(case_path, nc_open, started_at=run_start_time,
+                                               expected_range=expected)
+            else:
+                health = validate_current_run_outputs(case_path, nc_open, started_at=run_start_time)
+            if not health['ready']:
+                run_logs.append('[ERROR] 结果有效性检查失败；进程退出成功，但模型结果不可用。')
+                for error in health['errors']:
+                    run_logs.append(f'[ERROR] {error}')
+                for bad in health['bad_variables'][:3]:
+                    run_logs.append(f"[ERROR] {bad['file']} → {bad['variable']}: {bad['reason']}")
+                run_status = "failed"
+            else:
+                run_logs.append(f"[INFO] 结果有效性检查通过（{health.get('duration_seconds', 0):.3f}秒）")
+                if not trusted_gotm_copy and globals().get("run_config", {}).get("compress_results"):
+                    if not _compress_completed_getm_outputs(case_path, run_logs):
+                        return
+                    _archive_run_outputs(case_path, run_logs)
+                run_status = "completed"
+                total_elapsed = time.time() - run_start_time
+                run_logs.append(f"[INFO] 任务完成（含结果检查与后处理）；总用时: {total_elapsed:.1f}秒 ({total_elapsed/60:.1f}分钟)。")
         else:
             run_status = "failed"
             if finished_by_watchdog and _crashed:
                 run_logs.append("[ERROR] 模型运行失败：日志检测到 STOP 1 / fatal_error，"
                                 "看门狗误回收已纠正为失败（未归档空壳）")
             else:
-                run_logs.append(f"[ERROR] 模型运行失败，退出码: {run_process.returncode}")
+                if _crashed:
+                    run_logs.append('[ERROR] 日志检测到模型数值异常或致命错误，请查看 model_run.log。')
+                else:
+                    run_logs.append(f"[ERROR] {explain_exit_code(run_process.returncode)}")
     except Exception as e:
-        run_status = "failed"
+        if run_status != "stopped":
+            run_status = "failed"
         run_logs.append(f"[ERROR] 运行异常: {str(e)}")
     finally:
+        _capture_run_repair_summary(case_path, run_status, model_log_started)
+        run_metrics.finish()
+        run_case_path = None
+
+
+def run_mpi_model_thread(case_path, launcher, solver, process_count, runtime_dirs=None):
+    """Run an MPI executable group and publish results only after rank merge."""
+    global run_process, run_status, run_logs, run_case_path, run_config
+    from mpi_runner import MpiRun, merge_case_rank_outputs, prepare_mpi_case
+    original_case = Path(case_path).resolve()
+    case = None
+    runner = None
+    try:
+        case = prepare_mpi_case(original_case, msg_method=3, process_count=process_count)
+        run_logs.append(f"[INFO] MPI isolated working copy: {case}")
+        runner = MpiRun(launcher=launcher, solver=solver, n=process_count, case=case,
+                        runtime_dirs=runtime_dirs,
+                        merger=merge_case_rank_outputs, feature_enabled=True)
+        run_process = runner.start()
+        if isinstance(run_config, dict):
+            run_config["phase"] = "solving"
+        run_logs.append(f"[INFO] MPI started: {process_count} ranks via {launcher}")
+        # A stop can arrive while start() is spawning mpiexec but before the
+        # returned process is stored in run_process. run_stop then sees no
+        # process to kill; re-check here and reap the just-started MPI tree.
+        if run_status != "running":
+            runner.stop()
+            return
+        logpath = case / "model_run.log"
+        pos = 0
+        progress_reader = IncrementalLogReader()
+        reported_progress_error = None
+
+        def consume_rank_progress(final=False):
+            nonlocal reported_progress_error
+            progress_text = read_rank_zero_stderr(case, progress_reader, final=final)
+            if progress_text:
+                run_metrics.observe(progress_text, source="rank0_stderr")
+                for line in progress_text.splitlines():
+                    if line.strip(): run_logs.append(line.strip())
+                if len(run_logs) > 5000:
+                    run_logs[:] = run_logs[-2000:]
+            if progress_reader.last_error and progress_reader.last_error != reported_progress_error:
+                run_logs.append(f"[WARN] 无法读取 MPI rank 0 进度日志: {progress_reader.last_error}")
+                reported_progress_error = progress_reader.last_error
+            elif not progress_reader.last_error:
+                reported_progress_error = None
+
+        while run_process.poll() is None and run_status == "running":
+            time.sleep(0.5)
+            try:
+                with logpath.open("r", encoding="utf-8", errors="replace") as stream:
+                    stream.seek(pos); chunk = stream.read(); pos = stream.tell()
+                for line in chunk.splitlines():
+                    if line.strip(): run_logs.append(line.strip())
+            except OSError:
+                pass
+            consume_rank_progress()
+        # A rank can flush its last progress record while mpiexec is exiting.
+        consume_rank_progress(final=True)
+        try:
+            with logpath.open("r", encoding="utf-8", errors="replace") as stream:
+                stream.seek(pos)
+                for line in stream.read().splitlines():
+                    if line.strip(): run_logs.append(line.strip())
+        except OSError:
+            pass
+        if run_status == "stopped":
+            return
+        # Let MpiRun inspect the launcher and rank logs before propagating a
+        # nonzero launcher exit; otherwise useful solver diagnostics are lost.
+        if isinstance(run_config, dict):
+            run_config["phase"] = "merging"
+        merged = runner.finish()
+        if run_status == "stopped":
+            return
+        if not merged:
+            raise RuntimeError("MPI merge did not publish any complete outputs")
+        if globals().get("run_config", {}).get("compress_results") and not _compress_completed_getm_outputs(case, run_logs):
+            return
+        health = validate_current_run_outputs(case, nc_open, started_at=run_start_time)
+        if not health["ready"]:
+            raise RuntimeError("Merged MPI output failed validation: " + "; ".join(health.get("errors", [])))
+        if run_status == "stopped":
+            return
+        import tempfile
+        stage = Path(tempfile.mkdtemp(prefix=".mpi-publish-", dir=original_case))
+        backups = []
+        published = []
+        try:
+            targets = []
+            for source_file in merged:
+                source_file = Path(source_file)
+                staged = stage / source_file.name
+                shutil.copy2(source_file, staged)
+                targets.append((staged, original_case / source_file.name))
+            shutil.copy2(case / "model_run.log", stage / "model_run.log")
+            targets.append((stage / "model_run.log", original_case / "model_run.log"))
+            for pattern in ("*.stdout", "*.stderr"):
+                for rank_log in case.glob(pattern):
+                    staged_log = stage / ("mpi-" + rank_log.name)
+                    shutil.copy2(rank_log, staged_log)
+                    targets.append((staged_log, original_case / "output" / staged_log.name))
+            for restart_file in case.glob("restart.*.out"):
+                rank_token = restart_file.name.removeprefix("restart.").removesuffix(".out")
+                if len(rank_token) == 4 and rank_token.isdigit():
+                    staged_restart = stage / restart_file.name
+                    shutil.copy2(restart_file, staged_restart)
+                    targets.append((staged_restart, original_case / "output" / restart_file.name))
+            for _, target in targets:
+                target.parent.mkdir(parents=True, exist_ok=True)
+            # run_stop uses this same lock. Once the publish transaction starts,
+            # either it sees stopped and aborts before touching user files, or
+            # publication completes and the stop request sees a completed run.
+            with _NC_LOCK:
+                if run_status == "stopped":
+                    return
+                try:
+                    for _, target in targets:
+                        if target.exists():
+                            backup = stage / (target.name + ".previous")
+                            os.replace(target, backup)
+                            backups.append((backup, target))
+                    for staged, target in targets:
+                        os.replace(staged, target)
+                        published.append(target)
+                except Exception:
+                    for target in reversed(published):
+                        target.unlink(missing_ok=True)
+                    for backup, target in reversed(backups):
+                        os.replace(backup, target)
+                    raise
+                _archive_run_outputs(original_case, run_logs)
+                if any(target.name.startswith("restart.") and target.suffix == ".out"
+                       for _, target in targets):
+                    run_logs.append(
+                        "[WARN] MPI rank restart checkpoints saved in output/ as restart.<rank>.out; "
+                        "the current UI cannot reload these rank shards as a hotstart."
+                    )
+                run_status = "completed"
+        finally:
+            shutil.rmtree(stage, ignore_errors=True)
+        run_logs.append(f"[INFO] MPI run merged and validated ({len(merged)} output families)")
+    except Exception as error:
+        if run_status != "stopped": run_status = "failed"
+        run_logs.append(f"[ERROR] MPI run failed: {error}")
+    finally:
+        if isinstance(run_config, dict) and run_config.get("solver_mode", "").startswith("MPI"):
+            if run_status in {"completed", "failed", "stopped"}:
+                run_config["phase"] = run_status
+        if runner is not None and runner._log:
+            try: runner._log.close()
+            except Exception: pass
+        run_metrics.finish()
+        if case is not None:
+            if run_status == "completed":
+                shutil.rmtree(case, ignore_errors=True)
+            else:
+                try:
+                    shutil.copy2(case / "model_run.log", original_case / "model_run.mpi.log")
+                    for pattern in ("*.stdout", "*.stderr"):
+                        for rank_log in case.glob(pattern):
+                            shutil.copy2(rank_log, original_case / ("mpi-" + rank_log.name))
+                    run_logs.append(f"[INFO] MPI diagnostics preserved at {original_case}")
+                except OSError as error:
+                    run_logs.append(f"[WARN] Could not preserve MPI diagnostics: {error}")
+        run_process = None
         run_case_path = None
 
 # ── Routes: Pages ─────────────────────────────────────────────────────
@@ -1780,13 +2586,18 @@ def _load_external_cases():
     try:
         with open(EXTERNAL_CASES_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
-        return [p for p in data if isinstance(p, str)]
+        safe_paths = [p for p in data if isinstance(p, str)
+                      and not _is_pytest_temporary_case_path(p)]
+        if safe_paths != data:
+            _save_external_cases(safe_paths)
+        return safe_paths
     except Exception:
         return []
 
 def _save_external_cases(paths):
     with open(EXTERNAL_CASES_FILE, "w", encoding="utf-8") as f:
-        json.dump(paths, f, ensure_ascii=False, indent=2)
+        json.dump([p for p in paths if not _is_pytest_temporary_case_path(p)],
+                  f, ensure_ascii=False, indent=2)
 
 def _register_external_case(path):
     key = str(Path(path).resolve()).lower()
@@ -1799,15 +2610,147 @@ def _unregister_external_case(path):
                           if str(Path(p).resolve()).lower() != key])
 
 def _is_case_dir(p):
-    """A directory counts as a case when it holds getm.inp or bathymetry.nc."""
-    return (p / "getm.inp").exists() or (p / "bathymetry.nc").exists()
+    """Recognize GETM projects and identifiable native, single-column GOTM results."""
+    p = Path(p)
+    return ((p / "getm.inp").is_file() or (p / "bathymetry.nc").is_file()
+            or _is_gotm_result_dir(p) or _is_trusted_gotm_working_copy(p))
+
+
+def _is_trusted_gotm_working_copy(path):
+    return _validate_gotm_working_copy(path, _GOTM_MANIFEST_KEY)
+
+
+def _is_gotm_result_dir(path):
+    """Conservatively identify a read-only native GOTM result directory.
+
+    A GOTM YAML file alone is not enough: require a readable, non-empty native
+    output with explicit GOTM identity and aligned single-column h/z metadata.
+    This prevents a generic output.nc from being interpreted as a GOTM case.
+    """
+    case = Path(path)
+    output = case / "output.nc"
+    if not (case / "gotm.yaml").is_file() or not output.is_file():
+        return False
+    try:
+        with nc_open(output) as ds:
+            identity = " ".join(str(getattr(ds, name, "")) for name in ("comment", "model")).casefold()
+            time = ds.variables.get("time")
+            if "gotm" not in identity or time is None or time.ndim != 1 or time.size == 0:
+                return False
+            for var in ds.variables.values():
+                if var.ndim != 4 or var.dimensions[:2] != ("time", "z"):
+                    continue
+                h, z = ds.variables.get("h"), ds.variables.get("z")
+                if (h is None or z is None or h.dimensions != var.dimensions or z.dimensions != var.dimensions
+                        or var.shape[0] != time.size or var.shape[2:] != (1, 1)):
+                    continue
+                if all(str(getattr(item, "units", "")).strip().lower()
+                       in {"m", "meter", "meters", "metre", "metres"} for item in (h, z)):
+                    return True
+    except Exception:
+        return False
+    return False
+
+
+def _gotm_column_variable_inventory(path):
+    """List only variables backed by the active native single-column GOTM output."""
+    if not path:
+        return []
+    try:
+        candidate = Path(path)
+        output = ((find_output_files(candidate)["3d"] or find_output_files(candidate)["2d"])
+                  if candidate.is_dir() else candidate)
+        if not output:
+            return []
+        with nc_open(output) as ds:
+            result = []
+            for name, var in ds.variables.items():
+                if (var.ndim == 4 and var.dimensions[:2] == ("time", "z")
+                        and var.shape[2:] == (1, 1) and name not in {"h", "z"}):
+                    result.append({"name": name, "unit": str(getattr(var, "units", "") or "")})
+            return result
+    except Exception:
+        return []
+
+
+def _native_output_time_range(case_path):
+    try:
+        files = find_output_files(case_path)
+        output = files["3d"] or files["2d"]
+        if not output:
+            return None
+        with nc_open(output) as ds:
+            timevar = ds.variables["time"]
+            values = nc.num2date([timevar[0], timevar[-1]], timevar.units,
+                                 calendar=getattr(timevar, "calendar", "standard"),
+                                 only_use_cftime_datetimes=False)
+            return [value.strftime("%Y-%m-%d %H:%M:%S") for value in values]
+    except Exception:
+        return None
+
+
+def _active_case_is_read_only_gotm():
+    """True only for native GOTM result folders (GETM projects take precedence)."""
+    global active_case_read_only, active_case_kind_path
+    if not active_case_path:
+        return False
+    resolved = str(Path(active_case_path).resolve()).casefold()
+    if active_case_kind_path != resolved or active_case_read_only is None:
+        active_case_kind_path = resolved
+        active_case_read_only = (not (Path(active_case_path) / "getm.inp").is_file()
+                                 and _is_gotm_result_dir(active_case_path)
+                                 and not _is_trusted_gotm_working_copy(active_case_path))
+    return bool(active_case_read_only)
+
+
+@app.before_request
+def _protect_read_only_gotm_case():
+    """Keep a selected native GOTM replay read-only through the API."""
+    if not _active_case_is_read_only_gotm() or not request.path.startswith("/api/"):
+        return None
+    if request.method == "POST" and request.path == "/api/run/start" and active_case_path:
+        if (active_case_path / ".wet-gotm-working-copy.json").is_file():
+            if not (active_case_path / "gotm_release.exe").is_file():
+                return jsonify({"error": "GOTM 工作副本缺少 gotm_release.exe；请从只读 reference 重新另存为包含官方 release 与依赖的副本。"}), 400
+            return jsonify({"error": "GOTM 工作副本清单或文件校验失败；请从只读 reference 重新另存。"}), 400
+    if request.method in ("GET", "HEAD", "OPTIONS"):
+        return None
+    allowed = {
+        ("POST", "/api/case/open"),
+        ("POST", "/api/case/load"),
+        ("POST", "/api/case/save_as"),
+        ("POST", "/api/preprocess/case/create"),
+        ("POST", "/api/preprocess/save"),
+        ("POST", "/api/system/explore"),
+        ("POST", "/api/calibration/observations/compare-column"),
+    }
+    if (request.method, request.path) in allowed:
+        return None
+    return jsonify({"error": "当前是只读 GOTM 原生结果；不能在此目录运行模型或修改配置/观测。"}), 403
+
+
+@app.before_request
+def _protect_c_drive_case_writes():
+    """Keep C: cases browseable while preventing newly generated data on C:."""
+    if not active_case_path:
+        return None
+    if case_request_is_read_only_allowed(active_case_path, request.method, request.path):
+        return None
+    return jsonify({"error": "该案例位于 C:，当前按只读方式浏览。请先另存到非 C: 盘，再修改或运行。"}), 403
 
 def _under_case_dir(p):
-    try:
-        p.relative_to(CASE_DIR.resolve())
-        return True
-    except ValueError:
-        return False
+    resolved = Path(p).resolve()
+    for root in {CASE_DIR.resolve(), LEGACY_CASE_DIR.resolve()}:
+        try:
+            resolved.relative_to(root)
+            return True
+        except ValueError:
+            continue
+    return False
+
+def _case_roots():
+    return tuple(dict.fromkeys((CASE_DIR.resolve(), LEGACY_CASE_DIR.resolve(),
+                                PROXY_CASE_DIR.resolve())))
 
 def _case_in_use(path):
     """True when a model run is active inside the given case directory."""
@@ -1815,26 +2758,62 @@ def _case_in_use(path):
         return False
     return str(Path(run_case_path).resolve()).lower() == str(Path(path).resolve()).lower()
 
+def _proxy_case_fields(case_path):
+    """Expose proxy labels only when a hash-verified manifest is valid."""
+    manifest_path = Path(case_path) / "proxy_engineering.json"
+    if not manifest_path.exists():
+        return {}
+    validation = _load_proxy_manifest(case_path)
+    if not validation.valid:
+        return {"proxy_manifest_warning": (validation.warning or "代理工程 manifest 无效")[:240]}
+    return {"engineering_proxy": True,
+            "target_lake": validation.target_lake,
+            "scientific_validation_status": "not_scientifically_validated",
+            "partial_engineering_proxy": bool(validation.manifest.get("partial_engineering_proxy")),
+            "prepared": bool(validation.manifest.get("prepared")),
+            "case_loadable": bool(validation.manifest.get("prepared")),
+            "proxy_blockers": validation.manifest.get("blockers", []),
+            "proxy_manifest": validation.manifest}
+
+@_with_nc_lock
 def _activate_case(case_path):
     """Make case_path the active case and return the standard load payload."""
-    global active_case, active_case_path, cached_getm_config, cached_fabm_info
-    _ensure_case_dirs(case_path)
+    global active_case, active_case_path, cached_getm_config, cached_fabm_info, _active_case_generation
+    global active_case_read_only, active_case_kind_path
+    is_gotm = not (Path(case_path) / "getm.inp").is_file() and (
+        _is_gotm_result_dir(case_path) or _is_trusted_gotm_working_copy(case_path))
+    is_gotm_working = is_gotm and _is_trusted_gotm_working_copy(case_path)
+    is_gotm_read_only = is_gotm and not is_gotm_working
+    if not is_gotm_read_only and not is_system_drive(case_path):
+        # Recover a transaction interrupted after staging before any case config is read.
+        from case_model_transaction import recover_pending
+        recover_pending(case_path)
+        _ensure_case_dirs(case_path)
     case_name = case_path.name
-    active_case = case_name
-    active_case_path = case_path
-    # 记住本次选择，服务重启后自动恢复
-    try:
-        _LAST_CASE_FILE.write_text(
-            json.dumps({"path": str(case_path)}, ensure_ascii=False), encoding="utf-8")
-    except Exception:
-        pass
+    with _ACTIVE_CASE_LOCK:
+        active_case = case_name
+        active_case_path = case_path
+        _active_case_generation += 1
+    active_case_read_only = is_gotm_read_only
+    active_case_kind_path = str(Path(case_path).resolve()).casefold()
+    # 记住用户案例；pytest 临时夹具只在当前进程有效，不能持久化。
+    if not _is_pytest_temporary_case_path(case_path):
+        try:
+            _LAST_CASE_FILE.write_text(
+                json.dumps({"path": str(case_path)}, ensure_ascii=False), encoding="utf-8")
+        except Exception:
+            pass
     # Load configs - cache in globals to avoid GC crashes with YAML C ext
     # New cases built via preprocess may not have getm.inp yet (built later
     # on the input-data page); get_time_settings/get_run_info fall back to
     # defaults for an empty config.
     inp_path = case_path / "getm.inp"
     cached_getm_config = parse_getm_inp(inp_path) if inp_path.exists() else {}
-    cached_fabm_info = parse_fabm_yaml(case_path / "fabm.yaml") if (case_path / "fabm.yaml").exists() else {"modules": [], "categories": {}}
+    # The replay is an external source: do not let config inspection write defaults
+    # or heal sidecars in the user's original case directory.
+    cached_fabm_info = (parse_fabm_yaml(case_path / "fabm.yaml", persist_defaults=False)
+                        if (case_path / "fabm.yaml").exists() and not is_gotm_read_only
+                        else {"modules": [], "categories": {}})
     time_settings = get_time_settings(cached_getm_config)
     run_info = get_run_info(cached_getm_config)
     output_files = find_output_files(case_path)
@@ -1843,7 +2822,7 @@ def _activate_case(case_path):
     # Use the regex parser because PyYAML's safe_load crashes on `source: *` wildcard.
     output_warning = None
     out_path = case_path / "output.yaml"
-    if out_path.exists():
+    if out_path.exists() and not is_gotm_read_only:
         try:
             out_parsed = _parse_output_yaml(out_path)
             if out_parsed.get("sync_interval", 0) == 0:
@@ -1863,40 +2842,74 @@ def _activate_case(case_path):
         except Exception:
             output_ntimesteps = None
 
+    native_time_range = None
+    if is_gotm:
+        native_time_range = _native_output_time_range(case_path)
+        if native_time_range:
+            time_settings["start"], time_settings["stop"] = native_time_range
+            time_settings["source"] = "native_output"
+
     return jsonify({
         "success": True,
         "case_name": case_name,
         "case_path": str(case_path),
+        "case_generation": _active_case_snapshot()[1],
+        "case_type": "gotm_working_copy" if is_gotm_working else ("gotm_read_only" if is_gotm_read_only else "getm"),
+        "read_only": is_gotm_read_only,
+        "storage_read_only": is_system_drive(case_path),
+        "model_dimension": "single_column" if is_gotm else "grid",
+        "native_time_range": native_time_range,
+        "native_column_variables": _gotm_column_variable_inventory(
+            case_path) if is_gotm else None,
         "time_settings": time_settings,
         "run_info": run_info,
         "fabm": cached_fabm_info,
         "output_files": {k: str(v) if v else None for k, v in output_files.items()},
         "has_results": output_files["2d"] is not None or output_files["3d"] is not None,
+        "has_gotm_output": is_gotm and (Path(case_path) / "output.nc").is_file(),
+        "has_2d_output": False if is_gotm else output_files["2d"] is not None,
+        "has_3d_output": False if is_gotm else output_files["3d"] is not None,
         "output_ntimesteps": output_ntimesteps,
         "output_warning": output_warning,
+        **_proxy_case_fields(case_path),
     })
 
 @app.route("/api/cases")
 def list_cases():
+    is_working_gotm = globals().get("_is_trusted_gotm_working_copy", lambda _p: False)
     def _case_info(d, external):
+        outputs = find_output_files(d)
+        gotm = _is_gotm_result_dir(d) or is_working_gotm(d)
         return {
             "name": d.name,
             "path": str(d),
             "external": external,
+            "storage_read_only": is_system_drive(d),
+            "read_only": _is_gotm_result_dir(d) and not (d / "getm.inp").is_file() and not is_working_gotm(d),
+            "case_type": ("gotm_working_copy" if is_working_gotm(d) else
+                          "gotm_read_only" if _is_gotm_result_dir(d) and not (d / "getm.inp").is_file() else "getm"),
+            "model_dimension": "single_column" if gotm else "grid",
+            "has_gotm_output": gotm and (d / "output.nc").is_file(),
             "has_bathymetry": (d / "bathymetry.nc").exists(),
             "has_fabm": (d / "fabm.yaml").exists(),
             "has_meteo": (d / "meteo.nc").exists(),
             "has_rivers": (d / "riverinfo.dat").exists(),
-            "has_2d_output": any(d.glob("*.2d.nc")),
-            "has_3d_output": any(d.glob("*.3d.nc")),
+            "has_2d_output": False if gotm else outputs['2d'] is not None,
+            "has_3d_output": False if gotm else outputs['3d'] is not None,
+            **_proxy_case_fields(d),
         }
     cases = []
     seen = set()
-    if CASE_DIR.exists():
-        for d in CASE_DIR.iterdir():
-            if d.is_dir() and (d / "getm.inp").exists():
-                cases.append(_case_info(d, False))
-                seen.add(str(d.resolve()).lower())
+    for case_root in dict.fromkeys((CASE_DIR, LEGACY_CASE_DIR, PROXY_CASE_DIR)):
+        if case_root.exists():
+            for d in case_root.iterdir():
+                has_proxy_manifest = (d / "proxy_engineering.json").is_file()
+                if d.is_dir() and ((d / "getm.inp").exists() or _is_gotm_result_dir(d)
+                                   or is_working_gotm(d) or has_proxy_manifest):
+                    key = str(d.resolve()).lower()
+                    if key not in seen:
+                        cases.append(_case_info(d, False))
+                        seen.add(key)
     for raw in _load_external_cases():
         d = Path(raw)
         if not d.is_dir() or not _is_case_dir(d):
@@ -1908,6 +2921,63 @@ def list_cases():
         seen.add(key)
     return jsonify(cases)
 
+@app.route("/api/system/case-storage")
+def case_storage_status():
+    """Expose the selected new-case root and any startup fallback warning."""
+    return jsonify({"case_root": str(CASE_DIR), "source": CASE_STORAGE_SOURCE,
+                    "fallback": CASE_STORAGE_SOURCE == "alternate-volume",
+                    "warning": CASE_STORAGE_WARNING,
+                    "legacy_case_root": str(LEGACY_CASE_DIR),
+                    "temp_root": str(APP_TEMP_DIR), "log_root": str(APP_LOG_DIR),
+                    "state_root": str(STATE_DIR)})
+
+@app.route("/api/case/current")
+def current_case_identity():
+    """Read-only identity and dashboard context for the restored active case."""
+    case_path, case_generation = _active_case_snapshot()
+    if not case_path:
+        return jsonify({"case_name": None, "case_path": None,
+                        "case_generation": case_generation})
+    if not case_path.is_dir():
+        return jsonify({"case_name": None, "case_path": None,
+                        "case_generation": case_generation})
+    read_only = _active_case_is_read_only_gotm()
+    native_range = _native_output_time_range(case_path) if read_only else None
+    trusted_gotm = _is_trusted_gotm_working_copy(case_path)
+    is_gotm = trusted_gotm or _is_gotm_result_dir(case_path)
+    # The backend restores only the selected path at process startup. Rebuild
+    # the lightweight case metadata here so the dashboard can show the same
+    # context as an explicit case load without reactivating or writing files.
+    getm_config = cached_getm_config
+    if getm_config is None:
+        inp_path = case_path / "getm.inp"
+        getm_config = parse_getm_inp(inp_path) if inp_path.is_file() else {}
+    run_info = get_run_info(getm_config) if not read_only else {}
+    fabm_info = cached_fabm_info
+    if fabm_info is None:
+        fabm_path = case_path / "fabm.yaml"
+        fabm_info = (parse_fabm_yaml(fabm_path, persist_defaults=False)
+                     if fabm_path.is_file() and not read_only
+                     else {"modules": [], "categories": {}, "total_modules": 0})
+    output_files = find_output_files(case_path)
+    has_results = output_files["2d"] is not None or output_files["3d"] is not None
+    output_ntimesteps = None
+    if has_results:
+        try:
+            output_ntimesteps = get_ntimesteps(output_files["3d"] or output_files["2d"])
+        except Exception:
+            output_ntimesteps = None
+    return jsonify({"case_name": case_path.name, "case_path": str(case_path),
+                    "case_generation": case_generation,
+                    "read_only": read_only, "case_type": "gotm_working_copy" if trusted_gotm else ("gotm_read_only" if is_gotm else "getm"),
+                    "model_dimension": "single_column" if is_gotm else "grid",
+                    "native_time_range": _native_output_time_range(case_path) if is_gotm else native_range,
+                    "native_column_variables": _gotm_column_variable_inventory(case_path) if is_gotm else None,
+                    "run_info": run_info, "fabm": fabm_info,
+                    "has_results": has_results,
+                    "output_ntimesteps": output_ntimesteps,
+                    **_proxy_case_fields(case_path)})
+
 @app.route("/api/case/inputs")
 def case_inputs():
     """Return inventory of expected input files for the active case."""
@@ -1917,6 +2987,7 @@ def case_inputs():
         {"name": "bathymetry.nc", "desc": "水下地形（网格+水深）", "is_nc": True},
         {"name": "fabm.yaml", "desc": "生态模型配置（模块+参数）", "is_nc": False},
         {"name": "meteo.nc", "desc": "气象强迫数据", "is_nc": True},
+        {"name": "meteo_provenance.json", "desc": "气象来源与空间广播记录", "is_nc": False},
         {"name": "riverinfo.dat", "desc": "河流配置（入/出流位置）", "is_nc": False},
         {"name": "rivers.nc", "desc": "河流流量与水质时间序列", "is_nc": True},
         {"name": "fabm_init.nc", "desc": "生态初始条件", "is_nc": True},
@@ -1950,10 +3021,26 @@ def case_inputs():
 @app.route("/api/case/load", methods=["POST"])
 def load_case():
     data = request.json
-    case_name = data.get("case_name")
-    case_path = CASE_DIR / case_name
+    case_name = str(data.get("case_name") or "").strip()
+    requested_path = str(data.get("case_path") or "").strip()
+    if requested_path:
+        case_path = Path(requested_path).resolve()
+        if not _under_case_dir(case_path):
+            return jsonify({"success": False, "error": "案例路径不在本机案例目录中"}), 403
+    else:
+        # Backwards compatible name lookup; the active output root wins when
+        # two roots contain a case with the same name.
+        case_path = next((root / case_name for root in (CASE_DIR, LEGACY_CASE_DIR)
+                          if (root / case_name).exists()), CASE_DIR / case_name)
     if not case_path.exists():
         return jsonify({"success": False, "error": "案例不存在"}), 404
+    proxy_validation = _load_proxy_manifest(case_path)
+    if proxy_validation.valid and not proxy_validation.manifest.get("prepared"):
+        blockers = proxy_validation.manifest.get("blockers", [])
+        return jsonify({"success": False, "error": "代理工程案例尚未准备运行：" + "；".join(blockers),
+                        "engineering_proxy": True, "prepared": False,
+                        "target_lake": proxy_validation.target_lake,
+                        "proxy_blockers": blockers}), 409
     return _activate_case(case_path)
 
 @app.route("/api/case/open", methods=["POST"])
@@ -1967,12 +3054,19 @@ def open_case():
     if not p.is_absolute():
         return jsonify({"success": False, "error": "请提供绝对路径，例如 D:\\lakes\\mycase"}), 400
     p = p.resolve()
-    protected = {BASE_DIR.resolve(), APP_DIR.resolve(), CASE_DIR.resolve(), Path.home().resolve()}
+    protected = {BASE_DIR.resolve(), APP_DIR.resolve(), *_case_roots(), Path.home().resolve()}
     if p in protected or p.parent == p or not p.is_dir():
         return jsonify({"success": False, "error": f"目录不存在或不可用: {p}"}), 400
     if not _is_case_dir(p):
         return jsonify({"success": False, "error": "该目录不是有效案例（需包含 getm.inp 或 bathymetry.nc）"}), 400
-    if not _under_case_dir(p):
+    proxy_validation = _load_proxy_manifest(p)
+    if proxy_validation.valid and not proxy_validation.manifest.get("prepared"):
+        blockers = proxy_validation.manifest.get("blockers", [])
+        return jsonify({"success": False, "error": "代理工程案例尚未准备运行：" + "；".join(blockers),
+                        "engineering_proxy": True, "prepared": False,
+                        "target_lake": proxy_validation.target_lake,
+                        "proxy_blockers": blockers}), 409
+    if not _under_case_dir(p) and not _is_pytest_temporary_case_path(p):
         _register_external_case(p)
     return _activate_case(p)
 
@@ -1994,11 +3088,16 @@ def case_save_as():
     src = src.resolve()
     if not src.is_dir() or not _is_case_dir(src):
         return jsonify({"error": "源目录不是有效案例"}), 400
+    source_is_gotm = not (src / "getm.inp").is_file() and _is_gotm_result_dir(src)
+    if source_is_gotm and not include_results:
+        return jsonify({"error": "GOTM 单柱工作副本必须包含原始结果与可运行依赖；请明确勾选“包含结果”后另存。"}), 400
     dest = Path(dest_raw)
     if not dest.is_absolute():
         return jsonify({"error": "目标目录必须是绝对路径，例如 D:\\mycases\\backup01"}), 400
     dest = dest.resolve()
-    protected = {BASE_DIR.resolve(), APP_DIR.resolve(), CASE_DIR.resolve(), Path.home().resolve()}
+    if is_system_drive(dest):
+        return jsonify({"error": "为避免继续占用 C:，案例另存目标必须位于 C: 以外的磁盘。"}), 400
+    protected = {BASE_DIR.resolve(), APP_DIR.resolve(), *_case_roots(), Path.home().resolve()}
     if dest in protected or dest.parent == dest:
         return jsonify({"error": "目标目录不可用"}), 400
     if dest == src:
@@ -2021,7 +3120,12 @@ def case_save_as():
         except OSError as e:
             return jsonify({"error": f"无法创建目标目录: {e}"}), 400
     try:
-        if include_results:
+        if source_is_gotm:
+            try:
+                _create_gotm_working_copy(src, dest, _GOTM_MANIFEST_KEY)
+            except ValueError as e:
+                return jsonify({"error": f"无法创建 GOTM 工作副本: {e}"}), 400
+        elif include_results:
             shutil.copytree(src, dest, dirs_exist_ok=True)
         else:
             shutil.copytree(src, dest, dirs_exist_ok=True,
@@ -2050,7 +3154,9 @@ def case_delete():
     if not p.is_absolute():
         return jsonify({"error": "请提供绝对路径"}), 400
     p = p.resolve()
-    protected = {BASE_DIR.resolve(), APP_DIR.resolve(), CASE_DIR.resolve(), Path.home().resolve()}
+    if is_system_drive(p):
+        return jsonify({"error": "此操作不删除 C: 上的既有案例数据。"}), 403
+    protected = {BASE_DIR.resolve(), APP_DIR.resolve(), *_case_roots(), Path.home().resolve()}
     if p in protected or p.parent == p:
         return jsonify({"error": "非法目录"}), 400
     if not p.is_dir() or not _is_case_dir(p):
@@ -2075,10 +3181,12 @@ def case_delete():
     except OSError as e:
         return jsonify({"error": f"删除失败: {e}"}), 500
     _unregister_external_case(p)
-    global active_case, active_case_path, cached_getm_config, cached_fabm_info
+    global active_case, active_case_path, cached_getm_config, cached_fabm_info, _active_case_generation
     if active_case_path and str(Path(active_case_path).resolve()).lower() == str(p).lower():
-        active_case = None
-        active_case_path = None
+        with _ACTIVE_CASE_LOCK:
+            active_case = None
+            active_case_path = None
+            _active_case_generation += 1
         cached_getm_config = None
         cached_fabm_info = None
         # 该案例已删除，别让重启后自动恢复它
@@ -2092,6 +3200,7 @@ def case_delete():
 # ── Routes: Configuration ─────────────────────────────────────────────
 
 @app.route("/api/config/time", methods=["GET", "POST"])
+@_with_nc_lock
 def config_time():
     if not active_case_path:
         return jsonify({"error": "未加载案例"}), 400
@@ -2117,15 +3226,15 @@ def config_time():
                 new_dt = float(data["timestep"])
             except (TypeError, ValueError):
                 return jsonify({"success": False, "error": "timestep 必须是数字"}), 400
-            if new_dt <= 0:
-                return jsonify({"success": False, "error": "timestep 必须为正数"}), 400
+            if not np.isfinite(new_dt) or new_dt <= 0:
+                return jsonify({"success": False, "error": "timestep 必须为有限的正数"}), 400
             dt_max, dt_cfl = _cfl_max_timestep(active_case_path)
-            if dt_max and new_dt > dt_max:
+            if dt_max is not None and new_dt > dt_max:
                 return jsonify({
                     "success": False,
-                    "error": (f"时间步长 {new_dt:g}s 超过稳定上限 {dt_max}s"
-                              f"（本网格重力波 CFL≈{dt_cfl:.0f}s，上限取 15 倍）。"
-                              f"步长过大会导致数值发散：水位崩溃、全场变 NaN。建议 60~{int(dt_cfl * 3)}s。"),
+                    "error": (f"时间步长 {new_dt:g}s 超过重力波 CFL 估计上限 {dt_max:.6g}s。"
+                              f"请设为不超过 {dt_max:.6g}s；通过 CFL 检查也不保证生态过程稳定，"
+                              "应从小步长短时试运行开始，检查输出是否有限。"),
                 }), 400
             config["time"]["timestep"] = data["timestep"]
         if "step_2d" in data:
@@ -2157,7 +3266,10 @@ def config_fabm_param():
     param = data.get("param")
     value = data.get("value")
     fabm_path = active_case_path / "fabm.yaml"
-    ok = update_fabm_parameter(fabm_path, module, param, value)
+    try:
+        ok = update_fabm_parameter(fabm_path, module, param, value)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
     return jsonify({"success": ok})
 
 @app.route("/api/config/fabm/module", methods=["POST"])
@@ -2165,9 +3277,9 @@ def config_fabm_module():
     """Toggle a FABM module between enabled and disabled.
 
     Request body: {"module": "macrophytes", "enabled": false}
-    Disabling moves the instance to top-level `_disabled`; enabling restores it.
-    Before disabling, scans other enabled modules' coupling for references and
-    returns them as warnings (the caller decides whether to proceed).
+    Disabling moves the instance to the sidecar. Enabling restores it. A module
+    with incoming coupling references cannot be disabled until those references
+    are rewired; confirmation alone must not leave dangling targets.
     """
     if not active_case_path:
         return jsonify({"error": "未加载案例"}), 400
@@ -2179,13 +3291,16 @@ def config_fabm_module():
     fabm_path = active_case_path / "fabm.yaml"
     if not fabm_path.exists():
         return jsonify({"error": "fabm.yaml 不存在"}), 404
-    force = bool(data.get("force", False))
     ok, warnings = toggle_fabm_module(fabm_path, module, enabled)
     if not ok:
+        if not enabled and warnings and any(" 通过耦合 " in item for item in warnings):
+            return jsonify({
+                "success": False,
+                "blocked_by_couplings": True,
+                "warnings": warnings,
+                "repair_message": "先在生态网络重连列出的耦合端口，再禁用模块。确认或强制操作不会删除仍被引用的模块。",
+            }), 409
         return jsonify({"success": False, "warnings": warnings}), 400
-    if warnings and not force:
-        # Refuse the operation but surface the dependent modules so the UI can confirm
-        return jsonify({"success": False, "warnings": warnings, "needs_confirmation": True}), 409
     # Refresh cached fabm info
     global cached_fabm_info
     cached_fabm_info = parse_fabm_yaml(fabm_path)
@@ -2265,27 +3380,29 @@ def config_ghg_post():
 
 @app.route("/api/config/hotstart", methods=["GET", "POST"])
 def config_hotstart():
+    from hotstart import prepare_restart, restart_settings
     if not active_case_path:
         return jsonify({"error": "未加载案例"}), 400
     inp_path = active_case_path / "getm.inp"
     if request.method == "GET":
         config = parse_getm_inp(inp_path)
-        param = config.get("param", {})
-        return jsonify({
-            "enabled": param.get("hotstart", False),
-            "file": param.get("hotstart_file", ""),
-            "type": param.get("hotstarttype", 1),
-        })
+        return jsonify(restart_settings(active_case_path, config))
     else:
-        data = request.json
+        if run_status == "running":
+            return jsonify({"error": "请等待模型运行结束后修改启动设置"}), 409
+        data = request.get_json(silent=True)
+        if not isinstance(data, dict):
+            return jsonify({"error": "启动设置必须为 JSON 对象"}), 400
         config = parse_getm_inp(inp_path)
-        if "param" not in config:
-            config["param"] = {}
-        config["param"]["hotstart"] = data.get("enabled", False)
-        if "file" in data:
-            config["param"]["hotstart_file"] = data.get("file", "")
+        try:
+            checkpoint = prepare_restart(active_case_path, config,
+                enabled=data.get("enabled", False), filename=data.get("file", ""),
+                save=data.get("save", True))
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
         write_getm_inp(inp_path, config)
-        return jsonify({"success": True})
+        return jsonify({"success": True, "checkpoint": checkpoint,
+                        **restart_settings(active_case_path, config)})
 
 def _parse_output_yaml(out_path):
     """Parse output.yaml via regex — avoids PyYAML's failure on `source: *`
@@ -2323,6 +3440,10 @@ _OUTPUT_UNREGISTERED = {
     "u": "流速 u 由 GETM 原生 *.2d.nc 输出，不能写入 output.yaml",
     "v": "流速 v 由 GETM 原生 *.2d.nc 输出，不能写入 output.yaml",
 }
+# When a case has a prior output, constrain module groups to fields actually
+# registered by the solver that produced it. Static docs can describe fields
+# absent from the active packaged solver and writing those names is fatal.
+OUTPUT_SUBSCRIPTION_STRICT_REGISTERED = True
 _OUTPUT_HYDRO_2D = {"hn", "D", "bathymetry"}
 _OUTPUT_KEY_MODULES = ("abiotic_water", "abiotic_sediment", "POM", "phytoplankton",
                        "zooplankton", "macrophytes", "fish", "benthos")
@@ -2369,13 +3490,7 @@ def _sources_to_yaml(sources):
 
 def _preset_sources(case_path, preset):
     """Variable selection presets: minimal / standard / all."""
-    if preset == "all":
-        return ["*"]
-    if preset == "minimal":
-        return list(_OUTPUT_HYDRO_VARS)
-    inst = {m["name"] for m in _fabm_instances(case_path)}
-    picked = [c for c in _OUTPUT_KEY_MODULES if c in inst]
-    return list(_OUTPUT_HYDRO_VARS) + [f"{c}/*" for c in picked]
+    return _output_preset_sources(case_path, preset, sys.modules[__name__])
 
 
 def _category_var_counts(case_path):
@@ -2420,7 +3535,12 @@ _TIME_UNIT_SEC = {"second": 1, "sec": 1, "minute": 60, "min": 60, "hour": 3600,
 
 
 def _output_size_estimate(case_path, sources):
-    """Rough estimate of the output file volume produced by `sources`."""
+    """Estimate the configured output.yaml payload, not total run output size.
+
+    GETM writes independent 2D/3D streams controlled by io_spec and includes
+    compile/runtime-dependent fields. Their byte volume cannot be inferred
+    from output.yaml subscriptions, so this result is explicitly incomplete.
+    """
     info = {"available": False}
     try:
         inp = Path(case_path) / "getm.inp"
@@ -2438,6 +3558,15 @@ def _output_size_estimate(case_path, sources):
         t1 = datetime.strptime(stop, "%Y-%m-%d %H:%M:%S")
         dur = max(0.0, (t1 - t0).total_seconds())
         parsed = _parse_output_yaml(Path(case_path) / "output.yaml")
+        io_spec = cfg.get("io_spec", {}) or {}
+        getm_streams = {
+            dimension: {
+                "enabled": bool(io_spec.get(f"save_{dimension}", True)),
+                "first": int(io_spec.get(f"first_{dimension}", 1) or 1),
+                "step": int(io_spec.get(f"step_{dimension}", 1) or 1),
+            }
+            for dimension in ("2d", "3d")
+        }
         step = float(parsed["time_step"] or 1)
         unit = _TIME_UNIT_SEC.get(str(parsed["time_unit"]).lower(), 86400)
         interval = max(1.0, step * unit)
@@ -2463,6 +3592,14 @@ def _output_size_estimate(case_path, sources):
         nbytes = ntime * ncells * n_values_per_cell * 4  # NETCDF3 float32
         info.update({
             "available": True,
+            "complete": False,
+            "estimate_scope": "output_yaml_configured_fields_only",
+            "includes_getm_2d3d": False,
+            "getm_streams": getm_streams,
+            "estimate_note": (
+                "这只是 output.yaml 订阅字段的数据负载部分估算，不是完整输出量下界；"
+                "未计入 GETM 独立 2d.nc/3d.nc 流、网格/元数据和文件格式开销，完整磁盘需求未知。"
+            ),
             "ntime": ntime, "ncells": ncells, "nlev": nlev,
             "n_vars": n_vars,
             "bytes": nbytes,
@@ -2476,6 +3613,7 @@ def _output_size_estimate(case_path, sources):
 
 
 @app.route("/api/config/output", methods=["GET", "POST"])
+@_with_nc_lock
 def config_output():
     """Read/write output.yaml.
 
@@ -2491,6 +3629,10 @@ def config_output():
     if request.method == "GET":
         parsed = _parse_output_yaml(out_path)
         sources = _parse_output_sources(parsed["variables_raw"]) or ["*"]
+        try:
+            modules = _output_model_sources(active_case_path, sys.modules[__name__], sources)
+        except ValueError:
+            modules = _output_model_sources(active_case_path, sys.modules[__name__])
         return jsonify({
             "time_unit": parsed["time_unit"],
             "time_step": parsed["time_step"],
@@ -2498,12 +3640,14 @@ def config_output():
             "variables_raw": parsed["variables_raw"],
             # ── subscription ──
             "sources": sources,
-            "modules": _fabm_instances(active_case_path),
+            "modules": modules,
             "hydro_vars": _OUTPUT_HYDRO_VARS,
             "has_wildcard": "*" in sources,
             "estimate": _output_size_estimate(active_case_path, sources),
         })
     else:
+        if _case_in_use(active_case_path):
+            return jsonify(error='模型运行中，请结束后修改输出配置'), 409
         data = request.json or {}
         parsed = _parse_output_yaml(out_path)
         sync_interval = data.get("sync_interval")
@@ -2525,11 +3669,13 @@ def config_output():
         sources = data.get("sources")
         preset = data.get("preset")
         if preset:
-            sources = _preset_sources(active_case_path, preset)
+            try:
+                sources = _preset_sources(active_case_path, preset)
+            except ValueError as exc:
+                return jsonify(error=str(exc)), 400
         if sources is not None:
             if not isinstance(sources, list) or not sources:
                 return jsonify({"error": "sources 必须是非空数组"}), 400
-            sources = [str(s).strip() for s in sources if str(s).strip()]
             # 致命防护：显式请求 field manager 未注册的变量会让 GETM 启动即
             # STOP 1（wrap_field: Requested output field ... not registered）
             bad = [s for s in sources if s in _OUTPUT_UNREGISTERED]
@@ -2540,12 +3686,21 @@ def config_output():
                               f"否则模型启动时会以 wrap_field ... not registered 致命退出。"
                               f"水动力可订阅变量仅有：{'、'.join(_OUTPUT_HYDRO_VARS)}。")
                 }), 400
+            try:
+                sources = _resolve_output_sources(active_case_path, sources, sys.modules[__name__])
+            except ValueError as exc:
+                return jsonify(error=str(exc)), 400
             variables_raw = _sources_to_yaml(sources)
         else:
             sources = _parse_output_sources(parsed["variables_raw"]) or ["*"]
             # Preserve variables block as-is (the `source: *` wildcard is invalid YAML alias syntax
             # but FABM accepts it; rewriting it via yaml.dump would break it)
             variables_raw = data.get("variables_raw") or parsed["variables_raw"]
+            try:
+                sources = _resolve_output_sources(active_case_path, _parse_output_sources(variables_raw), sys.modules[__name__])
+            except ValueError as exc:
+                return jsonify(error=str(exc)), 400
+            variables_raw = _sources_to_yaml(sources)
         si_out = int(sync_interval) if float(sync_interval).is_integer() else sync_interval
         new_text = (
             f"output:\n"
@@ -2566,17 +3721,63 @@ def config_output():
             "sync_interval": si_out,
             "sources": sources,
             "estimate": est,
-            "warning": (f"预计输出约 {est['gb']} GB（{est['ntime']} 个时步 × {est['ncells']} 个水格 × "
-                        f"{est['n_vars']} 个变量）。磁盘或后处理可能吃不消，建议改用“精简/标准”订阅。")
+            "warning": (f"output.yaml 订阅字段数据负载估算约 {est['gb']} GB（{est['ntime']} 个时步 × "
+                        f"{est['ncells']} 个水格 × {est['n_vars']} 个变量）；此值未计 GETM 2D/3D 输出流，"
+                        "完整磁盘需求未知。建议按研究问题精简订阅并核对磁盘余量。")
                        if est.get("available") and est.get("gb", 0) >= 2 else None,
         })
 
 # ── Routes: Run Control ───────────────────────────────────────────────
 
+def _parse_gotm_time_interval(time_config):
+    """Parse and validate the UTC/calendar interval used by single-column GOTM."""
+    if not isinstance(time_config, dict):
+        raise ValueError("time 配置必须是包含 start、stop 和 dt 的映射")
+    start_value, stop_value = time_config.get("start"), time_config.get("stop")
+    if not start_value or not stop_value:
+        raise ValueError("start 和 stop 必须存在")
+    try:
+        start = (start_value if isinstance(start_value, datetime)
+                 else datetime.fromisoformat(str(start_value)))
+        stop = (stop_value if isinstance(stop_value, datetime)
+                else datetime.fromisoformat(str(stop_value)))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"start 和 stop 必须是有效 ISO 日期时间: {exc}") from exc
+    try:
+        if stop <= start:
+            raise ValueError("stop 必须晚于 start")
+    except TypeError as exc:
+        raise ValueError("start 和 stop 必须使用兼容的时区格式") from exc
+    try:
+        dt = float(time_config.get("dt"))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("dt 必须是有限正数") from exc
+    if not np.isfinite(dt) or dt <= 0:
+        raise ValueError("dt 必须是有限正数")
+    return start, stop, dt
+
 @app.route("/api/run/estimate")
 def run_estimate():
     if not active_case_path:
         return jsonify({"error": "未加载案例"}), 400
+    if globals().get("_active_case_is_read_only_gotm", lambda: False)():
+        return jsonify({"error": "当前为只读 GOTM 原生结果，不适用 GETM 运行估算"}), 400
+    if _is_trusted_gotm_working_copy(active_case_path):
+        try:
+            config = yaml.safe_load((active_case_path / "gotm.yaml").read_text(encoding="utf-8")) or {}
+            tcfg = config.get("time", {})
+            start, stop, dt = _parse_gotm_time_interval(tcfg)
+            days = (stop - start).total_seconds() / 86400.
+            steps = max(1, int(days * 86400. / dt))
+            return jsonify({"engine": "GOTM", "model_dimension": "single_column",
+                            "grid": "GOTM 单水柱", "nwater": "—", "duration_days": days,
+                            "nsteps": steps, "nlev": 1,
+                            "runtime_estimate": None,
+                            "runtime_estimate_status": "uncalibrated",
+                            "runtime_estimate_note": "尚未用当前计算机和此案例配置实测校准，不能可靠预测预运行耗时。",
+                            "pilot_guidance": "建议先在案例副本上运行代表性窗口，覆盖模型启动/预热及一个目标过程周期（如日变化或混合事件）；记录墙钟时间和完成步数后，仅对相同硬件与配置作粗略外推。"})
+        except Exception as exc:
+            return jsonify({"error": f"GOTM 时间配置无效: {exc}"}), 400
     config = parse_getm_inp(active_case_path / "getm.inp")
     return jsonify(estimate_run_time(active_case_path, config))
 
@@ -2596,6 +3797,37 @@ def run_check():
     if not active_case_path:
         return jsonify({"error": "未加载案例"}), 400
     case_path = active_case_path
+    if _case_in_use(case_path):
+        return jsonify(error='模型运行中，请结束后进行体检'), 409
+    if globals().get("_active_case_is_read_only_gotm", lambda: False)():
+        return jsonify({"checks": [{"level": "error", "title": "只读 GOTM reference",
+                                    "detail": "原始 reference 保持只读，不能从源目录运行。",
+                                    "fix": "使用“另存为”，包含原始结果与 GOTM release，创建工作副本后运行。"}],
+                        "ok": False, "blocking": 1, "n_warn": 0,
+                        "engine": "gotm", "model_dimension": "single_column"})
+    if globals().get("_is_trusted_gotm_working_copy", lambda _p: False)(case_path):
+        checks = []
+        try:
+            config = yaml.safe_load((case_path / "gotm.yaml").read_text(encoding="utf-8")) or {}
+            tcfg = config.get("time", {})
+            _parse_gotm_time_interval(tcfg)
+            valid = True
+            detail = f"{tcfg.get('start')} — {tcfg.get('stop')}；dt={float(tcfg.get('dt')):g}s"
+        except Exception as exc:
+            valid = False
+            detail = f"GOTM 时间区间无效: {exc}"
+        checks.append({"level": "ok" if valid else "error", "title": "GOTM 单水柱时间配置",
+                       "detail": detail,
+                       "fix": None if valid else "修复副本 gotm.yaml 中的 time 配置。"})
+        exe_ok = (case_path / "gotm_release.exe").is_file() and not (case_path / "gotm_release.exe").is_symlink()
+        checks.append({"level": "ok" if exe_ok else "error", "title": "官方 GOTM release",
+                       "detail": "副本内 gotm_release.exe 和应用工作副本清单校验通过。" if exe_ok else "缺少副本内 GOTM release。",
+                       "fix": None if exe_ok else "从只读 reference 重新另存工作副本。"})
+        checks.append({"level": "ok", "title": "模型维度",
+                       "detail": "GOTM 一维代表水柱；此案例不使用 GETM 空间网格或二维/三维 CFL 检查。"})
+        blocking = sum(item["level"] == "error" for item in checks)
+        return jsonify({"checks": checks, "ok": blocking == 0, "blocking": blocking,
+                        "n_warn": 0, "engine": "gotm", "model_dimension": "single_column"})
     inp_path = case_path / "getm.inp"
     if not inp_path.exists():
         return jsonify({"checks": [{"level": "error", "title": "缺少 getm.inp",
@@ -2604,6 +3836,30 @@ def run_check():
                         "ok": False, "blocking": 1})
     config = parse_getm_inp(inp_path)
     tcfg = config.get("time", {}) or {}
+
+    meteo_enabled = bool((config.get("meteo", {}) or {}).get("metforcing", False))
+    meteo_file_exists = (case_path / "meteo.nc").is_file()
+    if meteo_file_exists and not meteo_enabled:
+        add("error", "气象强迫配置不一致",
+            "案例中存在 meteo.nc，但 getm.inp 的 &meteo metforcing=.false.；GETM 将忽略已保存的气象数据。",
+            "保存气象强迫以自动启用 metforcing，或移除不打算使用的 meteo.nc。")
+    elif meteo_enabled and not meteo_file_exists:
+        add("error", "气象强迫配置不一致",
+            "getm.inp 启用了 metforcing，但案例目录中缺少 meteo.nc。",
+            "生成并保存气象强迫，或在运行设置中关闭 metforcing。")
+
+    # GETM elevation is relative to the bathymetric datum, not lake altitude.
+    m2d = config.get('m2d', {}) or {}
+    try:
+        elevation = float(m2d.get('elev_const', 0))
+        maximum = float((config.get('domain', {}) or {}).get('maxdepth', 0))
+        if m2d.get('elev_method', 1) == 1 and maximum > 0 and abs(elevation) > maximum:
+            add('warn', '水位基准可疑',
+                f'相对水位 elev_const={elevation:g}m 超过配置最大水深 {maximum:g}m。'
+                'GETM 会把相对水位加到水深；请核对是否误填了湖面绝对海拔。',
+                '在初始条件中核对湖面高程与水深基准面，再设置相对水位。')
+    except (ValueError, TypeError):
+        pass
 
     # 1 ── bathymetry
     bathy = str((config.get("domain", {}) or {}).get("bathymetry", "bathymetry.nc")).strip("'\"")
@@ -2627,19 +3883,22 @@ def run_check():
         dt_f = float(dt)
     except (TypeError, ValueError):
         dt_f = None
-    if dt_f is None:
-        add("warn", "时间步长缺失", "getm.inp 中未找到 timestep。", "在“运行设置”里设置时间步长。")
-    elif dt_max and dt_f > dt_max:
-        add("error", "时间步长超过稳定上限",
-            f"timestep={dt_f:g}s，CFL 临界约 {dt_cfl:.0f}s，本案例上限 {dt_max:g}s。"
-            f"超限时模型会静默发散（全湖变干、输出全 NaN）。",
-            f"把时间步长改为 60~{int(dt_cfl * 3)}s。")
+    if dt_f is None or not np.isfinite(dt_f) or dt_f <= 0:
+        add("error", "时间步长无效", "timestep 必须为有限的正数。", "在“时间设置”里设置有效时间步长。")
+    elif dt_max is not None and dt_f > dt_max:
+        add("error", "时间步长超过重力波 CFL 估计上限",
+            f"timestep={dt_f:g}s，本案例重力波 CFL 估计上限 {dt_max:.6g}s，超限可能导致数值发散。",
+            f"设为不超过 {dt_max:.6g}s，并从小步长短时试运行开始检查输出。")
+    elif dt_max is None:
+        add("warn", "CFL 无法估计",
+            f"timestep={dt_f:g}s；网格间距或有效水深不足，无法估计重力波 CFL 上限，也不保证生态过程稳定。",
+            "检查地形坐标和 dx/dy，启用 check_cfl，并从小步长短时试运行开始。")
     else:
-        add("ok", "时间步长", f"{dt_f:g}s（CFL 临界约 {dt_cfl:.0f}s，上限 {dt_max:g}s）")
+        add("ok", "时间步长", f"{dt_f:g}s ≤ 重力波 CFL 估计上限 {dt_max:.6g}s；此检查不保证生态过程稳定，需短时试运行检查输出。")
     if (config.get("domain", {}) or {}).get("check_cfl") is False:
         add("warn", "check_cfl 已关闭",
-            "check_cfl=.false. 时 GETM 不会因 CFL 超限而中止，只会静默发散。",
-            "调试期建议设为 .true.。")
+            "check_cfl=.false. 时 GETM 不会执行自身的重力波 CFL 检查，超限可能导致数值发散。",
+            "建议设为 .true.，并检查短时试运行输出。")
 
     # 3 ── output config
     out_path = case_path / "output.yaml"
@@ -2659,23 +3918,33 @@ def run_check():
                 f"（{_OUTPUT_UNREGISTERED[bad[0]]}）。模型启动时会以 "
                 f"wrap_field ... not registered 致命退出（STOP 1）。",
                 f"在“时间设置 → 输出变量”里去掉 {bad[0]}，或改用“标准/精简”预设。")
+        if not bad:
+            try:
+                resolved = _resolve_output_sources(case_path, sources, sys.modules[__name__])
+                if resolved != sources:
+                    add('error', '输出订阅需要转换', '当前订阅包含模块路径；本机求解器需要具体变量名称。',
+                        '点击转换按钮，保留所选模块并生成求解器支持的变量列表。')
+            except ValueError as exc:
+                add('error', '输出订阅无效', str(exc), '检查字段名称，或明确改用标准输出。')
         est = _output_size_estimate(case_path, sources)
-        if "*" in sources:
-            add("warn", "输出全部变量",
-                f"source: * 会写出模型注册的每一个变量。"
-                + (f"预计约 {est['gb']} GB。" if est.get("available") else "")
-                + "（滇池 362 天实测 17.9 GB）",
-                "改用“标准”订阅：水动力 + 关键生态模块。")
-        elif est.get("available"):
+        if est.get("available"):
             gb = est.get("gb", 0)
-            add("ok" if gb < 2 else "warn", "输出体积",
-                f"预计 {gb} GB（{est['ntime']} 时步 × {est['ncells']} 水格 × {est['n_vars']} 变量）",
-                None if gb < 2 else "减少订阅模块或加大 time_step 降采样。")
+            detail = (f"output.yaml 订阅字段数据负载估算约 {gb} GB "
+                      f"（{est['ntime']} 时步 × {est['ncells']} 水格 × {est['n_vars']} 变量）。"
+                      f"{est['estimate_note']}")
+            if "*" in sources:
+                detail += " source: * 包含当前模型注册变量；仅此订阅也可能产生较大输出。"
+            add("warn", "输出体积（部分估算）", detail,
+                "按研究问题精简订阅；运行前另行核对磁盘余量，并记录实际输出体积。")
+        elif "*" in sources:
+            add("warn", "输出全部变量",
+                "source: * 会写出模型注册的每一个变量；输出体积不可估算，且总磁盘需求未知。",
+                "改用“标准”订阅：水动力 + 关键生态模块。")
 
     # 4 ── forcing coverage
     try:
-        for w in _ensure_forcing_coverage(case_path, config):
-            add("warn", "驱动数据覆盖不足", w, "延长气象/入流数据，或缩短模拟时段。")
+        for w in inspect_forcing_coverage(case_path, config, sys.modules[__name__]):
+            add("error", "驱动数据覆盖不足", w, "延长气象/入流数据，或缩短模拟时段。")
     except ValueError as e:
         add("error", "驱动文件损坏", str(e), "重新生成气象/入流输入。")
 
@@ -2703,12 +3972,16 @@ def run_check():
             e2 = _output_size_estimate(case_path, srcs)
             if e2.get("available"):
                 need = e2["bytes"]
-        if need and free < need * 1.2:
-            add("error", "磁盘空间不足",
-                f"预计输出 {need / 1e9:.1f} GB，当前可用 {free / 1e9:.1f} GB。",
-                "减少输出变量或清理磁盘。")
-        elif need:
-            add("ok", "磁盘空间", f"预计输出 {need / 1e9:.2f} GB，可用 {free / 1e9:.1f} GB")
+        if need:
+            add("warn", "磁盘空间（完整需求未知）",
+                f"output.yaml 订阅字段数据负载估算约 {need / 1e9:.2f} GB；"
+                f"当前可用 {free / 1e9:.1f} GB。该值未计 GETM 2D/3D 流及网格/文件开销，"
+                "它不是完整输出量下界，不能据此判定完整磁盘空间充足或不足。",
+                "确认输出目录剩余空间，或先缩短代表性窗口并检查实际生成文件大小。")
+        else:
+            add("warn", "磁盘空间（完整需求未知）",
+                "无法估算 output.yaml 订阅字段负载；GETM 2D/3D 流及完整磁盘需求也未知。",
+                "确认输出目录剩余空间，并先用短窗口检查实际生成文件大小。")
     except Exception:
         pass
 
@@ -2717,114 +3990,439 @@ def run_check():
                     "n_warn": sum(1 for c in checks if c["level"] == "warn")})
 
 
+def _mpi_grid_shape(case_path):
+    """Read GETM's inclusive i/j computational extents for MPI checks."""
+    try:
+        domain = (parse_getm_inp(Path(case_path) / "getm.inp").get("domain") or {})
+        il, ih = int(domain["il"]), int(domain["ih"])
+        jl, jh = int(domain["jl"]), int(domain["jh"])
+        if ih < il or jh < jl:
+            return None
+        return ih - il + 1, jh - jl + 1
+    except (OSError, TypeError, ValueError, KeyError):
+        return None
+
+
+def _mpi_tuning_signature(case_path, allowed_processes, installation=None,
+                          duration_seconds=None, repetitions=1):
+    """Bind cached measurements to machine, solver inputs, and output schedule."""
+    import platform
+    from mpi_tuning import physical_cpu_count
+    case = Path(case_path).resolve()
+    digest = hashlib.sha256()
+    # Include all non-result input file names, sizes and timestamps. This covers
+    # grid, forcing, FABM, timestep, module and output settings without reading
+    # large NetCDF forcing files into memory.
+    for path in sorted(case.rglob("*")):
+        if not path.is_file() or any(part.lower() in {"output", ".git", "__pycache__"}
+                                     for part in path.relative_to(case).parts):
+            continue
+        rel = str(path.relative_to(case)).replace("\\", "/")
+        try:
+            stat = path.stat()
+        except OSError:
+            continue
+        digest.update(f"{rel}\0{stat.st_size}\0{stat.st_mtime_ns}\n".encode("utf-8"))
+    try:
+        import psutil
+        affinity = sorted(psutil.Process().cpu_affinity())
+    except Exception:
+        affinity = list(range(os.cpu_count() or 1))
+    info = {"case": digest.hexdigest(), "machine": platform.node(),
+            "system": platform.platform(), "processor": platform.processor(),
+            "logical": os.cpu_count(), "physical": physical_cpu_count(),
+            "affinity": affinity, "grid": _mpi_grid_shape(case),
+            "allowed": sorted(allowed_processes),
+            "tuner": "end-to-end-v2",
+            "duration_seconds": duration_seconds,
+            "repetitions": repetitions}
+    for key in ("launcher", "solver"):
+        path = Path((installation or {}).get(key, ""))
+        try:
+            stat = path.stat()
+            info[key] = (str(path.resolve()), stat.st_size, stat.st_mtime_ns)
+        except OSError:
+            info[key] = str(path)
+    return hashlib.sha256(json.dumps(info, sort_keys=True).encode()).hexdigest()
+
+
+def _mpi_tuning_worker(case_path, installation, allowed, signature, duration, repeats):
+    from mpi_tuning import benchmark_mpi_case
+    token = _mpi_tuning_state["cancel"]
+    def progress(value):
+        _mpi_tuning_state["progress"] = value
+    try:
+        result = benchmark_mpi_case(
+            case_path, launcher=installation["launcher"], solver=installation["solver"],
+            runtime_dirs=installation.get("runtime_dirs", []),
+            allowed_processes=allowed, duration_seconds=duration, repetitions=repeats,
+            cancelled=token.is_set, progress=progress)
+        if result.get("selected_processes") is None:
+            raise RuntimeError("没有任何候选获得有效的成功运行与合并结果")
+        _mpi_tuning_state.update(status="completed", result=result, error=None)
+        _mpi_tuning_cache[signature] = result
+    except InterruptedError:
+        _mpi_tuning_state.update(status="cancelled", error=None)
+    except Exception as exc:
+        _mpi_tuning_state.update(status="failed", error=str(exc))
+    finally:
+        _mpi_tuning_state["progress"] = None
+
+
+_mpi_tuning_cache = {}
+
+
 @app.route("/api/run/start", methods=["POST"])
+@_with_nc_lock
 def run_start():
-    global run_process, run_thread, run_status, run_logs, run_case_path
+    global run_process, run_thread, run_status, run_logs, run_case_path, run_config, run_start_time
+    global _run_identity, _run_log_case_path
+    if _mpi_tuning_state.get("status") == "running":
+        return jsonify({"success": False, "error": "MPI 性能调优正在运行，请取消或等待其结束后再启动模型"}), 409
+    if run_thread is not None and run_thread.is_alive():
+        return jsonify({"success": False, "error": "上次运行仍在结束或检查结果，请稍后再启动"}), 409
     if not active_case_path:
         return jsonify({"success": False, "error": "请先加载案例"}), 400
+    raw_request = request.get_data(cache=True)
+    if not raw_request:
+        run_request = {}
+    else:
+        run_request = request.get_json(silent=True)
+        if not isinstance(run_request, dict):
+            return jsonify(success=False, error="请求体必须是 JSON 对象。"), 400
+    if "compress_results" in run_request and type(run_request["compress_results"]) is not bool:
+        return jsonify(success=False, error="compress_results 必须是布尔值。"), 400
+    compress_results = bool(run_request.get("compress_results", True))
+    mpi_requested = bool(run_request.get("mpi", False))
+    mpi_options = None
+    if mpi_requested:
+        from mpi_runner import (MPI_RUN_ENABLED, discover_mpi_installation,
+                                merge_case_rank_outputs, mpi_capabilities,
+                                mpi_hotstart_error, validate_process_count)
+        if not (active_case_path / "getm.inp").is_file():
+            return jsonify(success=False, error="MPI 仅支持包含 getm.inp 的 GETM 网格案例。"), 400
+        mpi_grid_shape = _mpi_grid_shape(active_case_path)
+        if mpi_grid_shape is None:
+            return jsonify(success=False, error="无法从 getm.inp 确定 MPI 网格范围；请检查 domain il/ih/jl/jh。"), 400
+        installation = discover_mpi_installation()
+        launcher, solver = installation["launcher"], installation["solver"]
+        capabilities = mpi_capabilities(launcher=launcher, solver=solver,
+                                        merger=merge_case_rank_outputs,
+                                        feature_enabled=MPI_RUN_ENABLED,
+                                        grid_shape=mpi_grid_shape)
+        if not capabilities["enabled"]:
+            return jsonify(success=False, error=capabilities["reason"], mpi=capabilities), 400
+        try:
+            n = validate_process_count(run_request.get("processes", 1),
+                                       allowed_processes=capabilities["allowed_processes"])
+        except ValueError as exc:
+            return jsonify(success=False, error=str(exc)), 400
+        mpi_options = (launcher, solver, n, installation["runtime_dirs"])
     if run_status == "running":
         return jsonify({"success": False, "error": "模型正在运行中"}), 400
+    active_is_native_gotm = (not (active_case_path / "getm.inp").is_file()
+                             and (_is_gotm_result_dir(active_case_path)
+                                  or _is_trusted_gotm_working_copy(active_case_path)))
+    if active_is_native_gotm:
+        if not _is_trusted_gotm_working_copy(active_case_path):
+            if not (active_case_path / "gotm_release.exe").is_file():
+                return jsonify({"success": False, "error": "GOTM 工作副本缺少 gotm_release.exe；请从只读 reference 重新另存为包含官方 release 与依赖的副本。"}), 400
+            return jsonify({"success": False, "error": "只读 GOTM reference 不可运行，或工作副本清单验证失败；请从只读 reference 重新另存。"}), 403
+        gotm_exe = active_case_path / "gotm_release.exe"
+        if gotm_exe.is_symlink() or not gotm_exe.is_file() or gotm_exe.resolve().parent != active_case_path.resolve():
+            return jsonify({"success": False, "error": "GOTM 工作副本缺少受校验的 gotm_release.exe；请从只读 reference 重新另存。"}), 400
+        if os.name != "nt":
+            return jsonify({"success": False, "error": "随附的 gotm_release.exe 需要 Windows 原生运行环境。"}), 400
+        if gotm_exe.read_bytes()[:2] != b"MZ":
+            return jsonify({"success": False, "error": "GOTM 工作副本的 gotm_release.exe 不是有效 Windows PE 文件；请从 reference 重新另存。"}), 400
+        try:
+            config = yaml.safe_load((active_case_path / "gotm.yaml").read_text(encoding="utf-8")) or {}
+            times = config.get("time", {})
+            start, stop, dt = _parse_gotm_time_interval(times)
+        except Exception as exc:
+            return jsonify({"success": False, "error": f"GOTM 时间配置无效: {exc}"}), 400
+        try:
+            (active_case_path / "output.nc").unlink(missing_ok=True)
+        except OSError as exc:
+            return jsonify({"success": False, "error": f"无法清理副本中的旧 output.nc，拒绝启动以避免读取陈旧结果: {exc}"}), 400
+        run_process = None
+        _reset_run_repair_summary()
+        run_logs = ["[INFO] 启动官方 GOTM release；模型维度：单水柱。"]
+        run_status = "running"
+        run_case_path = active_case_path
+        _run_log_case_path = active_case_path
+        _run_identity = uuid.uuid4().hex
+        run_config = {"engine": "official_gotm_reference_working_copy", "start": str(start),
+                      "stop": str(stop), "timestep_seconds": dt}
+        run_start_time = time.time()
+        run_metrics.start(run_config, now=run_start_time)
+        run_thread = threading.Thread(target=run_model_thread, args=(active_case_path, gotm_exe), daemon=True)
+        run_thread.start()
+        return jsonify({"success": True, "engine": "gotm", "model_dimension": "single_column"})
+    from run_diagnostics import quoted_logicals
+    namelist_path = Path(active_case_path) / 'getm.inp'
+    if namelist_path.is_file() and quoted_logicals(namelist_path.read_bytes()):
+        return jsonify(success=False,error='逻辑值不能带引号，请运行体检并修复逻辑值引号。'),400
     if not EXE_PATH.exists():
         return jsonify({"success": False, "error": f"可执行文件不存在: {EXE_PATH}"}), 400
+    if str(EXE_PATH).lower().endswith('.exe'):
+        runtime_check = inspect_runtime(EXE_PATH, probe=True)
+        if not runtime_check['ready']:
+            return jsonify(success=False, error=runtime_check['detail'], runtime=runtime_check), 400
 
+    run_process = None
     run_logs = []
     inp_path = active_case_path / "getm.inp"
     config = parse_getm_inp(inp_path) if inp_path.exists() else {}
+    if mpi_options:
+        hotstart_error = mpi_hotstart_error(config)
+        if hotstart_error:
+            return jsonify(success=False, error=(
+                "当前并行求解器不支持 FABM 热启动：读取串行检查点会在 FABM temporal checkpoint 处失败。"
+                "请关闭热启动后冷启动并行运行，或改用串行求解器。"
+            )), 400
+    meteo_enabled = bool((config.get("meteo", {}) or {}).get("metforcing", False))
+    meteo_file_exists = (active_case_path / "meteo.nc").is_file()
+    if meteo_file_exists and not meteo_enabled:
+        return jsonify(success=False, error="拒绝运行：存在 meteo.nc，但 &meteo metforcing=.false.，GETM 会忽略该气象数据。请保存气象强迫以启用它，或移除未使用的 meteo.nc。"), 400
+    if meteo_enabled and not meteo_file_exists:
+        return jsonify(success=False, error="拒绝运行：metforcing 已启用但缺少 meteo.nc。请生成气象强迫，或关闭 metforcing。"), 400
     # Pre-flight: timestep sanity (CFL). A too-large timestep makes GETM
     # diverge silently (check_cfl=.false.): lake dries out, all-NaN output.
     _dt = config.get("time", {}).get("timestep") if isinstance(config, dict) else None
     _dt_max, _dt_cfl = _cfl_max_timestep(active_case_path)
-    if _dt is not None and _dt_max:
-        try:
-            _dt = float(_dt)
-        except (TypeError, ValueError):
-            _dt = None
-        if _dt and _dt > _dt_max:
-            return jsonify({
-                "success": False,
-                "error": (f"拒绝运行：时间步长 {_dt:g}s 超过稳定上限 {_dt_max}s"
-                          f"（CFL≈{_dt_cfl:.0f}s 的 15 倍）。请先在“运行设置”里把时间步长"
-                          f"改小（建议 60~{int(_dt_cfl * 3)}s），否则模型数值发散、输出全为 NaN。"),
-            }), 400
+    try:
+        _dt = float(_dt)
+    except (TypeError, ValueError):
+        _dt = None
+    if _dt is None or not np.isfinite(_dt) or _dt <= 0:
+        return jsonify(success=False, error="拒绝运行：timestep 必须为有限的正数，请先在“时间设置”里修改。"), 400
+    if _dt_max is not None and _dt > _dt_max:
+        return jsonify({
+            "success": False,
+            "error": (f"拒绝运行：时间步长 {_dt:g}s 超过重力波 CFL 估计上限 {_dt_max:.6g}s。"
+                      f"请设为不超过 {_dt_max:.6g}s；通过 CFL 检查也不保证生态过程稳定，"
+                      "应从小步长短时试运行开始，检查输出是否有限。"),
+        }), 400
+    if _dt_max is None:
+        run_logs.append("[WARN] 无法估计重力波 CFL 上限，请检查地形坐标和 dx/dy，并启用 check_cfl。")
+    run_logs.append("[WARN] 重力波 CFL 检查不保证生态过程稳定，请用小步长短时试运行检查输出是否有限。")
     # Pre-flight: forcing coverage (meteo/rivers must cover stop, else the
     # model dies with an EOF crash near the end of the run - Dianchi incident).
     try:
-        for w in _ensure_forcing_coverage(active_case_path, config):
-            run_logs.append(f"[WARN] {w}")
+        output_path = active_case_path / 'output.yaml'
+        if output_path.exists():
+            selected = _parse_output_sources(_parse_output_yaml(output_path)['variables_raw']) or ['*']
+            if _resolve_output_sources(active_case_path, selected, sys.modules[__name__]) != selected:
+                return jsonify(success=False, error='请先运行体检并转换输出订阅名称'), 400
+        coverage_warnings = inspect_forcing_coverage(active_case_path, config, sys.modules[__name__])
+        if coverage_warnings:
+            return jsonify(success=False, error='驱动数据覆盖不足：' + '；'.join(coverage_warnings)), 400
     except ValueError as e:
         return jsonify({"success": False, "error": f"驱动数据检查失败: {e}"}), 400
     # Pre-flight: when fabm.yaml enables the GHG modules the executable must
     # contain them, else FABM aborts at startup with an unknown-model fatal.
-    if _ghg_case_enabled(active_case_path):
+    # The MPI executable is a separately packaged solver with its own FABM
+    # modules. The serial GHG build/deploy check applies only when the serial
+    # executable will run; coupling this check to an MPI request can block a
+    # valid MPI binary while an unrelated serial rebuild is pending.
+    if _ghg_case_enabled(active_case_path) and not mpi_options:
         try:
             _ghg_ensure_exe_for_run(run_logs)
         except ValueError as e:
             return jsonify({"success": False, "error": str(e)}), 400
+    _reset_run_repair_summary()
     run_status = "running"
     run_case_path = active_case_path
-    run_thread = threading.Thread(target=run_model_thread, args=(active_case_path, EXE_PATH), daemon=True)
+    _run_log_case_path = active_case_path
+    _run_identity = uuid.uuid4().hex
+    run_config = estimate_run_time(active_case_path, config)
+    run_config["compress_results"] = compress_results
+    run_start_time = time.time()
+    if mpi_options:
+        launcher, solver, n, runtime_dirs = mpi_options
+        run_config["solver_mode"] = f"MPI ({n} ranks)"
+        run_config["phase"] = "preparing"
+        run_thread = threading.Thread(target=run_mpi_model_thread,
+                                      args=(active_case_path, launcher, solver, n, runtime_dirs), daemon=True)
+    else:
+        run_thread = threading.Thread(target=run_model_thread, args=(active_case_path, EXE_PATH), daemon=True)
+    run_metrics.start(run_config, now=run_start_time)
     run_thread.start()
     return jsonify({"success": True})
 
 @app.route("/api/run/status")
 def run_status_api():
-    elapsed = 0
-    if run_start_time and run_status == "running":
-        elapsed = time.time() - run_start_time
-
-    # Parse progress from logs
-    progress = 0
-    current_step = 0
-    for line in reversed(run_logs[-50:]):
-        # 行首 n = NNN 才是步数；避免把 "len = 364"（气象时间维长度）误匹配成进度
-        m = re.search(r"^\s*n\s*=\s*(\d+)", line)
-        if m:
-            current_step = int(m.group(1))
-            break
-
-    # Estimate total steps
-    total_steps = 0
-    if active_case_path:
-        try:
-            config = parse_getm_inp(active_case_path / "getm.inp")
-            est = estimate_run_time(active_case_path, config)
-            total_steps = est.get("nsteps", 0)
-        except Exception:
-            pass
-
-    if total_steps > 0 and current_step > 0:
-        progress = min(100, current_step / total_steps * 100)
-
-    eta = 0
-    if progress > 0 and elapsed > 0:
-        eta = elapsed / progress * (100 - progress)
-
+    try:
+        requested_log_limit = int(request.args.get("log_limit", "80"))
+    except (TypeError, ValueError):
+        requested_log_limit = 80
+    log_limit = max(80, min(5000, requested_log_limit))
+    metrics = run_metrics.snapshot(run_status)
+    result_case = Path(run_case_path or _run_log_case_path or active_case_path) if (run_case_path or _run_log_case_path or active_case_path) else None
+    solver_mode = (run_config.get("solver_mode") if isinstance(run_config, dict) else None) or "预编译串行求解器"
+    phase = run_config.get("phase") if isinstance(run_config, dict) else None
+    if run_status in {"completed", "failed", "stopped"}:
+        phase = run_status
+    if solver_mode.startswith("MPI"):
+        if run_status == "running" and phase == "merging":
+            # Solver-step ETA stops being meaningful after the launcher exits.
+            metrics["eta_seconds"] = None
+            metrics["eta_minutes"] = None
+    if run_status == "running" and phase == "compressing":
+        # Compressing/validating outputs is post-processing; solver-step ETA
+        # cannot estimate it. Preserve observed solver progress below 100%.
+        metrics["eta_seconds"] = None
+        metrics["eta_minutes"] = None
     return jsonify({
         "status": run_status,
-        "logs": run_logs[-200:],
+        "phase": phase,
+        "case_directory": str(result_case) if result_case else None,
+        "run_identity": _run_identity or (f"case:{active_case_path}" if active_case_path else "no-case"),
+        "log_case_directory": str(Path(_run_log_case_path).resolve()) if _run_log_case_path else None,
+        "output_directory": str(result_case / 'output') if result_case else None,
+        "writing_directory": str(result_case) if result_case and run_status == 'running' else None,
+        # Keep polling lightweight while FABM is emitting thousands of
+        # registration lines.  The full log remains on disk; the UI only needs
+        # a recent tail and can fetch the file after completion.
+        "logs": run_logs[-log_limit:],
         "total_logs": len(run_logs),
-        "elapsed": elapsed,
-        "progress": progress,
-        "current_step": current_step,
-        "total_steps": total_steps,
-        "eta_seconds": eta,
-        "eta_minutes": eta / 60,
+        "fabm_repair_summary": _run_repair_summary_payload(),
+        **metrics,
+        "performance": {"solver_mode": solver_mode, "step_cost_seconds":
+                        1 / metrics['steps_per_second'] if metrics['steps_per_second'] and metrics['steps_per_second'] > 0 else None,
+                        "estimate": run_config},
     })
 
+
+@app.route("/api/run/mpi-capabilities")
+def mpi_capabilities_api():
+    """Describe gated MPI availability for the run-control UI."""
+    from mpi_runner import (MPI_RUN_ENABLED, discover_mpi_installation,
+                            merge_case_rank_outputs, mpi_capabilities)
+    installation = discover_mpi_installation()
+    grid_shape = _mpi_grid_shape(active_case_path) if active_case_path and (active_case_path / "getm.inp").is_file() else None
+    result = mpi_capabilities(launcher=installation["launcher"],
+                              solver=installation["solver"],
+                              merger=merge_case_rank_outputs,
+                              feature_enabled=MPI_RUN_ENABLED,
+                              grid_shape=grid_shape)
+    if active_case_path and grid_shape is None:
+        result["enabled"] = False
+        result["reason"] = "无法从当前 GETM 案例确定 MPI 网格范围；请检查 domain il/ih/jl/jh。"
+    return jsonify(result)
+
+
+@app.route("/api/run/mpi-tuning", methods=["GET", "POST", "DELETE"])
+def mpi_tuning_api():
+    """Explicitly measure candidate MPI counts on disposable case copies."""
+    if request.method == "GET":
+        return jsonify({key: value for key, value in _mpi_tuning_state.items()
+                        if key != "cancel"})
+    if request.method == "DELETE":
+        token = _mpi_tuning_state.get("cancel")
+        if token is not None and _mpi_tuning_state.get("status") == "running":
+            token.set()
+            return jsonify(success=True, status="cancelling")
+        return jsonify(success=False, error="当前没有可取消的调优任务"), 409
+    if not active_case_path or not (Path(active_case_path) / "getm.inp").is_file():
+        return jsonify(success=False, error="请先加载含 getm.inp 的 GETM 网格案例"), 400
+    if run_status == "running" or (run_thread is not None and run_thread.is_alive()):
+        return jsonify(success=False, error="模型正在运行，调优不会与模型运行并发"), 409
+    # A second desktop/service instance may own a long run. Avoid starting
+    # benchmark solvers while any GETM solver/launcher is active on this PC.
+    try:
+        import psutil
+        for process in psutil.process_iter(["name"]):
+            name = (process.info.get("name") or "").lower().removesuffix(".exe")
+            if name in {"getm_cartesian", "getm_cartesian_parallel", "mpiexec"}:
+                return jsonify(success=False, error="检测到本机已有 GETM/MPI 进程；请待其结束后再测量"), 409
+    except Exception as exc:
+        return jsonify(success=False, error=f"无法可靠检查本机 GETM 进程，调优已阻止：{exc}"), 503
+    from mpi_runner import (MPI_RUN_ENABLED, discover_mpi_installation,
+                            merge_case_rank_outputs, mpi_capabilities)
+    installation = discover_mpi_installation()
+    capability = mpi_capabilities(launcher=installation["launcher"],
+                                   solver=installation["solver"],
+                                   merger=merge_case_rank_outputs,
+                                   feature_enabled=MPI_RUN_ENABLED,
+                                   grid_shape=_mpi_grid_shape(active_case_path))
+    if not capability.get("enabled"):
+        return jsonify(success=False, error=capability.get("reason", "MPI 不可用")), 400
+    try:
+        requested = request.get_json(silent=True) or {}
+        duration = max(3600, min(604800, int(requested.get("duration_seconds", 10800))))
+        repeats = max(1, min(2, int(requested.get("repetitions", 1))))
+    except (TypeError, ValueError):
+        return jsonify(success=False, error="调优时长或重复次数无效"), 400
+    allowed = capability.get("allowed_processes", [])
+    from mpi_tuning import minimum_trial_duration
+    duration = max(duration, minimum_trial_duration(active_case_path))
+    from mpi_tuning import choose_tuning_candidates, physical_cpu_count
+    candidates = choose_tuning_candidates(allowed, physical_cpu_count(),
+                                          logical_cores=max(allowed, default=1))
+    signature = _mpi_tuning_signature(active_case_path, allowed, installation,
+                                      duration_seconds=duration, repetitions=repeats)
+    cached = _mpi_tuning_cache.get(signature)
+    if cached:
+        return jsonify(success=True, cached=True, result=cached)
+    with _mpi_tuning_lock:
+        if _mpi_tuning_state.get("status") == "running":
+            return jsonify(success=False, error="已有 MPI 调优任务正在运行"), 409
+        token = threading.Event()
+        _mpi_tuning_state.update(status="running", progress=None, result=None,
+                                 error=None, cancel=token, signature=signature)
+        worker = threading.Thread(target=_mpi_tuning_worker,
+                                  args=(Path(active_case_path).resolve(), installation,
+                                        allowed, signature, duration, repeats),
+                                  name="mpi-performance-tuning", daemon=True)
+        worker.start()
+    return jsonify(success=True, status="running", cached=False,
+                   duration_seconds=duration,
+                   simulation_hours_per_candidate=duration / 3600,
+                   candidate_count=len(candidates), repetitions=repeats,
+                   candidate_processes=candidates)
+
 @app.route("/api/run/stop", methods=["POST"])
+@_with_nc_lock
 def run_stop():
     global run_process, run_status
-    if run_process and run_status == "running":
-        run_process.terminate()
+    if run_status == "running":
+        run_status = "stopped"
+        if run_process is None:
+            run_logs.append("[INFO] 启动任务已取消")
+            return jsonify({"success": True})
+        from mpi_runner import stop_process_tree
+        stop_process_tree(run_process)
         try:
             run_process.wait(timeout=5)
-        except subprocess.TimeoutExpired:
+        except (subprocess.TimeoutExpired, ProcessTimeoutExpired):
             run_process.kill()
         run_status = "stopped"
         run_logs.append("[INFO] 模型已被用户停止")
     return jsonify({"success": True})
 
 # ── Routes: Results ───────────────────────────────────────────────────
+
+def _add_authoritative_boundary(payload, case_path):
+    """Attach saved source geometry to any grid representation that supports it."""
+    saved_boundary = _load_saved_boundary_geometry(case_path)
+    if saved_boundary is None:
+        return payload
+    boundary_identity = hashlib.sha256(json.dumps(
+        saved_boundary["projected_polygons"], sort_keys=True,
+        separators=(",", ":"), allow_nan=False).encode("utf-8")).hexdigest()
+    provenance = dict(saved_boundary.get("provenance") or {})
+    provenance["identity"] = boundary_identity
+    payload["authoritative_boundary"] = {
+        "projected_polygons": saved_boundary["projected_polygons"],
+        "projected_crs": saved_boundary.get("projected_crs"),
+        "source_crs": saved_boundary.get("source_crs"),
+        "coordinate_space": saved_boundary.get("coordinate_space"),
+        "provenance": provenance,
+    }
+    return payload
+
 
 @app.route("/api/geo/grid")
 def geo_grid():
@@ -2842,9 +4440,15 @@ def geo_grid():
         with nc_open(b) as ds:
             if "bathymetry" not in ds.variables:
                 return jsonify({"error": "bathymetry.nc 中没有 bathymetry 变量"}), 400
+            if request.args.get("display") == "scientific":
+                from scientific_geometry import read_scientific_geometry
+                return jsonify(_add_authoritative_boundary(
+                    read_scientific_geometry(ds), active_case_path))
             depth = np.ma.filled(np.ma.masked_invalid(
-                np.asarray(ds.variables["bathymetry"][:], dtype="f8")), np.nan)
+                np.ma.asarray(ds.variables["bathymetry"][:], dtype="f8")), np.nan)
             ny, nx = depth.shape
+            from scientific_geometry import metre_axes
+            verified_x, verified_y = metre_axes(ds, ny, nx)
             lon = lat = None
             if "lonc" in ds.variables and "latc" in ds.variables:
                 lon = np.ma.filled(np.ma.masked_invalid(
@@ -2864,16 +4468,34 @@ def geo_grid():
     depth_s = depth[sl]
     land = ~(depth_s > 0)
     depth_out = np.where(land, np.nan, depth_s)
+    y_indices, x_indices = list(range(0, ny, stride)), list(range(0, nx, stride))
+    from scientific_geometry import sampled_display_topology
+    display_topology = sampled_display_topology(
+        depth, y_indices, x_indices,
+        x_axis=verified_x if verified_x is not None else np.arange(nx, dtype='f8'),
+        y_axis=verified_y if verified_y is not None else np.arange(ny, dtype='f8'))
     dx = float(abs(x[1] - x[0])) if x is not None and len(x) > 1 else \
         (float(abs(y[1] - y[0])) if y is not None and len(y) > 1 else 0.0)
     out = {
         "nx": int(depth_s.shape[1]), "ny": int(depth_s.shape[0]),
         "nx_full": nx, "ny_full": ny, "stride": stride,
         "dx": dx,
+        "dy": float(abs(y[1] - y[0])) if y is not None and len(y) > 1 else dx,
+        "xc": verified_x[::stride] if verified_x is not None else list(range(0, nx, stride)),
+        "yc": verified_y[::stride] if verified_y is not None else list(range(0, ny, stride)),
+        "coordinate_mode": "projected" if verified_x is not None else "index",
+        "coordinate_units": "m" if verified_x is not None else "index",
         "depth": [[None if not np.isfinite(v) else round(float(v), 3) for v in row]
                   for row in depth_out],
+        "dry_mask": (np.isfinite(depth_s) & (depth_s <= 0)).tolist(),
+        "display_topology": display_topology,
+        "land_elevation": None,
         "has_lonlat": lon is not None,
     }
+    # Both sampled map geometry and full-resolution scientific geometry share
+    # the same saved outline. Missing sidecars intentionally keep the wet-mask
+    # fallback; grid cells are never promoted to authoritative shoreline data.
+    out = _add_authoritative_boundary(out, active_case_path)
     if lon is not None:
         lon_s, lat_s = lon[sl], lat[sl]
         out["lon"] = [[None if not np.isfinite(v) else round(float(v), 6) for v in row]
@@ -2905,7 +4527,7 @@ def geo_field():
         level = int(request.args.get("level", -1))
     except ValueError:
         return jsonify({"error": "time/level 必须是整数"}), 400
-    of = find_output_files(active_case_path)
+    of = find_output_files(active_case_path, request.args.get('var'))
     nc_path = of.get("3d") or of.get("2d")
     if not nc_path:
         return jsonify({"error": "没有可用的输出文件（请先运行模型）"}), 404
@@ -2927,7 +4549,7 @@ def geo_field():
                 arr = v[t, :, :]
             else:
                 arr = v[:]
-            a = np.ma.filled(np.ma.masked_invalid(np.asarray(arr, dtype="f8")), np.nan)
+            a = np.ma.filled(np.ma.masked_invalid(np.ma.asarray(arr, dtype="f8")), np.nan)
     except Exception as e:
         return jsonify({"error": f"读取字段失败: {e}"}), 500
     ny, nx = a.shape
@@ -2952,18 +4574,72 @@ def results_variables():
         return jsonify({"error": "未加载案例"}), 400
     if _output_locked():
         return jsonify({"error": "模型运行中，输出文件正在写入，暂不能读取"}), 409
-    files = find_output_files(active_case_path)
+    # Pin the case identity for this request. A case switch during the cold
+    # read must not put a mixed inventory into the cache under the old key.
+    case_path = Path(active_case_path).resolve()
+    files = find_output_files(case_path, request.args.get('var'))
+    cache_key = _result_inventory_key(case_path, files)
+    cached = _result_inventory_cache.get(cache_key)
+    if cached is not None:
+        return jsonify(cached)
     result = {"2d": [], "3d": []}
     if files["2d"]:
         result["2d"] = get_variable_list(files["2d"])
-    if files["3d"]:
-        result["3d"] = get_variable_list(files["3d"])
+    inventory_paths = files.get('3d_candidates') or [
+        path for path in (files.get('3d'), files.get('legacy3d')) if path]
+    seen = set()
+    for path in inventory_paths:
+        for item in get_variable_list(path):
+            if item['name'] not in seen:
+                result['3d'].append(item)
+                seen.add(item['name'])
     result["timesteps_2d"] = get_ntimesteps(files["2d"]) if files["2d"] else 0
     result["timesteps_3d"] = get_ntimesteps(files["3d"]) if files["3d"] else 0
+    result['geometry_2d'] = _result_horizontal_geometry(files['2d']) if files.get('2d') else None
+    result['geometry_3d'] = _result_horizontal_geometry(files['3d']) if files.get('3d') else None
     # 真实日期标签（2d/3d 抽帧间隔通常 != 1 天，不能把帧序号当天数）
     result["time_labels_2d"] = _nc_time_labels(files["2d"]) if files["2d"] else []
     result["time_labels_3d"] = _nc_time_labels(files["3d"]) if files["3d"] else []
+    axes = list(dict.fromkeys(item['time_axis'] for group in ('2d', '3d') for item in result[group]))
+    result['time_axes'] = {path: _nc_time_labels(path) for path in axes}
+    current_case = Path(active_case_path).resolve() if active_case_path else None
+    if current_case == case_path:
+        _result_inventory_cache.put(cache_key, result)
     return jsonify(result)
+
+
+def _result_horizontal_geometry(path):
+    """Describe native horizontal output dimensions without fabricating space."""
+    resolved = Path(path).resolve()
+    try:
+        stat = resolved.stat()
+        key = (str(resolved), int(stat.st_size), int(stat.st_mtime_ns), int(getattr(stat, 'st_ino', 0)))
+    except OSError:
+        key = (str(resolved), None)
+    with _result_horizontal_geometry_cache_lock:
+        cached = _result_horizontal_geometry_cache.get(key)
+        if cached is not None:
+            _result_horizontal_geometry_cache.move_to_end(key)
+            return dict(cached)
+    with nc_open(path) as ds:
+        candidates = [v for v in ds.variables.values() if getattr(v, 'ndim', 0) == 4]
+        if not candidates:
+            candidates = [v for v in ds.variables.values() if getattr(v, 'ndim', 0) == 3]
+        if not candidates:
+            result = {'horizontal_shape': None, 'single_column': False,
+                      'source': 'output_dimensions', 'path': str(resolved)}
+        else:
+            variable = candidates[0]
+            shape = [int(variable.shape[-2]), int(variable.shape[-1])]
+            result = {'horizontal_shape': shape, 'single_column': shape == [1, 1],
+                      'source': 'native_output_dimensions', 'variable': variable.name,
+                      'path': str(resolved)}
+    with _result_horizontal_geometry_cache_lock:
+        _result_horizontal_geometry_cache[key] = dict(result)
+        _result_horizontal_geometry_cache.move_to_end(key)
+        while len(_result_horizontal_geometry_cache) > 16:
+            _result_horizontal_geometry_cache.popitem(last=False)
+    return result
 
 @app.route("/api/results/2d")
 def results_2d():
@@ -2971,7 +4647,7 @@ def results_2d():
         return jsonify({"error": "未加载案例"}), 400
     if _output_locked():
         return jsonify({"error": "模型运行中，输出文件正在写入，暂不能读取"}), 409
-    files = find_output_files(active_case_path)
+    files = find_output_files(active_case_path, request.args.get('var'))
     var_name = request.args.get("var", "temp")
     timestep = int(request.args.get("time", 0))
     level = int(request.args.get("level", 0))
@@ -2979,10 +4655,161 @@ def results_2d():
     nc_path = files["3d"] or files["2d"]
     if not nc_path:
         return jsonify({"error": "没有输出文件"}), 404
-    field = get_2d_field(nc_path, var_name, timestep, level)
+    geometry = _result_horizontal_geometry(nc_path)
+    if geometry.get('single_column'):
+        return jsonify({'error': '当前结果是单水柱（x=1、y=1），没有水平二维空间分布；请使用纵剖面或时间序列。',
+                        'reason': 'single_column_geometry', 'geometry': geometry}), 422
+    aggregation = request.args.get('aggregation', 'layer')
+    if aggregation not in ('layer', 'depth_mean'):
+        return jsonify({'error': '未知聚合方式'}), 400
+    try:
+        field = get_2d_field(nc_path, var_name, timestep, level,
+                             depth_average=aggregation == 'depth_mean',
+                             include_bathymetry=request.args.get('include_bathymetry', '1') != '0')
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
     if field is None:
         return jsonify({"error": f"变量 {var_name} 不存在，或输出文件没有任何时间记录（上次运行可能异常中断或 sync_interval=0）"}), 404
+    item = _lookup_result_variable(var_name)
+    if item:
+        field.update(_annotated_output(item, active_case_path))
     return jsonify(field)
+
+
+@app.route("/api/results/2d_batch", methods=["POST"])
+def results_2d_batch():
+    """Return up to four adjacent playback frames from one open result file."""
+    case_path, case_generation = _active_case_snapshot()
+    if not case_path:
+        return jsonify({"error": "未加载案例"}), 400
+    if _output_locked():
+        return jsonify({"error": "模型运行中，输出文件正在写入，暂不能读取"}), 409
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({"error": "批量结果请求必须是 JSON 对象"}), 400
+    var_name = str(payload.get("var", "")).strip()
+    times = payload.get("times")
+    level = payload.get("level", 0)
+    aggregation = payload.get("aggregation", "layer")
+    include_bathymetry = payload.get("include_bathymetry", False)
+    if (not var_name or not isinstance(times, list) or not 1 <= len(times) <= 4
+            or any(type(value) is not int or value < 0 for value in times)
+            or len(set(times)) != len(times)):
+        return jsonify({"error": "批量请求须提供 1 至 4 个不同的非负整数时步"}), 400
+    if type(level) is not int:
+        return jsonify({"error": "垂向层必须是整数"}), 400
+    if aggregation not in ("layer", "depth_mean"):
+        return jsonify({"error": "未知聚合方式"}), 400
+    if type(include_bathymetry) is not bool:
+        return jsonify({"error": "include_bathymetry 必须是布尔值"}), 400
+    expected_case_path = payload.get("expected_case_path")
+    if expected_case_path is not None:
+        try:
+            expected = str(Path(str(expected_case_path)).resolve()).casefold()
+            actual = str(case_path).casefold()
+        except (OSError, ValueError):
+            return jsonify({"error": "请求中的案例路径无效"}), 400
+        if expected != actual:
+            return jsonify({"error": "当前案例已切换，请重新请求当前帧"}), 409
+    expected_case_generation = payload.get("expected_case_generation")
+    if (expected_case_generation is not None
+            and (type(expected_case_generation) is not int
+                 or expected_case_generation != case_generation)):
+        return jsonify({"error": "当前案例版本已变化，请重新请求当前帧"}), 409
+    files = find_output_files(case_path, var_name)
+    nc_path = files["3d"] or files["2d"]
+    if not nc_path:
+        return jsonify({"error": "没有输出文件"}), 404
+    try:
+        source_path = Path(nc_path).resolve()
+        before = source_path.stat()
+        batch_data = get_2d_fields(nc_path, var_name, times, level,
+                                   depth_average=aggregation == "depth_mean",
+                                   include_bathymetry=include_bathymetry,
+                                   return_metadata=True)
+        after = source_path.stat()
+    except IndexError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except OSError:
+        return jsonify({"error": "结果文件不可用"}), 404
+    if (before.st_size != after.st_size or before.st_mtime_ns != after.st_mtime_ns
+            or getattr(before, 'st_ino', 0) != getattr(after, 'st_ino', 0)
+            or _output_locked()):
+        return jsonify({"error": "结果文件在批量读取期间发生变化，请重新请求"}), 409
+    if batch_data is None:
+        return jsonify({"error": f"变量 {var_name} 不存在，或输出文件没有任何时间记录"}), 404
+    frames, item = batch_data
+    if item.get("single_column"):
+        return jsonify({"error": "当前结果是单水柱，没有水平二维空间分布",
+                        "reason": "single_column_geometry",
+                        "geometry": {"horizontal_shape": item.get("horizontal_shape"),
+                                     "single_column": True,
+                                     "source": "native_output_dimensions",
+                                     "path": str(source_path)}}), 422
+    if not _same_case_snapshot(case_path, case_generation):
+        return jsonify({"error": "读取期间活动案例已切换，请重新请求当前帧"}), 409
+    if item:
+        for frame in frames.values():
+            frame.update(_annotated_output(item, case_path))
+    try:
+        stat = source_path.stat()
+    except OSError:
+        return jsonify({"error": "结果文件在响应期间不可用"}), 409
+    if (before.st_size != stat.st_size or before.st_mtime_ns != stat.st_mtime_ns
+            or getattr(before, 'st_ino', 0) != getattr(stat, 'st_ino', 0)
+            or _output_locked() or not _same_case_snapshot(case_path, case_generation)):
+        return jsonify({"error": "案例或结果在批量响应期间发生变化，请重新请求"}), 409
+    result_revision = f"{stat.st_size}:{stat.st_mtime_ns}:{getattr(stat, 'st_ino', 0)}"
+    return jsonify({
+        "frames": {str(timestep): frame for timestep, frame in frames.items()},
+        "result_revision": result_revision,
+        "case_path": str(case_path),
+        "case_generation": case_generation,
+    })
+
+
+@app.route("/api/results/range")
+def results_range():
+    """Scan a selected output window on the server and cache its stable colour range."""
+    if not active_case_path:
+        return jsonify({"error": "未加载案例"}), 400
+    if _output_locked():
+        return jsonify({"error": "模型运行中，输出文件正在写入，暂不能读取"}), 409
+    var_name = request.args.get("var", "temp")
+    start = request.args.get("start", type=int)
+    end = request.args.get("end", type=int)
+    if start is None or end is None or start < 0 or end < start:
+        return jsonify({"error": "播放范围必须是非负整数帧，且起始帧不大于结束帧"}), 400
+    files = find_output_files(active_case_path, var_name)
+    nc_path = files["3d"] or files["2d"]
+    if not nc_path:
+        return jsonify({"error": "没有输出文件"}), 404
+    path = Path(nc_path).resolve()
+    try:
+        stat = path.stat()
+    except OSError:
+        return jsonify({"error": "结果文件不存在"}), 404
+    key = (str(path), stat.st_mtime_ns, stat.st_size, var_name, start, end)
+    cached = _result_window_range_cache.get(key)
+    if cached is not None:
+        _result_window_range_cache.move_to_end(key)
+        return jsonify({**cached, "cache_hit": True})
+    from result_layers import time_window_range
+    try:
+        with nc_open(path) as ds:
+            result = time_window_range(ds, var_name, start, end)
+    except (OSError, ValueError, KeyError) as exc:
+        return jsonify({"error": str(exc)}), 400
+    if result is None:
+        return jsonify({"error": f"变量 {var_name} 不存在，或没有时间记录"}), 404
+    payload = {"variable": var_name, **result, "cache_hit": False}
+    _result_window_range_cache[key] = payload
+    _result_window_range_cache.move_to_end(key)
+    while len(_result_window_range_cache) > 64:
+        _result_window_range_cache.popitem(last=False)
+    return jsonify(payload)
 
 @app.route("/api/results/timeseries")
 def results_timeseries():
@@ -2990,7 +4817,7 @@ def results_timeseries():
         return jsonify({"error": "未加载案例"}), 400
     if _output_locked():
         return jsonify({"error": "模型运行中，输出文件正在写入，暂不能读取"}), 409
-    files = find_output_files(active_case_path)
+    files = find_output_files(active_case_path, request.args.get('var'))
     var_name = request.args.get("var", "temp")
     i = request.args.get("i", type=int)
     j = request.args.get("j", type=int)
@@ -3023,7 +4850,7 @@ def results_profile():
         return jsonify({"error": "未加载案例"}), 400
     if _output_locked():
         return jsonify({"error": "模型运行中，输出文件正在写入，暂不能读取"}), 409
-    files = find_output_files(active_case_path)
+    files = find_output_files(active_case_path, request.args.get('var'))
     var_name = request.args.get("var", "temp")
     timestep = int(request.args.get("time", 0))
     i = request.args.get("i", type=int)
@@ -3031,6 +4858,7 @@ def results_profile():
     nc_path = files["3d"]
     if not nc_path:
         return jsonify({"error": "没有3D输出文件"}), 404
+    from result_layers import physical_vertical_grid
     with nc_open(nc_path) as ds:
         if var_name not in ds.variables:
             return jsonify({"error": "变量不存在"}), 404
@@ -3038,18 +4866,22 @@ def results_profile():
         if var.ndim == 4 and var.shape[0] == 0:
             return jsonify({"error": "输出文件没有任何时间记录（上次运行可能异常中断或 sync_interval=0）"}), 404
         if var.ndim == 4:
+            start, sigma = physical_vertical_grid(ds, var)
             nt = var.shape[0]
             t = max(0, min(nt - 1, int(timestep))) if nt > 0 else 0
             if i is not None and j is not None:
-                col = var[t, :, j, i]
+                col = var[t, start:, j, i]
                 profile = (col.filled(np.nan) if isinstance(col, np.ma.MaskedArray) else np.asarray(col, dtype=float)).tolist()
             else:
-                slab = var[t, :, :, :]
+                slab = var[t, start:, :, :]
                 slab = slab.filled(np.nan) if isinstance(slab, np.ma.MaskedArray) else np.asarray(slab, dtype=float)
-                profile = np.nanmean(slab, axis=(1, 2)).tolist()
+                counts = np.isfinite(slab).sum(axis=(1, 2))
+                profile = np.divide(np.nansum(slab, axis=(1, 2)), counts,
+                                    out=np.full(len(slab), np.nan), where=counts > 0).tolist()
         else:
             profile = []
-        sigma = ds.variables["sigma"][:].tolist() if "sigma" in ds.variables else list(range(len(profile)))
+            sigma = []
+        profile = [float(v) if np.isfinite(v) else None for v in profile]
         return jsonify({
             "profile": profile,
             "sigma": sigma,
@@ -3062,7 +4894,7 @@ def results_profile():
 @app.route("/api/calibration/points", methods=["GET", "POST", "DELETE"])
 def calibration_points_api():
     if request.method == "GET":
-        return jsonify(calibration_points)
+        return jsonify(effective_calibration_points(sys.modules[__name__]))
     elif request.method == "POST":
         data = request.json
         point = {
@@ -3155,6 +4987,8 @@ def _parse_xlsx_calibration(file_storage):
     with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as tmp:
         tmp.write(file_storage.read())
         tmp_path = tmp.name
+    wb = None
+    rows_iter = None
     try:
         wb = load_workbook(tmp_path, read_only=True, data_only=True)
         ws = wb.active
@@ -3187,6 +5021,10 @@ def _parse_xlsx_calibration(file_storage):
             rows.append(row)
         return rows
     finally:
+        if rows_iter is not None and hasattr(rows_iter, 'close'):
+            rows_iter.close()
+        if wb is not None:
+            wb.close()
         try:
             os.unlink(tmp_path)
         except Exception:
@@ -3216,7 +5054,7 @@ def calibration_upload():
     point_id = request.form.get("point_id")
     if not point_id:
         return jsonify({"error": "缺少 point_id"}), 400
-    point = next((p for p in calibration_points if p["id"] == point_id), None)
+    point = next((p for p in effective_calibration_points(sys.modules[__name__]) if p["id"] == point_id), None)
     if not point:
         return jsonify({"error": f"率定点位 {point_id} 不存在"}), 404
     default_var = request.form.get("variable", "temp").strip() or "temp"
@@ -3269,14 +5107,59 @@ def calibration_comparison():
         return jsonify({"error": "模型运行中，输出文件正在写入，暂不能读取"}), 409
     pid = request.args.get("point_id")
     var = request.args.get("variable")
-    point = next((p for p in calibration_points if p["id"] == pid), None)
+    point = next((p for p in effective_calibration_points(sys.modules[__name__]) if p["id"] == pid), None)
     if not point:
         return jsonify({"error": "率定点位不存在"}), 404
 
-    files = find_output_files(active_case_path)
+    files = find_output_files(active_case_path, request.args.get('var'))
     nc_path = files["3d"] or files["2d"]
     if not nc_path:
         return jsonify({"error": "没有输出文件"}), 404
+
+    # Imported official observations are always paired against the full native
+    # physical column; legacy nearest-time data remain only on their old route.
+    from observation_store import ObservationStore
+    from observation_matching import pair_observations
+    case_path = Path(active_case_path).resolve()
+    observation_data = ObservationStore(case_path.parent).load(case_path.name)
+    observation_point_id = point.get('point_id', pid)
+    official = [r for r in observation_data.get('records', [])
+                if r.get('point_id') == observation_point_id and r.get('variable') == var]
+    if official:
+        target = dict(point)
+        target.setdefault('point_id', pid)
+        try:
+            native = _native_observation_model(nc_path, var, target)
+        except (OSError, ValueError, KeyError, IndexError) as exc:
+            return jsonify({'error': str(exc), 'diagnostics': [{'reason': str(exc)}],
+                            'downsampled': False}), 422
+        max_gap = observation_data.get('max_time_gap_hours')
+        pairs, diagnostics = pair_observations(official, native, max_time_gap_hours=max_gap)
+        scatter = [{'time': pair['observation']['time'], 'obs': pair['obs'], 'sim': pair['sim'],
+                    'source_line': pair['observation'].get('source_line')}
+                   for pair in pairs]
+        vals = [value for pair in scatter for value in (pair['obs'], pair['sim'])]
+        if vals:
+            low, high = min(vals), max(vals)
+            if low == high:
+                low -= 1; high += 1
+            pad = (high-low)*.05
+            axis_range = {'min': low-pad, 'max': high+pad}
+        else:
+            axis_range = {'min': 0, 'max': 1}
+        return jsonify({'point': point, 'variable': var, 'simulated': native,
+                        'observed': official, 'scatter_pairs': scatter,
+                        'axis_range': axis_range, 'diagnostics': diagnostics,
+                        'downsampled': False, 'geometry_source': native.get('geometry_source'),
+                        'mass_basis': native.get('mass_basis'),
+                        'mass_basis_source': native.get('mass_basis_source'),
+                        'mass_basis_provenance': native.get('mass_basis_provenance'),
+                        'mapping_note': (
+                            'workshop wet_obs.xml maps NO23.obs to sNO3W; this is an official NOx-to-NO3 proxy mapping.'
+                            if var == 'abiotic_water_sNO3W' else
+                            'NH4.obs is supplemental and is not listed in the official workshop wet_obs.xml mapping.'
+                            if var == 'abiotic_water_sNH4W' else None),
+                        'max_time_gap_hours': max_gap, 'observation_manifest': observation_data.get('manifest', [])})
 
     # Get simulated time series
     sim = get_timeseries(nc_path, var, i=point["i"], j=point["j"])
@@ -3293,15 +5176,363 @@ def calibration_comparison():
         "axis_range": axis_range,
     })
 
+@app.route('/api/calibration/observations/preview', methods=['POST'])
+def calibration_observations_preview():
+    """Preview official observations for the currently selected case."""
+    if not active_case_path:
+        return jsonify({'error': '未加载案例'}), 400
+    data = request.get_json(silent=True) or {}
+    files = data.get('files')
+    if not isinstance(files, list) or not files:
+        return jsonify({'error': 'files 必须为非空文件列表'}), 400
+    try:
+        max_gap = float(data.get('max_time_gap_hours'))
+        if not _math.isfinite(max_gap) or max_gap <= 0:
+            raise ValueError('max_time_gap_hours 必须是显式有限正数')
+        from observation_store import ObservationStore
+        case_path = Path(active_case_path).resolve()
+        store = ObservationStore(case_path.parent)
+        preview = store.preview(case_path.name, files, data.get('mappings') or {})
+        preview['max_time_gap_hours'] = max_gap
+        # Re-sign the timing policy along with the preview records.
+        preview.pop('preview_signature', None)
+        preview['preview_signature'] = store._sign({k: v for k, v in preview.items()
+                                                    if k != 'preview_signature'})
+        return jsonify(preview)
+    except (ValueError, OSError, TypeError) as exc:
+        return jsonify({'error': str(exc)}), 400
+
+@app.route('/api/calibration/observations/compare-column', methods=['POST'])
+def calibration_observations_compare_column():
+    """Read-only pair selected observations against an explicit GOTM column."""
+    if not active_case_path:
+        return jsonify({'error': '未加载 GOTM 案例'}), 400
+    if _output_locked():
+        return jsonify({'error': '模型运行中，输出文件正在写入，暂不能比较'}), 409
+    started_at = time.perf_counter()
+    data = request.get_json(silent=True) or {}
+    files = data.get('files')
+    mappings = data.get('mappings') or {}
+    lake_id = str(data.get('lake_id') or '').strip()
+    point_id = str(data.get('point_id') or '').strip()
+    variable_name = str(data.get('variable') or '').strip()
+    if not isinstance(files, list) or not files or len(files) > 8:
+        return jsonify({'error': '请选择 1–8 个官方观测文件'}), 400
+    try:
+        max_gap = float(data.get('max_time_gap_hours'))
+        if not _math.isfinite(max_gap) or max_gap <= 0:
+            raise ValueError('最大时间差必须是显式有限正数')
+        if not lake_id or not point_id or len(lake_id) > 200 or len(point_id) > 200:
+            raise ValueError('必须填写湖泊 ID 和观测组 ID；观测组 ID 仅用于将同一剖面文件归组')
+        if not variable_name or len(variable_name) > 200:
+            raise ValueError('必须明确选择要比较的模型变量')
+        from observations import parse_observations
+        from observation_matching import pair_observations
+        selected_records, file_summaries, ignored_files = [], [], []
+        for item in files:
+            from pathlib import Path as _Path
+            source = _Path(item).expanduser().resolve(strict=True)
+            if not source.is_file() or source.suffix.casefold() != '.obs':
+                raise ValueError('代表性水柱直读比较目前只接受官方 .obs 文件')
+            mapping = mappings.get(str(source), mappings.get(source.name, {}))
+            if not isinstance(mapping, dict):
+                raise ValueError(f'{source.name} 的映射无效')
+            mapped_variable = str(mapping.get('variable') or '').strip()
+            mapped_unit = str(mapping.get('unit') or '').strip()
+            if not mapped_variable or not mapped_unit:
+                raise ValueError(f'{source.name} 必须明确映射模型变量和观测单位')
+            if mapped_variable != variable_name:
+                ignored_files.append({'source_file': source.name, 'variable': mapped_variable,
+                                      'reason': 'different_selected_variable'})
+                continue
+            assigned_lake = str(mapping.get('lake_id') or lake_id).strip()
+            assigned_point = str(mapping.get('point_id') or point_id).strip()
+            if assigned_lake != lake_id or assigned_point != point_id:
+                raise ValueError(f'{source.name} 的湖泊/观测组映射与比较目标不一致')
+            explicit_mapping = dict(mapping, lake_id=lake_id, point_id=point_id,
+                                    depth_sign='negative_down')
+            parsed = parse_observations(source, explicit_mapping)
+            selected_records.extend(parsed['records'])
+            file_summaries.append({'source_file': source.name, 'sha256': parsed['source_sha256'],
+                                   'row_count': parsed['row_count'], 'usable_records': len(parsed['records']),
+                                   'diagnostics': parsed['diagnostics'], 'mapping': explicit_mapping})
+        if not file_summaries:
+            raise ValueError('所选文件中没有映射到当前模型变量的 .obs 文件')
+        files_by_variable = find_output_files(active_case_path, variable_name)
+        nc_path = files_by_variable['3d'] or files_by_variable['2d']
+        if not nc_path:
+            return jsonify({'error': f'当前案例没有变量 {variable_name} 的结果文件'}), 404
+        target = {'representativeness': 'column', 'lake_id': lake_id, 'point_id': point_id}
+        native = _native_observation_model(nc_path, variable_name, target)
+        pairs, diagnostics = pair_observations(
+            selected_records, native, max_time_gap_hours=max_gap)
+        scatter = [{'time': pair['observation']['time'], 'obs': pair['obs'], 'sim': pair['sim'],
+                    'source_file': pair['observation'].get('source_file'),
+                    'source_line': pair['observation'].get('source_line'),
+                    'model_times': pair['model_times'], 'time_weight': pair['time_weight'],
+                    'depth_layers': pair['depth_layers'], 'depth_weights': pair['depth_weights']}
+                   for pair in pairs]
+        return jsonify({'read_only': True, 'representativeness': 'column',
+                        'target': {'lake_id': lake_id, 'point_id': point_id,
+                                   'label': 'GOTM representative water column'},
+                        'variable': variable_name, 'simulated': native,
+                        'scatter_pairs': scatter, 'diagnostics': diagnostics,
+                        'files': file_summaries, 'ignored_files': ignored_files,
+                        'max_time_gap_hours': max_gap,
+                        'processing_ms': round((time.perf_counter() - started_at) * 1000, 1),
+                        'note': '仅使用当前 GOTM 输出的代表性水柱；未创建站点坐标或 GETM 网格单元。'})
+    except (ValueError, OSError, TypeError, KeyError, IndexError) as exc:
+        return jsonify({'error': str(exc)}), 422
+
+@app.route('/api/calibration/observations/apply', methods=['POST'])
+def calibration_observations_apply():
+    """Atomically apply a signed preview to only the active case."""
+    if not active_case_path:
+        return jsonify({'error': '未加载案例'}), 400
+    context = _results_context()
+    if context.get('busy'):
+        return jsonify({'error': '案例正在运行或率定，不能修改观测'}), 409
+    data = request.get_json(silent=True) or {}
+    try:
+        from observation_store import ObservationStore
+        case_path = Path(active_case_path).resolve()
+        store = ObservationStore(case_path.parent)
+        preview = data.get('preview')
+        payload = store.apply(case_path.name, preview, data.get('mappings'))
+        # Preserve explicit point identifiers from source rows for model pairing.
+        for record in payload.get('records', []):
+            row = record.get('source_row')
+            if isinstance(row, dict) and row.get('point_id') not in (None, ''):
+                record['point_id'] = str(row['point_id']).strip()
+        payload['max_time_gap_hours'] = preview.get('max_time_gap_hours')
+        store._persist(case_path.name, payload)
+        return jsonify({'success': True, 'records': payload['records'],
+                        'diagnostics': payload['diagnostics'], 'manifest': payload['manifest'],
+                        'max_time_gap_hours': payload['max_time_gap_hours']})
+    except (ValueError, OSError, TypeError, AttributeError) as exc:
+        return jsonify({'error': str(exc)}), 400
+
+@app.route('/api/calibration/observations', methods=['GET'])
+def calibration_observations_get():
+    """Read the active case's imported observation snapshot without mutation."""
+    if not active_case_path:
+        return jsonify({'error': '未加载案例'}), 400
+    try:
+        from observation_store import ObservationStore
+        case_path = Path(active_case_path).resolve()
+        payload = ObservationStore(case_path.parent).load(case_path.name)
+        for record in payload.get('records', []):
+            row = record.get('source_row')
+            if not record.get('point_id') and isinstance(row, dict) and row.get('point_id') not in (None, ''):
+                record['point_id'] = str(row['point_id']).strip()
+        return jsonify(payload)
+    except (ValueError, OSError) as exc:
+        return jsonify({'error': str(exc)}), 400
+
+def _native_observation_model(path, variable_name, target):
+    """Read every native timestamp and physical layer for one verified GETM cell."""
+    from vertical_geometry import read_vertical_geometry
+    from native_variable_metadata import describe_native_variable
+    def producer_for(ds):
+        producer = str(getattr(ds, 'wet_native_metadata_source', '') or '').strip()
+        if producer:
+            return producer
+        # An external output can carry a separate, auditable source attestation.
+        # Bind it to the exact immutable NetCDF bytes so it cannot silently
+        # authorize a different file copied into the same folder.
+        sidecar = Path(path).resolve().with_name('native_variable_metadata.json')
+        if not sidecar.is_file():
+            return None
+        try:
+            attestation = json.loads(sidecar.read_text(encoding='utf-8'))
+            expected = str(attestation.get('output_sha256') or '').lower()
+            producer = str(attestation.get('producer') or '').strip()
+            if len(expected) != 64 or len(producer) > 100:
+                return None
+            output_path = Path(path).resolve()
+            output_stat, sidecar_stat = output_path.stat(), sidecar.stat()
+            fingerprint = (str(output_path), output_stat.st_size, output_stat.st_mtime_ns,
+                           getattr(output_stat, 'st_ino', 0), str(sidecar.resolve()),
+                           sidecar_stat.st_size, sidecar_stat.st_mtime_ns,
+                           getattr(sidecar_stat, 'st_ino', 0), expected, producer)
+            with _native_attestation_cache_lock:
+                cached = _native_attestation_cache.get(fingerprint)
+                if cached is not None:
+                    _native_attestation_cache.move_to_end(fingerprint)
+                    return cached
+            digest = hashlib.sha256()
+            with output_path.open('rb') as stream:
+                before = os.fstat(stream.fileno())
+                for block in iter(lambda: stream.read(1024 * 1024), b''):
+                    digest.update(block)
+                after = os.fstat(stream.fileno())
+            stable = (before.st_size == after.st_size == output_stat.st_size
+                      and before.st_mtime_ns == after.st_mtime_ns == output_stat.st_mtime_ns
+                      and getattr(before, 'st_ino', 0) == getattr(after, 'st_ino', 0)
+                      == getattr(output_stat, 'st_ino', 0))
+            if not stable or digest.hexdigest() != expected:
+                return None
+            with _native_attestation_cache_lock:
+                _native_attestation_cache[fingerprint] = producer
+                _native_attestation_cache.move_to_end(fingerprint)
+                while len(_native_attestation_cache) > 16:
+                    _native_attestation_cache.popitem(last=False)
+            return producer
+        except (OSError, ValueError, TypeError):
+            return None
+    def metadata_for(ds, variable):
+        # Never infer a basis from a variable name or observation mapping. The
+        # output must explicitly identify a producer supported by our source catalog.
+        producer = producer_for(ds)
+        native = describe_native_variable(variable.name, getattr(variable, 'units', ''), producer)
+        declared_basis = str(getattr(variable, 'mass_basis', '') or '').strip().upper()
+        if native and declared_basis and native['mass_basis'] != declared_basis:
+            raise ValueError('NetCDF mass_basis conflicts with attested native source metadata')
+        if native:
+            return {'unit': native['unit'], 'mass_basis': native['mass_basis'],
+                    'mass_basis_source': producer, 'mass_basis_provenance': native['provenance']}
+        return {'unit': getattr(variable, 'units', ''),
+                'mass_basis': declared_basis or None,
+                'mass_basis_source': 'netcdf_variable_attribute' if declared_basis else None,
+                'mass_basis_provenance': None}
+    if target.get('representativeness') == 'column':
+        if not target.get('lake_id') or not target.get('point_id'):
+            raise ValueError('GOTM column mapping requires explicit point and lake identity')
+        with nc_open(path) as ds:
+            gotm_marker = ' '.join(str(getattr(ds, attr, '')) for attr in ('comment', 'model')).casefold()
+            if 'gotm' not in gotm_marker:
+                raise ValueError('column representativeness is supported only for identified GOTM output')
+            variable = ds.variables.get(variable_name)
+            hvar, zvar, timevar = (ds.variables.get('h'), ds.variables.get('z'), ds.variables.get('time'))
+            if (variable is None or variable.ndim != 4 or variable.dimensions[0] != 'time'
+                    or variable.dimensions[1] != 'z' or hvar is None or zvar is None or timevar is None
+                    or hvar.dimensions != variable.dimensions or zvar.dimensions != variable.dimensions):
+                raise ValueError('GOTM column requires aligned native time/z values, h and z geometry')
+            for name, item in (('h', hvar), ('z', zvar)):
+                if str(getattr(item, 'units', '')).strip().lower() not in {'m', 'meter', 'meters', 'metre', 'metres'}:
+                    raise ValueError(f'GOTM {name} geometry must be in metres')
+            lat_index = int(target.get('j', 0)); lon_index = int(target.get('i', 0))
+            if not (0 <= lat_index < variable.shape[2] and 0 <= lon_index < variable.shape[3]):
+                raise ValueError('GOTM representative column index is outside the native output')
+            if (variable.shape[2:] != (1, 1) and
+                    (target.get('spatial_mapping') != 'verified' or target.get('coordinate_crs') is None)):
+                raise ValueError('multi-column GOTM output needs verified horizontal mapping')
+            try:
+                clocks = nc.num2date(timevar[:], timevar.units,
+                                     calendar=getattr(timevar, 'calendar', 'standard'),
+                                     only_use_cftime_datetimes=False)
+            except (AttributeError, ValueError) as exc:
+                raise ValueError('GOTM native time coordinate is invalid') from exc
+            # Read each complete time×layer column as a single hyperslab. The
+            # former per-frame NetCDF indexing incurred thousands of C calls.
+            thickness = np.ma.filled(np.ma.asarray(
+                hvar[:, :, lat_index, lon_index], dtype=float), np.nan)
+            elevation = np.ma.filled(np.ma.asarray(
+                zvar[:, :, lat_index, lon_index], dtype=float), np.nan)
+            column_values = np.ma.filled(np.ma.asarray(
+                variable[:, :, lat_index, lon_index], dtype=float), np.nan)
+            if (thickness.shape != (timevar.size, variable.shape[1])
+                    or elevation.shape != thickness.shape or column_values.shape != thickness.shape
+                    or not np.isfinite(thickness).all() or np.any(thickness <= 0)
+                    or not np.isfinite(elevation).all() or not np.isfinite(column_values).all()):
+                raise ValueError('GOTM native values or h/z geometry contain invalid layers')
+            expected_depth = (np.sum(thickness, axis=1, keepdims=True)
+                              - np.cumsum(thickness, axis=1) + thickness / 2)
+            center_depth = -elevation
+            if not np.allclose(center_depth, expected_depth, rtol=0, atol=1e-5):
+                raise ValueError('GOTM z centers disagree with native h layer thickness/order')
+            times = [clock.strftime('%Y-%m-%d %H:%M:%S') for clock in clocks]
+            variable_metadata = metadata_for(ds, variable)
+            return {'times': times, 'values': column_values.tolist(), 'center_depth': center_depth.tolist(),
+                    'variable': variable_name, **variable_metadata,
+                    'lake_id': target['lake_id'], 'station_id': None,
+                    'point_id': target['point_id'], 'representativeness': 'column',
+                    'geometry_source': 'GOTM h+z', 'downsampled': False,
+                    'calendar': getattr(timevar, 'calendar', 'standard')}
+    explicit_cell = (target.get('spatial_mapping') == 'explicit_cell' and
+                     target.get('mapping_source') == 'gridstudio_explicit_cell')
+    if target.get('spatial_mapping') != 'verified' and not explicit_cell:
+        raise ValueError('GETM observation scoring requires verified spatial mapping')
+    required_identity = ('lake_id', 'station_id', 'point_id')
+    required_mapping = ('x_m', 'y_m') if explicit_cell else ('x_m', 'y_m', 'coordinate_crs')
+    if not all(target.get(k) is not None for k in required_identity + required_mapping):
+        raise ValueError('GETM target lacks station identity or verified coordinates')
+    with nc_open(path) as ds:
+        variable = ds.variables.get(variable_name)
+        if variable is None or variable.ndim != 4:
+            raise ValueError('GETM observation scoring requires a four-dimensional native variable')
+        i, j = int(target['i']), int(target['j'])
+        if not (0 <= j < variable.shape[2] and 0 <= i < variable.shape[3]):
+            raise ValueError('GETM station cell is outside the output grid')
+        model_crs = getattr(ds, 'coordinate_crs', None)
+        if not model_crs and ds.variables.get('crs') is not None:
+            crs_var = ds.variables['crs']
+            model_crs = (getattr(crs_var, 'spatial_ref', None)
+                         or getattr(crs_var, 'crs_wkt', None)
+                         or getattr(crs_var, 'epsg_code', None))
+        if not explicit_cell and (not model_crs or str(model_crs).strip().casefold() != str(target['coordinate_crs']).strip().casefold()):
+            raise ValueError('GETM output CRS is absent or differs from verified station mapping')
+        for axis, key, index in (('xc', 'x_m', i), ('yc', 'y_m', j)):
+            coord = ds.variables.get(axis)
+            if coord is None or coord.ndim != 1 or coord.shape[0] <= index:
+                raise ValueError(f'GETM {axis} coordinate is missing')
+            units = str(getattr(coord, 'units', '')).strip().lower()
+            if units not in {'m', 'meter', 'meters', 'metre', 'metres'}:
+                raise ValueError(f'GETM {axis} coordinate must be in metres')
+            if not np.isfinite(float(coord[index])):
+                raise ValueError(f'GETM {axis} coordinate is invalid at the explicitly selected cell')
+            if not np.isclose(float(coord[index]), float(target[key]), rtol=0, atol=1e-6):
+                raise ValueError(f'GETM {axis} coordinate does not match verified station mapping')
+        bathy_var = ds.variables.get('bathymetry')
+        if bathy_var is None or bathy_var.shape != variable.shape[2:]:
+            raise ValueError('GETM bathymetry is missing or does not match the output grid')
+        try:
+            clocks = nc.num2date(ds.variables['time'][:], ds.variables['time'].units,
+                                 calendar=getattr(ds.variables['time'], 'calendar', 'standard'),
+                                 only_use_cftime_datetimes=False)
+        except (KeyError, AttributeError, ValueError) as exc:
+            raise ValueError('GETM native time coordinate is invalid') from exc
+        times, values, depths = [], [], []
+        start, _ = __import__('result_layers').physical_vertical_grid(ds, variable)
+        for t, clock in enumerate(clocks):
+            geometry = read_vertical_geometry(ds, variable, t, bathy_var[:])
+            column_depth = np.asarray(geometry['center_depth'][:, j, i], dtype=float)
+            column_values = np.ma.filled(np.ma.asarray(variable[t, start:, j, i], dtype=float), np.nan)
+            if len(column_depth) != len(column_values) or not np.isfinite(column_depth).all():
+                raise ValueError('GETM native hn/zc geometry is invalid at a selected time')
+            times.append(clock.strftime('%Y-%m-%d %H:%M:%S'))
+            depths.append(column_depth.tolist())
+            values.append(np.asarray(column_values, dtype=float).tolist())
+        if not times:
+            raise ValueError('GETM output has no native time records')
+        variable_metadata = metadata_for(ds, variable)
+        return {'times': times, 'values': values, 'center_depth': depths,
+                'variable': variable_name, **variable_metadata,
+                'lake_id': target['lake_id'], 'station_id': target['station_id'],
+                'point_id': target['point_id'], 'spatial_mapping': target['spatial_mapping'],
+                'mapping_source': target.get('mapping_source'),
+                'calendar': getattr(ds.variables['time'], 'calendar', 'standard'),
+                'geometry_source': 'hn+zc' if 'zc' in ds.variables else 'hn',
+                'downsampled': False}
+
 def _parse_iso_time(s):
     """Best-effort ISO-8601 / YYYY-MM-DD[ HH:MM:SS] parser returning datetime or None."""
     if s is None:
         return None
+    def utc(value):
+        return value.astimezone(timezone.utc).replace(tzinfo=None) if value.tzinfo is not None else value
     if isinstance(s, datetime):
-        return s
+        return utc(s)
+    ordinal = parse_ordinal_date(s)
+    if ordinal is not None:
+        return utc(ordinal)
     s = str(s).strip()
     if not s:
         return None
+    try:
+        return utc(parse_calendar_date(s))
+    except ValueError:
+        pass
     for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M",
                 "%Y-%m-%d", "%Y/%m/%d %H:%M:%S", "%Y/%m/%d"):
         try:
@@ -3378,8 +5609,8 @@ def _pair_obs_sim(obs_list, sim_dict, max_lag_hours=24):
 def calibration_auto_config():
     config_path = DATA_DIR / "auto_calib_config.json"
     if request.method == "GET":
-        return jsonify(load_json(config_path, {
-            "method": "parsac",
+        return jsonify(load_json_with_seed(config_path, APP_DIR / "data" / "auto_calib_config.json", {
+            "method": "scipy",
             "parameters": [],
             "n_iterations": 100,
             "objective_function": "rmse",
@@ -3390,11 +5621,12 @@ def calibration_auto_config():
         return jsonify({"success": True})
 
 @app.route("/api/calibration/auto/start", methods=["POST"])
+@_with_nc_lock
 def calibration_auto_start():
     """Start a real calibration job in a background thread.
 
     Request body:
-      method: parsac | pest | bayesian | sensitivity
+      method: scipy (legacy aliases use SciPy with an explicit compatibility notice)
       iterations: int (max iterations)
       objective: rmse | nse | r2 | mae
       params: list of {module, param, min, max}
@@ -3404,24 +5636,58 @@ def calibration_auto_start():
     if not active_case_path:
         return jsonify({"error": "未加载案例"}), 400
     data = request.json or {}
-    method = data.get("method", "parsac")
-    max_iter = int(data.get("iterations", 100))
+    method = data.get("method", "scipy")
     objective = data.get("objective", "rmse")
+    if method not in ('scipy', 'pyabc', 'pest', 'parsac', 'bayesian', 'sensitivity'):
+        return jsonify({'error': '未知率定方法'}), 400
+    if objective not in ('rmse', 'nse', 'r2', 'mae'):
+        return jsonify({'error': '未知率定目标函数'}), 400
+    def integer_option(key, default, low, high):
+        raw = data.get(key, default)
+        value = int(raw)
+        if isinstance(raw, bool) or value != float(raw) or not low <= value <= high:
+            raise ValueError(f'{key} 必须为 {low} 至 {high} 的整数')
+        return value
+    try:
+        max_iter = integer_option('iterations', 100, 1, 10000)
+        if 'max_simulations' not in data:
+            raise ValueError('必须显式设置 max_simulations；每次评估都会运行一次完整模型')
+        if method == 'pyabc':
+            population = integer_option('population_size', 10, 2, 200)
+            budget = integer_option('max_simulations', None, population * 2, 10000000)
+            epsilon = float(data.get('minimum_epsilon', 0))
+            if not np.isfinite(epsilon) or epsilon < 0:
+                raise ValueError('ABC-SMC 最小距离必须为有限非负数')
+            engine_options = dict(population_size=population, max_simulations=budget, minimum_epsilon=epsilon)
+        else:
+            budget = integer_option('max_simulations', None, 1, 10000000)
+            engine_options = dict(max_simulations=budget)
+    except (ValueError, TypeError, OverflowError) as e:
+        return jsonify({'error': str(e)}), 400
     params = data.get("params", [])
-    if not params:
+    if not isinstance(params, list) or not params:
         return jsonify({"error": "请至少选择一个率定参数"}), 400
     # Validate parameter structure
     for p in params:
-        if not all(k in p for k in ("module", "param", "min", "max")):
+        if not isinstance(p, dict) or not all(k in p for k in ("module", "param", "min", "max")):
             return jsonify({"error": f"参数缺少 module/param/min/max: {p}"}), 400
-        if p["min"] >= p["max"]:
+        try:
+            p['min'], p['max'] = float(p['min']), float(p['max'])
+        except (ValueError, TypeError):
+            return jsonify({'error': '率定参数上下限必须为数值'}), 400
+        if not np.isfinite(p['min']) or not np.isfinite(p['max']) or p["min"] >= p["max"]:
             return jsonify({"error": f"{p['module']}.{p['param']}: min 必须 < max"}), 400
     try:
         from calibration import start_calibration_job
     except ImportError as e:
         return jsonify({"error": f"率定模块加载失败: {e}"}), 500
     try:
-        job_id = start_calibration_job(method, params, objective, max_iter, active_case_path)
+        job_id = start_calibration_job(method, params, objective, max_iter, active_case_path,
+                                       point_ids=data.get('point_ids'),
+                                       objective_weights=data.get('objective_weights'), engine_options=engine_options,
+                                       max_time_gap_hours=data.get('max_time_gap_hours'))
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({"error": f"启动失败: {e}"}), 500
     # Persist last config for reference
@@ -3430,6 +5696,10 @@ def calibration_auto_start():
         "parameters": params,
         "n_iterations": max_iter,
         "objective_function": objective,
+        "point_ids": data.get('point_ids'),
+        "objective_weights": data.get('objective_weights'),
+        "max_time_gap_hours": data.get('max_time_gap_hours'),
+        "engine_options": engine_options,
         "job_id": job_id,
         "started_at": datetime.now().isoformat(),
     })
@@ -3513,40 +5783,54 @@ def dashboard_summary():
     # 访问会触发访问冲突（0xC0000005）直接杀死整个服务进程。
     if _output_locked():
         return jsonify({"error": "模型运行中，输出文件正在写入，暂不能读取"}), 409
-    files = find_output_files(active_case_path)
-    nc_path = files["3d"] or files["2d"]
-    if not nc_path:
+    files = find_output_files(active_case_path, request.args.get('var'))
+    nc_paths = list(dict.fromkeys(
+        path for path in [files.get('3d'), *files.get('3d_candidates', []), files.get('2d')]
+        if path
+    ))
+    if not nc_paths:
         return jsonify({"error": "没有输出文件"}), 404
 
     # WET 实际变量名（带模块前缀，由 fabm 输出）。诊断汇总变量如 wet_chla、wet_totN/P/C。
     key_vars = [
-        "temp", "abiotic_water_sO2W", "abiotic_water_sNO3W", "abiotic_water_sNH4W",
+        "temp", "z", "u", "v",
+        "abiotic_water_sO2W", "abiotic_water_sNO3W", "abiotic_water_sNH4W",
         "abiotic_water_sPO4W", "abiotic_water_sSiO2W",
         "wet_chla", "POM_sDW", "DOM_sDW", "humus_sDW",
         "wet_totN", "wet_totP", "wet_totC",
     ]
     summary = {}
-    with nc_open(nc_path) as ds:
-        nt = get_ntimesteps(nc_path)
-        for vname in key_vars:
-            if vname in ds.variables:
-                var = ds.variables[vname]
-                # 崩溃/中断的运行会留下"已创建但从未写入"的变量（time 长度 0），
-                # 读取会 IndexError（2026-09-20 事故），跳过即可。
-                if var.shape[0] == 0:
+    # A full coupled 3D file and GETM's native 2D file own different fields.
+    # Search the preferred 3D result first, then each current 3D candidate and
+    # the native 2D result. Read only the latest spatial hyperslab per key field.
+    from result_aliases import resolve_result_name
+    aliases = {"z": ("z", "elev")}
+    unresolved = set(key_vars)
+    for nc_path in nc_paths:
+        # Candidate files may repeat the same output; one open at a time
+        # keeps memory bounded for multi-gigabyte result histories.
+        with nc_open(nc_path) as ds:
+            time_dim = next((dim for name, dim in ds.dimensions.items()
+                             if 'time' in name.lower()), None)
+            nt = len(time_dim) if time_dim is not None else 0
+            for requested_name in key_vars:
+                if requested_name not in unresolved:
                     continue
-
-                def _fill(a):
-                    return a.filled(np.nan) if isinstance(a, np.ma.MaskedArray) else np.asarray(a, dtype=float)
-
-                # 只读最新时步（hyperslab）——整变量读取在滇池级案例上是 GB 级 IO
+                vname = next((candidate for candidate in aliases.get(requested_name, (requested_name,))
+                              if candidate in ds.variables), None)
+                vname = vname or resolve_result_name(ds.variables, requested_name)
+                if vname not in ds.variables:
+                    continue
+                var = ds.variables[vname]
+                if not var.shape or var.shape[0] == 0:
+                    continue
                 if var.ndim == 4:
-                    # GETM sigma: index 0 = 底层, -1 = 表层
-                    field = _fill(var[-1, -1, :, :])
+                    field = var[-1, -1, :, :]
                 elif var.ndim == 3:
-                    field = _fill(var[-1, :, :])
+                    field = var[-1, :, :]
                 else:
                     continue
+                field = field.filled(np.nan) if isinstance(field, np.ma.MaskedArray) else np.asarray(field, dtype=float)
                 summary[vname] = {
                     "long_name": getattr(var, "long_name", vname),
                     "units": getattr(var, "units", ""),
@@ -3555,6 +5839,8 @@ def dashboard_summary():
                     "mean": float(np.nanmean(field)) if not np.all(np.isnan(field)) else None,
                     "ntimesteps": nt,
                 }
+                summary[vname].update(_annotated_output(dict(name=vname, units=summary[vname]['units'], long_name=summary[vname]['long_name']), active_case_path))
+                unresolved.remove(requested_name)
     return jsonify(summary)
 
 def _point_in_polygon(x, y, poly):
@@ -3570,25 +5856,157 @@ def _point_in_polygon(x, y, poly):
         j = i
     return inside
 
+
+def _extract_shapefile_polygon_groups(shapes):
+    """Return polygon exteriors with their contained ESRI-oriented holes.
+
+    ESRI polygon shapefiles store clockwise exteriors (negative signed area)
+    and counter-clockwise holes (positive signed area). Multiple clockwise
+    rings in one feature are separate islands/exteriors, not holes.
+    """
+    groups = []
+    orphan_rings = []
+    for shp in shapes:
+        pts = shp.points
+        starts = list(shp.parts) + [len(pts)]
+        rings = []
+        for index in range(len(starts) - 1):
+            ring = [(float(p[0]), float(p[1])) for p in pts[starts[index]:starts[index + 1]]]
+            if len(ring) < 4:
+                continue
+            signed_area = 0.5 * sum(
+                ring[i][0] * ring[(i + 1) % len(ring)][1]
+                - ring[(i + 1) % len(ring)][0] * ring[i][1]
+                for i in range(len(ring))
+            )
+            rings.append((ring, signed_area))
+        exteriors = [(ring, area) for ring, area in rings if area < 0]
+        holes = [(ring, area) for ring, area in rings if area > 0]
+        # Some nonconforming files omit winding direction. Keep their first
+        # ring as the exterior and treat the rest as independent polygons.
+        if not exteriors and rings:
+            exteriors = [(ring, area) for ring, area in rings]
+            holes = []
+        feature_groups = [{"outer": ring, "holes": [], "_area": abs(area)}
+                          for ring, area in exteriors]
+        for hole, _area in holes:
+            containers = [group for group in feature_groups
+                          if _point_in_polygon(hole[0][0], hole[0][1], group["outer"])]
+            if not containers:
+                orphan_rings.append(hole)
+                continue
+            min(containers, key=lambda group: group["_area"])["holes"].append(hole)
+        groups.extend(feature_groups)
+    for group in groups:
+        group.pop("_area", None)
+    # A shapefile containing only rings with hole winding has no reliable
+    # exterior; retain them as standalone polygons rather than dropping data.
+    groups.extend({"outer": ring, "holes": []} for ring in orphan_rings)
+    return groups
+
+
+def _rasterize_polygon_groups_mask(xc, yc, polygon_groups):
+    """Rasterize a union of exterior-minus-hole polygon groups."""
+    mask = np.zeros((len(yc), len(xc)), dtype=bool)
+    for group in polygon_groups:
+        outer = _rasterize_polygon_union_mask(xc, yc, [group["outer"]])
+        for hole in group.get("holes", []):
+            outer &= ~_rasterize_polygon_union_mask(xc, yc, [hole])
+        mask |= outer
+    return mask
+
+
+def _point_in_polygon_groups(x, y, polygon_groups):
+    """Test membership in a union of polygon groups with holes excluded."""
+    for group in polygon_groups:
+        if (_point_in_polygon(x, y, group["outer"])
+                and not any(_point_in_polygon(x, y, hole)
+                            for hole in group.get("holes", []))):
+            return True
+    return False
+
+
+def _rasterize_polygon_union_mask(xc, yc, rings):
+    """Rasterize the union of polygon rings at grid-cell centers.
+
+    Intersections use the same ray-crossing predicate and arithmetic order as
+    ``_point_in_polygon``. Sorting each row's intersections lets NumPy classify
+    all x centers without repeating a Python edge walk for every cell.
+    """
+    mask = np.zeros((len(yc), len(xc)), dtype=bool)
+    x_centers = np.asarray(xc, dtype=np.float64)
+    for poly in rings:
+        vertices = np.asarray(poly, dtype=np.float64)
+        if not len(vertices):
+            continue
+        # Edge i runs from the previous vertex to the current vertex, matching
+        # the order and arithmetic in _point_in_polygon.
+        x1 = vertices[:, 0]
+        y1 = vertices[:, 1]
+        x2 = np.roll(x1, 1)
+        y2 = np.roll(y1, 1)
+        for row, y in enumerate(yc):
+            crosses = (y1 > y) != (y2 > y)
+            if crosses.any():
+                intersections = ((x2[crosses] - x1[crosses])
+                                 * (y - y1[crosses])
+                                 / (y2[crosses] - y1[crosses] + 1e-12)
+                                 + x1[crosses])
+                ordered = np.sort(intersections)
+                # x < intersection is strict in _point_in_polygon, so values
+                # equal to x belong on searchsorted's right-hand side.
+                left_or_equal = np.searchsorted(ordered, x_centers, side='right')
+                crossings_to_right = len(ordered) - left_or_equal
+                mask[row] |= (crossings_to_right & 1).astype(bool)
+    return mask
+
+def compact_3d_waterbody_payload(payload):
+    """Keep waterbody render inputs and summarize its geometry sync warning."""
+    result = dict(payload)
+    synchronized = result.get('surface_synchronized')
+    valid = result.get('valid_geometry')
+    mismatch = any(
+        same is False and j < len(valid or []) and i < len(valid[j]) and valid[j][i] is True
+        for j, row in enumerate(synchronized or [])
+        for i, same in enumerate(row or [])
+    )
+    result['surface_sync_mismatch'] = mismatch
+    # Layer-center depth is a rendering coordinate, not optional diagnostic
+    # metadata. Compact 3D playback must retain it: a selected single sigma
+    # layer cannot be positioned from sigma alone because its convention is
+    # ambiguous (e.g. the top GETM layer has sigma=0).
+    for name in ('surface_synchronized', 'surface_elevation',
+                 'barotropic_surface_elevation', 'surface_difference'):
+        result.pop(name, None)
+    return result
+
+
 @app.route("/api/results/3d_surface")
 def results_3d_surface():
     """Return downsampled 3D volume for Plotly isosurface / point-cloud rendering.
 
     Strides the 3D array to ~`target` cells per axis to prevent browser OOM.
-    `target` (查询参数，默认 30) 由前端质量档位控制：低=16 / 中=22 / 高=30。
+    `target` (query parameter, default 30) is capped at 96; the UI selects
+    32/64/96 so small native grids can render their shoreline without gaps.
     """
     if not active_case_path:
         return jsonify({"error": "未加载案例"}), 400
     if _output_locked():
         return jsonify({"error": "模型运行中，输出文件正在写入，暂不能读取"}), 409
-    files = find_output_files(active_case_path)
+    files = find_output_files(active_case_path, request.args.get('var'))
     var_name = request.args.get("var", "temp")
     timestep = int(request.args.get("time", 0))
-    target = max(8, min(40, int(request.args.get("target", 30))))
+    # Medium/high-resolution views need enough horizontal samples to preserve
+    # real shoreline cells (e.g. the native 82×41 Dianchi bathymetry grid).
+    target = max(8, min(96, int(request.args.get("target", 30))))
     nc_path = files["3d"]
     if not nc_path:
         return jsonify({"error": "没有3D输出文件"}), 404
 
+    from result_layers import physical_vertical_grid
+    from scientific_geometry import (matching_input_dry_mask, metre_axes,
+                                     sampled_display_topology, static_3d_geometry_cache,
+                                     static_3d_geometry_key)
     with nc_open(nc_path) as ds:
         if var_name not in ds.variables:
             return jsonify({"error": f"变量 {var_name} 不存在"}), 404
@@ -3599,82 +6017,254 @@ def results_3d_surface():
         if nt == 0:
             return jsonify({"error": "输出文件没有任何时间记录（上次运行可能异常中断或 sync_interval=0）"}), 404
         t = max(0, min(nt - 1, int(timestep))) if nt > 0 else 0
+        # GOTM-style output is a physical water column, not a 1x1 lake map.
+        # Preserve its native h/z geometry so the 3D viewer can draw the real
+        # layer centers without inventing horizontal extent or bathymetry.
+        hvar, zvar = ds.variables.get('h'), ds.variables.get('z')
+        if (var.shape[2:] == (1, 1) and hvar is not None and zvar is not None
+                and hvar.dimensions == var.dimensions and zvar.dimensions == var.dimensions
+                and str(getattr(hvar, 'units', '')).strip().lower() in {'m', 'meter', 'meters', 'metre', 'metres'}
+                and str(getattr(zvar, 'units', '')).strip().lower() in {'m', 'meter', 'meters', 'metre', 'metres'}):
+            thickness = np.ma.filled(np.ma.asarray(hvar[t, :, 0, 0], dtype=float), np.nan)
+            elevation = np.ma.filled(np.ma.asarray(zvar[t, :, 0, 0], dtype=float), np.nan)
+            column = np.ma.filled(np.ma.asarray(var[t, :, 0, 0], dtype=float), np.nan)
+            if (np.isfinite(thickness).all() and np.all(thickness > 0)
+                    and np.isfinite(elevation).all() and np.isfinite(column).all()):
+                bottom_depth = float(thickness.sum())
+                center_depth = -elevation
+                if (np.all(center_depth > 0) and np.all(center_depth < bottom_depth)
+                        and (len(center_depth) < 2 or np.all(np.diff(center_depth) < 0))):
+                    valid = np.isfinite(column)
+                    minimum = float(column[valid].min()) if valid.any() else None
+                    maximum = float(column[valid].max()) if valid.any() else None
+                    values = [float(value) if np.isfinite(value) else None for value in column]
+                    depths = [float(value) for value in center_depth]
+                    return jsonify({
+                        'var_name': var_name, 'long_name': getattr(var, 'long_name', var_name),
+                        'units': getattr(var, 'units', ''), 'timestep': t,
+                        'data': [[[value]] for value in values],
+                        'min': minimum, 'max': maximum, 'data_min': minimum, 'data_max': maximum,
+                        'shape': [len(values), 1, 1], 'full_shape': [len(values), 1, 1],
+                        'total_layers': len(values), 'layer_indices': list(range(len(values))),
+                        'sigma': (-center_depth / bottom_depth).astype(float).tolist(),
+                        'column_depth_m': depths,
+                        'column_elevation_m': [float(value) for value in elevation],
+                        'depth': [[[depth]] for depth in depths],
+                        'bottom': [[bottom_depth]], 'water_depth': [[bottom_depth]],
+                        'valid_geometry': [[True]], 'depth_source': 'GOTM native h+z',
+                        'depth_reference': 'below instantaneous water surface',
+                        'depth_geometry_error': None, 'geometry_mode': 'single_column',
+                        'display_topology_status': 'single-column-native',
+                        'coordinate_mode': 'index', 'coordinate_units': 'index',
+                        'x': [0], 'y': [0], 'xc': [0], 'yc': [0],
+                        'sampling_stride': [1, 1, 1],
+                    })
         # 只读该时步的 (z,y,x) 切片——单时步约百 KB 级；整变量读取是数百 MB
-        slab = var[t]
-        if isinstance(slab, np.ma.MaskedArray):
-            slab = slab.filled(np.nan)
+        start, sigma = physical_vertical_grid(ds, var)
+        nzt, nyt, nxt = var.shape[1]-start, var.shape[2], var.shape[3]
+        stride_z = max(1, int(np.ceil(nzt / target)))
+        stride_y = max(1, int(np.ceil(nyt / target)))
+        stride_x = max(1, int(np.ceil(nxt / target)))
+        # Keep both physical endpoints and the explicitly selected layer for
+        # volume views. A waterbody single-layer view can request only its
+        # displayed physical ordinal, avoiding JSON transfer of unrendered
+        # sigma layers during playback.
+        layer_only = request.args.get('layer_only', '').strip().lower() in {'1', 'true', 'yes'}
+        requested_layer = int(request.args.get('level', -1))
+        if layer_only:
+            if requested_layer < -1 or requested_layer >= nzt:
+                return jsonify({'error': f'物理层索引越界（有效范围 -1 至 {nzt - 1}）'}), 400
+            selected_layer = nzt - 1 if requested_layer == -1 else requested_layer
+            layer_indices = [selected_layer]
         else:
-            slab = np.asarray(slab, dtype=float)
-        nzt, nyt, nxt = slab.shape[0], slab.shape[1], slab.shape[2]
-        stride_z = max(1, nzt // target)
-        stride_y = max(1, nyt // target)
-        stride_x = max(1, nxt // target)
-        vol = slab[::stride_z, ::stride_y, ::stride_x]
+            layer_indices = set(range(0, nzt, stride_z)) | {0, nzt - 1}
+            if requested_layer >= 0:
+                layer_indices.add(min(nzt - 1, requested_layer))
+            layer_indices = sorted(layer_indices)
+        vol = np.asarray(np.ma.filled(var[t, [start+k for k in layer_indices],
+                                          ::stride_y, ::stride_x], np.nan), dtype=float)
         # Replace NaN with None for JSON (Plotly treats null as transparent)
         vol_list = np.where(np.isnan(vol), None, vol).tolist()
 
         # ── 立体水体渲染所需的几何信息 ───────────────────────────────────
         # sigma：垂向坐标。GETM 常用 [-1,0]（-1=底 / 0=面），也有 [0,1] 约定，
         # 前端按实际符号自动判别，这里原样下发。
-        if "sigma" in ds.variables:
-            sigma = [float(v) for v in ds.variables["sigma"][:]]
-            if len(sigma) > nzt:                      # 界面数 = 层数+1，取层中心
-                mid = []
-                for k in range(nzt):
-                    a = sigma[k]
-                    b = sigma[k + 1] if (k + 1) < len(sigma) else (2 * sigma[k] - sigma[max(0, k - 1)] if k > 0 else sigma[k])
-                    mid.append(0.5 * (a + b))
-                sigma = mid
-            elif len(sigma) < nzt:
-                sigma = sigma + [sigma[-1]] * (nzt - len(sigma))
-        else:
-            sigma = [2 * k / max(1, nzt - 1) - 1 for k in range(nzt)]
+        sigma = [float(sigma[k]) if np.isfinite(sigma[k]) else None for k in layer_indices]
 
-        # 水平坐标：真实米制（保持长宽比与湖泊真实形状），缺省退回格点序号
-        if "xc" in ds.variables and "yc" in ds.variables:
-            xc_all = np.asarray(ds.variables["xc"][:], dtype=float)
-            yc_all = np.asarray(ds.variables["yc"][:], dtype=float)
-            xc = xc_all[::stride_x].tolist()
-            yc = yc_all[::stride_y].tolist()
-        else:
-            xc = [float(i) for i in range(vol.shape[2])]
-            yc = [float(j) for j in range(vol.shape[1])]
+        x_indices, y_indices = list(range(0, nxt, stride_x)), list(range(0, nyt, stride_y))
+        bathy_path = active_case_path / 'bathymetry.nc'
+        static_key = static_3d_geometry_key(active_case_path, nc_path, bathy_path,
+                                            (nyt, nxt), (stride_y, stride_x), target)
+        static_geometry_key = hashlib.sha256(repr(static_key).encode('utf-8')).hexdigest()
 
-        # 湖底地形：与 vol 同步长降采样，陆地格为 None
-        # 注意：GETM 输出里陆地格的 bathymetry 原生值是 -10.0（不是 NaN），
-        # 必须用 masked.filled(nan) 转换，否则陆地会被当成 10m 深的洞画进湖底。
-        bottom = None
-        if "bathymetry" in ds.variables:
-            try:
-                _b = ds.variables["bathymetry"][:]
-                if isinstance(_b, np.ma.MaskedArray):
-                    b_all = np.asarray(_b.filled(np.nan), dtype=float)
-                else:
-                    b_all = np.asarray(_b, dtype=float)
-                b_sub = b_all[::stride_y, ::stride_x]
-                bottom = np.where(np.isnan(b_sub), None, b_sub).tolist()
-                if (not bottom) or len(bottom) != vol.shape[1] or (not bottom[0]) or len(bottom[0]) != vol.shape[2]:
+        def build_static_geometry():
+            # All values here are immutable for a given output/grid revision.
+            # Cache the small display products, not the full native arrays.
+            xc_all, yc_all = metre_axes(ds, nyt, nxt, 'xc', 'yc')
+            output_has_bathymetry = 'bathymetry' in ds.variables
+            bottom = None
+            dry_mask = None
+            bottom_units = ''
+            topology_depth = None
+            display_topology_error = None
+
+            if output_has_bathymetry:
+                try:
+                    bottom_units = getattr(ds.variables['bathymetry'], 'units', '')
+                    topology_depth = np.ma.masked_invalid(
+                        np.ma.asarray(ds.variables['bathymetry'][:, :], dtype='f8'))
+                    b_sub = ds.variables['bathymetry'][::stride_y, ::stride_x]
+                    b_sub = np.asarray(np.ma.filled(np.ma.masked_invalid(b_sub), np.nan), dtype=float)
+                    bottom = np.where(np.isfinite(b_sub) & (b_sub > 0), b_sub, None).tolist()
+                    dry_mask = (np.isfinite(b_sub) & (b_sub <= 0)).tolist()
+                    if (not bottom or len(bottom) != len(y_indices) or
+                            not bottom[0] or len(bottom[0]) != len(x_indices)):
+                        bottom = None
+                except Exception:
                     bottom = None
-            except Exception:
-                bottom = None
 
-        return jsonify({
+            verified_dry_full = None
+            if bathy_path.exists() and (xc_all is None or bottom is None or
+                                        (bottom is not None and output_has_bathymetry)):
+                with nc_open(bathy_path) as grid:
+                    if xc_all is None:
+                        xc_all, yc_all = metre_axes(grid, nyt, nxt)
+                    if bottom is None:
+                        bottom_units = getattr(grid.variables['bathymetry'], 'units', '')
+                        topology_depth = np.ma.masked_invalid(
+                            np.ma.asarray(grid.variables['bathymetry'][:, :], dtype='f8'))
+                        b_sub = np.ma.filled(np.ma.masked_invalid(
+                            grid.variables['bathymetry'][::stride_y, ::stride_x]), np.nan)
+                        if b_sub.shape == vol.shape[1:]:
+                            bottom = [[float(v) if np.isfinite(v) and v > 0 else None for v in row]
+                                      for row in b_sub]
+                            dry_mask = (np.isfinite(b_sub) & (b_sub <= 0)).tolist()
+                    # Output fill values are not proof of land; validate the
+                    # independent input grid once for this static revision.
+                    if bottom is not None and output_has_bathymetry:
+                        verified_dry_full = matching_input_dry_mask(ds, grid, (nyt, nxt))
+                        if verified_dry_full is not None:
+                            dry_mask = (np.asarray(dry_mask, dtype=bool) |
+                                        verified_dry_full[::stride_y, ::stride_x]).tolist()
+
+            projected = xc_all is not None
+            xc = [xc_all[i] for i in x_indices] if projected else x_indices
+            yc = [yc_all[j] for j in y_indices] if projected else y_indices
+            display_topology = None
+            if topology_depth is not None and topology_depth.shape != (nyt, nxt):
+                topology_depth = None
+                display_topology_error = '原生水深网格尺寸与3D模型网格不一致'
+            if topology_depth is not None:
+                try:
+                    display_topology = sampled_display_topology(
+                        topology_depth, y_indices, x_indices,
+                        verified_dry_mask=verified_dry_full,
+                        x_axis=xc_all if projected else np.arange(nxt, dtype='f8'),
+                        y_axis=yc_all if projected else np.arange(nyt, dtype='f8'))
+                except ValueError as exc:
+                    # Never silently bridge native dry cells after sampling.
+                    display_topology_error = str(exc)
+            elif stride_y > 1 or stride_x > 1:
+                display_topology_error = '缺少完整原生水陆拓扑，已停止降采样网格绘制'
+            return dict(xc=xc, yc=yc, projected=projected, bottom=bottom,
+                        dry_mask=dry_mask, bottom_units=bottom_units,
+                        display_topology=display_topology,
+                        display_topology_error=display_topology_error)
+
+        static_geometry = static_3d_geometry_cache.get_or_build(static_key, build_static_geometry)
+        xc, yc = static_geometry['xc'], static_geometry['yc']
+        projected = static_geometry['projected']
+        bottom, dry_mask = static_geometry['bottom'], static_geometry['dry_mask']
+        bottom_units = static_geometry['bottom_units']
+        display_topology = static_geometry['display_topology']
+        display_topology_error = static_geometry['display_topology_error']
+        vol = np.where(np.isfinite(vol), vol, np.nan)
+        if bottom is not None:
+            wet = np.asarray([[v is not None and v > 0 for v in row] for row in bottom])
+            vol = np.where(wet[None, :, :], vol, np.nan)
+        vol_list = [[[None if not np.isfinite(v) else float(v) for v in row] for row in layer] for layer in vol]
+        from vertical_geometry import read_vertical_geometry, require_metres
+        vertical = dict(depth=None, elevation=None, water_depth=None, surface_elevation=None,
+                        valid_geometry=None, depth_source=None, depth_position=None,
+                        depth_reference=None, dynamic_geometry=False, depth_geometry_error=None,
+                        bathymetry_geometry_error=None,barotropic_surface_elevation=None,
+                        surface_difference=None,surface_synchronized=None,surface_source=None)
+        render_vol = vol
+        try:
+            require_metres('bathymetry',bottom_units)
+        except ValueError as exc:
+            vertical['bathymetry_geometry_error'] = str(exc)
+        try:
+            if bottom is None:
+                raise ValueError('缺少真实湖盆水深，无法确定垂向几何')
+            geometry = read_vertical_geometry(ds, var, t, np.asarray(bottom, dtype=float),
+                                             ys=slice(None, None, stride_y), xs=slice(None, None, stride_x),
+                                             bottom_units=bottom_units)
+            def finite_json(array):
+                return np.where(np.isfinite(array), array, None).tolist()
+            water_depth = np.asarray(bottom, dtype=float) + geometry['surface_elevation']
+            vertical.update(depth=finite_json(geometry['center_depth'][layer_indices]),
+                            elevation=finite_json(geometry['center_elevation'][layer_indices]),
+                            water_depth=finite_json(water_depth),
+                            surface_elevation=finite_json(geometry['surface_elevation']),
+                            valid_geometry=geometry['valid'].tolist(),depth_source=geometry['source'],
+                            depth_position=geometry['position'],depth_reference=geometry['depth_reference'],
+                            dynamic_geometry=geometry['dynamic'],surface_source=geometry['surface_source'],
+                            barotropic_surface_elevation=finite_json(geometry['barotropic_surface_elevation']) if geometry['barotropic_surface_elevation'] is not None else None,
+                            surface_difference=finite_json(geometry['surface_difference']) if geometry['surface_difference'] is not None else None,
+                            surface_synchronized=geometry['surface_synchronized'].tolist() if geometry['surface_synchronized'] is not None else None)
+            render_vol = np.where(geometry['valid'][None, :, :], vol, np.nan)
+        except ValueError as exc:
+            vertical['depth_geometry_error'] = str(exc)
+        result = {
+            **vertical,
             "data": vol_list,
             "shape": list(vol.shape),
-            "x": list(range(vol.shape[2])),
-            "y": list(range(vol.shape[1])),
-            "z": list(range(vol.shape[0])),
+            "full_shape": [nzt, nyt, nxt],
+            "sampling_stride": [stride_z, stride_y, stride_x],
+            "x": x_indices,
+            "y": y_indices,
+            "z": layer_indices,
+            "layer_indices": layer_indices,
+            "total_layers": nzt,
+            "coordinate_mode": "projected" if projected else "index",
+            "coordinate_units": "m" if projected else "index",
             "xc": xc,
             "yc": yc,
             "sigma": sigma,
             "bottom": bottom,
+            "dry_mask": dry_mask,
+            "display_topology": display_topology,
+            "display_topology_status": "ready" if display_topology is not None else "unavailable",
+            "display_topology_error": display_topology_error,
+            "land_elevation": None,
             "timestep": t,
-            "min": float(np.nanmin(vol)) if not np.all(np.isnan(vol)) else 0,
-            "max": float(np.nanmax(vol)) if not np.all(np.isnan(vol)) else 0,
+            "min": float(np.nanmin(render_vol)) if np.isfinite(render_vol).any() else None,
+            "max": float(np.nanmax(render_vol)) if np.isfinite(render_vol).any() else None,
+            "data_min": float(np.nanmin(vol)) if np.isfinite(vol).any() else None,
+            "data_max": float(np.nanmax(vol)) if np.isfinite(vol).any() else None,
             "var_name": var_name,
-            "long_name": getattr(var, "long_name", var_name),
+            "long_name": _annotated_output({"name": var_name, "units": getattr(var, "units", ""), "long_name": getattr(var, "long_name", var_name)}, active_case_path)["zh_name"],
             "units": getattr(var, "units", ""),
-        })
+            "static_geometry_key": static_geometry_key,
+        }
+        # Playback sends this revision back after the first full frame. Keep
+        # per-frame scientific values and vertical geometry, but avoid sending
+        # unchanged horizontal coordinates, bathymetry and wet topology again.
+        if request.args.get('static_key') == static_geometry_key:
+            for name in ('shape', 'full_shape', 'sampling_stride', 'x', 'y', 'z',
+                         'layer_indices', 'total_layers', 'coordinate_mode',
+                         'coordinate_units', 'xc', 'yc', 'sigma', 'bottom',
+                         'dry_mask', 'display_topology', 'display_topology_status',
+                         'display_topology_error', 'land_elevation'):
+                result.pop(name, None)
+        # The waterbody renderer uses this saved projected outline for a
+        # display-only shoreline trace. Keep it independent of field arrays,
+        # wet masks, and solver geometry.
+        result = _add_authoritative_boundary(result, active_case_path)
+        if request.args.get('waterbody_compact', '').strip().lower() in {'1', 'true', 'yes'}:
+            result = compact_3d_waterbody_payload(result)
+        return jsonify(result)
 
 @app.route("/api/results/state_vars_surface")
 def results_state_vars_surface():
@@ -3689,12 +6279,13 @@ def results_state_vars_surface():
         return jsonify({"error": "未加载案例"}), 400
     if _output_locked():
         return jsonify({"error": "模型运行中，输出文件正在写入，暂不能读取"}), 409
-    files = find_output_files(active_case_path)
+    files = find_output_files(active_case_path, request.args.get('var'))
     nc_path = files["3d"] or files["2d"]
     if not nc_path:
         return jsonify({"error": "没有输出文件"}), 404
 
     # 显示名 -> WET 实际变量名映射
+    from result_aliases import resolve_result_name
     key_vars = [
         ("温度", "temp"),
         ("溶解氧", "abiotic_water_sO2W"),
@@ -3708,6 +6299,7 @@ def results_state_vars_surface():
         nt = get_ntimesteps(nc_path)
         t_idx = -1 if nt > 0 else 0
         for display_name, vname in key_vars:
+            vname = resolve_result_name(ds.variables, vname)
             if vname in ds.variables:
                 var = ds.variables[vname]
                 if var.ndim not in (3, 4) or var.shape[0] == 0:
@@ -3732,6 +6324,7 @@ def results_state_vars_surface():
                     "long_name": getattr(var, "long_name", vname),
                     "units": getattr(var, "units", ""),
                 }
+                result[vname].update(_annotated_output(dict(name=vname, units=result[vname]['units'], long_name=result[vname]['long_name']), active_case_path))
     return jsonify(result)
 
 @app.route("/api/results/timeseries_polygon", methods=["POST"])
@@ -3752,7 +6345,7 @@ def results_timeseries_polygon():
     layer = data.get("layer", -1)
     if len(polygon) < 3:
         return jsonify({"error": "polygon 至少需要 3 个点"}), 400
-    files = find_output_files(active_case_path)
+    files = find_output_files(active_case_path, request.args.get('var'))
     nc_path = files["3d"] or files["2d"]
     if not nc_path:
         return jsonify({"error": "没有输出文件"}), 404
@@ -3786,7 +6379,7 @@ def results_timeseries_polygon():
             tunits = getattr(ds.variables[time_dim], "units", "")
             try:
                 times = nc.num2date(tvals, tunits).tolist()
-                times = [t.strftime("%Y-%m-%d %H:%M:%S") if hasattr(t, "strftime") else str(t) for t in times]
+                times = [format_model_time(t) for t in times]
             except Exception:
                 times = [float(t) for t in tvals]
         else:
@@ -3805,16 +6398,34 @@ def results_timeseries_polygon():
             nlev = var.shape[1]
             lev = layer if layer >= 0 else nlev + layer
             lev = max(0, min(nlev - 1, lev))
-            sub = _fill(var[:, lev, j1:j2, i1:i2])
-            series = [float(np.nanmean(sub[t][local])) if np.isfinite(sub[t][local]).any() else None for t in range(ntime)]
-        else:
-            sub = _fill(var[:, j1:j2, i1:i2])
-            series = [float(np.nanmean(sub[t][local])) if np.isfinite(sub[t][local]).any() else None for t in range(ntime)]
+        # Bound both axes of the read: long histories and large polygon
+        # bounding boxes must never materialize as one time×space array.
+        chunk_times, tile_size = 32, 128
+        totals = np.zeros(ntime, dtype=float)
+        counts = np.zeros(ntime, dtype=np.int64)
+        for t0 in range(0, ntime, chunk_times):
+            t1 = min(ntime, t0 + chunk_times)
+            for y0 in range(j1, j2, tile_size):
+                y1 = min(j2, y0 + tile_size)
+                for x0 in range(i1, i2, tile_size):
+                    x1 = min(i2, x0 + tile_size)
+                    tile_mask = local[y0 - j1:y1 - j1, x0 - i1:x1 - i1]
+                    if not tile_mask.any():
+                        continue
+                    key = ((slice(t0, t1), lev, slice(y0, y1), slice(x0, x1))
+                           if is_3d else
+                           (slice(t0, t1), slice(y0, y1), slice(x0, x1)))
+                    tile = _fill(var[key])
+                    valid = np.isfinite(tile) & tile_mask[None, :, :]
+                    totals[t0:t1] += np.sum(np.where(valid, tile, 0.0), axis=(1, 2))
+                    counts[t0:t1] += np.count_nonzero(valid, axis=(1, 2))
+        series = [float(total / count) if count else None
+                  for total, count in zip(totals, counts)]
         return jsonify({
             "times": times,
             "values": series,
             "var_name": var_name,
-            "long_name": getattr(var, "long_name", var_name),
+            "long_name": _annotated_output({"name": var_name, "units": getattr(var, "units", ""), "long_name": getattr(var, "long_name", var_name)}, active_case_path)["zh_name"],
             "units": getattr(var, "units", ""),
             "n_cells": int(mask.sum()),
             "layer": int(lev) if is_3d else None,
@@ -3834,7 +6445,7 @@ def results_timeseries_cell():
         layer = int(request.args.get("layer", -1))
     except ValueError:
         return jsonify({"error": "i/j/layer 必须是整数"}), 400
-    files = find_output_files(active_case_path)
+    files = find_output_files(active_case_path, request.args.get('var'))
     nc_path = files["3d"] or files["2d"]
     if not nc_path:
         return jsonify({"error": "没有输出文件"}), 404
@@ -3861,7 +6472,7 @@ def results_timeseries_cell():
             tunits = getattr(ds.variables[time_dim], "units", "")
             try:
                 times = nc.num2date(tvals, tunits).tolist()
-                times = [t.strftime("%Y-%m-%d %H:%M:%S") if hasattr(t, "strftime") else str(t) for t in times]
+                times = [format_model_time(t) for t in times]
             except Exception:
                 times = [float(t) for t in tvals]
         else:
@@ -3875,16 +6486,20 @@ def results_timeseries_cell():
             nlev = var.shape[1]
             lev = layer if layer >= 0 else nlev + layer
             lev = max(0, min(nlev - 1, lev))
-            col = _fill(var[:, lev, j, i])
-            series = [float(v) if np.isfinite(v) else None for v in col]
+            index = (lev, j, i)
         else:
-            col = _fill(var[:, j, i])
-            series = [float(v) if np.isfinite(v) else None for v in col]
+            index = (j, i)
+        series = []
+        chunk_times = 256
+        for t0 in range(0, ntime, chunk_times):
+            t1 = min(ntime, t0 + chunk_times)
+            col = _fill(var[(slice(t0, t1),) + index])
+            series.extend(float(v) if np.isfinite(v) else None for v in col)
         return jsonify({
             "times": times,
             "values": series,
             "var_name": var_name,
-            "long_name": getattr(var, "long_name", var_name),
+            "long_name": _annotated_output({"name": var_name, "units": getattr(var, "units", ""), "long_name": getattr(var, "long_name", var_name)}, active_case_path)["zh_name"],
             "units": getattr(var, "units", ""),
             "i": i, "j": j,
             "layer": int(lev) if is_3d else None,
@@ -3905,7 +6520,7 @@ def results_timeseries_cell():
 
 import math as _math
 
-_SHP_TEMP_DIR = APP_DIR / "_shp_uploads"
+_SHP_TEMP_DIR = APP_TEMP_DIR / "_shp_uploads"
 _SHP_TEMP_DIR.mkdir(exist_ok=True)
 
 
@@ -3980,25 +6595,78 @@ def _parse_prj_crs(prj_text):
     return {"crs_type": "unknown", "utm_zone": zone, "central_meridian": cm}
 
 
+def _sample_contour_lines(lines, depths, spacing, limit=500_000):
+    """Densify contour polylines at a metric spacing for grid interpolation."""
+    spacing = float(spacing)
+    if not _math.isfinite(spacing) or spacing <= 0:
+        raise ValueError("等深线采样间距必须为正数")
+    sampled, values = [], []
+    for line, depth in zip(lines, depths):
+        if len(line) < 2:
+            continue
+        first = (float(line[0][0]), float(line[0][1]))
+        sampled.append(first)
+        values.append(float(depth))
+        distance_next = spacing
+        distance_total = 0.0
+        previous = first
+        for start, end in zip(line, line[1:]):
+            end = (float(end[0]), float(end[1]))
+            dx, dy = end[0] - previous[0], end[1] - previous[1]
+            segment = _math.hypot(dx, dy)
+            if segment <= 0:
+                previous = end
+                continue
+            while distance_next <= distance_total + segment + 1e-9:
+                if len(sampled) >= limit:
+                    raise ValueError(f"等深线采样点超过安全上限 {limit}，请使用更粗网格或分批导入")
+                fraction = max(0.0, min(1.0, (distance_next - distance_total) / segment))
+                sampled.append((previous[0] + fraction * dx, previous[1] + fraction * dy))
+                values.append(float(depth))
+                distance_next += spacing
+            distance_total += segment
+            previous = end
+        last = (float(line[-1][0]), float(line[-1][1]))
+        if _math.hypot(last[0] - sampled[-1][0], last[1] - sampled[-1][1]) > 1e-8:
+            if len(sampled) >= limit:
+                raise ValueError(f"等深线采样点超过安全上限 {limit}，请使用更粗网格或分批导入")
+            sampled.append(last)
+            values.append(float(depth))
+    return sampled, values
+
+
+def _crs_label(crs, fallback="unknown"):
+    if crs is None:
+        return fallback
+    try:
+        epsg = crs.to_epsg()
+        if epsg:
+            return f"EPSG:{epsg}"
+    except Exception:
+        pass
+    try:
+        return crs.name or fallback
+    except Exception:
+        return fallback
+
+
 def _utm_zone_from_lon(lon):
     """Return UTM zone number (1-60) for a given longitude (degrees east)."""
     return int(_math.floor((lon + 180.0) / 6.0)) + 1
 
 
 def _lonlat_to_utm_xy(lon, lat, zone=None):
-    """Simplified lon/lat → UTM (x,y) in metres.
-
-    Uses the local Transverse Mercator approximation around the zone central
-    meridian. Accuracy is ~1 m per degree of latitude, sufficient for lake
-    grids (cells ≥ 10 m). If zone is None, it is derived from lon.
-    """
+    """Project WGS84 lon/lat into the requested UTM zone exactly."""
     if zone is None:
         zone = _utm_zone_from_lon(lon)
-    cm = (zone - 1) * 6.0 - 180.0 + 3.0  # central meridian of zone
-    cos_lat = _math.cos(_math.radians(lat))
-    x = 500000.0 + (lon - cm) * 111320.0 * cos_lat
-    y = lat * 110574.0  # approximate metres from equator
-    return x, y
+    x, y = _wgs84_to_utm_transformer(int(zone)).transform(float(lon), float(lat))
+    return float(x), float(y)
+
+
+@functools.lru_cache(maxsize=60)
+def _wgs84_to_utm_transformer(zone):
+    """Reuse exact WGS84→UTM transforms across uploaded vertices/samples."""
+    return crs_utils.make_transformer(crs_utils.WGS84, crs_utils.utm_crs(zone))
 
 
 def _coords_look_geographic(coords):
@@ -4032,21 +6700,78 @@ def _convert_boundary_to_utm(coords, crs_info):
     return out, new_info
 
 
+def _load_saved_boundary_geometry(case_path):
+    """Read an optional uploaded outline without deriving geometry from the grid."""
+    setup_path = Path(case_path) / "rivers_setup.json"
+    if not setup_path.is_file():
+        return None
+    try:
+        with setup_path.open("r", encoding="utf-8") as stream:
+            setup = json.load(stream) or {}
+            boundary = setup.get("boundary_geometry")
+    except (OSError, ValueError, TypeError):
+        return None
+    if not isinstance(boundary, dict):
+        return None
+    groups = boundary.get("projected_polygons")
+    if not isinstance(groups, list) or not groups:
+        # Some older saved cases persisted only source_polygons even though
+        # those vertices were already expressed in the projected bathymetry
+        # grid coordinate space. Accept that legacy shape only when both the
+        # declared coordinate space and its exact WKT match the active case.
+        # This is a format adapter, not a CRS transform or validation claim.
+        case_wkt = setup.get("boundary_wkt")
+        projected_crs = boundary.get("projected_crs")
+        source_groups = boundary.get("source_polygons")
+        if (boundary.get("coordinate_space") != "bathymetry_projected_grid_coordinates" or
+                not isinstance(case_wkt, str) or not case_wkt or
+                not isinstance(projected_crs, dict) or projected_crs.get("wkt") != case_wkt or
+                not isinstance(source_groups, list) or not source_groups):
+            return None
+        groups = source_groups
+        boundary = {**boundary, "projected_polygons": groups}
+
+    def valid_ring(ring):
+        if not isinstance(ring, list) or len(ring) < 3 or not all(
+                isinstance(point, (list, tuple)) and len(point) >= 2 and
+                all(isinstance(value, (int, float)) and not isinstance(value, bool) and _math.isfinite(value)
+                    for value in point[:2]) for point in ring):
+            return False
+        points = [(point[0], point[1]) for point in ring]
+        if len(set(points)) < 3:
+            return False
+        area2 = sum(points[index][0] * points[(index + 1) % len(points)][1] -
+                    points[(index + 1) % len(points)][0] * points[index][1]
+                    for index in range(len(points)))
+        return abs(area2) > 1e-12
+
+    if not all(isinstance(group, dict) and valid_ring(group.get("outer")) and
+               isinstance(group.get("holes", []), list) and
+               all(valid_ring(hole) for hole in group.get("holes", [])) for group in groups):
+        return None
+    return boundary
+
+
 @app.route("/api/preprocess/help")
 def preprocess_help():
     """Static guidance on expected shapefile formats."""
     return jsonify({
         "boundary": {
-            "geometry": "Polygon",
+            "geometry": "Polygon or MultiPolygon",
             "required_files": [".shp", ".shx", ".dbf"],
             "optional_files": [".prj"],
-            "description": "湖泊外边界多边形，第一个 polygon 的外环即湖岸线",
+            "description": "保留所有顺时针外环作为湖岸片区，逆时针内环作为干洞；支持多部件湖界",
             "crs": "推荐 UTM（带 .prj）；WGS84 经纬度也支持，后端自动转 UTM",
         },
         "bathymetry_point": {
             "geometry": "Point",
-            "required_fields": "任意一个数值字段表示水深(m)，例如 depth / ELEV / Z",
+            "required_fields": "必须显式提交 depth_field，指定一个表示水深(m)的数值字段；不猜测字段",
             "description": "散点测深，每个点带 (x, y, depth)。后端用 scipy.griddata 插值到网格",
+        },
+        "bathymetry_contour": {
+            "geometry": "PolyLine",
+            "required_fields": "必须显式提交 depth_field，指定等深线水深(m)字段，例如 CONTOUR",
+            "description": "等深线按所选字段赋值并按网格间距采样后插值",
         },
         "bathymetry_polygon": {
             "geometry": "Polygon",
@@ -4073,9 +6798,11 @@ def preprocess_case_create():
     case_path.mkdir(parents=True)
     _ensure_case_dirs(case_path)
     # Reuse the standard load_case logic by issuing an internal call shape
-    global active_case, active_case_path, cached_getm_config, cached_fabm_info
-    active_case = case_name
-    active_case_path = case_path
+    global active_case, active_case_path, cached_getm_config, cached_fabm_info, _active_case_generation
+    with _ACTIVE_CASE_LOCK:
+        active_case = case_name
+        active_case_path = case_path
+        _active_case_generation += 1
     cached_getm_config = None
     cached_fabm_info = None
     return jsonify({
@@ -4110,20 +6837,17 @@ def preprocess_boundary_upload():
         return jsonify({"error": f"读取 shapefile 失败: {e}"}), 500
     if reader.shapeType != shapefile.POLYGON and reader.shapeType != shapefile.POLYGONZ:
         return jsonify({"error": f"边界 shapefile 必须是 Polygon，当前 shapeType={reader.shapeType}"}), 400
-    # Collect the outer ring (first part) of EVERY polygon feature, so that
-    # multi-part lakes (e.g. 滇池外海 + 草海) are kept in full. Inner rings
-    # (holes) start at parts[1] and are skipped.
-    rings = []
-    for shp in reader.shapes():
-        pts = shp.points
-        parts = list(shp.parts) + [len(pts)]
-        if not pts or not parts:
-            continue
-        outer = pts[parts[0]:parts[1]]
-        if len(outer) >= 4:
-            rings.append([(p[0], p[1]) for p in outer])
-    if not rings:
+    polygon_groups = _extract_shapefile_polygon_groups(reader.shapes())
+    if not polygon_groups:
         return jsonify({"error": "shapefile 中没有有效 polygon"}), 400
+    # Preserve exact user-supplied vertices and the source CRS before any
+    # visualization/grid projection is applied.
+    source_polygon_groups = [{
+        "outer": [[float(x), float(y)] for x, y in group["outer"]],
+        "holes": [[[float(x), float(y)] for x, y in hole] for hole in group["holes"]],
+    } for group in polygon_groups]
+    source_crs_info = dict(crs_info)
+    rings = [group["outer"] for group in polygon_groups]
     # 用户显式声明的源坐标系：先把所有环重投影到 WGS84 经纬度，
     # 再走下方原有 lon/lat→UTM 管线，使边界进入标准 UTM 框架。
     crs_preset = (request.form.get("crs_preset") or "auto").strip()
@@ -4135,17 +6859,27 @@ def preprocess_boundary_upload():
             return jsonify({"error": "无法识别所选坐标系（自定义 EPSG 代码无效）"}), 400
         tr = crs_utils.make_transformer(src_crs, crs_utils.WGS84)
         try:
-            rings = [[tr.transform(p[0], p[1]) for p in ring] for ring in rings]
+            polygon_groups = [{
+                "outer": [tr.transform(p[0], p[1]) for p in group["outer"]],
+                "holes": [[tr.transform(p[0], p[1]) for p in hole]
+                          for hole in group["holes"]],
+            } for group in polygon_groups]
+            rings = [group["outer"] for group in polygon_groups]
         except Exception as e:
             return jsonify({"error": f"坐标转换失败: {e}（请确认所选坐标系与数据匹配）"}), 400
         crs_info = {"crs_type": "geographic", "utm_zone": None, "central_meridian": None}
         conversion_note = f"已从 {crs_utils.preset_label(crs_preset, crs_epsg)} 转换到标准 UTM"
     # Convert every ring to UTM/metric space
-    rings_utm = []
+    polygon_groups_utm = []
     crs_info2 = crs_info
-    for ring in rings:
-        conv, crs_info2 = _convert_boundary_to_utm(ring, crs_info)
-        rings_utm.append(conv)
+    for group in polygon_groups:
+        outer, crs_info2 = _convert_boundary_to_utm(group["outer"], crs_info)
+        holes = []
+        for hole in group["holes"]:
+            converted_hole, crs_info2 = _convert_boundary_to_utm(hole, crs_info)
+            holes.append(converted_hole)
+        polygon_groups_utm.append({"outer": outer, "holes": holes})
+    rings_utm = [group["outer"] for group in polygon_groups_utm]
     all_pts = [pt for ring in rings_utm for pt in ring]
     xs = [c[0] for c in all_pts]
     ys = [c[1] for c in all_pts]
@@ -4155,11 +6889,22 @@ def preprocess_boundary_upload():
     for ring in rings_utm:
         step = max(1, len(ring) // 400)
         previews.append(ring[::step])
+    holes_preview = []
+    for group in polygon_groups_utm:
+        for hole in group["holes"]:
+            step = max(1, len(hole) // 400)
+            holes_preview.append(hole[::step])
     largest = max(rings_utm, key=len)
     boundary_id = _pp_cache_id("bnd")
     _preprocess_cache["boundary"][boundary_id] = {
         "coords": largest,          # largest ring (kept for compatibility)
         "rings": rings_utm,         # ALL outer rings for mask generation
+        "polygons": polygon_groups_utm,
+        "source_polygons": source_polygon_groups,
+        "source_crs": source_crs_info,
+        "source_crs_selection": {"preset": crs_preset or "auto", "epsg": crs_epsg or None},
+        "source_files": sorted(name for name in os.listdir(work_dir)
+                                if Path(name).suffix.lower() in {".shp", ".shx", ".dbf", ".prj"}),
         "bbox": bbox,
         "crs_info": crs_info2,
         "orig_crs_type": crs_info["crs_type"],
@@ -4167,12 +6912,14 @@ def preprocess_boundary_upload():
     return jsonify({
         "boundary_id": boundary_id,
         "n_points": len(all_pts),
-        "n_polygons": len(rings_utm),
+        "n_polygons": len(polygon_groups_utm),
+        "n_holes": sum(len(group["holes"]) for group in polygon_groups_utm),
         "bbox": bbox,
         "crs_type": crs_info2["crs_type"],
         "utm_zone": crs_info2.get("utm_zone"),
         "coords_preview": previews[0] if len(previews) == 1 else previews,
         "rings_preview": previews,
+        "holes_preview": holes_preview,
         "orig_crs_type": crs_info["crs_type"],
         "warnings": warnings,
         "converted": conversion_note is not None,
@@ -4182,7 +6929,7 @@ def preprocess_boundary_upload():
 
 @app.route("/api/preprocess/bathymetry/upload", methods=["POST"])
 def preprocess_bathymetry_upload():
-    """Upload a point or polygon shapefile with a depth attribute.
+    """Upload point, polygon, or contour-line bathymetry with an explicit depth attribute.
 
     Multipart form:
       files = [.shp, .shx, .dbf, (.prj)]
@@ -4210,25 +6957,20 @@ def preprocess_bathymetry_upload():
         field_names = [f[0] for f in reader.fields[1:]]  # first is deletion flag
     except Exception as e:
         return jsonify({"error": f"读取属性表 (.dbf) 失败: {e}"}), 400
+    if not depth_field:
+        return jsonify({"error": "必须显式填写水深字段名；系统不会根据字段顺序猜测（例如 OBJECTID）。",
+                        "fields": field_names}), 400
     if depth_field and depth_field not in field_names:
         return jsonify({
             "error": f"字段 {depth_field} 不存在，可用字段: {field_names}",
             "fields": field_names,
         }), 400
-    if not depth_field:
-        # Heuristic: pick first numeric-looking field
-        candidates = [n for n in field_names if n.lower() in
-                      ("depth", "elev", "z", "h", "height", "水深", "高程", "深度")]
-        if candidates:
-            depth_field = candidates[0]
-        elif field_names:
-            depth_field = field_names[0]
-        else:
-            return jsonify({"error": "shapefile 没有任何属性字段"}), 400
     is_point = reader.shapeType in (shapefile.POINT, shapefile.POINTZ, shapefile.POINTM)
     is_poly = reader.shapeType in (shapefile.POLYGON, shapefile.POLYGONZ, shapefile.POLYGONM)
-    if not (is_point or is_poly):
-        return jsonify({"error": f"水深 shapefile 必须是 Point 或 Polygon，当前 shapeType={reader.shapeType}"}), 400
+    is_contour = reader.shapeType in (shapefile.POLYLINE, shapefile.POLYLINEZ, shapefile.POLYLINEM)
+    if not (is_point or is_poly or is_contour):
+        return jsonify({"error": f"水深 shapefile 必须是 Point、Polygon 或 PolyLine，当前 shapeType={reader.shapeType}",
+                        "fields": field_names}), 400
     # Determine reference CRS — prefer boundary if already cached, else use own
     boundary_cache = next(iter(_preprocess_cache["boundary"].values()), None)
     if boundary_cache:
@@ -4347,6 +7089,9 @@ def preprocess_bathymetry_upload():
             conversion_note = f"已从 {src_label} 转换到 UTM {zone}N"
     points = []
     polygons = []
+    polygon_groups = []
+    contour_lines = []
+    contour_line_depths = []
     depths = []
     records_iter = reader.records()
     shapes_iter = reader.shapes()
@@ -4368,6 +7113,26 @@ def preprocess_bathymetry_upload():
                 ux, uy = x, y
             points.append((ux, uy))
             depths.append(d)
+        elif is_contour:
+            pts = shp.points
+            if len(pts) < 2:
+                continue
+            parts = list(shp.parts) + [len(pts)]
+            feature_lines = []
+            for part_index in range(len(parts) - 1):
+                part = pts[parts[part_index]:parts[part_index + 1]]
+                if len(part) < 2:
+                    continue
+                if convert_xy is not None:
+                    line = [convert_xy(p[0], p[1]) for p in part]
+                elif target_crs["crs_type"] == "geographic":
+                    line = [_lonlat_to_utm_xy(p[0], p[1], target_crs.get("utm_zone")) for p in part]
+                else:
+                    line = [(p[0], p[1]) for p in part]
+                feature_lines.append(line)
+            contour_lines.extend(feature_lines)
+            contour_line_depths.extend([d] * len(feature_lines))
+            depths.append(d)
         else:  # polygon
             pts = shp.points
             if not pts:
@@ -4379,9 +7144,28 @@ def preprocess_bathymetry_upload():
             else:
                 utm_pts = [(p[0], p[1]) for p in pts]
             polygons.append(utm_pts)
+            feature_groups = _extract_shapefile_polygon_groups([shp])
+            if convert_xy is not None:
+                for group in feature_groups:
+                    group["outer"] = [convert_xy(x, y) for x, y in group["outer"]]
+                    group["holes"] = [[convert_xy(x, y) for x, y in hole]
+                                       for hole in group.get("holes", [])]
+            elif target_crs["crs_type"] == "geographic":
+                for group in feature_groups:
+                    group["outer"] = [_lonlat_to_utm_xy(x, y, target_crs.get("utm_zone"))
+                                       for x, y in group["outer"]]
+                    group["holes"] = [[_lonlat_to_utm_xy(x, y, target_crs.get("utm_zone"))
+                                        for x, y in hole]
+                                       for hole in group.get("holes", [])]
+            polygon_groups.append(feature_groups)
             depths.append(d)
     if not depths:
         return jsonify({"error": "没有有效的水深数据行（请检查 depth_field 是否为数值）"}), 400
+    try:
+        preview_points, preview_point_depths = _sample_contour_lines(
+            contour_lines, contour_line_depths, 25.0) if is_contour else ([], [])
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     # Warn when the bathy extent lies completely outside the boundary extent AND
     # no conversion was possible — almost always means the two shapefiles use
     # different CRS and neither has a usable .prj / declaration.
@@ -4389,6 +7173,9 @@ def preprocess_bathymetry_upload():
     if boundary_cache and convert_xy is None:
         if points:
             bx = [p[0] for p in points]; by = [p[1] for p in points]
+        elif contour_lines:
+            flat = [pt for line in contour_lines for pt in line]
+            bx = [p[0] for p in flat]; by = [p[1] for p in flat]
         else:
             flat = [pt for poly in polygons for pt in poly]
             bx = [p[0] for p in flat]; by = [p[1] for p in flat]
@@ -4404,35 +7191,56 @@ def preprocess_bathymetry_upload():
     inside_ratio = None
     if align_mode is not None and boundary_cache:
         rings_b = boundary_cache.get("rings") or [boundary_cache["coords"]]
-        probe = points[:400] if is_point else \
-            [pt for poly in polygons[:25] for pt in poly[:20]]
+        probe = points[:400] if is_point else (preview_points[:400] if is_contour else
+            [pt for poly in polygons[:25] for pt in poly[:20]])
         if probe:
-            n_in = sum(1 for px, py in probe
-                       if any(_point_in_polygon(px, py, r) for r in rings_b))
+            boundary_groups = boundary_cache.get("polygons")
+            if boundary_groups:
+                n_in = sum(1 for px, py in probe
+                           if _point_in_polygon_groups(px, py, boundary_groups))
+            else:
+                n_in = sum(1 for px, py in probe
+                           if any(_point_in_polygon(px, py, r) for r in rings_b))
             inside_ratio = n_in / len(probe)
     bathy_id = _pp_cache_id("bthy")
-    geom_type = "point" if is_point else "polygon"
+    geom_type = "point" if is_point else "contour" if is_contour else "polygon"
     _preprocess_cache["bathymetry"][bathy_id] = {
         "geom_type": geom_type,
         "points": points,
         "polygons": polygons,
+        "polygon_groups": polygon_groups,
+        "contour_lines": contour_lines,
+        "contour_line_depths": contour_line_depths,
         "depths": depths,
         "depth_field": depth_field,
         "crs_info": final_crs,
     }
+    source_crs = crs_utils.crs_from_wkt(crs_info.get("wkt")) if crs_info.get("wkt") else src_crs
     return jsonify({
         "bathy_id": bathy_id,
         "geom_type": geom_type,
         "n_features": len(depths),
+        "n_sample_points": len(preview_points) if is_contour else len(points),
+        "sample_spacing_m": 25.0 if is_contour else None,
         "depth_range": [float(min(depths)), float(max(depths))],
         "fields": field_names,
         "depth_field": depth_field,
+        "source_crs": _crs_label(source_crs, crs_info.get("crs_type", "unknown")),
+        "target_crs": (
+            f"EPSG:{32600 + int(final_crs['utm_zone'])} (WGS84 / UTM {int(final_crs['utm_zone'])}N)"
+            if final_crs.get("crs_type") == "utm" and final_crs.get("utm_zone")
+            else _crs_label(crs_utils.crs_from_wkt(final_crs.get("wkt")) if final_crs.get("wkt") else None,
+                            final_crs.get("crs_type", "unknown"))),
         "crs_type": final_crs["crs_type"],
         "warnings": warnings,
         "converted": align_mode is not None,
         "conversion": conversion_note,
         "inside_ratio": inside_ratio,
-        "preview_points": points[:200] if is_point else [],
+        "preview_points": (points[:200] if is_point else
+                           [[x, y] for x, y in preview_points[:200]] if is_contour else []),
+        "preview_point_depths": (depths[:200] if is_point else preview_point_depths[:200] if is_contour else []),
+        "preview_lines": ([line[:2000] for line in contour_lines[:50]] if is_contour else []),
+        "preview_line_depths": (contour_line_depths[:50] if is_contour else []),
         "preview_polygons": polygons[:50] if not is_point else [],
         "preview_depths": depths[:200] if is_point else depths[:50],
     })
@@ -4703,13 +7511,10 @@ def preprocess_grid_generate():
     rings = bnd.get("rings") or [bnd["coords"]]
     xc = x0 + (np.arange(nx) + 0.5) * dx
     yc = y0 + (np.arange(ny) + 0.5) * dy
-    mask = np.zeros((ny, nx), dtype=bool)
-    for j in range(ny):
-        for i in range(nx):
-            for poly in rings:
-                if _point_in_polygon(xc[i], yc[j], poly):
-                    mask[j, i] = True
-                    break
+    if bnd.get("polygons"):
+        mask = _rasterize_polygon_groups_mask(xc, yc, bnd["polygons"])
+    else:
+        mask = _rasterize_polygon_union_mask(xc, yc, rings)
     n_water = int(mask.sum())
     grid_id = _pp_cache_id("grid")
     _preprocess_cache["grid"][grid_id] = {
@@ -4758,11 +7563,26 @@ def preprocess_bathymetry_interpolate():
     yc = np.array(grid["yc"])
     bathy = np.full((ny, nx), -9999.0, dtype=float)
     geom = bthy["geom_type"]
-    if geom == "point":
-        pts = np.array(bthy["points"], dtype=float)
-        vals = np.array(bthy["depths"], dtype=float)
+    bathy_sample_count = None
+    if geom in ("point", "contour"):
+        if geom == "contour":
+            spacing = max(0.5, min(abs(float(grid.get("dx", 1.0))), abs(float(grid.get("dy", 1.0)))) * 0.5)
+            try:
+                sampled_points, sampled_values = _sample_contour_lines(
+                    bthy.get("contour_lines", []), bthy.get("contour_line_depths", []), spacing)
+            except ValueError as e:
+                return jsonify({"error": str(e)}), 400
+            pts = np.asarray(sampled_points, dtype=float)
+            vals = np.asarray(sampled_values, dtype=float)
+            if not len(pts):
+                return jsonify({"error": "等深线没有可插值的有效线段"}), 400
+            bathy_sample_count = len(pts)
+        else:
+            pts = np.array(bthy["points"], dtype=float)
+            vals = np.array(bthy["depths"], dtype=float)
+            bathy_sample_count = len(pts)
         if pts.size == 0:
-            return jsonify({"error": "水深 shapefile 没有点数据"}), 400
+            return jsonify({"error": "水深 shapefile 没有有效采样点"}), 400
         # Build query points for water cells only
         water_idx = np.argwhere(mask)  # rows of (j, i)
         if len(water_idx) == 0:
@@ -4802,32 +7622,44 @@ def preprocess_bathymetry_interpolate():
         depths = bthy["depths"]
         if not polys:
             return jsonify({"error": "水深 shapefile 没有面数据"}), 400
-        # Spatially index polygons by their bbox to cut work
-        poly_bboxes = []
-        for p in polys:
-            xs = [pt[0] for pt in p]
-            ys = [pt[1] for pt in p]
-            poly_bboxes.append((min(xs), min(ys), max(xs), max(ys)))
-        for j in range(ny):
-            for i in range(nx):
-                if not mask[j, i]:
-                    continue
-                x, y = xc[i], yc[j]
-                matched = None
-                for k, bb in enumerate(poly_bboxes):
-                    if bb[0] <= x <= bb[2] and bb[1] <= y <= bb[3]:
-                        if _point_in_polygon(x, y, polys[k]):
-                            matched = k
-                            break
-                if matched is not None:
-                    bathy[j, i] = float(depths[matched])
+        # Keep compatibility with older in-memory uploads that only cached one
+        # flattened ring per feature.
+        feature_groups = bthy.get("polygon_groups")
+        if feature_groups is None:
+            feature_groups = [[{"outer": poly, "holes": []}] for poly in polys]
+        # Spatially crop each feature by the bounds of all its exterior rings.
+        feature_bboxes = []
+        for groups in feature_groups:
+            exterior_points = [pt for group in groups for pt in group["outer"]]
+            if exterior_points:
+                xs = [pt[0] for pt in exterior_points]
+                ys = [pt[1] for pt in exterior_points]
+                feature_bboxes.append((min(xs), min(ys), max(xs), max(ys)))
+            else:
+                feature_bboxes.append(None)
+        # Rasterize each feature only over its bounding box, then claim still-
+        # unassigned water cells. This preserves feature-order precedence while
+        # avoiding a Python vertex walk for every grid cell.
+        unassigned = mask.copy()
+        for k, (groups, bb) in enumerate(zip(feature_groups, feature_bboxes)):
+            if bb is None:
+                continue
+            x0, y0, x1, y1 = bb
+            i_idx = np.flatnonzero((xc >= x0) & (xc <= x1))
+            j_idx = np.flatnonzero((yc >= y0) & (yc <= y1))
+            if not len(i_idx) or not len(j_idx):
+                continue
+            i0, i1 = int(i_idx[0]), int(i_idx[-1]) + 1
+            j0, j1 = int(j_idx[0]), int(j_idx[-1]) + 1
+            feature_mask = _rasterize_polygon_groups_mask(xc[i0:i1], yc[j0:j1], groups)
+            claim = feature_mask & unassigned[j0:j1, i0:i1]
+            bathy[j0:j1, i0:i1][claim] = float(depths[k])
+            unassigned[j0:j1, i0:i1][claim] = False
         # If any water cell unmatched, fill with nearest non-zero depth
         if mask.any() and (bathy[mask] <= 0).any():
             fill_value = float(np.median([d for d in depths if d > 0])) if any(d > 0 for d in depths) else 1.0
-            for j in range(ny):
-                for i in range(nx):
-                    if mask[j, i] and bathy[j, i] <= 0:
-                        bathy[j, i] = fill_value
+            fill = mask & (bathy <= 0)
+            bathy[fill] = fill_value
     # Cache interpolated result
     grid["depth_array"] = bathy.tolist()
     water_vals = bathy[mask]
@@ -4837,6 +7669,7 @@ def preprocess_bathymetry_interpolate():
         "depth_min": float(np.min(water_vals)),
         "depth_max": float(np.max(water_vals)),
         "depth_mean": float(np.mean(water_vals)),
+        "n_bathy_sample_points": bathy_sample_count,
         "nx": nx, "ny": ny,
     })
 
@@ -4853,7 +7686,7 @@ def _write_bathymetry_nc_standalone(path, nx, ny, dx, dy, x0, y0,
     simplified inverse-UTM approximation is used (only sane for true UTM grids).
     bathymetry positive=depth, -9999=land.
     """
-    ds = nc.Dataset(path, "w", format="NETCDF4")
+    ds = open_dataset(path, "w", format="NETCDF4")
     ds.createDimension("x", nx)
     ds.createDimension("y", ny)
     ds.createDimension("xq", nx + 1)
@@ -4925,12 +7758,16 @@ def preprocess_save():
     rivers = data.get("rivers") or []
     if not case_name:
         return jsonify({"error": "缺少 case_name"}), 400
+    if not re.match(r"^[A-Za-z0-9_\-\u4e00-\u9fa5 ]+$", case_name):
+        return jsonify({"error": "案例名仅允许字母、数字、下划线、空格、中文"}), 400
     if not grid_id or grid_id not in _preprocess_cache["grid"]:
         return jsonify({"error": "无效 grid_id"}), 400
     grid = _preprocess_cache["grid"][grid_id]
     if "depth_array" not in grid:
         return jsonify({"error": "请先执行水深插值步骤"}), 400
-    case_path = CASE_DIR / case_name
+    case_path = (CASE_DIR / case_name).resolve()
+    if case_path.parent != CASE_DIR.resolve():
+        return jsonify({"error": "案例名不能越出所选案例存储目录"}), 400
     case_path.mkdir(parents=True, exist_ok=True)
     bathy = np.array(grid["depth_array"], dtype=float)
     crs = grid.get("crs_info", {})
@@ -4984,14 +7821,31 @@ def preprocess_save():
             "rivers": rivers,
             "boundary_wkt": wkt,
         }
+        if bnd and bnd.get("polygons"):
+            meta["boundary_geometry"] = {
+                "schema_version": 1,
+                "coordinate_space": "bathymetry_projected_grid_coordinates",
+                "source_polygons": bnd.get("source_polygons", bnd["polygons"]),
+                "source_crs": bnd.get("source_crs", bnd.get("crs_info", {})),
+                "source_crs_selection": bnd.get("source_crs_selection", {"preset": "auto", "epsg": None}),
+                "projected_polygons": bnd["polygons"],
+                "projected_crs": bnd.get("crs_info", {}),
+                "provenance": {
+                    "source": "uploaded-boundary-shapefile",
+                    "files": bnd.get("source_files", []),
+                    "transformation": "grid-creation-projected-coordinates",
+                },
+            }
         with open(case_path / "rivers_setup.json", "w", encoding="utf-8") as f:
             json.dump(meta, f, ensure_ascii=False, indent=2)
     except Exception as e:
         return jsonify({"error": f"写入 rivers_setup.json 失败: {e}"}), 500
     # Activate the new case so the user can continue configuring it
-    global active_case, active_case_path, cached_getm_config, cached_fabm_info
-    active_case = case_name
-    active_case_path = case_path
+    global active_case, active_case_path, cached_getm_config, cached_fabm_info, _active_case_generation
+    with _ACTIVE_CASE_LOCK:
+        active_case = case_name
+        active_case_path = case_path
+        _active_case_generation += 1
     cached_getm_config = None
     cached_fabm_info = None
     return jsonify({
@@ -5082,16 +7936,62 @@ TROPHIC_PRESETS = {
 }
 
 _METEO_ALIASES = {
-    "date": ["date", "time", "datetime", "日期", "时间"],
+    "date": ["date", "time", "datetime", "timestamp", "tmstamp", "日期", "时间"],
     "u10": ["u10", "u", "uwind", "wind_u", "风速u", "纬向风"],
     "v10": ["v10", "v", "vwind", "wind_v", "风速v", "经向风"],
-    "slp": ["slp", "pressure", "pres", "sp", "气压", "海平面气压"],
-    "t2": ["t2", "tair", "air_temp", "temp", "temperature", "气温", "温度"],
-    "rh": ["rh", "hur", "humidity", "相对湿度"],
-    "tcc": ["tcc", "cloud", "clt", "云量", "总云量"],
-    "precip": ["precip", "precipitation", "pr", "rain", "降雨", "降水", "降水量"],
+    "ws": ["ws", "windspeed", "wind_speed", "wind_speed_10m", "meanws", "mean_ws", "windspeed_avg"],
+    "wd": ["wd", "winddir", "wind_dir", "wind_direction", "wind_direction_10m"],
+    "swr": ["swr", "swrad", "sw_in", "sw_rad_avg", "shortwave_radiation", "shortwave", "global_radiation"],
+    "slp": ["slp", "pressure", "pres", "sp", "airpressure_hpa_avg", "pressure_msl", "气压", "海平面气压"],
+    "t2": ["t2", "tair", "air_temp", "air_temp_as_avg", "air_temp_hs_avg", "ta_1_shield", "ta_2_vent", "temp", "temperature", "气温", "温度"],
+    "rh": ["rh", "hur", "humidity", "relhumidity_avg", "rh_shield", "相对湿度"],
+    "tcc": ["tcc", "cloud", "clt", "totalmolnmängd", "total_cloud_cover", "cloud_cover", "云量", "总云量"],
+    "precip": ["precip", "precipitation", "pr", "rain", "rain_total", "rain_tot", "降雨", "降水", "降水量"],
     "evap": ["evap", "evaporation", "蒸散", "蒸发", "蒸发量"],
 }
+
+
+def _getm_shortwave_clear_sky(stamp, longitude, latitude):
+    """Reproduce GETM solar geometry and clear-sky qtot for one model timestamp."""
+    pi = math.pi
+    day = stamp.timetuple().tm_yday
+    hour = stamp.hour + stamp.minute / 60.0 + stamp.second / 3600.0
+    rlon, rlat = math.radians(longitude), math.radians(latitude)
+    th0 = 2.0 * pi * day / 365.25
+    sundec = (0.006918 - 0.399912 * math.cos(th0) + 0.070257 * math.sin(th0)
+              - 0.006758 * math.cos(2 * th0) + 0.000907 * math.sin(2 * th0)
+              - 0.002697 * math.cos(3 * th0) + 0.001480 * math.sin(3 * th0))
+    thsun = (hour - 12.0) * math.radians(15.0) + rlon
+    coszen = max(0.0, math.sin(rlat) * math.sin(sundec)
+                 + math.cos(rlat) * math.cos(sundec) * math.cos(thsun))
+    if coszen <= 0.0:
+        return 0.0, 0.0
+    qatten = math.exp(math.log(0.7) / coszen)
+    qzer = coszen * 1350.0
+    qdir = qzer * qatten
+    qdiff = ((1.0 - 0.09) * qzer - qdir) * 0.5
+    qtot = qdir + qdiff
+    eclips = math.radians(23.439)
+    eqnx = 2.0 * pi / 365.0 * (day - 81)
+    sunbet = math.degrees(math.asin(math.sin(rlat) * math.sin(eclips * math.sin(eqnx))
+                                   + math.cos(rlat) * math.cos(eclips * math.sin(eqnx))))
+    return qtot, sunbet
+
+
+def _getm_effective_cloud(stamp, measured_swr, longitude, latitude):
+    """Invert GETM's short_wave_radiation formula; return cloud fraction and clipping flag."""
+    qtot, sunbet = _getm_shortwave_clear_sky(stamp, longitude, latitude)
+    if qtot <= 1e-8:
+        return None, False
+    raw = (1.0 + 0.0019 * sunbet - float(measured_swr) / qtot) / 0.62
+    return min(1.0, max(0.0, raw)), not 0.0 <= raw <= 1.0
+
+
+def _wind_components_from_from_direction(speed, direction_degrees):
+    """Convert meteorological wind-from speed/direction to eastward/northward components."""
+    radians = math.radians(float(direction_degrees) % 360.0)
+    speed = float(speed)
+    return -speed * math.sin(radians), -speed * math.cos(radians)
 _RIVER_ALIASES = {
     "date": ["date", "time", "datetime", "日期", "时间"],
     "Q": ["q", "discharge", "flow", "流量"],
@@ -5100,6 +8000,103 @@ _RIVER_ALIASES = {
     "no3": ["no3", "no3-n", "no3n", "nitrate", "硝氮", "硝酸盐"],
     "po4": ["po4", "po4-p", "po4p", "phosphate", "磷酸盐", "活性磷"],
 }
+
+_METEO_CONFIRM_DISTANCE_KM = 25.0
+
+
+def _meteo_source_fields(payload, existing=None):
+    """Validate editable source metadata while accepting legacy requests."""
+    existing = existing or {}
+
+    def text(name, limit, previous_key=None):
+        raw = payload.get(name) if name in payload else existing.get(previous_key or name, '')
+        value = str(raw or '').strip()
+        if len(value) > limit:
+            raise ValueError(f'{name} is too long')
+        return value
+
+    def coordinate(name, minimum, maximum):
+        existing_name = {'source_lat': 'latitude', 'source_lon': 'longitude'}.get(name, name)
+        raw = payload.get(name) if name in payload else existing.get(existing_name)
+        if raw is None or not str(raw).strip():
+            return None
+        try:
+            value = float(raw)
+        except (TypeError, ValueError):
+            raise ValueError(f'{name} must be a finite number') from None
+        if not np.isfinite(value) or not minimum <= value <= maximum:
+            raise ValueError(f'{name} is outside the valid range')
+        return value
+
+    return {
+        'latitude': coordinate('source_lat', -90, 90),
+        'longitude': coordinate('source_lon', -180, 180),
+        'source_url': text('source_url', 2048, 'source_url'),
+        'license': text('license', 256, 'license'),
+        'time_standard': text('source_time_standard', 128, 'time_standard'),
+    }
+
+
+def _save_meteo_original(raw, original_filename):
+    """Keep the uploaded bytes under Input/ without replacing an earlier file."""
+    input_dir = active_case_path / 'Input'
+    input_dir.mkdir(exist_ok=True)
+    basename = str(original_filename or '').replace('\\', '/').rsplit('/', 1)[-1]
+    safe_name = secure_filename(basename) or 'meteo_source.csv'
+    stem, suffix = Path(safe_name).stem, Path(safe_name).suffix
+    index = 1
+    while True:
+        candidate_name = safe_name if index == 1 else f'{stem}-{index}{suffix}'
+        candidate = input_dir / candidate_name
+        try:
+            with candidate.open('xb') as stream:
+                stream.write(raw)
+            return candidate.relative_to(active_case_path).as_posix()
+        except FileExistsError:
+            index += 1
+
+
+def _meteo_grid_location(lon2d, lat2d, source):
+    """Return grid bbox/centre and great-circle distance for an optional station."""
+    lon = np.asarray(np.ma.filled(np.ma.masked_invalid(lon2d), np.nan), dtype=float)
+    lat = np.asarray(np.ma.filled(np.ma.masked_invalid(lat2d), np.nan), dtype=float)
+    valid = np.isfinite(lon) & np.isfinite(lat)
+    if not valid.any():
+        raise ValueError('bathymetry.nc has no finite lonc/latc coordinates')
+    lon_min, lon_max = float(np.min(lon[valid])), float(np.max(lon[valid]))
+    lat_min, lat_max = float(np.min(lat[valid])), float(np.max(lat[valid]))
+    center = {'latitude': (lat_min + lat_max) / 2, 'longitude': (lon_min + lon_max) / 2}
+    result = {
+        'bbox': {'latitude_min': lat_min, 'latitude_max': lat_max,
+                 'longitude_min': lon_min, 'longitude_max': lon_max},
+        'center': center,
+        'distance_km': None,
+        'position_known': source.get('latitude') is not None and source.get('longitude') is not None,
+    }
+    if result['position_known']:
+        radius = 6371.0088
+        lat1, lon1 = np.radians([source['latitude'], source['longitude']])
+        lat2, lon2 = np.radians([center['latitude'], center['longitude']])
+        delta_lat, delta_lon = lat2 - lat1, lon2 - lon1
+        haversine = (np.sin(delta_lat / 2) ** 2 +
+                     np.cos(lat1) * np.cos(lat2) * np.sin(delta_lon / 2) ** 2)
+        result['distance_km'] = float(2 * radius * np.arcsin(np.sqrt(np.clip(haversine, 0, 1))))
+    return result
+
+
+def _meteo_confirmation_token(case_path, source, dates, series, spatial):
+    digest = hashlib.sha256()
+    digest.update(json.dumps({'dates': dates, 'series': series}, sort_keys=True,
+                             separators=(',', ':'), ensure_ascii=False).encode('utf-8'))
+    content = {
+        'case_path': str(Path(case_path).resolve()),
+        'source': {key: source.get(key) for key in
+                   ('latitude', 'longitude', 'source_url', 'license', 'sha256')},
+        'grid': spatial,
+        'data_sha256': digest.hexdigest(),
+    }
+    return hashlib.sha256(json.dumps(content, sort_keys=True, separators=(',', ':')
+                                     ).encode('utf-8')).hexdigest()
 
 
 def _map_columns(header, aliases):
@@ -5119,6 +8116,9 @@ def _map_columns(header, aliases):
 
 def _parse_date(s):
     """Parse a date/datetime string; returns datetime or None."""
+    ordinal = parse_ordinal_date(s)
+    if ordinal is not None:
+        return ordinal
     s = str(s).strip().replace("T", " ")
     for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d",
                 "%Y/%m/%d %H:%M:%S", "%Y/%m/%d %H:%M", "%Y/%m/%d",
@@ -5410,7 +8410,7 @@ def input_rivers_save():
     tvals = [(datetime.strptime(d, "%Y-%m-%d") - base).total_seconds() for d in all_dates]
     _NC_LOCK.acquire()
     try:
-        ds = nc.Dataset(str(active_case_path / "rivers.nc"), "w", format="NETCDF4")
+        ds = open_dataset(str(active_case_path / "rivers.nc"), "w", format="NETCDF4")
         # GETM's init_river_input_ncdf looks up the unlimited dimension and
         # queries it directly; a fixed-length time dim makes unlimdimid=-1 and
         # the model dies with "NetCDF: Invalid dimension ID or name".
@@ -5443,7 +8443,10 @@ def input_rivers_save():
                 v = ds.createVariable(name + suf, dtype, ("time",))
                 v.units = unit
                 v.long_name = f"{name} {lname}"
-                v[:] = np.array(series(key), dtype=dtype)
+                values = np.array(series(key), dtype=dtype)
+                if key == "Q" and r.get("kind") in ("inflow", "outflow"):
+                    values = np.abs(values) * (-1 if r["kind"] == "outflow" else 1)
+                v[:] = values
     finally:
         try:
             ds.close()
@@ -5478,56 +8481,168 @@ def _current_case_start(default_str):
 @app.route("/api/input/meteo/upload", methods=["POST"])
 def input_meteo_upload():
     """Upload meteo CSV → meteo_draft.json. Columns (aliases OK):
-    date,u10,v10,slp,t2,rh,tcc,precip,evap.
-    Units: u10/v10 m/s, slp hPa, t2 degC, rh/tcc 0-1 (or %), precip/evap mm/day.
+    Generic: date,u10,v10,slp,t2,rh,tcc,precip,evap.
+    PROGNOS/SITES: TMSTAMP, SW_Rad_Avg, Air_Temp_AS_Avg, RelHumidity_Avg,
+    MeanWS, WindDir, Rain_Total, AirPressure_hPa_Avg and optional cloud cover.
+    PROGNOS rainfall is hourly accumulation in mm; generic precip is mm/day.
+    Supplied-column gaps are rejected. Optional absent legacy columns retain explicit defaults.
     """
     if not active_case_path:
         return jsonify({"error": "未加载案例"}), 400
     f = request.files.get("file")
     if f is None:
         return jsonify({"error": "缺少 CSV 文件"}), 400
-    header, rows = _read_csv_rows(f)
+    raw = f.read()
+    header, rows = _read_csv_rows(io.BytesIO(raw))
     if header is None:
         return jsonify({"error": "CSV 为空或只有表头"}), 400
     m = _map_columns(header, _METEO_ALIASES)
-    missing = [k for k in ("date", "u10", "v10", "t2") if k not in m]
+    try:
+        source = _meteo_source_fields(request.form)
+    except ValueError as error:
+        return jsonify({"error": str(error)}), 400
+    uses_speed_direction = 'u10' not in m and 'v10' not in m and 'ws' in m and 'wd' in m
+    partial_vector = ('u10' in m) != ('v10' in m)
+    partial_direction = ('ws' in m) != ('wd' in m)
+    if partial_vector or (not uses_speed_direction and partial_direction):
+        return jsonify({"error": "风输入必须同时提供 u10/v10，或同时提供风速 MeanWS/WS 与风向 WindDir/WD"}), 400
+    missing = [k for k in ("date", "t2") if k not in m]
+    if 'u10' not in m and not uses_speed_direction:
+        missing.extend(['u10/v10 或 MeanWS/WindDir'])
     if missing:
         return jsonify({"error": f"CSV 缺少必需列: {', '.join(missing)}（识别到的列: {', '.join(header)}）"}), 400
-    keys = ["u10", "v10", "slp", "t2", "rh", "tcc", "precip", "evap"]
+    keys = ["u10", "v10", "slp", "t2", "rh", "tcc", "precip", "evap", "swr", "ws", "wd"]
     dates, series = [], {k: [] for k in keys}
     bad = 0
+    source_columns = {str(name).strip(): i for i, name in enumerate(header)
+                      if str(name).strip().lower().replace(' ', '').startswith(('source_', 'fill_'))}
+    source_rows = []
+    incomplete = defaultdict(list)
     for row in rows:
-        if len(row) <= max(m.values()):
-            continue
-        d = _parse_date(row[m["date"]])
+        date_text = str(row[m["date"]]).strip() if len(row) > m["date"] else ''
+        d = _parse_date(date_text)
         if d is None:
             bad += 1
             continue
-        dates.append(d.strftime("%Y-%m-%d"))
+        # Keep the legacy date-only API for daily CSVs while retaining clock
+        # time whenever the uploaded value explicitly contains a time.
+        dates.append(d.strftime("%Y-%m-%d %H:%M:%S" if ":" in date_text else "%Y-%m-%d"))
+        parsed = {}
         for k in keys:
-            series[k].append(_to_float(row[m[k]]) if k in m else None)
+            index = m.get(k)
+            value = _to_float(row[index]) if index is not None and len(row) > index else None
+            parsed[k] = value
+            if index is not None and value is None:
+                incomplete[k].append(dates[-1])
+        if uses_speed_direction:
+            if parsed['ws'] is None or parsed['wd'] is None:
+                incomplete['ws/wd'].append(dates[-1])
+            else:
+                parsed['u10'], parsed['v10'] = _wind_components_from_from_direction(parsed['ws'], parsed['wd'])
+        for k in keys:
+            series[k].append(parsed[k])
+        if source_columns:
+            mask = {}
+            for name, index in source_columns.items():
+                value = str(row[index]).strip() if len(row) > index else ''
+                if not value:
+                    incomplete[name].append(dates[-1])
+                mask[name] = value
+            source_rows.append(mask)
+        elif uses_speed_direction:
+            source_rows.append({'source_primary': 'Malma observation'})
     if len(dates) < 2:
         return jsonify({"error": "有效数据行不足 2 行（日期列无法解析）"}), 400
+    if incomplete:
+        detail = '; '.join(f"{header[m[key]] if key in m else key}: {len(stamps)} 行（如 {', '.join(stamps[:3])}）"
+                           for key, stamps in sorted(incomplete.items()))
+        return jsonify({"error": f"来源文件含未解决缺测；请显式补齐/标注外部来源后再导入，不会自动前向填充。{detail}"}), 400
+
+    # Preserve measured incoming shortwave for GETM's opt-in direct-SWR path.
+    # Cloud cover remains an independent longwave input; where absent, use a
+    # clearly labeled fixed proxy. The cloud-only pathway below is unchanged.
+    effective_cloud_source = []
+    clipped_swr = 0
+    if 'swr' in m:
+        if any(value is None or not np.isfinite(value) or value < 0 for value in series['swr']):
+            return jsonify({"error": "实测短波必须为有限且非负的 W/m² 数值"}), 400
+        if 'tcc' in m:
+            source_cloud = [value for value in series['tcc'] if value is not None]
+            if source_cloud and max(source_cloud) > 1.5:
+                series['tcc'] = [value / 100.0 if value is not None else None
+                                 for value in series['tcc']]
+            effective_cloud_source = ['observed cloud for longwave'] * len(dates)
+        else:
+            series['tcc'] = [0.5] * len(dates)
+            effective_cloud_source = ['fixed proxy for longwave'] * len(dates)
+
     stats = {}
+    missing_values_filled = {}
+    defaults = {"u10": 2.0, "v10": 1.0, "slp": 1013.0, "t2": 15.0,
+                "rh": 0.7, "tcc": 0.5, "precip": 0.0, "evap": 0.0, "swr": None, "ws": None, "wd": None}
     for k in keys:
         vals = [v for v in series[k] if v is not None]
-        if not vals:  # column entirely missing → sensible defaults
-            default = {"u10": 2.0, "v10": 1.0, "slp": 1013.0, "t2": 15.0,
-                       "rh": 0.7, "tcc": 0.5, "precip": 0.0, "evap": 0.0}[k]
+        if not vals and k not in m and k not in ('swr', 'ws', 'wd'):  # legacy absent optional column
+            default = defaults[k]
             series[k] = [default] * len(dates)
             stats[k] = {"default": default}
+            missing_values_filled[k] = len(dates)
         else:
-            series[k] = [_last_valid(series[k], i) if v is None else v for i, v in enumerate(series[k])]
-            stats[k] = {"min": min(vals), "mean": sum(vals) / len(vals), "max": max(vals)}
-    payload = {"dates": dates, **series}
+            missing_values_filled[k] = sum(value is None for value in series[k])
+            if vals:
+                stats[k] = {"min": min(vals), "mean": sum(vals) / len(vals), "max": max(vals)}
+            else:
+                stats[k] = {"not_used": True}
+    stored_file = _save_meteo_original(raw, f.filename)
+    rain_header = header[m['precip']] if 'precip' in m else ''
+    hourly_rain = rain_header.strip().lower().replace(' ', '') in {'rain_total', 'rain_tot'}
+    if not source.get('time_standard') and (uses_speed_direction or 'swr' in m):
+        source['time_standard'] = 'UTC+01:00 fixed standard time'
+    source.update({
+        'original_filename': str(f.filename or ''),
+        'stored_file': stored_file,
+        'sha256': hashlib.sha256(raw).hexdigest(),
+        'uploaded_at_utc': datetime.now(timezone.utc).isoformat(),
+    })
+    forcing_source_counts = {
+        field: {value: sum(row.get(field) == value for row in source_rows)
+                for value in sorted({row.get(field) for row in source_rows if row.get(field)})}
+        for field in source_columns
+    }
+    payload = {
+        "dates": dates, **series, 'source': source,
+        'column_mapping': {key: header[index] for key, index in m.items()},
+        'defaults_applied': {key: value['default'] for key, value in stats.items() if 'default' in value},
+        'missing_values_filled': missing_values_filled,
+        'precip_period_seconds': 3600 if hourly_rain else 86400,
+        'shortwave_mode': 'measured_swr' if 'swr' in m else 'cloud_calculated',
+        'conversions': (['wind: speed/direction-from to east/north u10/v10'] if uses_speed_direction else [])
+                       + (['precip: hourly accumulation mm to m/s'] if hourly_rain else ['precip: mm/day to m/s'])
+                       + (['swr: measured incoming shortwave W m-2'] if 'swr' in m else []),
+        'meteo_source_mask': source_rows,
+        'forcing_source_counts': forcing_source_counts,
+        'effective_cloud_source': effective_cloud_source,
+        'shortwave_inversion_clipped_rows': clipped_swr,
+        'shortwave_inversion_rows': len(effective_cloud_source),
+        'source_row_count': len(dates), 'n_bad_rows': bad,
+    }
     with open(active_case_path / "meteo_draft.json", "w", encoding="utf-8") as fo:
         json.dump(payload, fo, ensure_ascii=False)
     return jsonify({
         "success": True, "n_rows": len(dates),
         "date_range": [dates[0], dates[-1]],
         "stats": stats, "n_bad_rows": bad,
-        "unmapped_cols": [h for h in header if h.strip().lower().replace(" ", "") not in
-                          [a for al in _METEO_ALIASES.values() for a in al]],
+        "unmapped_cols": [h for h in header
+                          if h.strip().lower().replace(" ", "") not in
+                          [a for al in _METEO_ALIASES.values() for a in al]
+                          and not h.strip().lower().replace(' ', '').startswith(('source_', 'fill_'))],
+        'missing_values_filled': missing_values_filled,
+        'conversions': payload['conversions'],
+                    'effective_cloud_source_counts': dict((name, effective_cloud_source.count(name)) for name in set(effective_cloud_source)),
+                    'shortwave_mode': 'measured_swr' if 'swr' in m else 'cloud_calculated',
+        'shortwave_inversion_clipped_rows': clipped_swr,
+        'forcing_source_counts': forcing_source_counts,
+        "source": source,
     })
 
 
@@ -5542,7 +8657,18 @@ def input_meteo_draft():
     with open(p, "r", encoding="utf-8") as f:
         d = json.load(f)
     return jsonify({"exists": True, "dates": d["dates"],
-                    **{k: d[k] for k in ("u10", "v10", "slp", "t2", "rh", "tcc", "precip", "evap")}})
+                    **{k: d[k] for k in ("u10", "v10", "slp", "t2", "rh", "tcc", "precip", "evap")},
+                    'swr': d.get('swr'), 'shortwave_mode': d.get('shortwave_mode', 'cloud_calculated'),
+                    'source': d.get('source', {}),
+                    'column_mapping': d.get('column_mapping', {}),
+                    'defaults_applied': d.get('defaults_applied', {}),
+                    'missing_values_filled': d.get('missing_values_filled', {}),
+                    'conversions': d.get('conversions', []),
+                    'effective_cloud_source': d.get('effective_cloud_source', []),
+                    'shortwave_inversion_clipped_rows': d.get('shortwave_inversion_clipped_rows', 0),
+                    'meteo_source_mask': d.get('meteo_source_mask', []),
+                    'forcing_source_counts': d.get('forcing_source_counts', {}),
+                    'precip_period_seconds': d.get('precip_period_seconds', 86400)})
 
 
 @app.route("/api/input/meteo/save", methods=["POST"])
@@ -5561,18 +8687,53 @@ def input_meteo_save():
     data = request.json or {}
     rows = data.get("rows")
     if rows:
+        if draft_p.exists():
+            with open(draft_p, "r", encoding="utf-8") as f:
+                draft = json.load(f)
+        else:
+            draft = {}
         dates = [r["date"] for r in rows]
-        series = {k: [float(r.get(k) or 0.0) for r in rows]
+        required_values = ("u10", "v10", "slp", "t2", "rh", "tcc", "precip", "evap")
+        if any(r.get(k) is None or str(r.get(k)).strip() == '' for r in rows for k in required_values):
+            return jsonify({"success": False, "error": "气象行仍有空值；不会将缺测静默改为 0，请显式补齐来源数据。"}), 400
+        series = {k: [float(r[k]) for r in rows]
                   for k in ("u10", "v10", "slp", "t2", "rh", "tcc", "precip", "evap")}
+        if draft.get('shortwave_mode') == 'measured_swr':
+            try:
+                series['swr'] = [float(r['swr']) for r in rows]
+            except (KeyError, TypeError, ValueError):
+                return jsonify({"success": False, "error": "实测短波编辑值缺失或无效"}), 400
     elif draft_p.exists():
         with open(draft_p, "r", encoding="utf-8") as f:
             d = json.load(f)
+        draft = d
         dates = d["dates"]
         series = {k: d[k] for k in ("u10", "v10", "slp", "t2", "rh", "tcc", "precip", "evap")}
+        if d.get('shortwave_mode') == 'measured_swr':
+            series['swr'] = d['swr']
     else:
         return jsonify({"error": "无气象草稿数据（请先上传 CSV）"}), 400
     if len(dates) < 2:
         return jsonify({"error": "有效数据不足 2 行"}), 400
+    parsed_dates = [_parse_date(str(value)) for value in dates]
+    if any(value is None for value in parsed_dates):
+        return jsonify({"success": False, "error": "气象时间戳无法解析；请提供有效日期/时间"}), 400
+    try:
+        strictly_increasing = all(current > previous
+                                  for previous, current in zip(parsed_dates, parsed_dates[1:]))
+    except TypeError:
+        strictly_increasing = False
+    if not strictly_increasing:
+        return jsonify({"success": False, "error": "气象时间必须严格递增，不能重复或倒序"}), 400
+    source = _meteo_source_fields(data, draft.get('source', {}))
+    source.update({key: draft.get('source', {}).get(key) for key in
+                   ('original_filename', 'stored_file', 'sha256', 'uploaded_at_utc')})
+    source_dates = list(dates)
+    if draft_p.exists():
+        draft['source'] = source
+        temporary_draft = active_case_path / '.meteo_draft.json.tmp'
+        temporary_draft.write_text(json.dumps(draft, ensure_ascii=False), encoding='utf-8')
+        os.replace(temporary_draft, draft_p)
     # Auto-extend to model stop (+1 day) by repeating the last daily record.
     # 滇池事故：CSV 比 getm.inp stop 早结束 → 模型在 99.999% 处 meteo EOF 崩溃。
     n_ext = 0
@@ -5592,41 +8753,101 @@ def input_meteo_save():
                     _d += timedelta(days=1)
                 if _ext:
                     n_ext = len(_ext)
-                    for k in ("u10", "v10", "slp", "t2", "rh", "tcc", "precip", "evap"):
+                    for k in ("u10", "v10", "slp", "t2", "rh", "tcc", "precip", "evap", "swr"):
+                        if k not in series:
+                            continue
                         series[k] = list(series[k]) + [series[k][-1]] * n_ext
+                    if draft.get('meteo_source_mask'):
+                        draft['meteo_source_mask'] = list(draft['meteo_source_mask']) + [
+                            dict(draft['meteo_source_mask'][-1]) for _ in range(n_ext)]
+                    if draft.get('effective_cloud_source'):
+                        draft['effective_cloud_source'] = list(draft['effective_cloud_source']) + [
+                            draft['effective_cloud_source'][-1] for _ in range(n_ext)]
                     dates = list(dates) + [d.strftime("%Y-%m-%d") for d in _ext]
     # Unit normalisation
     def col(key):
         return np.array(series[key], dtype=float)
     u10, v10 = col("u10"), col("v10")
     slp = col("slp")
+    conversions = []
     if np.nanmean(slp) < 5000.0:      # hPa → Pa
         slp = slp * 100.0
+        conversions.append('slp: hPa to Pa')
     t2 = col("t2")
     rh = col("rh")
     if np.nanmean(rh) > 1.5:          # % → fraction
         rh = rh / 100.0
+        conversions.append('rh: percent to fraction')
     tcc = col("tcc")
     if np.nanmean(tcc) > 1.5:
         tcc = tcc / 100.0
-    precip = col("precip") / 86400.0 / 1000.0   # mm/day → m/s
+        conversions.append('tcc: percent to fraction')
+    use_measured_swr = draft.get('shortwave_mode') == 'measured_swr'
+    swr = None
+    if use_measured_swr:
+        swr = col('swr')
+        if not np.all(np.isfinite(swr)) or np.any(swr < 0):
+            return jsonify({"success": False, "error": "实测短波必须为有限且非负的 W/m² 数值"}), 400
+    precip_period_seconds = float(draft.get('precip_period_seconds', 86400))
+    if not np.isfinite(precip_period_seconds) or precip_period_seconds <= 0:
+        return jsonify({"success": False, "error": "降水累计周期必须为正的有限秒数"}), 400
+    precip = col("precip") / precip_period_seconds / 1000.0
+    conversions.append('precip: hourly accumulation mm to m/s' if precip_period_seconds == 3600
+                       else f'precip: accumulation/{precip_period_seconds:g}s mm to m/s')
     # GETM fwf = precip + evap；蒸发必须是负值（long_name 已注明 negative =
     # water loss）。滇池事故：evap 写成正号 → 全年 974mm 蒸发被当成入流。
     # 用 abs() 强制符号，用户 CSV 里无论给正负值都归一为负。
     evap = -np.abs(col("evap")) / 86400.0 / 1000.0
+    conversions.append('evap: absolute mm/day to negative m/s')
     start = _current_case_start(dates[0])
-    base = _parse_date(dates[0])
-    tvals = np.array([(_parse_date(d) - base).total_seconds() for d in dates], dtype="f8")
+    model_start = _parse_date(start)
+    output_dates = [_parse_date(str(value)) for value in dates]
+    try:
+        tvals = np.array([(value - model_start).total_seconds() for value in output_dates], dtype="f8")
+    except TypeError:
+        return jsonify({"success": False, "error": "气象时间戳与模型时间起点的时区格式不兼容"}), 400
     # Grid geometry from bathymetry.nc
     with nc_open(bathy_p) as bds:
         lon2d = np.array(bds.variables["lonc"][:])
         lat2d = np.array(bds.variables["latc"][:])
+    try:
+        spatial = _meteo_grid_location(lon2d, lat2d, source)
+    except ValueError as error:
+        return jsonify({"error": str(error)}), 400
+    output_series = {key: values.tolist() for key, values in {
+        'u10': u10, 'v10': v10, 'slp': slp, 't2': t2, 'rh': rh, 'tcc': tcc,
+        'precip': precip, 'evap': evap, **({'swr': swr} if swr is not None else {})}.items()}
+    confirmation_token = _meteo_confirmation_token(active_case_path, source, dates,
+                                                    output_series, spatial)
+    requires_confirmation = (not spatial['position_known'] or
+                             spatial['distance_km'] > _METEO_CONFIRM_DISTANCE_KM)
+    if requires_confirmation and data.get('confirmation_token') != confirmation_token:
+        message = ('位置未知，仍可广播' if not spatial['position_known'] else
+                   f"站点距网格中心 {spatial['distance_km']:.1f} km，超过 {_METEO_CONFIRM_DISTANCE_KM:g} km")
+        return jsonify({
+            'success': False, 'requires_confirmation': True,
+            'confirmation_token': confirmation_token,
+            'warning': {
+                'message': message, 'position_known': spatial['position_known'],
+                'source_position': {'latitude': source.get('latitude'),
+                                    'longitude': source.get('longitude')},
+                'grid_center': spatial['center'], 'grid_bbox': spatial['bbox'],
+                'distance_km': spatial['distance_km'],
+                'threshold_km': _METEO_CONFIRM_DISTANCE_KM,
+                'explanation': '确认后仍会把单站时间序列空间均匀广播到所有格点；这不是空间插值或全湖观测场。',
+            },
+        })
+    spatial_provenance = {
+        **spatial, 'mode': 'single_station_uniform_broadcast',
+        'threshold_km': _METEO_CONFIRM_DISTANCE_KM,
+        'confirmed': bool(requires_confirmation),
+    }
     ny, nx = lon2d.shape
     lon1d = lon2d[ny // 2, :]
     lat1d = lat2d[:, nx // 2]
     _NC_LOCK.acquire()
     try:
-        ds = nc.Dataset(str(active_case_path / "meteo.nc"), "w", format="NETCDF4")
+        ds = open_dataset(str(active_case_path / "meteo.nc"), "w", format="NETCDF4")
         ds.createDimension("lon", nx)
         ds.createDimension("lat", ny)
         ds.createDimension("time", len(dates))
@@ -5646,6 +8867,8 @@ def input_meteo_save():
         put("t2", t2.astype("f4"), "f4", "degC", "2m air temperature")
         put("rh", rh.astype("f4"), "f4", "1", "relative humidity")
         put("tcc", tcc.astype("f4"), "f4", "1", "total cloud cover")
+        if swr is not None:
+            put("swr", swr.astype("f4"), "f4", "W m-2", "measured incoming shortwave radiation")
         put("precip", precip, "f8", "m s-1", "precipitation rate")
         put("evap", evap, "f8", "m s-1", "evaporation rate (negative = water loss)")
     finally:
@@ -5655,8 +8878,38 @@ def input_meteo_save():
             pass
         _NC_LOCK.release()
     (active_case_path / "meteo_input.txt").write_text("meteo.nc\n", encoding="utf-8")
+    provenance = {
+        'schema_version': 1,
+        'created_at_utc': datetime.now(timezone.utc).isoformat(),
+        'source': source,
+        'source_period': {'start': source_dates[0], 'end': source_dates[-1],
+                          'rows': draft.get('source_row_count', len(source_dates))},
+        'columns': draft.get('column_mapping', {}),
+        'defaults_applied': draft.get('defaults_applied', {}),
+        'missing_values_filled': draft.get('missing_values_filled', {}),
+        'conversions': list(draft.get('conversions', [])) + conversions,
+        'meteo_source_mask': draft.get('meteo_source_mask', []),
+        'forcing_source_counts': draft.get('forcing_source_counts', {}),
+        'effective_cloud_source': draft.get('effective_cloud_source', []),
+        'shortwave_mode': 'measured_swr' if use_measured_swr else 'cloud_calculated',
+        'shortwave_inversion_clipped_rows': draft.get('shortwave_inversion_clipped_rows', 0),
+        'time_extension_days': n_ext,
+        'spatial': spatial_provenance,
+    }
+    provenance_path = active_case_path / 'meteo_provenance.json'
+    provenance_tmp = active_case_path / '.meteo_provenance.json.tmp'
+    provenance_tmp.write_text(json.dumps(provenance, ensure_ascii=False, indent=2) + '\n',
+                              encoding='utf-8')
+    os.replace(provenance_tmp, provenance_path)
+    if _inp.is_file():
+        try:
+            _enable_getm_meteo_forcing(_inp, use_measured_swr=use_measured_swr)
+        except OSError as error:
+            return jsonify({"success": False,
+                            "error": f"气象文件已保存，但无法安全更新 getm.inp 启用 metforcing：{error}"}), 500
     return jsonify({"success": True, "n_times": len(dates), "grid": f"{nx}x{ny}", "start": start,
-                    "extended_days": n_ext})
+                    "extended_days": n_ext, 'spatial': spatial_provenance,
+                    'provenance_file': 'meteo_provenance.json'})
 
 
 # ── Case skeleton builder ─────────────────────────────────────────────
@@ -5724,10 +8977,10 @@ def _gen_fabm_init(case_path, preset):
     out = case_path / "fabm_init.nc"
     try:
         try:
-            ds = nc.Dataset(str(out), "w", format="NETCDF4")
+            ds = open_dataset(str(out), "w", format="NETCDF4")
         except PermissionError:
             out = case_path / "fabm_init_v2.nc"
-            ds = nc.Dataset(str(out), "w", format="NETCDF4")
+            ds = open_dataset(str(out), "w", format="NETCDF4")
         ny, nx = depth.shape
         ds.createDimension("x", nx); ds.createDimension("y", ny)
         xv = ds.createVariable("x", "f8", ("x",)); xv.units = "m"; xv[:] = x
@@ -5757,6 +9010,17 @@ def _gen_fabm_init(case_path, preset):
 
 
 def _build_getm_inp(case_path, case_name, start, stop, timestep, has_meteo, has_rivers, nlev):
+    duration = (datetime.fromisoformat(stop)-datetime.fromisoformat(start)).total_seconds()
+    if timestep <= 0 or duration < timestep:
+        raise ValueError('模拟时段须至少包含一个正时间步')
+    try:
+        meteo_provenance = json.loads((Path(case_path) / 'meteo_provenance.json').read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        meteo_provenance = {}
+    use_measured_swr = meteo_provenance.get('shortwave_mode') == 'measured_swr'
+    # About twenty frames for short runs; at most one day between long-run frames.
+    output_steps = min(max(1,int(86400/timestep)),max(1,int(duration/timestep)//20))
+    output_seconds = output_steps*timestep
     runid = re.sub(r"[^A-Za-z0-9_]", "_", case_name.upper())[:24] + "_WET"
     # river_method: 0=无河流, 1=恒定流量(全年只用首条记录!), 2=线性时间插值。
     # 滇池事故：method=1 导致盘龙江/海口河全年用 1月2日的流量。必须用 2。
@@ -5764,14 +9028,14 @@ def _build_getm_inp(case_path, case_name, start, stop, timestep, has_meteo, has_
     metforcing = ".true." if has_meteo else ".false."
     content = f"""! {case_name} - GETM-FABM-WET configuration (auto-built)
 &param
-   dryrun = '.false.'
+   dryrun = .false.
    runid = '{runid}'
    title = '{case_name} GETM-FABM-WET'
-   parallel = '.false.'
+   parallel = .false.
    runtype = 4
-   hotstart = '.false.'
-   use_epoch = '.false.'
-   save_initial = '.false.'
+   hotstart = .false.
+   use_epoch = .false.
+   save_initial = .false.
 /
 
 &time
@@ -5786,7 +9050,7 @@ def _build_getm_inp(case_path, case_name, start, stop, timestep, has_meteo, has_
    maxdepth = 30.0
    bathy_format = 2
    bathymetry = 'bathymetry.nc'
-   f_plane = '.true.'
+   f_plane = .true.
    il = 1
    ih = 1
    jl = 1
@@ -5796,13 +9060,14 @@ def _build_getm_inp(case_path, case_name, start, stop, timestep, has_meteo, has_
    kdum = {nlev}
    z0_method = 0
    z0_const = 0.001
-   check_cfl = '.false.'
+   check_cfl = .false.
 /
 
 &meteo
    metforcing = {metforcing}
-   on_grid = '.true.'
-   calc_met = '.true.'
+   on_grid = .true.
+   calc_met = .true.
+{('   use_measured_swr = .true.' + chr(10)) if use_measured_swr else ''}
    met_method = 2
    meteo_file = 'meteo_input.txt'
    fwf_method = 2
@@ -5838,8 +9103,8 @@ def _build_getm_inp(case_path, case_name, start, stop, timestep, has_meteo, has_
    turb_adv_split = 1
    turb_adv_hor = 1
    turb_adv_ver = 1
-   calc_temp = '.true.'
-   calc_salt = '.false.'
+   calc_temp = .true.
+   calc_salt = .false.
    avmback = 1e-05
    avhback = 1e-06
    ip_method = 2
@@ -5847,11 +9112,11 @@ def _build_getm_inp(case_path, case_name, start, stop, timestep, has_meteo, has_
    vel_check = 1
    min_vel = -10.0
    max_vel = 10.0
-   bdy3d = '.false.'
+   bdy3d = .false.
    bdyfmt_3d = 1
    bdy3d_ramp = 0
    bdyfile_3d = ' '
-   bdy3d_tmrlx = '.false.'
+   bdy3d_tmrlx = .false.
    bdy3d_tmrlx_ucut = 0.0
    bdy3d_tmrlx_max = 0.0
    bdy3d_tmrlx_min = 0.0
@@ -5888,41 +9153,41 @@ def _build_getm_inp(case_path, case_name, start, stop, timestep, has_meteo, has_
    out_fmt = 2
    hotin_fmt = 2
    hotout_fmt = 2
-   save_metrics = '.false.'
-   save_masks = '.false.'
-   save_2d = '.true.'
-   save_3d = '.true.'
-   save_vel = '.true.'
-   destag = '.false.'
-   save_strho = '.true.'
-   save_s = '.false.'
-   save_t = '.true.'
-   save_rho = '.false.'
-   save_rad = '.false.'
-   save_turb = '.true.'
-   save_tke = '.true.'
-   save_eps = '.true.'
-   save_num = '.true.'
-   save_nuh = '.true.'
-   save_ss_nn = '.false.'
-   save_taub = '.false.'
+   save_metrics = .false.
+   save_masks = .false.
+   save_2d = .true.
+   save_3d = .true.
+   save_vel = .true.
+   destag = .false.
+   save_strho = .true.
+   save_s = .false.
+   save_t = .true.
+   save_rho = .false.
+   save_rad = .false.
+   save_turb = .true.
+   save_tke = .true.
+   save_eps = .true.
+   save_num = .true.
+   save_nuh = .true.
+   save_ss_nn = .false.
+   save_taub = .false.
    first_2d = 1
-   step_2d = 8640
-   sync_2d = 8640
+   step_2d = {output_steps}
+   sync_2d = 1
    first_3d = 1
-   step_3d = 8640
-   sync_3d = 8640
-   save_meteo = '.false.'
-   save_numerical_analyses = '.false.'
+   step_3d = {output_steps}
+   sync_3d = 1
+   save_meteo = .false.
+   save_numerical_analyses = .false.
 /
 
 &getm_fabm
    fabm_config = 'fabm.yaml'
-   fabm = '.true.'
+   fabm = .true.
 /
 
 &diagnostics
-   diagnostics = '.false.'
+   diagnostics = .false.
 /
 """
     # Fill real domain extents from bathymetry.nc
@@ -5932,6 +9197,14 @@ def _build_getm_inp(case_path, case_name, start, stop, timestep, has_meteo, has_
     content = content.replace("   ih = 1\n", f"   ih = {nx}\n")
     content = content.replace("   jh = 1\n", f"   jh = {ny}\n")
     (case_path / "getm.inp").write_text(content, encoding="utf-8")
+    return output_seconds
+
+
+def _luoma_template_file(filename):
+    """Resolve the validated Luoma build asset from the app or case store."""
+    candidates = (BASE_DIR / "case" / "Lake Luoma" / filename,
+                  CASE_DIR / "Lake Luoma" / filename)
+    return next((path for path in candidates if path.is_file()), candidates[0])
 
 
 @app.route("/api/case/build", methods=["POST"])
@@ -5939,7 +9212,7 @@ def case_build():
     global cached_getm_config, cached_fabm_info
     """One-click build of the complete case skeleton from bathymetry.nc.
 
-    Body: {preset: 'mesotrophic'|'eutrophic'|'hypereutrophic',
+    Body: {preset: 'mesotrophic'|'eutrophic'|'hypereutrophic'|'custom',
            start: 'YYYY-MM-DD HH:MM:SS', stop: ..., timestep?: 15,
            nlev?: 10}
     Generates: getm.inp, getm_fabm.inp, gotm_fabm.yaml, gotmturb.nml,
@@ -5951,6 +9224,12 @@ def case_build():
     data = request.json or {}
     preset_key = data.get("preset", "eutrophic")
     preset = TROPHIC_PRESETS.get(preset_key)
+    custom_fallback = preset_key == "custom"
+    if custom_fallback:
+        # Custom/imported FABM configurations do not map to a trophic preset.
+        # Seed the rebuilt template with the documented eutrophic baseline;
+        # saved initial-condition overrides and requested engines are applied below.
+        preset = TROPHIC_PRESETS["eutrophic"]
     if preset is None:
         return jsonify({"error": f"未知预设 {preset_key}"}), 400
     start = (data.get("start") or "").strip()
@@ -5960,7 +9239,15 @@ def case_build():
     d0, d1 = _parse_date(start), _parse_date(stop)
     if d0 is None or d1 is None or d1 <= d0:
         return jsonify({"error": "时间格式错误或结束时间早于开始时间"}), 400
-    timestep = int(data.get("timestep") or 15)
+    raw_timestep = data.get("timestep", 15)
+    try:
+        timestep = float(raw_timestep)
+    except (TypeError, ValueError, OverflowError):
+        return jsonify({"error": "timestep 必须为有限的正数"}), 400
+    if isinstance(raw_timestep, bool) or not np.isfinite(timestep) or timestep <= 0:
+        return jsonify({"error": "timestep 必须为有限的正数"}), 400
+    if timestep > (d1 - d0).total_seconds():
+        return jsonify({"error": "模拟时段须至少包含一个正时间步"}), 400
     nlev = int(data.get("nlev") or 10)
     # Engine selection made on the module page (before/without a case).
     # Falls back to the persisted draft, then to eco-on / ghg-off.
@@ -5968,6 +9255,7 @@ def case_build():
     if not engines:
         engines = _load_module_selection()
     eco_selected = bool(engines.get("eco", True))
+    water_quality_selected = bool(engines.get("water_quality", eco_selected))
     fish_selected = bool(engines.get("fish", True)) and eco_selected
     ghg_selected = bool(engines.get("ghg", False))
     case_path = active_case_path
@@ -5976,6 +9264,8 @@ def case_build():
     _ensure_case_dirs(case_path)
     warnings = []
     notes = []
+    if custom_fallback:
+        notes.append("Custom preset fallback: using the eutrophic safe baseline; saved initial-condition overrides and engine selections will still be applied.")
     # 0) repair legacy wrong coordinates
     geo_note = _fix_case_geo(case_path)
     if geo_note:
@@ -5998,12 +9288,33 @@ def case_build():
             warnings.append("河流数据不全，已按无河流配置（river_method=0）")
             has_rivers = False
     # 3) getm.inp
-    _build_getm_inp(case_path, active_case, d0.strftime("%Y-%m-%d %H:%M:%S"),
+    output_seconds = _build_getm_inp(case_path, active_case, d0.strftime("%Y-%m-%d %H:%M:%S"),
                     d1.strftime("%Y-%m-%d %H:%M:%S"), timestep, has_meteo, has_rivers, nlev)
+    saved_initial = _load_init_cond(case_path)
+    saved_hydro = saved_initial.get("hydro") or {}
+    if saved_hydro:
+        cfg = parse_getm_inp(case_path / "getm.inp")
+        for section, key in (("m2d", "elev_const"), ("temp", "temp_const")):
+            if key in saved_hydro:
+                cfg.setdefault(section, {})[key] = saved_hydro[key]
+        write_getm_inp(case_path / "getm.inp", cfg)
     # 4) fabm.yaml from the validated Luoma template + preset params
-    template = BASE_DIR / "case" / "Lake Luoma" / "fabm.yaml"
+    template = _luoma_template_file("fabm.yaml")
     if not template.exists():
         return jsonify({"error": f"缺少模板 {template}"}), 500
+    existing_initial_overrides = {}
+    existing_fabm = case_path / "fabm.yaml"
+    if custom_fallback and existing_fabm.exists():
+        try:
+            existing_doc = yaml.safe_load(existing_fabm.read_text(encoding="utf-8-sig")) or {}
+            for module, instance in (existing_doc.get("instances") or {}).items():
+                init = instance.get("initialization") if isinstance(instance, dict) else None
+                if isinstance(init, dict):
+                    for variable, value in init.items():
+                        if isinstance(value, (int, float)) and not isinstance(value, bool):
+                            existing_initial_overrides[f"{module}.{variable}"] = value
+        except Exception as e:
+            warnings.append(f"读取现有 FABM 初值失败，无法恢复其自定义值: {e}")
     shutil.copy2(template, case_path / "fabm.yaml")
     params = []
     for key, val in preset.items():
@@ -6013,13 +9324,14 @@ def case_build():
         params.append({"module": mod, "param": par, "value": float(val)})
     applied = update_fabm_parameter_batch(case_path / "fabm.yaml", params)
     # 4b) engine selection from the module page
-    if not eco_selected:
-        try:
-            cfg = parse_getm_inp(case_path / "getm.inp")
-            cfg.setdefault("getm_fabm", {})["fabm"] = ".false."
-            write_getm_inp(case_path / "getm.inp", cfg)
-        except Exception as e:
-            warnings.append(f"写入 fabm=.false. 失败: {e}")
+    try:
+        _set_fabm_domain(case_path, "eco", eco_selected)
+        _set_fabm_domain(case_path, "water_quality", water_quality_selected)
+        cfg = parse_getm_inp(case_path / "getm.inp")
+        cfg.setdefault("getm_fabm", {})["fabm"] = bool(eco_selected or water_quality_selected)
+        write_getm_inp(case_path / "getm.inp", cfg)
+    except Exception as e:
+        warnings.append(f"写入 FABM 模块选择失败: {e}")
     # 4a) 鱼类（食物网顶层）——模板 fabm.yaml 本身不含鱼，按需注入/清除
     if (case_path / "fabm.yaml").exists():
         try:
@@ -6042,12 +9354,27 @@ def case_build():
         except Exception as e:
             warnings.append(f"启用温室气体模块失败: {e}")
     notes.append(
-        f"模块组合：水动力{'✓' if True else '✗'} · "
-        f"水质生态{'✓' if eco_selected else '✗'} · "
+        f"模块组合：水动力✓ · "
+        f"生态网络{'✓' if eco_selected else '✗'} · "
+        f"水质化学{'✓' if water_quality_selected else '✗'} · "
         f"鱼类{'✓' if fish_selected else '✗'} · "
         f"温室气体{'✓' if ghg_selected else '✗'}")
     # 5) fabm_init.nc (may fall back to fabm_init_v2.nc when locked by a zombie process)
-    init_name = _gen_fabm_init(case_path, preset)
+    saved_wq = dict(existing_initial_overrides)
+    saved_wq.update(saved_initial.get("water_quality") or {})
+    if saved_wq:
+        fabm_path = case_path / "fabm.yaml"
+        raw = yaml.safe_load(fabm_path.read_text(encoding="utf-8")) or {}
+        instances = raw.get("instances") or {}
+        for key, value in saved_wq.items():
+            module, _, variable = key.partition(".")
+            if module in instances and isinstance(instances[module], dict):
+                instances[module].setdefault("initialization", {})[variable] = value
+        fabm_path.write_text(yaml.safe_dump(raw, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    init_preset = dict(preset)
+    if saved_initial.get("macrophytes") is not None:
+        init_preset["macro_sD"] = saved_initial["macrophytes"]
+    init_name = _gen_fabm_init(case_path, init_preset)
     # 6) static config files
     (case_path / "getm_fabm.inp").write_text(
         "&getm_fabm_nml\n"
@@ -6074,13 +9401,16 @@ def case_build():
         "    split_factor: 1\n"
         "    w_adv_discr: 6\n"
         "    cnpar: 1.0\n", encoding="utf-8")
-    gotmturb = (BASE_DIR / "case" / "Lake Luoma" / "gotmturb.nml")
+    gotmturb = _luoma_template_file("gotmturb.nml")
     if gotmturb.exists():
         shutil.copy2(gotmturb, case_path / "gotmturb.nml")
+    output_seconds_yaml = (str(int(output_seconds))
+                           if float(output_seconds).is_integer()
+                           else str(output_seconds))
     (case_path / "output.yaml").write_text(
         "output:\n"
-        "   time_unit: day\n"
-        "   time_step: 1\n"
+        "   time_unit: second\n"
+        f"   time_step: {output_seconds_yaml}\n"
         "   sync_interval: 1\n"
         "   variables:\n"
         "      - source: *\n", encoding="utf-8")
@@ -6121,7 +9451,7 @@ def case_build():
 # ── Local shell helpers: folder picker & Explorer ─────────────────────
 
 PICKER_SCRIPT = APP_DIR / "pick_folder.ps1"
-PICKER_RESULT = APP_DIR / ".picker_result.json"
+PICKER_RESULT = APP_TEMP_DIR / "picker_result.json"
 
 _PICK_TK_LOCK = threading.Lock()
 _PICK_TK_ROOT = None
@@ -6191,7 +9521,7 @@ def _ps_pick_dir(start=""):
     return PICKER_RESULT.read_text(encoding="utf-8", errors="replace").strip()
 
 
-_PICK_LOG = APP_DIR / ".picker_debug.log"
+_PICK_LOG = APP_LOG_DIR / "picker_debug.log"
 
 
 def _pick_log(msg):
@@ -6367,15 +9697,15 @@ def config_engines_set():
     config = parse_getm_inp(inp_path)
     if "getm_fabm" not in config:
         config["getm_fabm"] = {}
-    config["getm_fabm"]["fabm"] = ".true." if eco else ".false."
+    config["getm_fabm"]["fabm"] = eco
     write_getm_inp(inp_path, config)
     return jsonify({"success": True, "eco": eco})
 
 
 # ── Module selection (works with or without an active case) ───────────
 
-MODULE_SELECTION_FILE = APP_DIR / ".module_selection.json"
-MODULE_SELECTION_DEFAULT = {"hydro": True, "eco": True, "fish": True, "ghg": False}
+MODULE_SELECTION_FILE = STATE_DIR / ".module_selection.json"
+MODULE_SELECTION_DEFAULT = {"hydro": True, "eco": True, "water_quality": True, "fish": True, "ghg": False}
 
 ENGINE_CATALOG = {
     "hydro": {
@@ -6385,9 +9715,15 @@ ENGINE_CATALOG = {
         "fixed": True,
     },
     "eco": {
-        "key": "eco", "label": "水质生态", "icon": "🦠",
-        "long_name": "水质生态（FABM-WET 食物网）",
-        "desc": "浮游植物（蓝藻/硅藻/绿藻）、浮游动物、底栖动物、沉水植物、碎屑与营养盐循环。关闭后仅运行物理水动力，生态变量不再计算。",
+        "key": "eco", "label": "生态网络", "icon": "🦠",
+        "long_name": "生态网络（FABM-WET 食物网）",
+        "desc": "浮游植物、浮游动物、底栖动物、沉水植物和鱼类等生物群落。可与水质化学过程分别启用。",
+        "fixed": False,
+    },
+    "water_quality": {
+        "key": "water_quality", "label": "水质化学", "icon": "🧪",
+        "long_name": "水质化学（FABM-WET）",
+        "desc": "水体与底泥营养盐、有机质、沉积物交换、埋藏及底水界面过程。可与生态网络分别启用。",
         "fixed": False,
     },
     "fish": {
@@ -6407,7 +9743,7 @@ ENGINE_CATALOG = {
 }
 
 # 鱼类模块默认随生态模块一起开启：食物网缺顶层捕食者是不完整的
-MODULE_ENGINE_KEYS = ("hydro", "eco", "fish", "ghg")
+MODULE_ENGINE_KEYS = ("hydro", "eco", "water_quality", "fish", "ghg")
 
 
 def _load_module_selection():
@@ -6422,6 +9758,9 @@ def _load_module_selection():
                 for k in MODULE_ENGINE_KEYS:
                     if isinstance(d.get(k), bool):
                         sel[k] = d[k]
+                # Before water_quality existed, eco was the combined FABM switch.
+                if "water_quality" not in d and d.get("eco") is False:
+                    sel["water_quality"] = False
     except Exception:
         pass
     return sel
@@ -6454,6 +9793,79 @@ def _case_eco_enabled(case_path):
         return None
 
 
+def _fabm_domain_selection(case_path, fabm_enabled=True):
+    """Read ecology and water-quality availability independently from FABM YAML."""
+    if not fabm_enabled:
+        return {"eco": False, "water_quality": False}
+    selection = {"eco": bool(fabm_enabled), "water_quality": bool(fabm_enabled)}
+    path = Path(case_path) / "fabm.yaml"
+    if not path.exists():
+        return selection
+    try:
+        from wet_instance_catalog import classify_model
+        raw = yaml.safe_load(path.read_text(encoding="utf-8-sig")) or {}
+        instances = raw.get("instances") or {}
+        found = {"eco": False, "water_quality": False}
+        for config in instances.values():
+            if not isinstance(config, dict):
+                continue
+            domain, family = classify_model(str(config.get("model", "")))
+            if domain == "ecology": found["eco"] = True
+            elif domain == "water_quality" and family not in ("inorganic_carbon", "methane"): found["water_quality"] = True
+        disabled = yaml.safe_load((Path(case_path) / "fabm_disabled.yaml").read_text(encoding="utf-8-sig")) if (Path(case_path) / "fabm_disabled.yaml").exists() else {}
+        for config in ((disabled or {}).get("instances") or {}).values():
+            if not isinstance(config, dict):
+                continue
+            domain, family = classify_model(str(config.get("model", "")))
+            if domain == "ecology": found["eco"] = True
+            elif domain == "water_quality" and family not in ("inorganic_carbon", "methane"): found["water_quality"] = True
+        # For domains represented in this case, the active set determines state;
+        # absent legacy inventory falls back to the GETM FABM master switch.
+        for key in found:
+            selection[key] = any(
+                isinstance(config, dict)
+                and classify_model(str(config.get("model", "")))[0] == ("ecology" if key == "eco" else key)
+                and not (key == "water_quality" and classify_model(str(config.get("model", "")))[1] in ("inorganic_carbon", "methane"))
+                for config in instances.values()) if found[key] else False
+        if not found["eco"] and not found["water_quality"]:
+            return {"eco": bool(fabm_enabled), "water_quality": bool(fabm_enabled)}
+        return selection
+    except Exception:
+        return selection
+
+
+def _set_fabm_domain(case_path, key, enabled):
+    """Move a WET capability family to/from FABM's standard disabled inventory."""
+    from wet_instance_catalog import classify_model
+    path = Path(case_path) / "fabm.yaml"
+    disabled_path = Path(case_path) / "fabm_disabled.yaml"
+    raw = yaml.safe_load(path.read_text(encoding="utf-8-sig")) or {}
+    instances = raw.setdefault("instances", {})
+    disabled_doc = yaml.safe_load(disabled_path.read_text(encoding="utf-8-sig")) if disabled_path.exists() else {}
+    disabled_doc = disabled_doc or {}
+    disabled = disabled_doc.setdefault("instances", {})
+    domain = "ecology" if key == "eco" else "water_quality"
+    if enabled:
+        for name, config in list(disabled.items()):
+            family_domain = classify_model(str(config.get("model", ""))) if isinstance(config, dict) else ("other", "")
+            if family_domain[0] == domain and not (key == "water_quality" and family_domain[1] in ("inorganic_carbon", "methane")) and name not in instances:
+                instances[name] = config
+                del disabled[name]
+    else:
+        for name, config in list(instances.items()):
+            family_domain = classify_model(str(config.get("model", ""))) if isinstance(config, dict) else ("other", "")
+            if family_domain[0] == domain and not (key == "water_quality" and family_domain[1] in ("inorganic_carbon", "methane")):
+                disabled[name] = config
+                del instances[name]
+    if not disabled:
+        disabled_doc.pop("instances", None)
+    path.write_text(yaml.safe_dump(raw, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    if disabled_doc:
+        disabled_path.write_text(yaml.safe_dump(disabled_doc, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    elif disabled_path.exists():
+        disabled_path.unlink()
+
+
 @app.route("/api/config/modules", methods=["GET"])
 def config_modules_get():
     """Full module/engine catalogue.
@@ -6468,7 +9880,7 @@ def config_modules_get():
     if has_case:
         eco_real = _case_eco_enabled(active_case_path)
         if eco_real is not None:
-            sel["eco"] = eco_real
+            sel.update(_fabm_domain_selection(active_case_path, eco_real))
             source = "case"
         if (active_case_path / "fabm.yaml").exists():
             sel["ghg"] = _ghg_case_enabled(active_case_path)
@@ -6527,12 +9939,16 @@ def config_modules_set():
     if active_case_path:
         eco_real = _case_eco_enabled(active_case_path)
         if eco_real is not None:
-            sel["eco"] = eco_real
-        try:
-            sel["ghg"] = bool(_ghg_case_enabled(active_case_path))
-            sel["fish"] = bool(_fish_case_enabled(active_case_path))
-        except Exception:
-            pass
+            sel.update(_fabm_domain_selection(active_case_path, eco_real))
+        # A freshly created bathymetry-only case has no ecological config yet.
+        # Missing modules there are pending choices, not disabled engines.
+        # Match GET: use the real module state only after fabm.yaml exists.
+        if (active_case_path / "fabm.yaml").exists():
+            try:
+                sel["ghg"] = bool(_ghg_case_enabled(active_case_path))
+                sel["fish"] = bool(_fish_case_enabled(active_case_path))
+            except Exception:
+                pass
     for k in MODULE_ENGINE_KEYS:
         if k in data:
             sel[k] = bool(data[k])
@@ -6551,17 +9967,26 @@ def config_modules_set():
 
     result["applied_to"] = active_case
     inp = active_case_path / "getm.inp"
-    if sel["eco"] and inp.exists():
+    if inp.exists():
         try:
             config = parse_getm_inp(inp)
             if "getm_fabm" not in config:
                 config["getm_fabm"] = {}
-            config["getm_fabm"]["fabm"] = ".true." if sel["eco"] else ".false."
+            config["getm_fabm"]["fabm"] = bool(sel["eco"] or sel.get("water_quality", True))
             write_getm_inp(inp, config)
             result["applied"].append("getm.inp: getm_fabm/fabm")
         except Exception as e:
             result["warnings"].append(f"写入 getm.inp 失败: {e}")
     fabm_path = active_case_path / "fabm.yaml"
+    if fabm_path.exists():
+        for key in ("eco", "water_quality"):
+            if key in data:
+                try:
+                    _set_fabm_domain(active_case_path, key, bool(sel[key]))
+                    result["applied"].append(f"fabm.yaml: {key} instances")
+                except Exception as e:
+                    result["success"] = False
+                    result["warnings"].append(f"写入 {key} 模块失败: {e}")
     if fabm_path.exists() and sel.get("fish") is not None and sel.get("eco", True):
         try:
             ok, warns = fish_support.toggle_fish_modules(fabm_path, bool(sel["fish"]))
@@ -6608,8 +10033,8 @@ INIT_COND_DEFAULT = {"surface_elev_abs": None, "datum_abs": None,
                      "trophic": None, "macrophytes": None}
 
 
-def _load_init_cond():
-    p = active_case_path / INIT_COND_FILE
+def _load_init_cond(case_path=None):
+    p = (case_path if case_path is not None else active_case_path) / INIT_COND_FILE
     out = dict(INIT_COND_DEFAULT)
     if p.exists():
         try:
@@ -6664,14 +10089,14 @@ def case_init_conditions_get():
     case_path = active_case_path
     inp = case_path / "getm.inp"
     cfg = parse_getm_inp(inp) if inp.exists() else {}
-    side = _load_init_cond()
+    side = _load_init_cond(case_path)
     bathy = _bathy_stats(case_path)
 
     m2d = cfg.get("m2d", {}) or {}
     temp = cfg.get("temp", {}) or {}
     hydro = {
-        "elev_const": m2d.get("elev_const", 0.0),
-        "temp_const": temp.get("temp_const", 15.0),
+        "elev_const": m2d.get("elev_const", (side.get("hydro") or {}).get("elev_const", 0.0)),
+        "temp_const": temp.get("temp_const", (side.get("hydro") or {}).get("temp_const", 15.0)),
         "surface_elev_abs": side.get("surface_elev_abs"),
         "datum_abs": side.get("datum_abs"),
         "hotstart": bool((cfg.get("param", {}) or {}).get("hotstart", False)),
@@ -6706,7 +10131,7 @@ def case_init_conditions_get():
                     "model": inst.get("model", ""),
                     "n_init": len(init),
                     "init": init,
-                    "desc": _fabm_docs().get("modules", {}).get(name, ""),
+                    **_annotate_module(name, inst.get("long_name", name), meta.get("category", "其他")),
                     "docs": {k: _annotate_variable(inst.get("model", ""), k)
                              for k in init},
                 })
@@ -6763,7 +10188,7 @@ def case_init_conditions_set():
 
     # ── 1) water level & temperature → getm.inp ──────────────────────
     inp = case_path / "getm.inp"
-    side = _load_init_cond()
+    side = _load_init_cond(case_path)
     elev = hydro_in.get("elev_const")
     surface_abs = hydro_in.get("surface_elev_abs")
     datum_abs = hydro_in.get("datum_abs")
@@ -6777,6 +10202,9 @@ def case_init_conditions_set():
         elev = float(elev)
         side.pop("surface_elev_abs", None)
         side.pop("datum_abs", None)
+    saved_hydro = side.setdefault("hydro", {})
+    if elev not in (None, ""):
+        saved_hydro["elev_const"] = float(elev)
     if elev is not None and elev != "" and inp.exists():
         try:
             config = parse_getm_inp(inp)
@@ -6788,6 +10216,8 @@ def case_init_conditions_set():
         except Exception as e:
             warnings.append(f"写入 getm.inp 失败: {e}")
     temp_const = hydro_in.get("temp_const")
+    if temp_const not in (None, ""):
+        saved_hydro["temp_const"] = float(temp_const)
     if temp_const not in (None, "") and inp.exists():
         try:
             config = parse_getm_inp(inp)
@@ -6800,6 +10230,15 @@ def case_init_conditions_set():
 
     # ── 2) water quality initial values → fabm.yaml ──────────────────
     wq = data.get("water_quality") or {}
+    saved_wq = side.setdefault("water_quality", {})
+    for key, value in wq.items():
+        module, separator, variable = str(key).partition(".")
+        if not module or not separator or not variable:
+            continue
+        try:
+            saved_wq[key] = float(value)
+        except (TypeError, ValueError):
+            continue
     fabm_path = case_path / "fabm.yaml"
     n_written = 0
     if wq and fabm_path.exists():
@@ -6865,61 +10304,140 @@ def case_init_conditions_set():
 # ── Main ───────────────────────────────────────────────────────────────
 
 def _reattach_orphan_model():
-    """Detect a getm_cartesian.exe still running from a previous service
-    instance (the exe outlives the service that spawned it) and re-attach:
-    keeps run_status='running' so the dashboard 409 guard (HDF5 concurrent
-    access) and the delete/save-as guards stay effective, and clears the
-    status when the exe exits. Must be called once at service startup."""
-    global run_status, run_case_path, run_start_time
+    """Reattach only this solver in a known case and validate its final result."""
+    global run_status, run_case_path, run_start_time, run_process, run_thread, run_config, run_logs
+    global _run_identity, _run_log_case_path
     try:
         import psutil
-        procs = [p for p in psutil.process_iter(["name", "pid", "create_time"])
-                 if (p.info["name"] or "").lower() == "getm_cartesian.exe"]
-    except Exception:
-        return
-    if not procs:
-        return
-    p = procs[0]
-    run_status = "running"
-    try:
-        run_start_time = p.info["create_time"]
-    except Exception:
-        run_start_time = time.time()
-    # Locate the running case: the known case whose model_run.log was
-    # touched most recently (the exe appends stderr continuously).
-    candidates = []
-    try:
-        dirs = [d for d in CASE_DIR.iterdir() if d.is_dir()] + \
-               [Path(p) for p in _load_external_cases()]
-        for case_dir in dirs:
-            log = case_dir / "model_run.log"
-            if log.exists():
-                candidates.append((log.stat().st_mtime, case_dir))
-    except Exception:
-        pass
-    if candidates:
-        candidates.sort(reverse=True)
-        if time.time() - candidates[0][0] < 600:
-            run_case_path = candidates[0][1]
-            print(f"[启动] 检测到运行中的模型 (PID {p.info['pid']}, 案例 {run_case_path.name})，已恢复运行状态")
-        else:
-            print(f"[启动] 检测到运行中的模型进程 (PID {p.info['pid']})，已恢复运行状态")
-    else:
-        print(f"[启动] 检测到运行中的模型进程 (PID {p.info['pid']})，已恢复运行状态")
-
-    def _watch(pid):
-        global run_status, run_case_path
-        while True:
-            time.sleep(30)
+        executable = EXE_PATH.resolve()
+        known_cases = {directory.resolve() for root in (CASE_DIR, LEGACY_CASE_DIR)
+                       if root.is_dir() for directory in root.iterdir() if directory.is_dir()}
+        known_cases.update(Path(directory).resolve() for directory in _load_external_cases() if Path(directory).is_dir())
+        owned = None
+        for process in psutil.process_iter(["pid", "exe", "cwd", "create_time"]):
             try:
-                import psutil
-                psutil.Process(pid)
-            except Exception:
-                run_status = "completed"
-                run_case_path = None
-                return
+                process_exe, case = Path(process.exe()).resolve(), Path(process.cwd()).resolve()
+                created = float(process.create_time())
+                if (process_exe != executable or case not in known_cases or not np.isfinite(created)
+                        or not any((case / filename).is_file() for filename in ('getm.inp', 'bathymetry.nc'))):
+                    continue
+                owned = process, case, created
+                break
+            except (psutil.NoSuchProcess, psutil.AccessDenied, OSError, ValueError, TypeError):
+                continue
+    except Exception:
+        return
+    if owned is None:
+        return
+    process, case, created = owned
+    pid = process.pid
+    log_path = case / 'model_run.log'
+    log_state = dict(offset=0, identity=None, partial='', completed=False, fatal=False, fresh=False)
 
-    threading.Thread(target=_watch, args=(p.info["pid"],), daemon=True).start()
+    def still_owned():
+        return run_process is process and run_case_path == case
+
+    def read_log():
+        try:
+            stat = log_path.stat()
+            if stat.st_mtime < created:
+                return
+            identity = (stat.st_dev, stat.st_ino)
+            if log_state['identity'] != identity or stat.st_size < log_state['offset']:
+                log_state.update(offset=0, identity=identity, partial='', completed=False, fatal=False)
+            log_state['fresh'] = True
+            with log_path.open('rb') as stream:
+                stream.seek(log_state['offset'])
+                while still_owned():
+                    chunk = stream.read(65536)
+                    if not chunk:
+                        break
+                    log_state['offset'] = stream.tell()
+                    text = log_state['partial'] + chunk.decode('utf-8', errors='replace')
+                    log_state['fatal'] |= log_has_solver_failure(text)
+                    log_state['completed'] |= 'getm: Completed on' in text
+                    run_metrics.observe(text)
+                    lines = text.split('\n')
+                    log_state['partial'] = lines.pop()[-8192:]
+                    run_logs.extend(line.strip() for line in lines if line.strip())
+                    if len(run_logs) > 5000:
+                        del run_logs[:-2000]
+        except OSError:
+            pass
+
+    with _NC_LOCK:
+        if run_status == 'running' or (run_thread is not None and run_thread.is_alive()):
+            return
+        _reset_run_repair_summary()
+        run_process, run_case_path, run_start_time = process, case, created
+        _run_log_case_path = case
+        _run_identity = f"reattached:{pid}:{created:.6f}"
+        run_status, run_logs = 'running', []
+        try:
+            config = parse_getm_inp(case / 'getm.inp') if (case / 'getm.inp').is_file() else {}
+            run_config = estimate_run_time(case, config)
+        except (OSError, ValueError, TypeError):
+            run_config = {}
+        run_metrics.start(run_config, now=created)
+        run_logs.append(f'[INFO] 已恢复模型进程 PID {pid}，案例：{case.name}')
+        read_log()
+
+    def _watch():
+        global run_status, run_case_path
+        denied = False
+        try:
+            while still_owned():
+                read_log()
+                try:
+                    current = psutil.Process(pid)
+                    if (float(current.create_time()) != created or Path(current.exe()).resolve() != executable
+                            or Path(current.cwd()).resolve() != case or not current.is_running()
+                            or current.status() == psutil.STATUS_ZOMBIE):
+                        break
+                except psutil.NoSuchProcess:
+                    break
+                except (psutil.AccessDenied, OSError):
+                    if not denied:
+                        run_logs.append('[WARN] 暂时无法确认恢复进程的身份，保留运行保护并继续检查。')
+                        denied = True
+                time.sleep(1)
+            with _NC_LOCK:
+                if not still_owned():
+                    return
+                read_log()
+                if run_status == 'stopped':
+                    return
+                if not log_state['fresh'] or not log_state['completed'] or log_state['fatal']:
+                    run_status = 'failed'
+                    run_logs.append('[ERROR] 恢复的模型进程已退出，但缺少本次运行完成日志或存在致命错误。')
+                    return
+                health = validate_current_run_outputs(case, nc_open, started_at=created)
+                if not still_owned() or run_status == 'stopped':
+                    return
+                if not health['ready']:
+                    run_status = 'failed'
+                    run_logs.append('[ERROR] 恢复运行的结果有效性检查失败，未归档输出。')
+                    run_logs.extend(f'[ERROR] {error}' for error in health['errors'])
+                    for bad in health['bad_variables'][:3]:
+                        run_logs.append(f"[ERROR] {bad['file']} → {bad['variable']}: {bad['reason']}")
+                    return
+                _archive_run_outputs(case, run_logs)
+                run_status = 'completed'
+                run_logs.append('[INFO] 恢复的模型运行完成，结果有效性检查通过。')
+        except Exception as error:
+            with _NC_LOCK:
+                if still_owned() and run_status != 'stopped':
+                    run_status = 'failed'
+                    run_logs.append(f'[ERROR] 恢复运行检查失败：{error}')
+        finally:
+            with _NC_LOCK:
+                if still_owned():
+                    _capture_run_repair_summary(case, run_status, log_state['fresh'])
+                    run_metrics.finish()
+                    run_case_path = None
+
+    run_thread = threading.Thread(target=_watch, daemon=True, name='reattached-model')
+    run_thread.start()
 
 def main():
     _reattach_orphan_model()
@@ -6942,6 +10460,49 @@ def main():
     except ImportError as e:
         print(f"  Waitress不可用({e})，使用 Flask 开发服务器")
         app.run(host="127.0.0.1", port=PORT, debug=False, threaded=False)
+
+def _lookup_result_variable(name):
+    if not active_case_path:
+        return None
+    files = find_output_files(active_case_path, name)
+    paths = []
+    for value in files.values():
+        if isinstance(value, (list, tuple)):
+            paths.extend(value)
+        elif value:
+            paths.append(value)
+    for path in dict.fromkeys(paths):
+        with nc_open(path) as dataset:
+            if name in dataset.variables:
+                var = dataset.variables[name]
+                return dict(name=name, units=getattr(var, 'units', ''),
+                            long_name=getattr(var, 'long_name', name), dims=list(var.dimensions), ndim=var.ndim)
+    return None
+
+
+def _results_context():
+    calibration = sys.modules.get('calibration')
+    jobs = list(getattr(calibration, 'calibration_jobs', {}).values()) if calibration else []
+    busy = run_status == 'running' or bool(run_thread and run_thread.is_alive()) or any(
+        job.status == 'running' or bool(job._thread and job._thread.is_alive()) for job in jobs)
+    return dict(case_path=active_case_path, busy=busy, lock=_NC_LOCK, lookup=_lookup_result_variable)
+
+
+register_result_file_routes(app, _results_context)
+register_variable_routes(app, _results_context)
+
+from grid_api import register_grid_routes
+register_grid_routes(app, sys.modules[__name__])
+from project_api import register_project_routes
+register_project_routes(app, sys.modules[__name__])
+register_run_diagnostic_routes(app, sys.modules[__name__])
+register_lake_points_routes(app, sys.modules[__name__])
+from spatial_sections import register as register_spatial_sections
+register_spatial_sections(app, sys.modules[__name__])
+from parameter_defaults import ParameterDefaultsError
+@app.errorhandler(ParameterDefaultsError)
+def parameter_defaults_error(error):
+    return jsonify({'error': str(error), 'source': 'fabm_defaults.json'}), 400
 
 if __name__ == "__main__":
     main()

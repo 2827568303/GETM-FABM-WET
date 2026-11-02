@@ -1,0 +1,104 @@
+/* Scientific results: clear paper, quiet framing and quantitative legends. */
+#page-viz2d,#page-viz2d .viz-container {min-width:0;max-width:100%;}
+#page-viz2d .viz-controls select {max-width:100%;min-width:0;}
+#page-viz2d .viz-controls .time-slider {min-width:80px;flex:1;}
+.viz-size-controls {display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 10px;font-size:12px;}
+.viz-size-controls input {width:86px;max-width:100%;padding:4px;border:1px solid var(--border);}
+.viz-size-controls span {color:var(--text-muted);font-size:11px;}
+#viz2d-viewport.vc-resizable {resize:both;min-width:120px;min-height:180px;max-width:100%;height:500px;box-sizing:border-box;}
+#viz2d-viewport canvas {max-width:none;}
+#viz2d-info,#viz2d-coord {overflow-wrap:anywhere;}
+/* These two dialogs use a backdrop/content structure rather than the older
+   modal-overlay wrapper. Keep closed dialogs out of the page layout. */
+#modal-cell-ts,#modal-add-calib {
+    display:none;position:fixed;inset:0;z-index:1000;align-items:center;justify-content:center;
+    min-width:0;max-width:none;max-height:none;padding:16px;border:0;border-radius:0;background:transparent;
+}
+#modal-cell-ts.active,#modal-add-calib.active {display:flex;}
+#modal-cell-ts .modal-backdrop,#modal-add-calib .modal-backdrop {position:absolute;inset:0;background:rgba(0,0,0,.45);}
+#modal-cell-ts .modal-content,#modal-add-calib .modal-content {
+    position:relative;width:min(800px,100%);max-width:100%;max-height:calc(100vh - 32px);overflow:auto;padding:16px;box-sizing:border-box;
+}
+#modal-cell-ts .modal-header,#modal-add-calib .modal-header {display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;}
+#modal-add-calib .modal-content {width:min(480px,100%);}
+/* The description must remain readable beside editable values in a narrow
+   work pane, including after interface zoom or sidebar resizing. */
+.ic-rows {container-type:inline-size;}
+.ic-row {grid-template-columns:minmax(55px,150px) minmax(70px,110px) 56px minmax(0,1fr);}
+.ic-row label,.ic-row .ic-desc {overflow-wrap:anywhere;}
+.ic-grid {grid-template-columns:repeat(auto-fill,minmax(min(220px,100%),1fr));}
+@container (max-width:480px) {
+    .ic-row {grid-template-columns:minmax(40px,1fr) minmax(60px,1fr) minmax(36px,.6fr);}
+    .ic-row .ic-desc {grid-column:1 / -1;overflow:visible;}
+}
+#page-viz2d .viz-canvas,#page-viz3d .viz-canvas,
+#page-viz2d .vc-canvas-viewport,#page-viz3d .vc-canvas-viewport {
+    background:#f1f4f5;
+    border-radius:2px;
+}
+#viz3d-plotly { background:#f7fafb!important; border-color:#bdcbd3!important; }
+#page-viz2d .vc-plot-tools button,#page-viz3d .vc-plot-tools button {
+    background:rgba(255,255,255,.94);border:1px solid #b8c8d1;color:#385b70;
+    border-radius:2px;box-shadow:0 1px 2px rgba(35,64,80,.08);
+}
+#page-viz2d .vc-plot-tools button:hover,#page-viz3d .vc-plot-tools button:hover {
+    background:#e8f2f7;border-color:#7da5ba;color:#1e618b;
+}
+.scientific-colorbar {
+    position:relative;overflow:visible!important;min-height:13px;height:13px!important;
+    margin:34px 8px 31px!important;border:1px solid #b6c8d2;border-radius:1px!important;
+    box-shadow:none!important;
+}
+.scientific-colorbar-title {
+    position:absolute;left:0;top:-25px;max-width:100%;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:600;color:#345568;
+}
+.scientific-colorbar-tick {
+    position:absolute;top:100%;transform:translateX(-50%);padding-top:8px;
+    white-space:nowrap;font:11px/1.2 'Segoe UI','Microsoft YaHei',sans-serif;
+    font-variant-numeric:tabular-nums;color:#4d6472;
+}
+.scientific-colorbar-tick::before {
+    content:'';position:absolute;left:50%;top:0;height:5px;border-left:1px solid #718995;
+}
+.scientific-colorbar-tick[data-edge="start"] { transform:translateX(0); }
+.scientific-colorbar-tick[data-edge="end"] { transform:translateX(-100%); }
+.scientific-colorbar-tick[data-edge="start"]::before { left:0; }
+.scientific-colorbar-tick[data-edge="end"]::before { left:100%; }
+#viz2d-colorbar.scientific-colorbar + div { display:none; }
+#viz2d-info,#viz2d-coord {
+    color:#536a77!important;font-variant-numeric:tabular-nums;line-height:1.7;
+}
+.results-variable-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px; }
+.results-variable-card {
+    background:#f6f9fb;border:1px solid #ccdae2;border-left:3px solid #4e88a8;
+    border-radius:2px;padding:12px 14px;margin:10px 0 14px;color:#405c6d;
+    font-size:12px;line-height:1.65;overflow-wrap:anywhere;
+}
+.results-variable-card h3,.results-variable-card h4,.results-variable-card strong { color:#264e66; }
+.results-variable-card p { margin:4px 0; }
+.variable-guide-heading,.reference-strip { display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px; }
+.variable-guide-heading code { font-size:11px;color:#627581; }
+.reference-strip { margin-top:8px; }
+.reference-strip span,.reference-note { color:#687b86; }
+.reference-form { display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin-top:10px; }
+.reference-form label { display:grid;gap:4px;flex:1 1 150px; }
+.reference-form input { width:100%;box-sizing:border-box;padding:6px;border:1px solid #bcccd5;border-radius:2px; }
+.results-variable-card details { margin-top:9px; }
+.results-variable-card summary { cursor:pointer;color:#346d8c; }
+.results-variable-card .reference-status { display:inline-block;padding:2px 7px;border:1px solid #c5d6e0;background:#eaf2f7;color:#3a617a;border-radius:2px; }
+.results-variable-card [data-status="warning"] { background:#fff5e8;border-color:#e7c18d;color:#855b20; }
+.results-variable-card [data-status="ok"] { background:#edf5f0;border-color:#b6d2c0;color:#3c6e51; }
+.results-variable-card [data-status="unset"] { background:#f1f3f5;border-color:#d1d8de;color:#687780; }
+.results-table { width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:12px; }
+.results-table th { background:#edf3f6;color:#365b70;font-weight:600;text-align:left; }
+.results-table th,.results-table td { padding:9px 11px;border-bottom:1px solid #dbe4e9; }
+.results-table th,.results-table td { white-space:nowrap; }
+.results-table td:nth-child(2) { white-space:normal; }
+.results-table tbody tr:nth-child(even) { background:#f8fafb; }
+.results-table tbody tr:hover { background:#edf5f9; }
+@media(max-width:720px) {
+    .results-variable-grid { grid-template-columns:1fr; }
+    .results-variable-card { padding:10px 11px; }
+    .scientific-colorbar { margin-left:12px!important;margin-right:12px!important; }
+}

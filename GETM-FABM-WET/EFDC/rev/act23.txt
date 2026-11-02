@@ -1,0 +1,10 @@
+     0 diag51 ready
+     0 diag104 ready force=true
+ 10747 WaitForMultipleObjectsEx 6047ms 0xa70(Process) ; 0xa08(Event) ; 0x9f8(Event)
+ 10748   SetEvent(0xa70) -> 0
+ 10748   SetEvent(0xa08) -> 1
+ 10748   SetEvent(0x9f8) -> 1
+ 10748 WaitForMultipleObjects 6048ms 0xa70(Process) ; 0xa08(Event) ; 0x9f8(Event)
+ 10748   SetEvent(0xa70) -> 0
+ 10748   SetEvent(0xa08) -> 1
+ 10748   SetEvent(0x9f8) -> 1

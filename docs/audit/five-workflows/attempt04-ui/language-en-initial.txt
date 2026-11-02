@@ -1,0 +1,694 @@
+- img "3DWET"
+- heading "3DWET Studio" [level=1]
+- paragraph: Lake ecology · 3D modelling workbench
+- generic: Overview
+- generic: 📊
+- text: Dashboard
+- generic: 📁
+- text: Case management
+- generic: Preprocessing
+- generic: 🛠️
+- text: Preprocessing
+- generic: ▦
+- text: Interactive grid editor
+- generic: 📥
+- text: Input data
+- generic: 🧩
+- text: Module configuration
+- generic: ⚙️
+- text: Parameter editor
+- generic: 🧪
+- text: Initial conditions
+- generic: ⏱️
+- text: Time settings
+- generic: Run
+- generic: ▶️
+- text: Run control
+- generic: Postprocessing
+- generic: 🌐
+- text: Map view
+- generic: 🗺️
+- text: 2D visualization
+- generic: 🧊
+- text: 3D visualization
+- generic: 🔥
+- text: Vertical heatmap
+- generic: 📈
+- text: Time series
+- generic: Calibration
+- generic: 🎯
+- text: Calibration analysis
+- generic: 🔄
+- text: Automatic calibration
+- generic: Workbench
+- generic: ◉
+- text: Environment and startup diagnostics
+- generic: 📋
+- text: Project import and physics settings
+- generic: "Case: Round4 UI Lake 1302"
+- menubar "Workbench menu":
+  - button "Project"
+  - button "Edit"
+  - button "View"
+  - button "Layers"
+  - button "Run"
+  - button "Settings"
+  - button "Help"
+  - button "Language"
+  - generic: 3DWET Studio · GIS workbench
+- toolbar "Common tools":
+  - button "▣ Case":
+    - generic: ▣
+    - generic: Case
+  - button "⚒ Preprocessing":
+    - generic: ⚒
+    - generic: Preprocessing
+  - button "▦ Grid":
+    - generic: ▦
+    - generic: Grid
+  - button "▶ Run":
+    - generic: ▶
+    - generic: Run
+  - button "⌖ Map":
+    - generic: ⌖
+    - generic: Map
+  - button "▤ 2D":
+    - generic: ▤
+    - generic: 2D
+  - button "◇ 3D":
+    - generic: ◇
+    - generic: 3D
+  - button "⚙ Diagnostics":
+    - generic: ⚙
+    - generic: Diagnostics
+- generic: Initial conditions
+- generic: Round4 UI Lake 1302
+- button "100%"
+- generic: Idle
+- generic: Initial conditions
+- generic: Set initial water level, temperature and water quality for a cold start
+- generic: ▶
+- text: 💧 Initial water level and temperature
+- text: Initial water level
+- emphasis: (relative to the bathymetry datum, m)
+- spinbutton: "0"
+- text: Absolute lake surface elevation
+- emphasis: (m, e.g. 1884 for Dianchi)
+- spinbutton
+- text: Absolute bathymetry datum elevation
+- emphasis: （m）
+- spinbutton
+- text: Initial water temperature
+- emphasis: （℃）
+- spinbutton: "16.25"
+- text: Bathymetry
+- code: bathymetry.nc
+- text: ：水域格 165 个，水深范围 3.000 ~ 7.000 m，均值 5.085 m。
+- text: 水位填 0 即湖面恰好位于地形零点；此处最大水深 7.000 m。
+- text: 💡 How to set water level GETM's
+- code: m2d/elev_const
+- text: is the water surface height relative to the bathymetry datum, sharing
+- code: bathymetry.nc
+- text: the same datum. For bathymetry depths referenced to 1884 m, as in the Dianchi case, the lake surface is at 1884 m,set elev_const to 0; setting 1884 raises the surface to 3788 m. The Absolute lake surface elevation and Absolute bathymetry datum elevation fields can calculate elev_const automatically.
+- generic: ▶
+- text: 🌱 Trophic state preset (fill initial water quality)
+- radio "富营养（藻类浊水态）" [checked]
+- text: 富营养（藻类浊水态）
+- radio "重富营养（蓝藻水华频发）"
+- text: 重富营养（蓝藻水华频发）
+- radio "中营养（水草清水态）"
+- text: 中营养（水草清水态）
+- text: Choose a trophic state to fill standard initial values in Initial water quality; each value can then be adjusted. Also used to generate
+- code: fabm_init.nc
+- text: (submerged plant biomass as a function of depth).
+- text: Maximum submerged plant biomass
+- emphasis: gDW/m²
+- spinbutton: "8"
+- generic: ▶
+- text: 🧫 Initial water quality (by module; g/m³)
+- textbox "Search variables, e.g. NH4 / O2 / algae"
+- button "↩ Fill from current trophic state"
+- button "📐 Apply preset values"
+- generic: Benthic animals
+- generic: ●
+- text: zoobenthos
+- emphasis: zoobenthos
+- text: Benthic animals
+- code: wet/zoobenthos
+- generic "sC"
+- spinbutton: "0.2"
+- generic: gC/m2
+- generic "C"
+- generic "sC_PV"
+- spinbutton: "0.2"
+- generic: gC/m2
+- generic "C pel. var"
+- generic "sD"
+- spinbutton: "0.4"
+- generic: gDW/m2
+- generic "DW"
+- generic "sD_PV"
+- spinbutton: "0.5"
+- generic: gDW/m2
+- generic "DW pel. var"
+- generic "sN"
+- spinbutton: "0.035"
+- generic: gN/m2
+- generic "N"
+- generic "sN_PV"
+- spinbutton: "0.035"
+- generic: gN/m2
+- generic "N pel. var"
+- generic "sP"
+- spinbutton: "0.005"
+- generic: gP/m2
+- generic "P"
+- generic "sP_PV"
+- spinbutton: "0.005"
+- generic: gP/m2
+- generic "P pel. var"
+- generic: Organic matter
+- generic: ●
+- text: DOM
+- emphasis: dom
+- text: "Dissolved organic matter (DOM): dissolved C/N/P"
+- code: wet/om_pool
+- generic "sCS"
+- spinbutton: "4"
+- generic: gC/m2
+- generic "sediment C"
+- generic "sCW"
+- spinbutton: "1"
+- generic: gC/m3
+- generic "water column C"
+- generic "sDS"
+- spinbutton: "10"
+- generic: gDW/m2
+- generic "sediment DW"
+- generic "sDW"
+- spinbutton: "6.125"
+- generic: gDW/m3
+- generic "water column DW"
+- generic "sNS"
+- spinbutton: "0.06"
+- generic: gN/m2
+- generic "sediment N"
+- generic "sNW"
+- spinbutton: "0.01"
+- generic: gN/m3
+- generic "water column N"
+- generic "sPS"
+- spinbutton: "0.01"
+- generic: gP/m2
+- generic "sediment P"
+- generic "sPW"
+- spinbutton: "0.001"
+- generic: gP/m3
+- generic "water column P"
+- generic: ●
+- text: POM
+- emphasis: pom
+- text: "Particulate organic matter (POM): particulate C/N/P/dry weight in water and sediment"
+- code: wet/om_pool
+- generic "sCS"
+- spinbutton: "18.96"
+- generic: gC/m2
+- generic "sediment C"
+- generic "sCS_PV"
+- spinbutton: "18.96"
+- generic: gC/m2
+- generic "sediment C PV"
+- generic "sCW"
+- spinbutton: "0.04"
+- generic: gC/m3
+- generic "water column C"
+- generic "sDS"
+- spinbutton: "47.4"
+- generic: gDW/m2
+- generic "sediment DW"
+- generic "sDS_PV"
+- spinbutton: "47.4"
+- generic: gDW/m2
+- generic "sediment DW PV"
+- generic "sDW"
+- spinbutton: "7.25"
+- generic: gDW/m3
+- generic "water column DW"
+- generic "sNS"
+- spinbutton: "0.6"
+- generic: gN/m2
+- generic "sediment N"
+- generic "sNS_PV"
+- spinbutton: "0.6"
+- generic: gN/m2
+- generic "sediment N PV"
+- generic "sNW"
+- spinbutton: "0.01"
+- generic: gN/m3
+- generic "water column N"
+- generic "sPS"
+- spinbutton: "0.1"
+- generic: gP/m2
+- generic "sediment P"
+- generic "sPS_PV"
+- spinbutton: "0.1"
+- generic: gP/m2
+- generic "sediment P PV"
+- generic "sPW"
+- spinbutton: "0.001"
+- generic: gP/m3
+- generic "water column P"
+- generic: ●
+- text: humus
+- emphasis: humus
+- text: "Humus: a slowly mineralizing pool of refractory organic matter"
+- code: wet/om_pool
+- generic "sCS"
+- spinbutton: "1487.6"
+- generic: gC/m2
+- generic "sediment C"
+- generic "sCS_PV"
+- spinbutton: "1487.6"
+- generic: gC/m2
+- generic "sediment C PV"
+- generic "sDS"
+- spinbutton: "3719"
+- generic: gDW/m2
+- generic "sediment DW"
+- generic "sDS_PV"
+- spinbutton: "3719"
+- generic: gDW/m2
+- generic "sediment DW PV"
+- generic "sNS"
+- spinbutton: "166"
+- generic: gN/m2
+- generic "sediment N"
+- generic "sNS_PV"
+- spinbutton: "166"
+- generic: gN/m2
+- generic "sediment N PV"
+- generic "sPS"
+- spinbutton: "16"
+- generic: gP/m2
+- generic "sediment P"
+- generic "sPS_PV"
+- spinbutton: "16"
+- generic: gP/m2
+- generic "sediment P PV"
+- generic: Aquatic plants
+- generic: ●
+- text: macrophytes
+- emphasis: macrophytes
+- text: "Submerged aquatic plants: biomass, nutrient uptake and senescence"
+- code: wet/macrophytes
+- generic "sC"
+- spinbutton: "12"
+- generic: gC/m2
+- generic "P"
+- generic "sC_PV"
+- spinbutton: "0"
+- generic: gC/m2
+- generic "C pel. var"
+- generic "sD"
+- spinbutton: "30"
+- generic: gDW/m2
+- generic "DW"
+- generic "sD_PV"
+- spinbutton: "0"
+- generic: gDW/m2
+- generic "DW pel. var"
+- generic "sN"
+- spinbutton: "0.6"
+- generic: gN/m2
+- generic "N"
+- generic "sN_PV"
+- spinbutton: "0"
+- generic: gN/m2
+- generic "N pel. var"
+- generic "sP"
+- spinbutton: "0.06"
+- generic: gP/m2
+- generic "P"
+- generic "sP_PV"
+- spinbutton: "0"
+- generic: gP/m2
+- generic "P pel. var"
+- generic: Zooplankton
+- generic: ●
+- text: cladocerans
+- emphasis: cladocerans
+- text: Cladocerans (zooplankton)
+- code: wet/zooplankton
+- generic "sC"
+- spinbutton: "0.04"
+- generic: gC/m3
+- generic "C"
+- generic "sD"
+- spinbutton: "0.3"
+- generic: gDW/m3
+- generic "DW"
+- generic "sN"
+- spinbutton: "0.007"
+- generic: gN/m3
+- generic "N"
+- generic "sP"
+- spinbutton: "0.001"
+- generic: gP/m3
+- generic "P"
+- generic: ●
+- text: copepods
+- emphasis: copepods
+- text: Copepods (zooplankton)
+- code: wet/zooplankton
+- generic "sC"
+- spinbutton: "0.04"
+- generic: gC/m3
+- generic "C"
+- generic "sD"
+- spinbutton: "0.3"
+- generic: gDW/m3
+- generic "DW"
+- generic "sN"
+- spinbutton: "0.007"
+- generic: gN/m3
+- generic "N"
+- generic "sP"
+- spinbutton: "0.001"
+- generic: gP/m3
+- generic "P"
+- generic: Phytoplankton
+- generic: ●
+- text: cyanobacteria
+- emphasis: cyanobacteria
+- text: Cyanobacteria (contributors to harmful algal blooms)
+- code: wet/phytoplankton
+- generic "sCS"
+- spinbutton: "0.0012"
+- generic: gC/m2
+- generic "sediment C"
+- generic "sCS_PV"
+- spinbutton: "0.0012"
+- generic: gC/m2
+- generic "sediment C PV"
+- generic "sCW"
+- spinbutton: "0.04"
+- generic: gC/m3
+- generic "water column C"
+- generic "sDS"
+- spinbutton: "0.003"
+- generic: gDW/m2
+- generic "sediment DW"
+- generic "sDS_PV"
+- spinbutton: "0.003"
+- generic: gDW/m2
+- generic "sediment DW PV"
+- generic "sDW"
+- spinbutton: "0.3"
+- generic: gDW/m3
+- generic "water column DW"
+- generic "sNS"
+- spinbutton: "0.0003"
+- generic: gN/m2
+- generic "sediment N"
+- generic "sNS_PV"
+- spinbutton: "0.0003"
+- generic: gN/m2
+- generic "sediment N PV"
+- generic "sNW"
+- spinbutton: "0.03"
+- generic: gN/m3
+- generic "water column N"
+- generic "sPW"
+- spinbutton: "0.003"
+- generic: gP/m3
+- generic "water column P"
+- generic: ●
+- text: diatoms
+- emphasis: diatom phytoplankton
+- text: Diatoms
+- code: wet/phytoplankton
+- generic "sCS"
+- spinbutton: "0.00012"
+- generic: gC/m2
+- generic "sediment C"
+- generic "sCS_PV"
+- spinbutton: "0.00012"
+- generic: gC/m2
+- generic "sediment C PV"
+- generic "sCW"
+- spinbutton: "0.2"
+- generic: gC/m3
+- generic "water column C"
+- generic "sDS"
+- spinbutton: "0.003"
+- generic: gDW/m2
+- generic "sediment DW"
+- generic "sDS_PV"
+- spinbutton: "0.003"
+- generic: gDW/m2
+- generic "sediment DW PV"
+- generic "sDW"
+- spinbutton: "0.3"
+- generic: gDW/m3
+- generic "water column DW"
+- generic "sNS"
+- spinbutton: "0.0003"
+- generic: gN/m2
+- generic "sediment N"
+- generic "sNS_PV"
+- spinbutton: "0.0003"
+- generic: gN/m2
+- generic "sediment N PV"
+- generic "sNW"
+- spinbutton: "0.025"
+- generic: gN/m3
+- generic "water column N"
+- generic "sPW"
+- spinbutton: "0.0025"
+- generic: gP/m3
+- generic "water column P"
+- generic: ●
+- text: greens
+- emphasis: green phytoplankton
+- text: Green algae
+- code: wet/phytoplankton
+- generic "sCS"
+- spinbutton: "0.0012"
+- generic: gC/m2
+- generic "sediment C"
+- generic "sCS_PV"
+- spinbutton: "0.0012"
+- generic: gC/m2
+- generic "sediment C PV"
+- generic "sCW"
+- spinbutton: "0.12"
+- generic: gC/m3
+- generic "water column C"
+- generic "sDS"
+- spinbutton: "0.003"
+- generic: gDW/m2
+- generic "sediment DW"
+- generic "sDS_PV"
+- spinbutton: "0.003"
+- generic: gDW/m2
+- generic "sediment DW PV"
+- generic "sDW"
+- spinbutton: "0.2"
+- generic: gDW/m3
+- generic "water column DW"
+- generic "sNS"
+- spinbutton: "0.0003"
+- generic: gN/m2
+- generic "sediment N"
+- generic "sNS_PV"
+- spinbutton: "0.0003"
+- generic: gN/m2
+- generic "sediment N PV"
+- generic "sNW"
+- spinbutton: "0.015"
+- generic: gN/m3
+- generic "water column N"
+- generic "sPW"
+- spinbutton: "0.0015"
+- generic: gP/m3
+- generic "water column P"
+- generic: Greenhouse gases
+- generic: ●
+- text: inorganic_carbon
+- emphasis: inorganic carbon, pH and CO2 air-water exchange (GHG)
+- text: Inorganic carbon / pH / atmospheric CO2 exchange (greenhouse gas)
+- code: wet/inorganic_carbon
+- generic "sAlkW"
+- spinbutton: "2000"
+- generic: mEq/m3
+- generic "total alkalinity"
+- generic "sDICW"
+- spinbutton: "20"
+- generic: g/m3
+- generic "dissolved inorganic carbon"
+- generic: ●
+- text: methane
+- emphasis: methane production, oxidation and emission (GHG)
+- text: Methane production, oxidation and emission (greenhouse gas)
+- code: wet/methane
+- generic "sCH4W"
+- spinbutton: "0.01"
+- generic: g/m3
+- generic "methane C in water"
+- generic: Abiotic water processes
+- generic: ●
+- text: abiotic_water
+- emphasis: abiotic_process_in_water
+- text: "Abiotic water processes: dissolved oxygen, inorganic N/P/Si nutrients, particulate inorganic matter settling and adsorption"
+- code: wet/abiotic_water
+- generic "sDIMW"
+- spinbutton: "10"
+- generic: g/m3
+- generic "inorganic matter"
+- generic "sNH4W"
+- spinbutton: "0.03"
+- generic: g/m3
+- generic "ammonium"
+- generic "sNO3W"
+- spinbutton: "0.3"
+- generic: g/m3
+- generic "nitrate"
+- generic "sO2W"
+- spinbutton: "8.5"
+- generic: g/m3
+- generic "oxygen"
+- generic "sPAIMW"
+- spinbutton: "0"
+- generic: g/m3
+- generic "IM-adsorbed P"
+- generic "sPO4W"
+- spinbutton: "0.015"
+- generic: g/m3
+- generic "phosphate"
+- generic "sSiO2W"
+- spinbutton: "3.5"
+- generic: g/m3
+- generic "silica dioxide"
+- generic "sSiPaW"
+- spinbutton: "0.025"
+- generic: g/m3
+- generic "particulate Si"
+- generic: Abiotic sediment processes
+- generic: ●
+- text: abiotic_sediment
+- emphasis: abiotic_process_in_sediment
+- text: "Abiotic sediment processes: pore-water exchange, nitrification/denitrification, phosphorus adsorption and release"
+- code: wet/abiotic_sediment
+- generic "sDIMS"
+- spinbutton: "31700"
+- generic: g/m2
+- generic "inorganic matter"
+- generic "sNH4S"
+- spinbutton: "0.04"
+- generic: g/m2
+- generic "ammonium"
+- generic "sNO3S"
+- spinbutton: "0.025"
+- generic: g/m2
+- generic "nitrate"
+- generic "sPAIMS"
+- spinbutton: "2"
+- generic: g/m2
+- generic "absorbed phosphate"
+- generic "sPO4S"
+- spinbutton: "0.02"
+- generic: g/m2
+- generic "phosphate"
+- generic "sSiO2S"
+- spinbutton: "0.1"
+- generic: g/m2
+- generic "dissolved SiO2"
+- generic "sSiPaS"
+- spinbutton: "14"
+- generic: g/m2
+- generic "particulate Si"
+- generic: Fish
+- generic: ●
+- text: AdFish
+- emphasis: adult benthivorous fish
+- text: "Adult benthivorous fish: feed on benthic animals and disturb sediment, promoting internal nutrient release through bioturbation"
+- code: wet/fish
+- generic "sC"
+- spinbutton: "0.4"
+- generic: gC/m3
+- generic "C"
+- generic "sD"
+- spinbutton: "1"
+- generic: gDW/m3
+- generic "DW"
+- generic "sN"
+- spinbutton: "0.1"
+- generic: gN/m3
+- generic "N"
+- generic "sP"
+- spinbutton: "0.022"
+- generic: gP/m3
+- generic "P"
+- generic: ●
+- text: JuFish
+- emphasis: juvenile planktivorous fish
+- text: "Juvenile planktivorous fish: feed on cladocerans, copepods and other zooplankton; recruitment stage of the fish population"
+- code: wet/fish
+- generic "sC"
+- spinbutton: "0.1"
+- generic: gC/m3
+- generic "C"
+- generic "sD"
+- spinbutton: "0.25"
+- generic: gDW/m3
+- generic "DW"
+- generic "sN"
+- spinbutton: "0.025"
+- generic: gN/m3
+- generic "N"
+- generic "sP"
+- spinbutton: "0.0055"
+- generic: gP/m3
+- generic "P"
+- generic: ●
+- text: PiscFish
+- emphasis: piscivorous fish
+- text: "Piscivorous fish: feed on juvenile and adult fish; top predators in the food web"
+- code: wet/fish
+- generic "sC"
+- spinbutton: "0.049"
+- generic: gC/m3
+- generic "C"
+- generic "sD"
+- spinbutton: "0.07"
+- generic: gDW/m3
+- generic "DW"
+- generic "sN"
+- spinbutton: "0.007"
+- generic: gN/m3
+- generic "N"
+- generic "sP"
+- spinbutton: "0.00154"
+- generic: gP/m3
+- generic "P"
+- generic: 💾 Apply initial conditions
+- button "💾 Save to case"
+- button "🔄 Reload"
+- text: Saving writes to
+- code: getm.inp
+- text: （m2d/elev_const、temp/temp_const）、
+- code: fabm.yaml
+- text: (each module's initialization) and
+- code: fabm_init.nc
+- text: (submerged plants). To use the updated initial values, keepCold start。
+- status:
+  - generic: Project
+  - strong: Round4 UI Lake 1302
+  - generic: Grid
+  - strong: Waiting to load
+  - generic: Run
+  - strong: Idle
+  - generic: View
+  - strong: 100%
+  - generic: Coordinate reference system
+  - strong: —

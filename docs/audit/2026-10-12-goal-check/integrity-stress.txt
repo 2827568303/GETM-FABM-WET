@@ -1,0 +1,214 @@
+Attempt 1/500
+.                                                                        [100%]
+1 passed in 0.54s
+Attempt 2/500
+.                                                                        [100%]
+1 passed in 0.44s
+Attempt 3/500
+.                                                                        [100%]
+1 passed in 0.56s
+Attempt 4/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 5/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 6/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 7/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 8/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 9/500
+.                                                                        [100%]
+1 passed in 0.11s
+Attempt 10/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 11/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 12/500
+.                                                                        [100%]
+1 passed in 0.11s
+Attempt 13/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 14/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 15/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 16/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 17/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 18/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 19/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 20/500
+.                                                                        [100%]
+1 passed in 0.12s
+Attempt 21/500
+.                                                                        [100%]
+1 passed in 0.11s
+Attempt 22/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 23/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 24/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 25/500
+.                                                                        [100%]
+1 passed in 0.08s
+Attempt 26/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 27/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 28/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 29/500
+.                                                                        [100%]
+1 passed in 0.08s
+Attempt 30/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 31/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 32/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 33/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 34/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 35/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 36/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 37/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 38/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 39/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 40/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 41/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 42/500
+.                                                                        [100%]
+1 passed in 0.08s
+Attempt 43/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 44/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 45/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 46/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 47/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 48/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 49/500
+.                                                                        [100%]
+1 passed in 0.10s
+Attempt 50/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 51/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 52/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 53/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 54/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 55/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 56/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 57/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 58/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 59/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 60/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 61/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 62/500
+.                                                                        [100%]
+1 passed in 0.09s
+Attempt 63/500
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_legitimate_stop_between_output_intervals_is_valid ____________
+
+model = (WindowsPath('C:/Users/23801/AppData/Local/Temp/pytest-of-Lenovo/pytest-308/test_legitimate_stop_between_o0/source'), ...test-of-Lenovo/pytest-308/test_legitimate_stop_between_o0/trial'), <function model.<locals>.run at 0x000001DF8F9468C0>)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001DF8F909B40>
+
+    def test_legitimate_stop_between_output_intervals_is_valid(model, monkeypatch):
+        source, target, run = model
+        (source/'getm.inp').write_text("&time\n start = '2020-01-01 00:00:00'\n stop = '2020-01-01 00:20:50'\n timestep = 2.\n/\n")
+        (source/'output.yaml').write_text('output:\n time_unit: second\n time_step: 60\n sync_interval: 1\n')
+        result = calibration.run_model_in_temp(source, [], keep_temp=True)
+>       assert result['success'], result
+E       AssertionError: {'success': False, 'error': 'Calibration outputs failed current-run integrity checks', 'output_health': {'ready': Fals...p_dir': 'C:\\Users\\23801\\AppData\\Local\\Temp\\pytest-of-Lenovo\\pytest-308\\test_legitimate_stop_between_o0\\trial'}
+E       assert False
+
+model      = (WindowsPath('C:/Users/23801/AppData/Local/Temp/pytest-of-Lenovo/pytest-308/test_legitimate_stop_between_o0/source'), ...test-of-Lenovo/pytest-308/test_legitimate_stop_between_o0/trial'), <function model.<locals>.run at 0x000001DF8F9468C0>)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001DF8F909B40>
+result     = {'success': False, 'error': 'Calibration outputs failed current-run integrity checks', 'output_health': {'ready': Fals...p_dir': 'C:\\Users\\23801\\AppData\\Local\\Temp\\pytest-of-Lenovo\\pytest-308\\test_legitimate_stop_between_o0\\trial'}
+run        = <function model.<locals>.run at 0x000001DF8F9468C0>
+source     = WindowsPath('C:/Users/23801/AppData/Local/Temp/pytest-of-Lenovo/pytest-308/test_legitimate_stop_between_o0/source')
+target     = WindowsPath('C:/Users/23801/AppData/Local/Temp/pytest-of-Lenovo/pytest-308/test_legitimate_stop_between_o0/trial')
+
+tests\test_calibration_integrity.py:174: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_calibration_integrity.py::test_legitimate_stop_between_output_intervals_is_valid
+1 failed in 0.24s

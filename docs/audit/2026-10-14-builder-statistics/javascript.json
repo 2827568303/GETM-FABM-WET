@@ -1,0 +1,162 @@
+[
+  {
+    "test": "3DWET\\tests\\test_build_confirmation.js",
+    "returncode": 0,
+    "output": "Build confirmation: waits, cancellation leaves inputs intact, acceptance starts once PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_builder_dashboard_statistics.js",
+    "returncode": 0,
+    "output": "Builder dashboard: actual layers/modules/wet cells; stale estimates ignored PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_calibration_param_baseline.js",
+    "returncode": 0,
+    "output": "parameter baseline: saved case values are clean; save refreshes baseline; reset remains PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_calibration_real_scientific_language.js",
+    "returncode": 0,
+    "output": "real scientific language: charts follow selected language and switch existing imported labels PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_calibration_scientific_charts.js",
+    "returncode": 0,
+    "output": "scientific charts: replace old paired labels with one selected language PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_calibration_spatial_controls.js",
+    "returncode": 0,
+    "output": "spatial section controls: selected variable, time, fixed axis/index PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_calibration_ui.js",
+    "returncode": 0,
+    "output": "calibration UI: selected station payload and zero objective rendering PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_calibration_workflow.js",
+    "returncode": 0,
+    "output": "calibration workflow: actual variables, run completion, failure isolation, zero convergence, weights PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_canvas_size_controls.js",
+    "returncode": 0,
+    "output": "2D size controls: initial, numeric, native resize, fit and bounds PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_chart_language.js",
+    "returncode": 0,
+    "output": "chart language: existing dataset/title switches both ways, numeric arrays and dates preserved PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_chart_lifecycle.js",
+    "returncode": 0,
+    "output": "Chart.js lifecycle: null canvas cleanup, observers/listeners/toolbars, five redraws PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_confirm_dialog.js",
+    "returncode": 0,
+    "output": "In-app confirm/prompt: wait, cancel, accept, text, focus and concurrent protection PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_dashboard_scientific_language.js",
+    "returncode": 0,
+    "output": "dashboard scientific language: summary and six-field labels use the selected scientific name PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_i18n.js",
+    "returncode": 0,
+    "output": "i18n: locale persistence, reversible source translation, unknown fallback and safe language packs PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_initial_drafts.js",
+    "returncode": 0,
+    "output": "initial drafts: filter, hidden save, rerender and invalid empty input PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_initial_instance_inputs.js",
+    "returncode": 0,
+    "output": "initial conditions: independent instance inputs and saved values PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_initial_presets.js",
+    "returncode": 0,
+    "output": "Initial full presets: metadata excluded, aliases unique, refill targeted, user drafts preserved PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_initial_scientific_language.js",
+    "returncode": 0,
+    "output": "initial conditions show only selected English descriptions and retain source metadata PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_model_dates.js",
+    "returncode": 0,
+    "output": "model dates: ordinal conversions, validation, UTC and chart spacing PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_model_dates_ui.js",
+    "returncode": 0,
+    "output": "model dates UI: charts, heatmap hover, inputs and solver ISO compatibility PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_parameter_types.js",
+    "returncode": 0,
+    "output": "parameter types: boolean/string/number save, invalid rejection, empty-string reset PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_preprocess_case_load.js",
+    "returncode": 0,
+    "output": "preprocess case load: common state, saved preview and failure handling PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_result_panel_order.js",
+    "returncode": 0,
+    "output": "Profile, depth mean and time series: latest response wins; stale cases/errors ignored PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_result_request_order.js",
+    "returncode": 0,
+    "output": "Result requests: preserve selection, latest inventory/field wins, obsolete errors and cases ignored PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_run_notifications.js",
+    "returncode": 0,
+    "output": "run notifications: true ETA crossings, invalid estimates, deduplication and terminal states PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_scientific_language.js",
+    "returncode": 0,
+    "output": "scientific language: selected language only, imported metadata fallback, reversible switches PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_spatial_sections.js",
+    "returncode": 0,
+    "output": "Spatial section rendering passed\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_variable_guide.js",
+    "returncode": 0,
+    "output": "Variable guide: missing values, lower bounds, initial comparison PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_view_controls.js",
+    "returncode": 0,
+    "output": "view controls: bounds and cursor-anchored zoom PASS\n2D viewport: narrow, wide and tall fitting preserves aspect PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_viz_geometry.js",
+    "returncode": 0,
+    "output": "lake geometry: shoreline, holes, disconnected cells, masks, scale and sigma PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_viz_render.js",
+    "returncode": 0,
+    "output": "lake render: masks, true depth labels, volume arrays, empty data and preview PASS\n"
+  },
+  {
+    "test": "3DWET\\tests\\test_viz_scientific_language.js",
+    "returncode": 0,
+    "output": "Plotly scientific labels switch between English, Chinese and imported language PASS\n"
+  }
+]

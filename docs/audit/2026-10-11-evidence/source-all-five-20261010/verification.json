@@ -1,0 +1,59 @@
+{
+  "cases": [
+    "Lake Dianchi",
+    "Lake Luoma",
+    "NativeTest",
+    "Theoretical lake",
+    "_fish_probe"
+  ],
+  "results": [
+    {
+      "case": "Lake Dianchi",
+      "passed": false,
+      "error": "ValueError: LAKE_DIANCHI_WET.3d.nc: temp lacks valid values at 24120 wet cells",
+      "repetition": 1
+    },
+    {
+      "case": "Lake Luoma",
+      "passed": false,
+      "error": "ValueError: LUOMAHU_WET.3d.nc: temp lacks valid values at 23960 wet cells",
+      "repetition": 1
+    },
+    {
+      "case": "NativeTest",
+      "passed": false,
+      "error": "ValueError: THEORETICAL_LAKE.3d.nc: temp lacks valid values at 5600 wet cells",
+      "repetition": 1
+    },
+    {
+      "case": "Theoretical lake",
+      "passed": false,
+      "error": "ValueError: THEORETICAL_LAKE.3d.nc: temp lacks valid values at 5600 wet cells",
+      "repetition": 1
+    },
+    {
+      "case": "_fish_probe",
+      "passed": false,
+      "error": "ValueError: FISH_PROBE.3d.nc: temp lacks valid values at 24120 wet cells",
+      "repetition": 1
+    }
+  ],
+  "passed": false,
+  "duration_seconds": 1200,
+  "repetitions": 1,
+  "scope": "Short native integration and numerical-finiteness checks; not scientific accuracy or annual stability validation.",
+  "health": {
+    "application": "3dwet-studio",
+    "instance_id": "79cdf68db988418d83f1418533a8754e",
+    "model_root": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\source-all-five-20261010\\3DWET",
+    "pid": 13136,
+    "ready": true
+  },
+  "listed_cases": [
+    "Lake Dianchi",
+    "Lake Luoma",
+    "NativeTest",
+    "Theoretical lake",
+    "_fish_probe"
+  ]
+}

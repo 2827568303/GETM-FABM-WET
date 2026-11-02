@@ -1,0 +1,199 @@
+- img "3DWET"
+- heading "3DWET Studio" [level=1]
+- paragraph: Lake ecology · 3D modelling workbench
+- generic: Overview
+- generic: 📊
+- text: Dashboard
+- generic: 📁
+- text: Case management
+- generic: Preprocessing
+- generic: 🛠️
+- text: Preprocessing
+- generic: ▦
+- text: Interactive grid editor
+- generic: 📥
+- text: Input data
+- generic: 🧩
+- text: Module configuration
+- generic: ⚙️
+- text: Parameter editor
+- generic: 🧪
+- text: Initial conditions
+- generic: ⏱️
+- text: Time settings
+- generic: Run
+- generic: ▶️
+- text: Run control
+- generic: Postprocessing
+- generic: 🌐
+- text: Map view
+- generic: 🗺️
+- text: 2D visualization
+- generic: 🧊
+- text: 3D visualization
+- generic: 🔥
+- text: Vertical heatmap
+- generic: 📈
+- text: Time series
+- generic: Calibration
+- generic: 🎯
+- text: Calibration analysis
+- generic: 🔄
+- text: Automatic calibration
+- generic: Workbench
+- generic: ◉
+- text: Environment and startup diagnostics
+- generic: 📋
+- text: Project import and physics settings
+- generic: "Case: Round4 UI Lake 1302"
+- menubar "Workbench menu":
+  - button "Project"
+  - button "Edit"
+  - button "View"
+  - button "Layers"
+  - button "Run"
+  - button "Settings"
+  - button "Help"
+  - button "Language"
+  - generic: 3DWET Studio · GIS workbench
+- toolbar "Common tools":
+  - button "▣ Case":
+    - generic: ▣
+    - generic: Case
+  - button "⚒ Preprocessing":
+    - generic: ⚒
+    - generic: Preprocessing
+  - button "▦ Grid":
+    - generic: ▦
+    - generic: Grid
+  - button "▶ Run":
+    - generic: ▶
+    - generic: Run
+  - button "⌖ Map":
+    - generic: ⌖
+    - generic: Map
+  - button "▤ 2D":
+    - generic: ▤
+    - generic: 2D
+  - button "◇ 3D":
+    - generic: ◇
+    - generic: 3D
+  - button "⚙ Diagnostics":
+    - generic: ⚙
+    - generic: Diagnostics
+- generic: Dashboard
+- generic: Round4 UI Lake 1302
+- button "100%"
+- generic: Idle
+- button "01 Project":
+  - generic: "01"
+  - text: Project
+- button "02 Data and grid":
+  - generic: "02"
+  - text: Data and grid
+- button "03 Model configuration":
+  - generic: "03"
+  - text: Model configuration
+- button "04 Compute":
+  - generic: "04"
+  - text: Compute
+- button "05 Results and calibration":
+  - generic: "05"
+  - text: Results and calibration
+- generic: Model dashboard
+- generic: Key state variables and model run status
+- generic: Wet cells
+- generic: "165"
+- generic: Vertical layers
+- generic: "6"
+- generic: Ecological modules
+- generic: "20"
+- generic: Output time step
+- generic "共 20 帧(2020-DOY001 → 2020-DOY001)": "20"
+- generic: 🌡️ Key state variables (surface mean, latest time step)
+- generic: "dom: water column DW"
+- generic: 6.124 gDW/m3
+- generic: "Extent: 6.124 ~ 6.124"
+- generic: "pom: water column DW"
+- generic: 7.282 gDW/m3
+- generic: "Extent: 7.272 ~ 7.308"
+- generic: "abiotic_process_in_water: ammonium"
+- generic: 0.030 g/m3
+- generic: "Extent: 0.030 ~ 0.030"
+- generic: "abiotic_process_in_water: nitrate"
+- generic: 0.300 g/m3
+- generic: "Extent: 0.300 ~ 0.300"
+- generic: "abiotic_process_in_water: oxygen"
+- generic: 8.506 g/m3
+- generic: "Extent: 8.503 ~ 8.511"
+- generic: "abiotic_process_in_water: phosphate"
+- generic: 0.015 g/m3
+- generic: "Extent: 0.015 ~ 0.015"
+- generic: "abiotic_process_in_water: silica dioxide"
+- generic: 3.500 g/m3
+- generic: "Extent: 3.500 ~ 3.500"
+- generic: "humus: water column DW"
+- generic: 0.504 gDW/m3
+- generic: "Extent: 0.503 ~ 0.507"
+- generic: 🗺️ Spatial distribution of state variables (mini heatmap)
+- generic: "pom: water column DW"
+- group "Figure view controls":
+  - button "Zoom in": +
+  - button "Zoom out": −
+  - button "Restore full figure extent": Reset
+  - button "Toggle fullscreen": ⛶
+- generic: 7.272 ~ 7.308 gDW/m3 (均值 7.282)
+- generic: "abiotic_process_in_water: nitrate"
+- group "Figure view controls":
+  - button "Zoom in": +
+  - button "Zoom out": −
+  - button "Restore full figure extent": Reset
+  - button "Toggle fullscreen": ⛶
+- generic: 0.300 ~ 0.300 g/m3 (均值 0.300)
+- generic: "abiotic_process_in_water: oxygen"
+- group "Figure view controls":
+  - button "Zoom in": +
+  - button "Zoom out": −
+  - button "Restore full figure extent": Reset
+  - button "Toggle fullscreen": ⛶
+- generic: 8.503 ~ 8.511 g/m3 (均值 8.506)
+- generic: "abiotic_process_in_water: phosphate"
+- group "Figure view controls":
+  - button "Zoom in": +
+  - button "Zoom out": −
+  - button "Restore full figure extent": Reset
+  - button "Toggle fullscreen": ⛶
+- generic: 0.015 ~ 0.015 g/m3 (均值 0.015)
+- generic: Water temperature
+- group "Figure view controls":
+  - button "Zoom in": +
+  - button "Zoom out": −
+  - button "Restore full figure extent": Reset
+  - button "Toggle fullscreen": ⛶
+- generic: 16.157 ~ 16.216 Celsius (均值 16.200)
+- generic: Total chlorophyll a concentration
+- group "Figure view controls":
+  - button "Zoom in": +
+  - button "Zoom out": −
+  - button "Restore full figure extent": Reset
+  - button "Toggle fullscreen": ⛶
+- generic: 12.000 ~ 12.050 ug/L (均值 12.036)
+- generic: 📋 Quick actions
+- button "🛠️ New model (preprocessing)"
+- button "📁 Select / load case"
+- button "⚙️ Edit model parameters"
+- button "⏱️ Set run time"
+- button "▶️ Run model"
+- button "🗺️ View 2D results"
+- button "📈 Extract time series"
+- status:
+  - generic: Project
+  - strong: Round4 UI Lake 1302
+  - generic: Grid
+  - strong: Waiting to load
+  - generic: Run
+  - strong: Idle
+  - generic: View
+  - strong: 100%
+  - generic: Coordinate reference system
+  - strong: —

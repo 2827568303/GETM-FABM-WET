@@ -1,0 +1,295 @@
+﻿{
+    "applied":  true,
+    "targets":  [
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\category-output-probe",
+                        "bytes":  691917
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\current-case-native-smoke",
+                        "bytes":  45792991
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\direct-package-luoma-20261009",
+                        "bytes":  300534338
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\external-alternative-inputs-20261010",
+                        "bytes":  144187346
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\external-random-20261010",
+                        "bytes":  198702866
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\external-random-all-engines-20261010",
+                        "bytes":  215469023
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\external-random-doy-all-engines-20261010",
+                        "bytes":  215469090
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\feature-matrix-20261010",
+                        "bytes":  102719603
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\feature-matrix-20261010-complete",
+                        "bytes":  103113946
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\feature-matrix-20261010-final",
+                        "bytes":  102990888
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\feature-matrix-20261010-final2",
+                        "bytes":  103110093
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\feature-matrix-20261010b",
+                        "bytes":  102984415
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-packaged-all6-20261011",
+                        "bytes":  4312107152
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-packaged-external-20261011",
+                        "bytes":  215505382
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-packaged-features-20261011",
+                        "bytes":  995102096
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-preview-20261011",
+                        "bytes":  144187741
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-installed-standalone-20261011",
+                        "bytes":  244382664
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-installed-standalone-20261011-retry",
+                        "bytes":  262308070
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-installer-upgrade-20261011",
+                        "bytes":  484441704
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\installed-coupled-verified",
+                        "bytes":  159718057
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\installer-fixture",
+                        "bytes":  6774142
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\installer-fixture-output",
+                        "bytes":  215976169
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\installer-preservation-test",
+                        "bytes":  50
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\native-pressure-regression-20261010",
+                        "bytes":  2094404092
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\native-pressure-regression-20261010-2",
+                        "bytes":  6010720291
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\native-pressure-regression-20261010-3",
+                        "bytes":  6010720291
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\native-smoke",
+                        "bytes":  250690076
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\packaged-coupled-final",
+                        "bytes":  151642215
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\packaged-coupled-test",
+                        "bytes":  151655397
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\packaged-coupled-verified",
+                        "bytes":  159718073
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\performance-benchmark",
+                        "bytes":  47178359
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\performance-benchmark-v2",
+                        "bytes":  48081244
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\pyinstaller",
+                        "bytes":  30714722
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\root-cause-probe-20261010",
+                        "bytes":  1647971652
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\source-all-five-20261010",
+                        "bytes":  8110709653
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\source-final-defaults-all5-20261010",
+                        "bytes":  4087328117
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\theoretical-relative-datum-20261010",
+                        "bytes":  263196368
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\usability-ui-root",
+                        "bytes":  145014193
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-all-builtin-cases-20261009",
+                        "bytes":  614783997
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-all-builtin-cases-20261009-2",
+                        "bytes":  1265412326
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-all-cases-20261009",
+                        "bytes":  193226170
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-all-cases-20261009-2",
+                        "bytes":  772872951
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-all-cases-20261009-3",
+                        "bytes":  772872951
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-luoma-20261009",
+                        "bytes":  300317674
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-luoma-20261009-3",
+                        "bytes":  300317714
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-luoma-20261009-4",
+                        "bytes":  300317714
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-luoma-20261009-5",
+                        "bytes":  300317682
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-luoma-no-lock-20261009",
+                        "bytes":  339687013
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-luoma-no3d-20261009",
+                        "bytes":  146240618
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-luoma-poll2-20261009",
+                        "bytes":  300317726
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-luoma-poll4-20261009",
+                        "bytes":  300317710
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-luoma-slowpoll-20261009",
+                        "bytes":  339687018
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-luoma-true-lock-20261009",
+                        "bytes":  339687023
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-nativetest-20261009",
+                        "bytes":  60341637
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-packaged-studiodemo-20261009",
+                        "bytes":  145031275
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-source-launcher-packaged-model-luoma-20261009",
+                        "bytes":  300317599
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\verify-source-luoma-20261009",
+                        "bytes":  339686789
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\release\\stage",
+                        "bytes":  478714112
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\release\\verification",
+                        "bytes":  29781
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\3DWETStudio.spec",
+                        "bytes":  2084
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\all-cases-build-20261009-2.log",
+                        "bytes":  15153
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\all-cases-build-20261009-3.log",
+                        "bytes":  15153
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\all-cases-build-20261009-4.log",
+                        "bytes":  15154
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\all-cases-build-20261009-5.log",
+                        "bytes":  15153
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\all-cases-build-20261009.log",
+                        "bytes":  15153
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\installer-preservation-test-install.log",
+                        "bytes":  7577
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\native-pressure-fix-build.log",
+                        "bytes":  2993
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\native-toolchain-prepare.log",
+                        "bytes":  1435
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\production-install.log",
+                        "bytes":  673581
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\qgis-ui-build-20261009.log",
+                        "bytes":  15154
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\ui-build-20261009.log",
+                        "bytes":  15154
+                    },
+                    {
+                        "path":  "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\usability-build.log",
+                        "bytes":  15174
+                    }
+                ],
+    "bytes":  45797320884,
+    "retained":  "Source, original case inputs/user data, installed application, installer, synthetic input archive, evidence, build toolchains and native rollback snapshot."
+}

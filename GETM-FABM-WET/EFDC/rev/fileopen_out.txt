@@ -1,0 +1,4 @@
+     0 diag51 ready
+     0 ready
+  2452 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8
+  9078 ExitProcess tid=53256

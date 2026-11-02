@@ -1,0 +1,26 @@
+{
+  "verified_utc": "2026-10-08",
+  "documentation": {
+    "webview2": "https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution",
+    "inno_setup": "https://jrsoftware.org/isdl.php",
+    "signature_verification": "https://jrsoftware.org/isdl-verify.php"
+  },
+  "files": [
+    {
+      "filename": "innosetup-6.7.3.exe",
+      "url": "https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe",
+      "sha256": "9C73C3BAE7ED48D44112A0F48E66742C00090BDB5BEF71D9D3C056C66E97B732",
+      "signer": "Pyrsys B.V.",
+      "role": "Build tool only; not installed on the end user's machine"
+    },
+    {
+      "filename": "MicrosoftEdgeWebView2RuntimeInstallerX64.exe",
+      "url": "https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/18c66e75-0385-4019-be3f-3f4a2bb867d5/MicrosoftEdgeWebView2RuntimeInstallerX64.exe",
+      "discovery_url": "https://go.microsoft.com/fwlink/?linkid=2124701",
+      "sha256": "AC22ECDC19C5B88B87F3FA752C00DA9541653A8F5C0C5FC4A3B2B6EBE6591F69",
+      "signer": "Microsoft Corporation",
+      "bytes": 212358352,
+      "role": "Offline x64 Evergreen WebView2 prerequisite"
+    }
+  ]
+}

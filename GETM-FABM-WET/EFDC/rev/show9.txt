@@ -1,0 +1,8 @@
+﻿[js]      0 diag51 ready
+pid 39456
+[ 0.22] WIN VBMsoStdCompMgr        ''                             vis=0
+[ 0.22] WIN ThunderRT6Main         'EFDC_Explorer8.4'             vis=1
+[ 0.22] WIN IME                    'Default IME'                  vis=0
+[ 2.94] WIN ThunderRT6FormDC       'Activation Wizard'            vis=0
+[ 9.66] EXITED code=0
+done

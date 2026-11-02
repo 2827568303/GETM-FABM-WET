@@ -1,0 +1,137 @@
+- img "3DWET"
+- heading "3DWET Studio" [level=1]
+- paragraph: 湖泊生态 · 三维建模工作台
+- generic: 总览
+- generic: 📊
+- text: 仪表盘
+- generic: 📁
+- text: 案例管理
+- generic: 前处理
+- generic: 🛠️
+- text: 前处理
+- generic: ▦
+- text: 交互网格编辑
+- generic: 📥
+- text: 输入数据
+- generic: 🧩
+- text: 模块配置
+- generic: ⚙️
+- text: 参数编辑
+- generic: 🧪
+- text: 初始条件
+- generic: ⏱️
+- text: 时间设置
+- generic: 运行
+- generic: ▶️
+- text: 运行控制
+- generic: 后处理
+- generic: 🌐
+- text: 地图视图
+- generic: 🗺️
+- text: 2D 可视化
+- generic: 🧊
+- text: 3D 可视化
+- generic: 🔥
+- text: 垂向热图
+- generic: 📈
+- text: 时间序列
+- generic: 率定
+- generic: 🎯
+- text: 率定分析
+- generic: 🔄
+- text: 自动率定
+- generic: 工作台
+- generic: ◉
+- text: 环境与启动诊断
+- generic: 📋
+- text: 项目导入与物理设置
+- generic: "案例: Round12 UI Lake 1402"
+- menubar "工作台菜单":
+  - button "项目"
+  - button "编辑"
+  - button "视图"
+  - button "图层"
+  - button "运行"
+  - button "设置"
+  - button "帮助"
+  - button "语言"
+  - generic: 3DWET Studio · GIS 工作台
+- toolbar "常用工具":
+  - button "▣ 案例":
+    - generic: ▣
+    - generic: 案例
+  - button "⚒ 前处理":
+    - generic: ⚒
+    - generic: 前处理
+  - button "▦ 网格":
+    - generic: ▦
+    - generic: 网格
+  - button "▶ 运行":
+    - generic: ▶
+    - generic: 运行
+  - button "⌖ 地图":
+    - generic: ⌖
+    - generic: 地图
+  - button "▤ 2D":
+    - generic: ▤
+    - generic: 2D
+  - button "◇ 3D":
+    - generic: ◇
+    - generic: 3D
+  - button "⚙ 诊断":
+    - generic: ⚙
+    - generic: 诊断
+- generic: 仪表盘
+- generic: Round12 UI Lake 1402
+- button "100%"
+- generic: 空闲
+- button "01 项目":
+  - generic: "01"
+  - text: 项目
+- button "02 数据与网格":
+  - generic: "02"
+  - text: 数据与网格
+- button "03 模型配置":
+  - generic: "03"
+  - text: 模型配置
+- button "04 计算":
+  - generic: "04"
+  - text: 计算
+- button "05 结果与率定":
+  - generic: "05"
+  - text: 结果与率定
+- generic: 模型仪表盘
+- generic: 关键状态变量总览与模型运行状态
+- generic: 水域格数
+- generic: "161"
+- generic: 垂向层数
+- generic: "6"
+- generic: 生态模块
+- generic: "20"
+- generic: 输出时步
+- generic: "-"
+- generic: 🌡️ 主要状态变量（最新时步表层均值）
+- generic: 📊
+- text: 加载案例并运行模型后显示
+- generic: 🗺️ 状态变量空间分布（mini-heatmap）
+- generic: 🗺️
+- text: 加载案例并运行模型后显示
+- generic: 📋 快速操作
+- button "🛠️ 新建模型（前处理）"
+- button "📁 选择/加载案例"
+- button "⚙️ 编辑模型参数"
+- button "⏱️ 设置运行时间"
+- button "▶️ 运行模型"
+- button "🗺️ 查看2D结果"
+- button "📈 提取时间序列"
+- status:
+  - generic: 项目
+  - strong: Round12 UI Lake 1402
+  - generic: 网格
+  - strong: 待加载
+  - generic: 运行
+  - strong: 空闲
+  - generic: 视图
+  - strong: 100%
+  - generic: 坐标系
+  - strong: —

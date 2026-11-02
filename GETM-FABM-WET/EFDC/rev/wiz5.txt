@@ -1,0 +1,7 @@
+﻿[js]      0 diag51 ready
+[js]      0 diag97 ready
+pid 51388
+[js]   3050 [wait1] show 0x1b5051a title="Activation Wizard" prev=24 vis=1
+win 0x1b5051a vis=1 title='Activation Wizard' rect=(0,3 643x489)
+saved (643, 489)
+after: 0x1b5051a vis=1

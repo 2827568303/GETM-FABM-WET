@@ -3487,6 +3487,19 @@ end subroutine deallocate_prefetch_vertical
       maximum = self%state_variables(ivar)%maximum
       _LOOP_BEGIN_EX_(self%env_int)
          value = self%env_int%prefetch _INDEX_SLICE_PLUS_1_(read_index)
+#ifdef _FABM_DIAGNOSTIC_FIRST_BOUNDS
+         if (value<minimum-1.e-2_rk*max(abs(minimum),1._rk).or.value>maximum) then
+            write (unit=err,fmt='(a,a,a,3(1x,es24.16))') 'First out-of-bounds FABM state ',trim(self%state_variables(ivar)%name), &
+               ' value/min/max:',value,minimum,maximum
+            call log_message(err)
+            stop 2
+         end if
+#endif
+         if (value/=value.or.abs(value)>huge(value)) then
+            write (unit=err,fmt='(a,a)') 'Non-finite value of FABM state variable ',trim(self%state_variables(ivar)%name)
+            call log_message(err)
+            stop 1
+         end if
          if (value<minimum.or.value>maximum) valid = .false.
       _LOOP_END_
    end do
@@ -3645,6 +3658,19 @@ subroutine internal_check_horizontal_state(self,environment _ARGUMENTS_HORIZONTA
 
       _HORIZONTAL_LOOP_BEGIN_
          value = environment%prefetch_hz _INDEX_HORIZONTAL_SLICE_PLUS_1_(read_index)
+#ifdef _FABM_DIAGNOSTIC_FIRST_BOUNDS
+         if (value<minimum-1.e-2_rk*max(abs(minimum),1._rk).or.value>maximum) then
+            write (unit=err,fmt='(a,a,a,3(1x,es24.16))') 'First out-of-bounds FABM horizontal state ',trim(state_variables(ivar)%name), &
+               ' value/min/max:',value,minimum,maximum
+            call log_message(err)
+            stop 2
+         end if
+#endif
+         if (value/=value.or.abs(value)>huge(value)) then
+            write (unit=err,fmt='(a,a)') 'Non-finite value of FABM horizontal state variable ',trim(state_variables(ivar)%name)
+            call log_message(err)
+            stop 1
+         end if
          if (value<minimum) then
             ! State variable value lies below prescribed minimum.
             valid = .false.

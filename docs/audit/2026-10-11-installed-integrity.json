@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "installed_file_checks": {
+    "3DWETStudio.exe": {
+      "matches": true,
+      "sha256": "7b11f852a362c3a3a94462be7b98a33f9fc9e7f8bf2079fe009caeaf8c9b7d51"
+    },
+    "3DWETStudio.ico": {
+      "matches": true,
+      "sha256": "8df960e28f78452ab38d0166dedcb1c383383d493e52338c66d67e67409f3950"
+    },
+    "_internal/fabm_glossary.json": {
+      "matches": true,
+      "sha256": "5afd7f6ba214f4092199572309dee4c61fdec2be1c7c8257cbf60365632d9a6e"
+    },
+    "_internal/static/brand/3dwet.svg": {
+      "matches": true,
+      "sha256": "889956ce866aedb0a637067f7d122087842dc1f799e1d09c531900176126d623"
+    },
+    "3DWET/bin/getm_cartesian.exe": {
+      "matches": true,
+      "sha256": "f06a7219490a9d160f72c18788db463fe9cf1ec4881b0b0c52141d8762e65e8a"
+    }
+  },
+  "icon_sizes": [
+    [
+      16,
+      16
+    ],
+    [
+      24,
+      24
+    ],
+    [
+      32,
+      32
+    ],
+    [
+      48,
+      48
+    ],
+    [
+      64,
+      64
+    ],
+    [
+      128,
+      128
+    ],
+    [
+      256,
+      256
+    ]
+  ],
+  "exe_contains_windows_icon": true
+}

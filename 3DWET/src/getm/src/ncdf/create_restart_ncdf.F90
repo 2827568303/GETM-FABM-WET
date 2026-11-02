@@ -29,7 +29,7 @@
    use bio_var, only: numc
 #endif
 #ifdef _FABM_
-   use getm_fabm, only: fabm_calc,model
+   use getm_fabm, only: fabm_calc,model,define_temporal_memory
 #endif
    IMPLICIT NONE
 !
@@ -247,6 +247,7 @@
 #endif
 #ifdef _FABM_
       if (fabm_calc) then
+         call define_temporal_memory(ncid,xdim_id,ydim_id)
          status = nf90_def_var(ncid, "fabm_pel", nf90_double, &
                                (/ xdim_id, ydim_id, zdim_id, fabmpeldim_id /), &
                                 fabm_pel_id)

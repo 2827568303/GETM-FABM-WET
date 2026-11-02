@@ -2,6 +2,13 @@
 let state = {
     activeCase: null,
     activeCasePath: null,
+    caseType: null,
+    storageReadOnly: false,
+    mpiSelectionByCase: new Map(),
+    mpiProcessCountByCase: new Map(),
+    mpiCapabilitiesRequest: 0,
+    serverCaseGeneration: null,
+    outputRevision: 0,
     cases: [],
     fabmModules: [],
     fabmCategories: {},
@@ -9,13 +16,118 @@ let state = {
     variables3d: [],
     charts: {},
     runPollTimer: null,
+    runPhysicsDiagnosticState: null,
     calibPollTimer: null,
     calibJobId: null,
     calibPointsLoaded: false,
     calLastData: null,
     currentParams: [],
+    proxyCase: null,
 };
 
+function localizedResult(item, name) {
+    const key=name || item?.name || item?.var_name;
+    const source=[...state.variables3d,...state.variables2d].find(v=>v.name===key) || item || {name:key};
+    return window.StudioI18n?.variable(source) || {...source,display_name:source.zh_name || source.long_name || key};
+}
+function resultLabel(item,name) { const v=localizedResult(item,name); return v.comparison_name || v.display_name || name; }
+const chartLanguageSources = new WeakMap();
+function translateChartLabels(config) {
+    if (!config || typeof config !== 'object') return;
+    for (const [key,value] of Object.entries(config)) {
+        if (['label','text'].includes(key) && typeof value === 'string') {
+            let sources=chartLanguageSources.get(config);
+            if (!sources) {sources=new Map();chartLanguageSources.set(config,sources);}
+            const previous=sources.get(key);
+            const source=previous && value===previous.output ? previous.source : value;
+            let localized=source;
+            const replacements = [];
+            const scientificLabels = {};
+            const knownTerms = [...(state.scientificTerms || new Map()).entries()].sort((a,b) => b[0].length-a[0].length);
+            knownTerms.forEach(([term,original]) => {
+                if (!localized.includes(term)) return;
+                const token = `@@SCIENTIFIC_${replacements.length}@@`;
+                localized = localized.replace(term,token);
+                replacements.push([token,window.StudioI18n?.scientificText(original.zh,original.en) || term]);
+            });
+            for(const variable of [...state.variables3d,...state.variables2d]) {
+                const label = resultLabel(variable,variable.name);
+                const pairs = variable.zh_name && variable.en_name ? [
+                    `${variable.zh_name} / ${variable.en_name}`, `${variable.en_name} / ${variable.zh_name}`
+                ] : [];
+                const names=[previous?.scientificLabels?.[variable.name],label,...pairs,variable.zh_name,variable.en_name,variable.long_name_en]
+                    .filter(name=>name && (name.length>2 || /[\u3400-\u9fff]/.test(name)))
+                    .sort((a,b)=>b.length-a.length);
+                const match=names.find(name=>localized.includes(name));
+                if (match) {
+                    scientificLabels[variable.name] = match;
+                    const token = `@@SCIENTIFIC_${replacements.length}@@`;
+                    localized=localized.replace(match,token);
+                    replacements.push([token,label]);
+                }
+            }
+            let output=window.StudioI18n?.t(localized) || localized;
+            replacements.forEach(([token,label]) => {output=output.replace(token,label);});
+            sources.set(key,{source,output,scientificLabels});config[key]=output;
+        } else if (value && typeof value==='object' && key!=='labels' && !(key==='data' && Array.isArray(value))) {
+            translateChartLabels(value);
+        }
+    }
+}
+function localizedChart(context,config) {
+    translateChartLabels(config);
+    return new Chart(context,config);
+}
+function localizedVariableLabel(v) {
+    const hasLev=hasVerticalResultDimension(v);
+    return `${resultLabel(v,v.name)} · ${v.name} [${v.units||''}]${hasLev?'':' ('+(window.StudioI18n?.t('无垂向层') || '无垂向层')+')'}`;
+}
+const verticalResultSelectIds = new Set(['viz3d-var','viz3d-avg-var']);
+function resultVariablePriority(variable) {
+    const name=String(variable?.name||'').toLowerCase();
+    const label=[variable?.zh_name,variable?.en_name,variable?.long_name,variable?.long_name_en,variable?.meaning,variable?.meaning_en]
+        .filter(Boolean).join(' ').toLowerCase();
+    const units=String(variable?.units||'').toLowerCase().replace(/\s+/g,'');
+    // Saturation and methodological diagnostics remain on-demand even when
+    // their names contain oxygen, PAR, or transparency terminology.
+    if (/(saturation|饱和)/.test(`${name} ${label}`)) return 2;
+    if (name==='ho2bod' || name.startsWith('ho2bod_')) return 2;
+    // Rank only variables present in the actual results inventory. Names below
+    // are output fields; model parameters and derived quantities are not added.
+    if (/^(elev|z|depth|water_depth|d|temp|temperature|u|v|w|uu|vv|ww)$/.test(name)) return 0;
+    if (/^(wet_)?(totn|totp|totnwater|totpwater|chla|total_chla|tot_chla|totsuspar)$/.test(name)
+        || /^wet_(totn|totp|chla)_calculator_result$/.test(name)) return 1;
+    if (/(^|[_-])s?(o2|nh4|no3|po4|tn|tp)w$/.test(name) || /abiotic_water_s(o2|nh4|no3|po4)w$/.test(name)) return 1;
+    if ((/(^|[_-])bod($|[_-])|biochemical oxygen demand|生化需氧量/.test(`${name} ${label}`)) && !name.startsWith('ho2bod')) return 1;
+    if (/(dissolved oxygen|溶解氧|(^|[_-])ph($|[_-])|酸碱度|(^|[_-])cod($|[_-])|化学需氧量)/.test(`${name} ${label}`)) return 1;
+    if (/(^|[_-])(nh4|no3|po4|tn|tp)([_-]|$)|氨氮|硝酸盐|磷酸盐|总氮|总磷/.test(`${name} ${label}`)) return 1;
+    if (/total suspended|总悬浮|totsuspar/.test(`${name} ${label}`)) return 1;
+    const biomass=/_sd(?:_pv)?$/.test(name) || /biomass|生物量|干重/.test(label);
+    if (/(fish|jufish|adfish|piscfish|鱼类)/.test(`${name} ${label}`) && biomass) return 1;
+    if (/(zoobenthos|bivalve|底栖动物)/.test(`${name} ${label}`) && biomass) return 1;
+    if (/(zooplankton|cladoceran|copepod|浮游动物)/.test(`${name} ${label}`) && biomass) return 1;
+    if (/(waterplant|macrophyte|水生植物)/.test(`${name} ${label}`) && biomass) return 1;
+    // Transparency is a direct result only when its metadata identifies the
+    // quantity and its published unit is metres; never infer it from turbidity.
+    if (/(transparen|secchi|透明度)/.test(`${name} ${label}`) && units==='m') return 1;
+    return 2;
+}
+function prioritizeResultVariables(variables) {
+    return variables.map((variable,index)=>({variable,index,priority:resultVariablePriority(variable)}))
+        .sort((a,b)=>a.priority-b.priority||a.index-b.index).map(item=>item.variable);
+}
+function hasVerticalResultDimension(variable) {
+    return variable?.ndim===4 || (Array.isArray(variable?.dims) && variable.dims.includes('sigma'));
+}
+function resultVariableOptionLabel(variable, requiresVertical=false) {
+    const label=localizedVariableLabel(variable);
+    if(!requiresVertical || hasVerticalResultDimension(variable))return label;
+    const reason=window.StudioI18n?.scientificText?.(
+        '3D 垂向查看需要真实垂向层；请切换到 2D。',
+        '3D vertical views require real vertical layers; switch to 2D.'
+    ) || '3D 垂向查看需要真实垂向层；请切换到 2D。';
+    return `${label} · ${reason}`;
+}
 // ── Utilities ─────────────────────────────────────────────────────────
 function $(id) { return document.getElementById(id); }
 function fmt(v, d=2) { return v === null || v === undefined || isNaN(v) ? '-' : Number(v).toFixed(d); }
@@ -26,10 +138,16 @@ function fmtSize(bytes) {
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return (bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1) + ' ' + units[i];
 }
+function syncQgisStatusBar(runLabel) {
+    const project = $('qgis-status-case');
+    const run = $('qgis-status-run');
+    if (project) project.textContent = state.activeCase || '未加载案例';
+    if (run && runLabel) run.textContent = runLabel;
+}
 function toast(msg, type='info') {
     const t = document.createElement('div');
     t.className = `toast ${type}`;
-    t.textContent = msg;
+    t.textContent = ModelDates.formatText(msg);
     $('toast-container').appendChild(t);
     setTimeout(() => t.remove(), 3000);
 }
@@ -38,22 +156,40 @@ function showModal(id) { $(id).classList.add('active'); }
 
 async function api(url, opts={}) {
     return new Promise((resolve) => {
+        if (opts.signal?.aborted) { resolve({aborted:true}); return; }
+        const timedResult = /\/api\/results\/2d(?:\?|$)|\/api\/results\/2d_batch(?:\?|$)|\/api\/geo\/grid(?:\?|$)/.test(url);
+        const perfNow=()=>window.performance?.now?.() ?? Date.now();
+        const startedAt = timedResult ? perfNow() : 0;
         const xhr = new XMLHttpRequest();
+        const cancel = () => xhr.abort();
+        const finish = value => {
+            opts.signal?.removeEventListener('abort', cancel);
+            resolve(value);
+        };
+        xhr.onabort = () => finish({aborted:true});
+        opts.signal?.addEventListener('abort', cancel, {once:true});
         const method = opts.method || 'GET';
         xhr.open(method, url, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onload = function() {
             try {
-                resolve(JSON.parse(xhr.responseText));
+                const receivedAt = timedResult ? perfNow() : 0;
+                const decodeStartedAt = timedResult ? perfNow() : 0;
+                const data = JSON.parse(xhr.responseText);
+                if (timedResult && data && typeof data === 'object' && !Array.isArray(data)) {
+                    data._clientTiming = { requestMs: receivedAt - startedAt,
+                        decodeMs: perfNow() - decodeStartedAt };
+                }
+                finish(data);
             } catch(e) {
-                resolve({error: 'Invalid JSON response: ' + xhr.responseText.substring(0, 200)});
+                finish({error: 'Invalid JSON response: ' + xhr.responseText.substring(0, 200)});
             }
         };
         xhr.onerror = function() {
-            resolve({error: 'Network error (XHR) - cannot connect to server'});
+            finish({error: 'Network error (XHR) - cannot connect to server'});
         };
         xhr.ontimeout = function() {
-            resolve({error: 'Request timeout'});
+            finish({error: 'Request timeout'});
         };
         xhr.timeout = opts.timeout || 30000;
         if (opts.body) {
@@ -66,10 +202,20 @@ async function api(url, opts={}) {
 
 // ── Navigation ────────────────────────────────────────────────────────
 function navigate(page) {
+    window.StudioNavigation?.activate(page);
+    window.ScientificWorkspace?.onNavigate(page);
+    const contentPage = page === 'ecology' ? 'gridstudio' : page;
     document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === page));
-    document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === `page-${page}`));
-    const titles = {dashboard:'仪表盘',cases:'案例管理',preprocess:'前处理',input:'输入数据',modules:'模块配置',parameters:'参数编辑',initial:'初始条件',time:'时间设置',run:'运行控制',map:'地图视图',viz2d:'2D可视化',viz3d:'3D可视化',vheat:'垂向热图',timeseries:'时间序列',calibrate:'率定分析',autocal:'自动率定'};
+    document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === `page-${contentPage}`));
+    const content=document.querySelector?.('.content-area');
+    if(content)content.scrollTop=0;
+    const titles = {dashboard:'仪表盘',cases:'案例管理',preprocess:'前处理',input:'输入数据',modules:'模块配置',ecology:'生态网络与食物网',parameters:'参数编辑',initial:'初始条件',time:'时间设置',run:'运行控制',map:'地图视图',viz2d:'2D可视化',viz3d:'3D可视化',vheat:'垂向热图',timeseries:'时间序列',calibrate:'率定分析',autocal:'自动率定'};
     $('page-title').textContent = titles[page] || page;
+    if (contentPage === 'gridstudio') {
+        if (page === 'gridstudio') $('page-title').textContent = '交互网格编辑';
+        window.initGridStudio();
+    }
+    if (page === 'system') { $('page-title').textContent = '环境与启动诊断'; window.loadStudioDiagnostics(); }
     // Page-specific init
     if (page === 'cases') loadCases();
     if (page === 'preprocess') { initPreprocess(); renderEngines(); }
@@ -77,6 +223,7 @@ function navigate(page) {
     if (page === 'modules') { loadEngines(); renderModuleCards(); }
     if (page === 'parameters') loadParamModules();
     if (page === 'initial') loadInitConditions();
+    if (page === 'run') window.loadResultFiles?.();
     if (page === 'time') { loadTimeSettings(); loadOutputConfig(); }
     if (page === 'map') loadMapGrid();
     if (page === 'viz2d') initViz2d();
@@ -85,8 +232,39 @@ function navigate(page) {
     if (page === 'timeseries') initTimeseries();
     if (page === 'calibrate') initCalibrate();
     if (page === 'autocal') initAutoCal();
+    if (page === 'ecology') requestAnimationFrame(() => {
+        const heading = document.getElementById('ecology-network-heading');
+        if (!heading) return;
+        heading.scrollIntoView({block: 'start'});
+        heading.focus({preventScroll: true});
+    });
 }
 
+// Keep the ecology editor reachable when a desktop/web server is serving an
+// older cached template that predates its model-configuration navigation item.
+function ensureEcologyNavigationItem() {
+    if (document.querySelector('.nav-item[data-page="ecology"]')) return;
+    const modelNav = document.querySelector('[data-group-items="model"]');
+    if (!modelNav) return;
+
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'nav-item getm-case-only';
+    item.dataset.page = 'ecology';
+
+    const icon = document.createElement('span');
+    icon.className = 'nav-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.replaceChildren(StudioIcons.node('foodweb'));
+    item.appendChild(icon);
+    item.appendChild(document.createTextNode('生态网络与食物网'));
+
+    const parameters = modelNav.querySelector('[data-page="parameters"]');
+    if (parameters) modelNav.insertBefore(item, parameters);
+    else modelNav.appendChild(item);
+}
+
+ensureEcologyNavigationItem();
 document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => navigate(item.dataset.page));
 });
@@ -109,7 +287,13 @@ async function loadCases() {
         const tr = document.createElement('tr');
         const isActive = activePath && c.path && c.path.toLowerCase() === activePath;
         if (isActive) tr.style.background = 'rgba(37,99,235,0.15)';
-        let nameCell = `<strong>${c.name}</strong>`;
+        let nameCell = `<strong>${escapeHtml(c.name)}</strong>`;
+        if (c.engineering_proxy) {
+            nameCell += proxyCaseBadgeMarkup(c, true);
+            if (!c.prepared) {
+                nameCell += `<div class="proxy-case-blockers">${(c.proxy_blockers || []).map(escapeHtml).join('<br>')}</div>`;
+            }
+        }
         if (isActive) {
             nameCell += ` <span style="font-size:10px;background:#2563eb;color:white;padding:1px 6px;border-radius:8px;">当前</span>`;
         }
@@ -121,16 +305,16 @@ async function loadCases() {
         tr.setAttribute('oncontextmenu', `openCaseCtxMenu(event, ${idx})`);
         tr.innerHTML = `
             <td>${nameCell}</td>
-            <td>${c.has_bathymetry ? '✅' : '❌'}</td>
-            <td>${c.has_fabm ? '✅' : '❌'}</td>
-            <td>${c.has_meteo ? '✅' : '❌'}</td>
-            <td>${c.has_rivers ? '✅' : '❌'}</td>
-            <td>${c.has_2d_output ? '✅' : '❌'}</td>
-            <td>${c.has_3d_output ? '✅' : '❌'}</td>
+            <td>${c.has_bathymetry ? '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-check"></use></svg>' : '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-error"></use></svg>'}</td>
+            <td>${c.has_fabm ? '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-check"></use></svg>' : '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-error"></use></svg>'}</td>
+            <td>${c.has_meteo ? '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-check"></use></svg>' : '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-error"></use></svg>'}</td>
+            <td>${c.has_rivers ? '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-check"></use></svg>' : '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-error"></use></svg>'}</td>
+            <td>${c.has_2d_output ? '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-check"></use></svg>' : '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-error"></use></svg>'}</td>
+            <td>${c.has_3d_output ? '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-check"></use></svg>' : '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-error"></use></svg>'}</td>
             <td style="white-space:nowrap;">
-                <button class="btn btn-primary btn-sm" onclick="caseAction('load', ${idx})">加载</button>
-                <button class="btn btn-sm" onclick="caseAction('saveas', ${idx})">另存为</button>
-                <button class="btn btn-danger btn-sm" onclick="caseAction('delete', ${idx})">删除</button>
+                <button class="btn btn-primary btn-sm" onclick="caseAction('load', ${idx})" ${c.engineering_proxy && !c.prepared ? 'disabled title="输入未齐，不可加载运行"' : ''}>加载</button>
+                <button class="btn btn-sm" onclick="caseAction('saveas', ${idx})" ${c.engineering_proxy && !c.prepared ? 'disabled title="准备记录只读"' : ''}>另存为</button>
+                <button class="btn btn-danger btn-sm" onclick="caseAction('delete', ${idx})" ${c.engineering_proxy ? 'disabled title="代理工程审计记录保留"' : ''}>删除</button>
             </td>`;
         tbody.appendChild(tr);
     });
@@ -139,9 +323,13 @@ async function loadCases() {
 function caseAction(action, idx) {
     const c = (state.cases || [])[idx];
     if (!c) return;
+    if (c.engineering_proxy && !c.prepared) {
+        toast((c.proxy_blockers || ['代理工程输入尚未准备完成']).join('；'), 'warning');
+        return;
+    }
     if (action === 'load') {
         if (c.external) loadExternalCase(c.path);
-        else loadCase(c.name);
+        else loadCase(c.name, c.path);
     } else if (action === 'saveas') {
         showSaveAsModal(c);
     } else if (action === 'delete') {
@@ -149,30 +337,114 @@ function caseAction(action, idx) {
     }
 }
 
+function proxyCaseBadgeMarkup(caseData, compact=false) {
+    if (!caseData || caseData.engineering_proxy !== true) return '';
+    const lake = escapeHtml(caseData.target_lake || '目标湖泊');
+    const status = caseData.partial_engineering_proxy ? '部分代理工程运行' : (caseData.prepared ? '代理工程运行' : '代理工程准备未完成');
+    return `<span class="proxy-case-badge${compact ? ' compact' : ''}" role="status">${status} · ${lake} · 非科学验证</span>`;
+}
+
+function proxyCaseDetailsMarkup(caseData) {
+    if (!caseData || caseData.engineering_proxy !== true) return '';
+    const manifest = caseData.proxy_manifest || caseData;
+    const sources = Array.isArray(manifest.sources) ? manifest.sources : [];
+    const roles = {measured:'实测来源',derived:'代理/派生',synthetic_proxy:'合成代理',upstream_reference:'上游参考',missing:'缺失/未完成'};
+    const sourceRows = sources.map(source => {
+        const path = escapeHtml(source.path || '（路径缺失）');
+        const purpose = escapeHtml(source.purpose || '用途未说明');
+        const role = escapeHtml(roles[source.role] || '来源未知');
+        const description = source.source_description ? ` · ${escapeHtml(source.source_description)}` : '';
+        const origin = source.origin_path ? ` · 原始路径：${escapeHtml(source.origin_path)}` : '';
+        const license = source.license_path ? ` · 许可记录：${escapeHtml(source.license_path)}` : '';
+        return `<li><b>${role}</b> · ${path} — ${purpose}${description}${origin}${license}</li>`;
+    }).join('');
+    const blockers = (caseData.proxy_blockers || manifest.blockers || []).map(escapeHtml).map(x=>`<li>${x}</li>`).join('');
+    const geometry = manifest.geometry || {};
+    const forcing = manifest.forcing || {};
+    const partial = manifest.partial_engineering_proxy === true
+        ? `<div>部分工程运行：关闭模块 ${escapeHtml((manifest.disabled_modules || []).join('、') || '未列明')}</div>` : '';
+    return `<div class="proxy-case-details"><strong>${manifest.partial_engineering_proxy === true ? '部分代理工程运行' : '代理工程运行'} / 非科学验证</strong>`+
+        `<div>科学验证状态：未完成</div>`+
+        `${partial}`+
+        `<div>空间几何：${escapeHtml(geometry.description || geometry.status || '缺少来源信息')}</div>`+
+        `<div>强迫来源：${escapeHtml(forcing.description || forcing.status || '缺少来源信息')}</div>`+
+        `${blockers ? `<details open><summary>未完成输入与阻塞项</summary><ul>${blockers}</ul></details>` : ''}`+
+        `${sourceRows ? `<details><summary>来源清单（${sources.length} 项）</summary><ul>${sourceRows}</ul></details>` : ''}</div>`;
+}
+
+function renderProxyCaseStatus(caseData) {
+    state.proxyCase = caseData?.engineering_proxy === true ? caseData : null;
+    const badge = $('case-badge');
+    if (badge) {
+        const base = caseData?.case_type === 'gotm_working_copy'
+            ? `${caseData.case_name} · GOTM 单水柱工作副本`
+            : caseData?.read_only ? `${caseData.case_name} · 只读 GOTM 单水柱` : (caseData?.case_name || '未加载案例');
+        const nativePeriod = Array.isArray(caseData?.native_time_range) && caseData.native_time_range.length === 2
+            ? ` · ${caseData.native_time_range[0]} — ${caseData.native_time_range[1]}` : '';
+        badge.innerHTML = `<span class="case-name">${escapeHtml(base + nativePeriod)}</span>${proxyCaseBadgeMarkup(caseData)}`;
+        badge.style.display = caseData?.case_name ? 'inline-flex' : 'none';
+    }
+    const details = proxyCaseDetailsMarkup(caseData);
+    ['proxy-dashboard-notice','proxy-run-notice','proxy-viz2d-notice','proxy-viz3d-notice']
+        .forEach(id => {
+            const element = $(id);
+            if (!element) return;
+            element.innerHTML = details;
+            element.hidden = !details;
+        });
+}
+
+function refreshCaseStatistics(data) {
+    const request = state.caseStatisticsRequest = (state.caseStatisticsRequest || 0) + 1;
+    const revision = state.caseRevision;
+    const casePath = state.activeCasePath;
+    const current = () => request === state.caseStatisticsRequest
+        && revision === state.caseRevision && casePath === state.activeCasePath;
+    const nlev = data.run_info?.nlev;
+    if (nlev) setNlev(nlev);
+    $('stat-nlev').textContent = nlev || '-';
+    $('stat-modules').textContent = data.fabm?.total_modules ?? '-';
+    $('stat-water').textContent = '...';
+    api('/api/run/estimate').then(est => {
+        if (!current()) return;
+        $('stat-water').textContent = !est.error && typeof est.nwater === 'number'
+            ? est.nwater.toLocaleString() : '-';
+    }).catch(() => {
+        if (current()) $('stat-water').textContent = '-';
+    });
+}
+
 function applyLoadedCase(data) {
+    state.caseRevision = (state.caseRevision || 0) + 1;
+    document.body.classList.toggle('readonly-gotm', !!data.read_only);
+    document.body.classList.toggle('gotm-single-column', String(data.case_type || '').startsWith('gotm_'));
+    window.ObservationManager?.setColumnVariableInventory(data.native_column_variables || null);
+    window.set3DSectionIndicator?.(null)?.catch(()=>{});
+    state.variables2d = [];
+    state.variables3d = [];
     state.activeCase = data.case_name;
     state.activeCasePath = data.case_path;
+    state.caseType = data.case_type || null;
+    state.storageReadOnly = !!data.storage_read_only;
+    document.body.classList.toggle('storage-read-only', !!data.storage_read_only);
+    state.serverCaseGeneration = Number.isInteger(data.case_generation) ? data.case_generation : null;
     state.fabmModules = data.fabm.modules || [];
     state.fabmCategories = data.fabm.categories || {};
-    if (data.run_info && data.run_info.nlev) setNlev(data.run_info.nlev);
-    $('case-badge').style.display = 'inline';
-    $('case-badge').textContent = data.case_name;
+    renderProxyCaseStatus(data);
+    const calibrationDesc = $('calibration-page-desc');
+    if (calibrationDesc) calibrationDesc.textContent = data.read_only
+        ? '当前打开的是只读 GOTM 原生输出。请使用下方官方观测文件入口进行代表水柱比较；GETM 点位、运行和观测写入功能已停用。'
+        : '设置率定点位，输入实测数据，对比模拟-实测结果';
     $('footer-status').textContent = `案例: ${data.case_name}`;
+    syncQgisStatusBar();
     // Update dashboard
-    $('stat-water').textContent = '...';
-    $('stat-nlev').textContent = data.run_info.nlev || '-';
-    $('stat-modules').textContent = data.fabm.total_modules || '-';
-    // 水域格数来自运行估算（读 bathymetry，轻量）
-    api('/api/run/estimate').then(est => {
-        if (!est.error && typeof est.nwater === 'number') $('stat-water').textContent = est.nwater.toLocaleString();
-        else $('stat-water').textContent = '-';
-    }).catch(() => { $('stat-water').textContent = '-'; });
+    refreshCaseStatistics(data);
     // Output.yaml sync_interval=0 sanity check banner
     const banner = $('output-warning-banner');
     if (banner) {
         if (data.output_warning) {
             banner.style.display = 'block';
-            banner.innerHTML = `<strong>⚠️ 输出配置警告：</strong> ${data.output_warning} <button class="btn btn-primary btn-sm" style="margin-left:8px;" onclick="fixSyncInterval()">一键修复 (设为 1)</button>`;
+            banner.innerHTML = `<strong><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-warning"></use></svg> 输出配置警告：</strong> ${data.output_warning} <button class="btn btn-primary btn-sm" style="margin-left:8px;" onclick="fixSyncInterval()">一键修复 (设为 1)</button>`;
         } else {
             banner.style.display = 'none';
         }
@@ -187,29 +459,46 @@ function applyLoadedCase(data) {
         const nb = $('output-warning-banner');
         if (nb) {
             nb.style.display = 'block';
-            nb.innerHTML = `<strong>⚠️ 无结果数据：</strong> ${msg}`;
+            nb.innerHTML = `<strong><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-warning"></use></svg> 无结果数据：</strong> ${msg}`;
         }
     }
     // Load variables if results exist（无结果时也会注入“水深(地形)”占位变量，
     // 保证 2D/3D/地图视图至少能看到湖泊网格与湖盆）
     loadVariables();
+    window.loadResultFiles?.();
     if (data.has_results) {
         loadDashboardSummary();
+    } else {
+        const dashboardVars=$('dashboard-vars');
+        const dashboardCanvas=$('dashboard-mini-heatmaps');
+        if(dashboardVars)dashboardVars.innerHTML='<div class="empty-state">'+(window.StudioI18n?.scientificText('当前案例尚无输出结果。运行模型后显示','No model output is available for this case. Run the model to populate results.')||'当前案例尚无输出结果。运行模型后显示')+'</div>';
+        if(dashboardCanvas)loadDashboardStaticPreview();
     }
     // 案例切换后地图数据属于旧案例，必须重置；若用户正停在地图页则立即重载
     resetMapView();
-    toast(`已加载案例: ${data.case_name}`, 'success');
+    const nativePeriod = Array.isArray(data.native_time_range) && data.native_time_range.length === 2
+        ? `原生输出时间 ${data.native_time_range[0]} — ${data.native_time_range[1]}。` : '';
+    toast(data.case_type === 'gotm_working_copy'
+        ? `已加载 GOTM 单水柱工作副本: ${data.case_name}。仅表示一维代表水柱结果，不是 GETM 空间网格。${nativePeriod}`
+        : data.read_only
+        ? `已打开只读 GOTM 原生结果: ${data.case_name}。${nativePeriod}可进行代表水柱观测比较；不能在此目录运行或修改配置。`
+        : `已加载案例: ${data.case_name}`, 'success');
+    if (data.storage_read_only) {
+        toast('该案例位于 C:，当前可浏览但不能修改或运行；请先另存到非 C: 磁盘。', 'warning');
+    }
     navigate('dashboard');
     // 刷新一次运行状态面板（服务重启后 run_status 回到 idle，页面应如实显示）
     pollRunStatus();
     // 刷新案例管理表（高亮当前案例）
     loadCases();
+    loadMpiRunCapabilities();
 }
 
-async function loadCase(name) {
-    const data = await api('/api/case/load', {method:'POST', body:{case_name:name}});
-    if (data.error) { toast(data.error, 'error'); return; }
+async function loadCase(name, path) {
+    const data = await api('/api/case/load', {method:'POST', body:{case_name:name, case_path:path}});
+    if (data.error) { toast(data.error, 'error'); return false; }
     applyLoadedCase(data);
+    return true;
 }
 
 async function loadExternalCase(path) {
@@ -257,9 +546,9 @@ async function loadDirBrowser(path) {
     const dirs = (r.entries || []).filter(e => e.is_dir);
     const files = (r.entries || []).filter(e => !e.is_dir);
     list.innerHTML =
-        `<div class="db-item db-dir" onclick="loadDirBrowser('${escapeAttr(r.parent || '')}')">⬆ 上一级${r.parent ? '（' + escapeHtml(r.parent) + '）' : ''}</div>` +
-        dirs.map(e => `<div class="db-item db-dir" title="${escapeAttr(e.path)}" onclick="loadDirBrowser('${escapeAttr(e.path)}')">📁 ${escapeHtml(e.name)}</div>`).join('') +
-        (files.length ? `<div class="db-sep">📄 文件（${files.length}）</div>` : '') +
+        `<div class="db-item db-dir" onclick="loadDirBrowser('${escapeAttr(r.parent || '')}')"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-up"></use></svg> 上一级${r.parent ? '（' + escapeHtml(r.parent) + '）' : ''}</div>` +
+        dirs.map(e => `<div class="db-item db-dir" title="${escapeAttr(e.path)}" onclick="loadDirBrowser('${escapeAttr(e.path)}')"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg> ${escapeHtml(e.name)}</div>`).join('') +
+        (files.length ? `<div class="db-sep"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-file"></use></svg> 文件（${files.length}）</div>` : '') +
         files.slice(0, 50).map(e => `<div class="db-item db-file" title="${escapeAttr(e.path)}" onclick="loadDirBrowser('${escapeAttr(e.path)}')">${escapeHtml(e.name)}</div>`).join('') +
         (!dirs.length && !files.length ? '<div class="db-item">（空目录）</div>' : '');
 }
@@ -300,7 +589,7 @@ async function pickCaseFolder(fixedPath) {
                 clearInterval(_pickTimer);
                 if (statusEl) statusEl.innerHTML =
                     '<span style="color:var(--warning)">没有检测到弹出的选择窗口（可能是浏览器环境限制）。' +
-                    '请改用右侧「📂 浏览目录」，在页面内逐级选择案例目录，功能完全一致。</span>';
+                    '请改用右侧「<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg> 浏览目录」，在页面内逐级选择案例目录，功能完全一致。</span>';
             }
             return;
         }
@@ -349,7 +638,7 @@ function ctxAction(action, useParent) {
         navigate('cases');
         return;
     }
-    if (action === 'load') { if (c.external) loadExternalCase(c.path); else loadCase(c.name); return; }
+    if (action === 'load') { if (c.external) loadExternalCase(c.path); else loadCase(c.name, c.path); return; }
     if (action === 'saveas') { showSaveAsModal(c); return; }
 }
 
@@ -358,7 +647,12 @@ function showSaveAsModal(c) {
     saveAsCase = c;
     $('save-as-source').textContent = `源案例: ${c.path}`;
     $('save-as-dest').value = '';
-    $('save-as-include-results').checked = false;
+    const gotmReference = c.case_type === 'gotm_read_only';
+    $('save-as-include-results').checked = gotmReference;
+    $('save-as-include-results').disabled = false;
+    $('save-as-include-label').textContent = gotmReference
+        ? 'GOTM 单水柱：包含原始 output.nc、gotm_release.exe 与配置/输入，创建可运行的独立副本（必需）'
+        : '包含模拟结果文件（*.3d.nc / output.nc 等，可能达数 GB、耗时数分钟）';
     showModal('modal-save-as');
 }
 
@@ -382,27 +676,34 @@ function _samePath(a, b) {
 }
 
 async function deleteCase(c) {
-    const input = prompt(`确定要删除案例吗？此操作不可恢复！\n\n${c.path}\n\n如确认，请输入案例名称 "${c.name}"：`);
+    const input = await promptStudio(`确定要删除案例吗？此操作不可恢复！\n\n${c.path}\n\n如确认，请输入案例名称 "${c.name}"：`);
     if (input === null) return;
     if (input.trim() !== c.name) { toast('案例名称不匹配，已取消删除', 'error'); return; }
     const res = await api('/api/case/delete', {method:'POST', body:{path: c.path}});
     if (res.error) { toast(res.error, 'error'); return; }
     toast(`案例已删除（清理 ${res.n_files} 个文件，释放 ${fmtSize(res.size_bytes)}）`, 'success');
     if (state.activeCasePath && _samePath(state.activeCasePath, c.path)) {
+        state.caseRevision=(state.caseRevision||0)+1;
         state.activeCase = null;
         state.activeCasePath = null;
+        state.caseType = null;
+        state.storageReadOnly = false;
+        state.serverCaseGeneration = null;
         $('case-badge').style.display = 'none';
         $('footer-status').textContent = '未加载案例';
+        syncQgisStatusBar();
+        clearResultInventory();
+        loadMpiRunCapabilities();
     }
     loadCases();
 }
 
 async function fixSyncInterval() {
     if (!state.activeCase) { toast('请先加载案例', 'error'); return; }
-    if (!confirm('将 output.yaml 的 sync_interval 从 0 改为 1（每个时间步同步输出）？')) return;
+    if (!await confirmStudio('将 output.yaml 的 sync_interval 从 0 改为 1（每个时间步同步输出）？')) return;
     const res = await api('/api/config/output', {
         method: 'POST',
-        body: JSON.stringify({ sync_interval: 1 })
+        body: { sync_interval: 1 }
     });
     if (res.success) {
         toast(`已修复 sync_interval = ${res.sync_interval}`, 'success');
@@ -446,33 +747,54 @@ function renderOutputSubscription(cfg) {
             <input type="checkbox" class="out-src" value="${v}" ${checked(v) ? 'checked' : ''}> ${v}
         </label>`).join('');
     if (mods.length) {
-        html += `<div style="width:100%;font-size:11px;color:var(--text-muted);margin-top:4px;">生态模块（模块名/*）:</div>`;
+        html += `<div style="width:100%;font-size:11px;color:var(--text-muted);margin-top:4px;">生态模块（自动转换为模型支持的变量）:</div>`;
         html += mods.map(m => `
             <label style="font-size:12px;white-space:nowrap;" title="${m.model || ''}">
-                <input type="checkbox" class="out-src" value="${m.name}/*" ${checked(m.name) ? 'checked' : ''}> ${m.name}
+                <input type="checkbox" class="out-src" value="${m.name}/*" ${m.selected || m.partially_selected || checked(m.name) ? 'checked' : ''}> ${m.name}${m.partially_selected ? '（部分）' : ''}
             </label>`).join('');
     } else {
         html += `<div style="font-size:11px;color:var(--text-muted);">（fabm.yaml 中未解析到 instances）</div>`;
     }
     box.innerHTML = html;
+    box.querySelectorAll('.out-src').forEach(el => {
+        const module = mods.find(m => el.value === m.name + '/*');
+        if (module?.partially_selected) { el.indeterminate = true; el.dataset.partial = 'true'; }
+        el.addEventListener('change', () => { el.dataset.partial = 'false'; _outputCfg.selectionChanged = true; });
+    });
 
     const e = cfg.estimate || {};
     if (est) {
         if (!e.available) {
-            est.innerHTML = `<span style="font-size:12px;color:var(--text-muted);">体积预估不可用（需要 getm.inp 时间范围 + 地形）</span>`;
+            est.innerHTML = `<span style="font-size:12px;color:var(--text-muted);">字段负载估算不可用；完整磁盘需求未知，且未计 GETM 独立 2D/3D 输出流。</span>`;
         } else {
             const gb = e.gb;
-            const color = gb >= 2 ? 'var(--danger)' : (gb >= 0.5 ? 'var(--warning)' : 'var(--success)');
+            const color = gb >= 2 ? 'var(--danger)' : 'var(--warning)';
+            const streams = e.getm_streams || {};
+            const streamLabel = (dimension, filename) => {
+                const stream = streams[dimension];
+                if (!stream) return `${filename} 状态未知`;
+                return stream.enabled
+                    ? `${filename} 已启用（每 ${stream.step} 个模型步写出）`
+                    : `${filename} 已关闭`;
+            };
             est.innerHTML = `<div style="font-size:12px;">
-                <strong style="color:${color};">预计输出 ≈ ${gb >= 1 ? gb.toFixed(2) + ' GB' : e.mb.toFixed(0) + ' MB'}</strong>
+                <strong style="color:${color};">output.yaml 字段负载估算 ≈ ${gb >= 1 ? gb.toFixed(2) + ' GB' : e.mb.toFixed(0) + ' MB'}；完整磁盘需求未知</strong>
                 <span style="color:var(--text-muted);"> — ${e.ntime} 时步 × ${e.ncells} 水格 × ${e.n_vars} 变量
-                ${e.measured_counts ? '（变量数按上次输出实测）' : '（变量数为估算）'}</span></div>`;
+                ${e.measured_counts ? '（变量数按上次输出实测）' : '（变量数为估算）'}</span>
+                <div style="color:var(--text-muted);margin-top:3px;">未计入 ${streamLabel('2d', '2d.nc')}；${streamLabel('3d', '3d.nc')}；也未计网格与文件格式开销。</div></div>`;
         }
     }
 }
 
 function _selectedOutputSources() {
-    return Array.from(document.querySelectorAll('.out-src:checked')).map(el => el.value);
+    if (!_outputCfg?.selectionChanged) return _outputCfg?.sources || [];
+    return Array.from(document.querySelectorAll('.out-src'))
+        .filter(el => el.checked || el.dataset.partial === 'true')
+        .flatMap(el => {
+            if (el.dataset.partial !== 'true') return [el.value];
+            const module = _outputCfg.modules.find(m => el.value === m.name + '/*');
+            return _outputCfg.sources.filter(s => module?.sources.includes(s));
+        });
 }
 
 async function applyOutputPreset(preset) {
@@ -501,28 +823,110 @@ async function saveOutputSubscription() {
 async function runPreflightCheck() {
     if (!state.activeCase) { toast('请先加载案例', 'error'); return; }
     const panel = $('run-check-panel');
+    const caseAtRequest = state.activeCasePath;
+    const generation = (panel._diagnosticGeneration || 0) + 1;
+    panel._diagnosticGeneration = generation;
     panel.style.display = 'block';
-    panel.innerHTML = '<div style="font-size:12px;color:var(--text-muted);">🩺 体检中...</div>';
+    StudioIcons.setStatus(panel, 'health', '体检中...');
     const res = await api('/api/run/check');
+    if (generation !== panel._diagnosticGeneration || state.activeCasePath !== caseAtRequest) return;
     if (res.error) {
-        panel.innerHTML = `<div style="color:var(--danger);font-size:12px;">体检失败: ${res.error}</div>`;
+        panel.textContent = `体检失败: ${res.error}`;
         return;
     }
-    const icon = { error: '❌', warn: '⚠️', ok: '✅' };
     const color = { error: 'var(--danger)', warn: 'var(--warning)', ok: 'var(--success)' };
-    const rows = (res.checks || []).map(c => `
-        <div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;">
-            <span>${icon[c.level] || ''}</span>
-            <div style="flex:1;">
-                <div style="font-weight:600;color:${color[c.level]};">${c.title}</div>
-                <div style="color:var(--text-secondary);">${c.detail || ''}</div>
-                ${c.fix ? `<div style="color:var(--info);margin-top:2px;">👉 ${c.fix}</div>` : ''}
-            </div>
-        </div>`).join('');
-    const head = res.ok
-        ? `<div style="font-size:13px;font-weight:600;color:var(--success);margin-bottom:6px;">✅ 可以运行（${res.n_warn} 条提醒）</div>`
-        : `<div style="font-size:13px;font-weight:600;color:var(--danger);margin-bottom:6px;">❌ ${res.blocking} 项必须先修复</div>`;
-    panel.innerHTML = `<div style="border:1px solid var(--border);border-radius:6px;padding:10px;background:var(--bg-tertiary);">${head}${rows}</div>`;
+    // Use text nodes for every server-supplied value, including filenames.
+    const box = document.createElement('div');
+    box.style.cssText = 'border:1px solid var(--border);border-radius:6px;padding:10px;background:var(--bg-tertiary);';
+    const text = (parent, value, style) => {
+        const element = document.createElement('div');
+        element.textContent = ModelDates.formatText(value);
+        if (style) element.style.cssText = style;
+        parent.appendChild(element);
+        return element;
+    };
+    const statusLine = (parent, name, label, className, style) => {
+        const element = document.createElement('div');
+        StudioIcons.setStatus(element, name, label, className);
+        if (style) element.style.cssText = style;
+        parent.appendChild(element);
+        return element;
+    };
+    statusLine(box, res.ok ? 'check' : 'error',
+        res.ok ? `可以运行（${res.n_warn || 0} 条提醒）` : `${res.blocking} 项必须先修复`,
+        `icon-status-${res.ok ? 'ok' : 'error'}`,
+        `font-size:13px;font-weight:600;margin-bottom:6px;color:${res.ok ? color.ok : color.error};`);
+    text(box, '体检只读取输入。修复仅执行按钮描述的修改，保存原文件备份后重新检查。CFL 通过后仍需短时试运行检查输出。',
+        'font-size:11px;color:var(--text-muted);margin-bottom:8px;');
+    const jump = async target => {
+        if (state.activeCasePath !== caseAtRequest) { toast('当前案例已变化，请重新体检', 'error'); return; }
+        if (target.page === 'projecttools') {
+            const nav = document.querySelector('.nav-item[data-page="projecttools"]');
+            if (!nav) { toast(`请打开物理设置并编辑 ${target.file}`, 'error'); return; }
+            if ($('physics-file')) $('physics-file').value = target.file;
+            nav.click(); // Also invokes the physics editor's asynchronous loader.
+        } else {
+            navigate(target.page);
+            // navigate() starts loading; await fresh controls before highlighting.
+            if (target.page === 'time') await Promise.all([loadTimeSettings(), loadOutputConfig()]);
+            if (target.page === 'input') await loadInputData();
+        }
+        const deadline = Date.now() + 31000;
+        let control;
+        while (Date.now() < deadline && state.activeCasePath === caseAtRequest) {
+            control = target.selector ? document.querySelector(target.selector) : $(target.control);
+            if (control && control.getClientRects().length) break;
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        if (state.activeCasePath !== caseAtRequest) return;
+        if (!control || !control.getClientRects().length) {
+            toast(`未找到对应控件，请检查 ${target.file}`, 'error');
+            return;
+        }
+        control.scrollIntoView({behavior: 'smooth', block: 'center'});
+        const previous = control.style.outline;
+        control.style.outline = '3px solid var(--warning)';
+        if (typeof control.focus === 'function') control.focus({preventScroll: true});
+        setTimeout(() => { control.style.outline = previous; }, 4000);
+    };
+    for (const c of res.checks || []) {
+        const row = document.createElement('div');
+        row.style.cssText = 'padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;';
+        statusLine(row, c.level === 'error' ? 'error' : c.level === 'ok' ? 'check' : 'warning', c.title || '',
+            c.level === 'error' ? 'icon-status-error' : c.level === 'ok' ? 'icon-status-ok' : 'icon-status-warning',
+            `font-weight:600;color:${color[c.level] || color.warn};`);
+        text(row, c.detail || '', 'color:var(--text-secondary);white-space:pre-wrap;overflow-wrap:anywhere;');
+        if (c.fix) text(row, `建议：${c.fix}`, 'color:var(--info);margin-top:2px;');
+        if (c.source_file) text(row, `${c.id} · ${c.source_file}`, 'color:var(--text-muted);margin-top:3px;');
+        if (c.level !== 'ok' && c.target) {
+            const locate = document.createElement('button');
+            locate.className = 'btn btn-sm';
+            locate.textContent = '定位设置';
+            locate.style.marginTop = '6px';
+            locate.addEventListener('click', () => jump(c.target).catch(error => toast(String(error), 'error')));
+            row.appendChild(locate);
+        }
+        if (c.repair && res.case_path && res.revision) {
+            const repair = document.createElement('button');
+            repair.className = 'btn btn-primary btn-sm';
+            repair.style.cssText = 'margin-left:8px;margin-top:6px;';
+            repair.textContent = c.repair.label;
+            repair.addEventListener('click', async () => {
+                if (state.activeCasePath !== caseAtRequest) { toast('当前案例已变化，请重新体检', 'error'); return; }
+                box.querySelectorAll('button').forEach(button => { button.disabled = true; });
+                const result = await api('/api/run/repair', {method: 'POST', body: {
+                    case_path: res.case_path, revision: res.revision, action: c.repair.id
+                }});
+                if (state.activeCasePath !== caseAtRequest) return;
+                if (result.error) toast(result.error, 'error');
+                else toast(`已修复 ${result.file}，原文件已备份`, 'success');
+                await runPreflightCheck();
+            });
+            row.appendChild(repair);
+        }
+        box.appendChild(row);
+    }
+    panel.replaceChildren(box);
     if (!res.ok) toast(`体检发现 ${res.blocking} 项致命问题，请先修复`, 'error');
 }
 
@@ -539,7 +943,7 @@ async function saveOutputConfig() {
     }
     const res = await api('/api/config/output', {
         method: 'POST',
-        body: JSON.stringify(payload)
+        body: payload
     });
     if (res.success) {
         toast(`输出配置已保存 (sync_interval=${res.sync_interval})`, 'success');
@@ -553,11 +957,11 @@ async function saveOutputConfig() {
 // ── Input Data ────────────────────────────────────────────────────────
 // 每个输入文件对应的"去填写"入口
 const _INPUT_FILE_ACTIONS = {
-    'bathymetry.nc':   {label: '🛠️ 前处理', act: () => navigate('preprocess')},
-    'meteo.nc':        {label: '🌦️ 填气象', act: () => _scrollToCard('meteo-csv-file')},
-    'meteo_input.txt': {label: '🌦️ 填气象', act: () => _scrollToCard('meteo-csv-file')},
-    'rivers.nc':       {label: '🏞️ 配河流', act: () => _scrollToCard('river-add-name')},
-    'riverinfo.dat':   {label: '🏞️ 配河流', act: () => _scrollToCard('river-add-name')},
+    'bathymetry.nc':   {label: '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-tools"></use></svg> 前处理', act: () => navigate('preprocess')},
+    'meteo.nc':        {label: '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-weather"></use></svg> 填气象', act: () => _scrollToCard('meteo-csv-file')},
+    'meteo_input.txt': {label: '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-weather"></use></svg> 填气象', act: () => _scrollToCard('meteo-csv-file')},
+    'rivers.nc':       {label: '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-river"></use></svg> 配河流', act: () => _scrollToCard('river-add-name')},
+    'riverinfo.dat':   {label: '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-river"></use></svg> 配河流', act: () => _scrollToCard('river-add-name')},
 };
 
 function _scrollToCard(elId) {
@@ -575,7 +979,7 @@ async function loadInputData() {
     const tbody = $('input-files-table').querySelector('tbody');
     if (!state.activeCase) {
         tbody.innerHTML = '<tr><td colspan="7">请先加载案例</td></tr>';
-        $('input-overview').innerHTML = '<div class="empty-state"><div class="icon">📂</div>请先加载案例</div>';
+        $('input-overview').innerHTML = '<div class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg></div>请先加载案例</div>';
         $('river-list-panel').innerHTML = '<div style="color:var(--text-muted);font-size:12px;">请先加载案例</div>';
         $('meteo-preview').innerHTML = '';
         return;
@@ -589,13 +993,13 @@ async function loadInputData() {
     data.files.forEach((f, idx) => {
         if (f.exists) { existCount++; totalSize += f.size_bytes || 0; } else { missingCount++; }
         const status = f.exists
-            ? '<span style="color:var(--success)">✅ 存在</span>'
-            : '<span style="color:var(--danger)">❌ 缺失</span>';
+            ? '<span style="color:var(--success)"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-check"></use></svg> 存在</span>'
+            : '<span style="color:var(--danger)"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-error"></use></svg> 缺失</span>';
         const size = f.exists ? fmtSize(f.size_bytes) : '-';
-        const mtime = f.exists ? f.mtime : '-';
+        const mtime = f.exists ? ModelDates.format(f.mtime) : '-';
         const nVars = f.exists ? (f.n_vars !== null && f.n_vars !== undefined ? f.n_vars : '-') : '-';
         const act = _INPUT_FILE_ACTIONS[f.name] ||
-            {label: '🏗️ 去构建', act: () => _scrollToCard('build-status')};
+            {label: '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-build"></use></svg> 去构建', act: () => _scrollToCard('build-status')};
         state._inputFileActions.push(act.act);
         const tr = document.createElement('tr');
         tr.innerHTML = `<td><code style="font-size:11px;">${f.name}</code></td><td>${status}</td><td>${size}</td><td style="font-size:11px;">${mtime}</td><td>${nVars}</td><td style="font-size:12px;color:var(--text-secondary);">${f.desc}</td><td><button class="btn btn-sm" onclick="_inputFileAction(${idx})">${act.label}</button></td>`;
@@ -616,14 +1020,14 @@ async function loadInputData() {
 }
 
 // ── 气象 CSV → meteo.nc ───────────────────────────────────────────────
-const _METEO_KEYS = ['u10', 'v10', 'slp', 't2', 'rh', 'tcc', 'precip', 'evap'];
+const _METEO_KEYS = ['u10', 'v10', 'slp', 't2', 'rh', 'tcc', 'precip', 'evap', 'swr'];
 
 function downloadMeteoTemplate() {
     const csv = [
         'date,u10,v10,slp,t2,rh,tcc,precip,evap',
-        '2020-01-01,2.5,-1.2,1016.8,8.4,0.72,0.45,0.0,1.2',
-        '2020-01-02,3.1,-0.8,1015.2,7.9,0.78,0.62,0.6,1.1',
-        '2020-01-03,1.8,0.4,1017.9,9.2,0.65,0.30,0.0,1.3',
+        '2020-DOY001,2.5,-1.2,1016.8,8.4,0.72,0.45,0.0,1.2',
+        '2020-DOY002,3.1,-0.8,1015.2,7.9,0.78,0.62,0.6,1.1',
+        '2020-DOY003,1.8,0.4,1017.9,9.2,0.65,0.30,0.0,1.3',
     ].join('\n');
     const blob = new Blob(['\ufeff' + csv + '\n'], {type: 'text/csv;charset=utf-8'});
     const a = document.createElement('a');
@@ -655,12 +1059,24 @@ async function uploadMeteoCsv() {
     if (!fi || !fi.files.length) { _ppStatus('meteo-upload-status', '请先选择 CSV 文件', false); return; }
     const fd = new FormData();
     fd.append('file', fi.files[0]);
+    fd.append('source_lat', $('meteo-source-lat')?.value || '');
+    fd.append('source_lon', $('meteo-source-lon')?.value || '');
+    fd.append('source_url', $('meteo-source-url')?.value || '');
+    fd.append('license', $('meteo-source-license')?.value || '');
+    fd.append('source_time_standard', $('meteo-source-time-standard')?.value || '');
     _ppStatus('meteo-upload-status', '上传解析中...', true);
     const res = await _uploadForm('/api/input/meteo/upload', fd);
     if (res.error) { _ppStatus('meteo-upload-status', '失败: ' + res.error, false); return; }
-    let html = `<span>✓ 已解析 <strong>${res.n_rows}</strong> 行（${res.date_range[0]} ~ ${res.date_range[1]}）</span>`;
-    if (res.n_bad_rows) html += `<div style="color:var(--warning);font-size:11px;">⚠ ${res.n_bad_rows} 行日期无法解析，已跳过</div>`;
-    if (res.unmapped_cols && res.unmapped_cols.length) html += `<div style="color:var(--warning);font-size:11px;">⚠ 未识别列（已忽略）: ${res.unmapped_cols.join(', ')}</div>`;
+    let html = `<span>${StudioIcons.svg('check')} 已解析 <strong>${res.n_rows}</strong> 行（${ModelDates.format(res.date_range[0])} ~ ${ModelDates.format(res.date_range[1])}）</span>`;
+    if (res.n_bad_rows) html += `<div style="color:var(--warning);font-size:11px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-warning"></use></svg> ${res.n_bad_rows} 行日期无法解析，已跳过</div>`;
+    if (res.unmapped_cols && res.unmapped_cols.length) html += `<div style="color:var(--warning);font-size:11px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-warning"></use></svg> 未识别列（已忽略）: ${res.unmapped_cols.join(', ')}</div>`;
+    if (res.conversions?.length) html += `<div style="font-size:11px;">导入转换：${res.conversions.map(escapeHtml).join('；')}</div>`;
+    if (res.shortwave_mode === 'measured_swr') html += `<div style="font-size:11px;">实测短波路径：保留 SW_IN/SW_Rad_Avg（W/m²）并在 GETM 中直接使用；云量单独用于长波。无云量列时使用固定 0.5 云量代理。</div>`;
+    const sourceCounts = res.forcing_source_counts || {};
+    for (const [field, counts] of Object.entries(sourceCounts)) {
+        const summary = Object.entries(counts).map(([sourceName, count]) => `${escapeHtml(sourceName)} ${Number(count)}`).join(' / ');
+        html += `<div style="font-size:11px;">${escapeHtml(field)}：${summary}</div>`;
+    }
     _ppStatus('meteo-upload-status', html, true);
     await loadMeteoDraftPreview();
     _prefillBuildDates(res.date_range[0], res.date_range[1]);
@@ -673,24 +1089,35 @@ async function loadMeteoDraftPreview() {
     const res = await api('/api/input/meteo/draft');
     if (res.error || !res.exists) {
         state.meteoDraft = null;
+        for (const [id, value] of [['meteo-source-lat',''],['meteo-source-lon',''],['meteo-source-url',''],['meteo-source-license',''],['meteo-source-time-standard','']]) {
+            const input = $(id); if (input) input.value = value;
+        }
         el.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">尚未上传气象 CSV。上传后此处显示可编辑的数据表格。</div>';
         return;
     }
     state.meteoDraft = res;
+    const source = res.source || {};
+    const sourceInputs = [['meteo-source-lat',source.latitude],['meteo-source-lon',source.longitude],
+        ['meteo-source-url',source.source_url],['meteo-source-license',source.license],
+        ['meteo-source-time-standard',source.time_standard]];
+    for (const [id, value] of sourceInputs) {
+        const input = $(id); if (input) input.value = value ?? '';
+    }
     _prefillBuildDates(res.dates[0], res.dates[res.dates.length - 1]);
     const n = res.dates.length;
     const show = Math.min(n, 200);
-    const head = ['date', ..._METEO_KEYS].map(k => `<th>${k}</th>`).join('');
+    const meteoKeys = res.shortwave_mode === 'measured_swr' ? _METEO_KEYS : _METEO_KEYS.filter(k => k !== 'swr');
+    const head = ['date（年内儒略日）', ...meteoKeys].map(k => `<th>${k}</th>`).join('');
     let rows = '';
     for (let k = 0; k < show; k++) {
-        rows += '<tr>' + `<td style="font-size:11px;white-space:nowrap;">${res.dates[k]}</td>` +
-            _METEO_KEYS.map(key =>
+        rows += '<tr>' + `<td style="font-size:11px;white-space:nowrap;">${ModelDates.format(res.dates[k])}</td>` +
+            meteoKeys.map(key =>
                 `<td><input type="number" step="any" style="width:74px;padding:1px 4px;font-size:11px;" value="${fmt(res[key][k], 3)}" onchange="_meteoCellEdit(${k}, '${key}', this.value)"></td>`
             ).join('') + '</tr>';
     }
     el.innerHTML = `
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">
-            草稿共 <strong>${n}</strong> 行${n > show ? `（预览前 ${show} 行；未显示行按原值写入）` : ''}，可直接修改数值后生成 meteo.nc。单位: 风 m/s、气压 hPa、气温 ℃、湿度/云量 0-1、降雨/蒸发 mm/day（后端自动换算）。
+            草稿共 <strong>${n}</strong> 行${n > show ? `（预览前 ${show} 行；未显示行按原值写入）` : ''}，可直接修改数值后生成 meteo.nc。降雨累计周期：${Number(res.precip_period_seconds) === 3600 ? '每小时' : `${Number(res.precip_period_seconds) / 3600} 小时`}；来源和缺测填充记录保存在 meteo_provenance.json。导入的任一列若有空值会拒绝，不会静默前向填充。
         </div>
         <div style="max-height:260px;overflow:auto;border:1px solid var(--border);border-radius:6px;">
             <table class="data-table" style="font-size:11px;margin:0;"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
@@ -705,7 +1132,7 @@ function _meteoCellEdit(rowIdx, key, value) {
     state.meteoEdited = true;
 }
 
-async function saveMeteoNc() {
+async function saveMeteoNc(confirmationToken=null) {
     if (!state.activeCase) { toast('请先加载案例', 'error'); return; }
     if (!state.meteoDraft) { _ppStatus('meteo-upload-status', '无气象草稿，请先上传 CSV', false); return; }
     _ppStatus('meteo-upload-status', '生成 meteo.nc 中...', true);
@@ -713,13 +1140,30 @@ async function saveMeteoNc() {
     if (state.meteoEdited) {
         body.rows = state.meteoDraft.dates.map((d, k) => {
             const r = {date: d};
-            _METEO_KEYS.forEach(key => r[key] = state.meteoDraft[key][k]);
+            const meteoKeys = state.meteoDraft.shortwave_mode === 'measured_swr' ? _METEO_KEYS : _METEO_KEYS.filter(key => key !== 'swr');
+            meteoKeys.forEach(key => r[key] = state.meteoDraft[key][k]);
             return r;
         });
     }
+    body.source_lat = $('meteo-source-lat')?.value || '';
+    body.source_lon = $('meteo-source-lon')?.value || '';
+    body.source_url = $('meteo-source-url')?.value || '';
+    body.license = $('meteo-source-license')?.value || '';
+    if (confirmationToken) body.confirmation_token = confirmationToken;
     const res = await api('/api/input/meteo/save', {method: 'POST', body});
     if (res.error) { _ppStatus('meteo-upload-status', '失败: ' + res.error, false); return; }
-    _ppStatus('meteo-upload-status', `✓ meteo.nc 已生成（${res.n_times} 个时步，广播到 ${res.grid} 网格，时间原点 ${res.start}）`, true);
+    if (res.requires_confirmation) {
+        const w = res.warning || {}, center = w.grid_center || {};
+        const station = w.position_known
+            ? `${w.source_position.latitude}, ${w.source_position.longitude}` : '位置未知';
+        const distance = Number.isFinite(w.distance_km) ? `${w.distance_km.toFixed(1)} km` : '不可计算';
+        const message = `${w.message || '空间位置未验证'}\n来源站点：${station}\n网格中心：${center.latitude ?? '未知'}, ${center.longitude ?? '未知'}\n距离：${distance}\n\n${w.explanation || '单站序列会广播到全格点。'}\n\n确认继续生成 meteo.nc？`;
+        _ppStatus('meteo-upload-status', `<strong><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-warning"></use></svg> ${escapeHtml(w.message || '空间位置未验证')}</strong><div>来源站点：${escapeHtml(station)} · 网格中心：${escapeHtml(`${center.latitude ?? '未知'}, ${center.longitude ?? '未知'}`)} · 距离：${escapeHtml(distance)}</div><div>${escapeHtml(w.explanation || '')}</div>`, false);
+        if (window.confirm(message)) return saveMeteoNc(res.confirmation_token);
+        _ppStatus('meteo-upload-status', '已取消生成；可修正来源位置后重试，或确认仍按单站均匀广播。', false);
+        return;
+    }
+    _ppStatus('meteo-upload-status', `${StudioIcons.svg('check')} meteo.nc 已生成（${res.n_times} 个时步，广播到 ${res.grid} 网格，时间原点 ${ModelDates.format(res.start)}）`, true);
     toast('meteo.nc 已生成', 'success');
     loadInputData();
 }
@@ -737,13 +1181,13 @@ async function loadRiverPanel() {
     }
     el.innerHTML = res.rivers.map((r, k) => `
         <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;">
-            <span style="color:var(--success);">▲</span>
+            <span style="color:var(--success);"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-river"></use></svg></span>
             <strong style="min-width:86px;">${r.name}</strong>
             <span style="color:var(--text-muted);font-size:12px;">i=${r.i}, j=${r.j}</span>
-            <span id="river-draft-${k}" style="font-size:11px;color:${r.has_draft ? 'var(--success)' : 'var(--danger)'};">${r.has_draft ? `✅ ${r.n_rows} 行` : '❌ 未上传数据'}</span>
+            <span id="river-draft-${k}" style="font-size:11px;color:${r.has_draft ? 'var(--success)' : 'var(--danger)'};">${r.has_draft ? `<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-check"></use></svg> ${r.n_rows} 行` : '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-error"></use></svg> 未上传数据'}</span>
             <input type="file" id="river-csv-${k}" accept=".csv,.txt" style="display:none;" onchange="_riverCsvChosen(${k})">
-            <button class="btn btn-sm" style="margin-left:auto;" onclick="showRiverSeries('${r.name}')">📈 曲线</button>
-            <button class="btn btn-sm" onclick="$('river-csv-${k}').click()">📤 上传CSV</button>
+            <button class="btn btn-sm" style="margin-left:auto;" onclick="showRiverSeries('${r.name}')"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-chart"></use></svg> 曲线</button>
+            <button class="btn btn-sm" onclick="$('river-csv-${k}').click()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-upload"></use></svg> 上传CSV</button>
             <button class="btn btn-sm" style="color:var(--danger);" onclick="deleteRiver('${r.name}')">删除</button>
         </div>`).join('') +
         `<div style="font-size:11px;color:var(--text-muted);margin-top:6px;">
@@ -762,12 +1206,12 @@ async function _riverCsvChosen(k) {
     if (st) { st.textContent = '上传中...'; st.style.color = 'var(--info)'; }
     const res = await _uploadForm('/api/input/rivers/upload', fd);
     if (res.error) {
-        if (st) { st.textContent = '❌ 上传失败'; st.style.color = 'var(--danger)'; st.title = res.error; }
+        if (st) { StudioIcons.setStatus(st, 'error', '上传失败', 'icon-status-error'); st.style.color = 'var(--danger)'; st.title = res.error; }
         toast(`${name}: ${res.error}`, 'error');
         return;
     }
     if (st) {
-        st.textContent = `✅ ${res.n_rows} 行`;
+        StudioIcons.setStatus(st, 'check', `${res.n_rows} 行`, 'icon-status-ok');
         st.style.color = 'var(--success)';
         st.title = `Q 范围 ${res.q_min.toFixed(2)}~${res.q_max.toFixed(2)} m³/s（均值 ${res.q_mean.toFixed(2)}），出流天数 ${res.n_outflow_days}`;
     }
@@ -789,7 +1233,7 @@ async function addRiverManually() {
 }
 
 async function deleteRiver(name) {
-    if (!confirm(`删除河流 ${name} 及其已上传的流量数据？`)) return;
+    if (!await confirmStudio(`删除河流 ${name} 及其已上传的流量数据？`)) return;
     const res = await api('/api/input/rivers/delete', {method: 'POST', body: {name}});
     if (res.error) { toast(res.error, 'error'); return; }
     toast(`已删除河流 ${name}`, 'info');
@@ -801,7 +1245,7 @@ async function saveRiversNc() {
     _ppStatus('rivers-save-status', '生成中...', true);
     const res = await api('/api/input/rivers/save', {method: 'POST'});
     if (res.error) { _ppStatus('rivers-save-status', '失败: ' + res.error, false); return; }
-    _ppStatus('rivers-save-status', `✓ 已生成 rivers.nc（${res.n_rivers} 条河 × ${res.n_times} 个时步）与 riverinfo.dat`, true);
+    _ppStatus('rivers-save-status', `${StudioIcons.svg('check')} 已生成 rivers.nc（${res.n_rivers} 条河 × ${res.n_times} 个时步）与 riverinfo.dat`, true);
     toast('rivers.nc + riverinfo.dat 已生成', 'success');
     loadInputData();
 }
@@ -814,12 +1258,12 @@ async function showRiverSeries(name) {
     $('river-series-title').textContent = name;
     $('river-series-status').textContent = '读取 rivers.nc ...';
     const res = await api(`/api/input/rivers/series?name=${encodeURIComponent(name)}`);
-    if (res.error) { $('river-series-status').textContent = '❌ ' + res.error; state.riverSeries = null; return; }
+    if (res.error) { StudioIcons.setStatus($('river-series-status'), 'error', '曲线读取失败', 'icon-status-error'); $('river-series-status').title = res.error; state.riverSeries = null; return; }
     state.riverSeries = res;
     const sel = $('river-series-var');
     sel.innerHTML = Object.entries(res.series).map(([k, v]) =>
         `<option value="${k}">${v.long_name || k}${v.units ? ` (${v.units})` : ''}</option>`).join('');
-    $('river-series-status').textContent = `✓ ${res.times.length} 个时步`;
+    StudioIcons.setStatus($('river-series-status'), 'check', `${res.times.length} 个时步`, 'icon-status-ok');
     drawRiverSeries();
     panel.scrollIntoView({behavior: 'smooth', block: 'nearest'});
 }
@@ -831,9 +1275,9 @@ function drawRiverSeries() {
     const s = res.series[key];
     if (!s) return;
     if (state.charts.river) state.charts.river.destroy();
-    state.charts.river = new Chart($('river-series-chart').getContext('2d'), {
+    state.charts.river = localizedChart($('river-series-chart').getContext('2d'), {
         type: 'line',
-        data: { labels: res.times, datasets: [{
+        data: { labels: ModelDates.chartLabels(res.times), datasets: [{
             label: `${s.long_name || key} (${s.units || ''})`,
             data: s.values, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)',
             fill: true, tension: 0.2, pointRadius: 0, borderWidth: 1.5,
@@ -848,31 +1292,55 @@ function drawRiverSeries() {
 
 // ── 一键构建完整案例 ──────────────────────────────────────────────────
 function _prefillBuildDates(start, stop) {
-    if ($('build-start') && !$('build-start').value) $('build-start').value = start + ' 00:00:00';
-    if ($('build-stop') && !$('build-stop').value) $('build-stop').value = stop + ' 00:00:00';
+    if ($('build-start') && !$('build-start').value) $('build-start').value = ModelDates.format(start, {time: true});
+    if ($('build-stop') && !$('build-stop').value) $('build-stop').value = ModelDates.format(stop, {time: true});
+}
+
+// Validate displayed ordinal dates, then send the solver its existing ISO contract.
+function _readModelPeriod(startId, stopId) {
+    const start = ModelDates.toIso($(startId).value.trim(), {time: true});
+    const stop = ModelDates.toIso($(stopId).value.trim(), {time: true});
+    if (ModelDates.parse(stop).date.getTime() <= ModelDates.parse(start).date.getTime()) {
+        throw new Error('结束时间必须晚于开始时间（年份 + 年内儒略日）');
+    }
+    $(startId).value = ModelDates.format(start);
+    $(stopId).value = ModelDates.format(stop);
+    return {start, stop};
 }
 
 async function buildCase() {
     if (!state.activeCase) { toast('请先加载案例', 'error'); return; }
+    const caseName = state.activeCase, casePath = state.activeCasePath, revision = state.caseRevision;
+    const current = () => caseName === state.activeCase && casePath === state.activeCasePath
+        && revision === state.caseRevision;
     // 模块组合来自「模块配置」页；营养状态来自「初始条件」页
     const engines = {};
     (state.engines || []).forEach(e => { engines[e.key] = !!e.enabled; });
+    let period;
+    try { period = _readModelPeriod('build-start', 'build-stop'); }
+    catch (error) { _ppStatus('build-status', error.message, false); return; }
+    const timestep=Number($('build-dt').value.trim() || 15);
+    if(!Number.isFinite(timestep) || timestep<=0){
+        _ppStatus('build-status',window.StudioI18n?.scientificText('时间步长必须为有限的正数',
+            'Time step must be a finite positive number.') || '时间步长必须为有限的正数',false);return;
+    }
     const body = {
         preset: (state.icData && state.icData.trophic) || 'eutrophic',
-        start: $('build-start').value.trim(),
-        stop: $('build-stop').value.trim(),
-        timestep: parseInt($('build-dt').value) || 15,
+        ...period,
+        timestep,
         nlev: parseInt($('build-nlev').value) || 10,
         engines,
     };
     if (!body.start || !body.stop) { _ppStatus('build-status', '请填写开始/结束时间（可先上传气象 CSV 自动填充）', false); return; }
-    if (!confirm(`构建案例 ${state.activeCase}？\n将生成 getm.inp / fabm.yaml 等 9 个配置文件（已有配置会被覆盖，数据文件保留）`)) return;
+    if (!await confirmStudio(`构建案例 ${caseName}？\n将生成 getm.inp / fabm.yaml 等 9 个配置文件（已有配置会被覆盖，数据文件保留）`)) return;
+    if (!current()) return;
     _ppStatus('build-status', '构建中（生成配置文件）...', true);
     const res = await api('/api/case/build', {method: 'POST', body});
+    if (!current()) return;
     if (res.error) { _ppStatus('build-status', '失败: ' + res.error, false); return; }
-    let html = `<span>✓ 构建成功：预设 <strong>${res.preset_label}</strong>，${res.params_applied} 个生态参数已写入 fabm.yaml</span>`;
-    (res.notes || []).forEach(n => { html += `<div style="color:var(--info);font-size:11px;">ℹ ${n}</div>`; });
-    (res.warnings || []).forEach(w => { html += `<div style="color:var(--warning);font-size:11px;">⚠ ${w}</div>`; });
+    let html = `<span>${StudioIcons.svg('check')} 构建成功：预设 <strong>${res.preset_label}</strong>，${res.params_applied} 个生态参数已写入 fabm.yaml</span>`;
+    (res.notes || []).forEach(n => { html += `<div style="color:var(--info);font-size:11px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-info"></use></svg> ${n}</div>`; });
+    (res.warnings || []).forEach(w => { html += `<div style="color:var(--warning);font-size:11px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-warning"></use></svg> ${w}</div>`; });
     html += `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">案例文件: ${res.files.join(', ')}</div>`;
     _ppStatus('build-status', html, true);
     toast('案例构建成功，可到「运行控制」页运行模型', 'success');
@@ -880,10 +1348,12 @@ async function buildCase() {
     loadCases();
     // Silently refresh fabm module state: the case was loaded before build,
     // so state.fabmModules is stale/empty and module/parameter pages show blank.
-    const data = await api('/api/case/load', {method: 'POST', body: {case_name: state.activeCase}});
+    const data = await api('/api/case/load', {method: 'POST', body: {case_name: caseName, case_path: state.activeCasePath}});
+    if (!current()) return;
     if (!data.error) {
         state.fabmModules = data.fabm.modules || [];
         state.fabmCategories = data.fabm.categories || {};
+        refreshCaseStatistics(data);
         renderModuleCards();
         loadParamModules();
     }
@@ -896,7 +1366,7 @@ function renderModuleCards() {
     const container = $('modules-container');
     if (!container) return;
     if (!state.fabmModules.length) {
-        container.innerHTML = '<div class="empty-state"><div class="icon">🧩</div>加载案例后显示模块列表（未加载案例时，上方「功能模块」可先行选择引擎组合）</div>';
+        container.innerHTML = '<div class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-modules"></use></svg></div>加载案例后显示模块列表（未加载案例时，上方「功能模块」可先行选择引擎组合）</div>';
         return;
     }
     const q = ($('module-search') ? $('module-search').value : '').trim().toLowerCase();
@@ -929,12 +1399,12 @@ function renderModuleCards() {
                 <div style="font-size:11px;color:var(--text-muted);">${m.name}</div>
                 <div class="module-params">${m.n_params} 参数 ${m.has_coupling ? '• 有耦合' : ''}</div>
                 ${refs}
-                <div style="margin-top:6px;"><span style="font-size:11px;color:${m.enabled ? 'var(--success)' : 'var(--text-muted)'}">${m.enabled ? '● 已启用' : '○ 已禁用'}</span></div>
+                <div style="margin-top:6px;"><span style="font-size:11px;color:${m.enabled ? 'var(--success)' : 'var(--text-muted)'}">${m.enabled ? `${StudioIcons.svg('check','icon-status-ok')} 已启用` : `${StudioIcons.svg('info')} 已禁用`}</span></div>
             </div>`;
         });
         html += '</div></div>';
     }
-    if (!any) html += '<div class="empty-state"><div class="icon">🔍</div>没有匹配的模块</div>';
+    if (!any) html += '<div class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-search"></use></svg></div>没有匹配的模块</div>';
     container.innerHTML = html;
 }
 
@@ -942,14 +1412,19 @@ async function toggleModule(name, currentlyEnabled) {
     if (!state.activeCase) { toast('请先加载案例', 'error'); return; }
     const nextEnabled = !currentlyEnabled;
     const verb = nextEnabled ? '启用' : '禁用';
-    if (!confirm(`确定${verb}模块 "${name}"？`)) return;
+    if (!await confirmStudio(`确定${verb}模块 "${name}"？`)) return;
     const res = await api('/api/config/fabm/module', {
         method: 'POST',
         body: { module: name, enabled: nextEnabled }
     });
+    if (res.blocked_by_couplings) {
+        const refs = Array.isArray(res.warnings) ? res.warnings.join('\n') : '';
+        toast([res.repair_message, refs].filter(Boolean).join('\n'), 'warning');
+        return;
+    }
     if (res.needs_confirmation) {
         const msg = `以下模块依赖 ${name}：\n${res.warnings.join('\n')}\n\n仍要${verb}吗？`;
-        if (!confirm(msg)) return;
+        if (!await confirmStudio(msg)) return;
         const res2 = await api('/api/config/fabm/module', {
             method: 'POST',
             body: { module: name, enabled: nextEnabled, force: true }
@@ -1012,7 +1487,7 @@ function renderEngines() {
         const e = (res.engines || []).find(x => x.key === 'ghg');
         let html = '';
         if (e && e.enabled && !e.exe_has_ghg) {
-            html = '<div style="font-size:11px;color:var(--warning);">⚠ 温室气体模块已启用，但当前模型程序不含该模块，正在/将自动编译，完成后自动部署。</div>';
+            html = '<div style="font-size:11px;color:var(--warning);"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-warning"></use></svg> 温室气体模块已启用，但当前模型程序不含该模块，正在/将自动编译，完成后自动部署。</div>';
         }
         warn.innerHTML = html;
     }
@@ -1020,15 +1495,16 @@ function renderEngines() {
 
 function engineCard(e) {
     const on = !!e.enabled;
+    const engineIcon = ({hydro:'water',eco:'foodweb',water_quality:'flask',fish:'modules',ghg:'cloud'})[e.key] || 'modules';
     const hint = [];
-    if (e.key === 'ghg' && on && e.building) hint.push('⚙ 正在后台编译温室气体模块…');
-    if (e.key === 'ghg' && on && !e.exe_has_ghg && !e.building) hint.push('⚙ 新程序待部署：模型结束或下次启动运行前自动生效');
+    if (e.key === 'ghg' && on && e.building) hint.push('<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-settings"></use></svg> 正在后台编译温室气体模块…');
+    if (e.key === 'ghg' && on && !e.exe_has_ghg && !e.building) hint.push('<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-settings"></use></svg> 新程序待部署：模型结束或下次启动运行前自动生效');
     return `<div class="module-card engine-card ${on ? 'enabled' : 'disabled'}" onclick="toggleEngine('${e.key}')" title="点击切换${on ? '关闭' : '启用'}">
-        <div class="engine-title">${e.icon || ''} ${e.long_name || e.label}</div>
+        <div class="engine-title">${StudioIcons.svg(engineIcon)} ${e.long_name || e.label}</div>
         <div class="engine-desc">${e.desc}</div>
         <div class="engine-foot">
             <span class="switch ${on ? 'on' : ''}"><span class="track"><span class="knob"></span></span>${on ? '启用' : '关闭'}</span>
-            ${e.fixed ? '<span style="color:var(--success);margin-left:10px;">● 必选内核</span>' : ''}
+            ${e.fixed ? `<span style="color:var(--success);margin-left:10px;">${StudioIcons.svg('check','icon-status-ok')} 必选内核</span>` : ''}
         </div>
         ${hint.map(h => `<div style="font-size:10px;color:var(--warning);margin-top:4px;">${h}</div>`).join('')}
     </div>`;
@@ -1040,8 +1516,10 @@ async function toggleEngine(key) {
     if (e.fixed) { toast('水动力是模型核心引擎，始终启用', 'info'); return; }
     const next = !e.enabled;
     const ASK = {
-        eco: ['启用水质生态引擎（FABM-WET 食物网）？\n随后可在「初始条件」页设置营养盐与藻类初值。',
-              '关闭水质生态引擎？\n关闭后仅运行水动力，生态变量不再计算。'],
+        eco: ['启用生态网络（FABM-WET 食物网）？\n水质化学模块可单独启用。',
+              '关闭生态网络？\n水质化学模块仍可独立运行。'],
+        water_quality: ['启用水质化学模块（FABM-WET）？\n生态网络可单独启用。',
+              '关闭水质化学模块？\n生态网络仍可独立运行。'],
         fish: ['启用鱼类模块（食物网顶层捕食者）？\n将新增 JuFish 幼鱼 / AdFish 成鱼 / PiscFish 食鱼性鱼三组状态变量，'
                + '闭合「藻—浮游动物—鱼」的下行控制链路。模块已编译在程序中，启用无需重新编译。',
                '关闭鱼类模块？\n将从配置中移除三个鱼类实例，食物网将缺少顶层捕食者（可一键重新启用）。'],
@@ -1049,7 +1527,7 @@ async function toggleEngine(key) {
               '关闭温室气体引擎？\n将从配置中移除温室气体模块（再次启用时自动生成）。'],
     };
     const ask = ASK[key] || ['', ''];
-    if (!confirm(next ? ask[0] : ask[1])) return;
+    if (!await confirmStudio(next ? ask[0] : ask[1])) return;
     const body = {};
     body[key] = next;
     const res = await api('/api/config/modules', {method: 'POST', body});
@@ -1063,7 +1541,7 @@ async function toggleEngine(key) {
 
 // ── 温室气体引擎（CO₂/CH₄）────────────────────────────────────────────
 async function toggleGhgEngine(next) {
-    if (!confirm(next
+    if (!await confirmStudio(next
         ? '启用温室气体引擎（CO₂/CH₄）？\n将新增 DIC/碱度/pH/甲烷状态变量并闭合碳循环；\n若当前程序未包含该模块，将自动编译（后台进行）'
         : '关闭温室气体引擎？\n将从配置中移除温室气体模块（再次启用时自动重新生成）')) return;
     const res = await api('/api/config/ghg', {method: 'POST', body: {enabled: next}});
@@ -1108,7 +1586,19 @@ async function pollGhgBuild() {
 }
 
 // ── Parameters ────────────────────────────────────────────────────────
-function loadParamModules() {
+async function loadParamModules() {
+    // The parameter page can be opened from restored/imported sessions where
+    // the active case is known but the in-memory FABM module cache is empty.
+    // Hydrate only that empty cache; case-load remains the normal source of truth.
+    const casePath = state.activeCasePath;
+    if ((!Array.isArray(state.fabmModules) || !state.fabmModules.length) && casePath) {
+        const data = await api('/api/config/fabm');
+        if (casePath !== state.activeCasePath) return;
+        if (!data.error && Array.isArray(data.modules)) {
+            state.fabmModules = data.modules;
+            state.fabmCategories = data.categories || {};
+        }
+    }
     const sel = $('param-module-select');
     sel.innerHTML = '';
     state.fabmModules.forEach(m => {
@@ -1138,24 +1628,23 @@ function renderParams(params) {
         row.className = 'param-row';
         const hasDefault = p.default_value !== null && p.default_value !== undefined;
         const isModified = hasDefault && String(p.value) !== String(p.default_value);
-        const dirtyClass = isModified ? ' param-dirty' : '';
+        const savedValue = p.saved_value ?? p.value;
+        const dirtyClass = String(p.value) !== String(savedValue) ? ' param-dirty' : '';
         const unitHtml = p.unit
             ? `<span class="param-unit" title="单位">${escapeHtml(p.unit)}</span>` : '';
         const commentHtml = p.comment
             ? `<div class="param-comment" title="${escapeAttr(p.comment)}">${escapeHtml(p.comment)}</div>`
             : '';
-        const descHtml = p.desc
-            ? `<div class="param-desc" title="说明：${escapeAttr(p.desc)}">${escapeHtml(p.desc)}</div>`
-            : '';
-        const descEnHtml = (p.desc_en && p.desc_en !== p.desc)
-            ? `<div class="param-desc-en">${escapeHtml(p.desc_en)}</div>`
-            : '';
+        const description = window.StudioI18n?.scientificText(p.desc, p.desc_en) || p.desc || p.desc_en || '';
+        const descHtml = description
+            ? `<div class="param-desc" data-i18n-skip="true">${escapeHtml(description)}</div>` : '';
+        const descEnHtml = '';
         const resetBtn = hasDefault && isModified
-            ? `<button class="btn btn-sm" style="margin-left:4px;font-size:10px;padding:2px 6px;" title="恢复为默认值 ${p.default_value}" onclick="resetParam('${moduleName}', '${p.name}', ${idx})">↺ 默认</button>`
+            ? `<button class="btn btn-sm" style="margin-left:4px;font-size:10px;padding:2px 6px;" title="恢复为默认值 ${p.default_value}" onclick="resetParam('${moduleName}', '${p.name}', ${idx})">${StudioIcons.svg('refresh')} 默认</button>`
             : '';
         row.innerHTML = `
             <span class="param-name">${p.name}${unitHtml}</span>
-            <input class="param-value${dirtyClass}" value="${p.value}" data-idx="${idx}" data-default="${hasDefault ? String(p.default_value).replace(/"/g, '&quot;') : ''}" onchange="saveParam(this, '${moduleName}', '${p.name}')">
+            <input class="param-value${dirtyClass}" value="${escapeAttr(p.value)}" data-idx="${idx}" data-type="${p.type || typeof p.value}" data-saved="${escapeAttr(savedValue)}" data-has-default="${hasDefault}" data-default="${hasDefault ? escapeAttr(p.default_value) : ''}" oninput="this.classList.toggle('param-dirty', this.value !== this.dataset.saved); scheduleParamSave(this, '${moduleName}', '${p.name}')" onchange="saveParam(this, '${moduleName}', '${p.name}')">
             <span class="param-saved" id="param-saved-${idx}"></span>
             ${resetBtn}
             <div class="param-detail">${descHtml}${descEnHtml}${commentHtml}</div>`;
@@ -1175,8 +1664,8 @@ async function resetParam(module, param, idx) {
     const input = document.querySelector(`input[data-idx="${idx}"]`);
     if (!input) return;
     const defaultVal = input.dataset.default;
-    if (!defaultVal && defaultVal !== '0') { toast('无默认值', 'warning'); return; }
-    if (!confirm(`恢复 ${param} 为默认值 ${defaultVal}？`)) return;
+    if (input.dataset.hasDefault === 'false' || defaultVal === undefined) { toast('无默认值', 'warning'); return; }
+    if (!await confirmStudio(`恢复 ${param} 为默认值 ${defaultVal}？`)) return;
     input.value = defaultVal;
     await saveParam(input, module, param);
 }
@@ -1187,14 +1676,43 @@ function filterParams() {
     renderParams(filtered);
 }
 
+const paramSaveTimers = new WeakMap();
+function scheduleParamSave(input, module, param) {
+    const pending = paramSaveTimers.get(input);
+    if (pending !== undefined) clearTimeout(pending);
+    const timer = setTimeout(() => {
+        paramSaveTimers.delete(input);
+        return saveParam(input, module, param);
+    }, 400);
+    paramSaveTimers.set(input, timer);
+}
+
 async function saveParam(input, module, param) {
+    const pending = paramSaveTimers.get(input);
+    if (pending !== undefined) {
+        clearTimeout(pending);
+        paramSaveTimers.delete(input);
+    }
     let val = input.value;
-    const num = Number(val);
-    if (!isNaN(num)) val = num;
+    const moduleState = state.fabmModules.find(m => m.name === module);
+    const paramState = moduleState?.parameters.find(p => p.name === param);
+    const type = input.dataset.type || paramState?.type || typeof paramState?.value;
+    if (type === 'boolean') {
+        if (!['true', 'false'].includes(val.trim().toLowerCase())) { toast('布尔参数请输入 true 或 false', 'error'); return; }
+        val = val.trim().toLowerCase() === 'true';
+    } else if (type === 'number') {
+        if (!val.trim() || !Number.isFinite(Number(val))) { toast('数值参数必须是有限数值，不能为空', 'error'); return; }
+        val = Number(val);
+    }
     const res = await api('/api/config/fabm/param', {method:'POST', body:{module, param, value:val}});
     const idx = input.dataset.idx;
     if (res.success) {
-        $(`param-saved-${idx}`).textContent = '✓ 已保存';
+        if (paramState) { paramState.value = val; paramState.saved_value = val; }
+        const current = state.currentParams.find(p => p.name === param);
+        if (current && moduleState?.parameters.includes(current)) { current.value = val; current.saved_value = val; }
+        input.dataset.saved = String(val);
+        input.classList.remove('param-dirty');
+        StudioIcons.setStatus($(`param-saved-${idx}`), 'check', '已保存', 'icon-status-ok');
         setTimeout(() => { const e = $(`param-saved-${idx}`); if(e) e.textContent=''; }, 1500);
         toast(`参数 ${param} 已更新`, 'success');
     } else {
@@ -1207,8 +1725,8 @@ async function loadTimeSettings() {
     if (!state.activeCase) return;
     const t = await api('/api/config/time');
     if (t.error) return;
-    $('time-start').value = t.start;
-    $('time-stop').value = t.stop;
+    $('time-start').value = ModelDates.format(t.start, {time: true});
+    $('time-stop').value = ModelDates.format(t.stop, {time: true});
     $('time-dt').value = t.timestep;
     $('time-step2d').value = t.step_2d;
     // Hotstart
@@ -1216,6 +1734,7 @@ async function loadTimeSettings() {
     if (!hs.error) {
         document.querySelector(`input[name="hotstart"][value="${hs.enabled?1:0}"]`).checked = true;
         $('hotstart-file').value = hs.file || '';
+        $('hotstart-save').checked = hs.save;
         toggleHotstart(hs.enabled);
     }
     // Estimate
@@ -1223,24 +1742,40 @@ async function loadTimeSettings() {
     if (!est.error) {
         $('run-estimate').innerHTML = `
             <div class="grid-4">
-                <div class="stat-card"><div class="stat-label">网格</div><div class="stat-value" style="font-size:16px;">${est.grid}</div></div>
+                <div class="stat-card"><div class="stat-label">网格 / 垂向层</div><div class="stat-value" style="font-size:16px;">${est.grid} / ${est.nlev}</div></div>
                 <div class="stat-card"><div class="stat-label">水域格</div><div class="stat-value">${est.nwater}</div></div>
                 <div class="stat-card"><div class="stat-label">模拟时长</div><div class="stat-value">${fmt(est.duration_days,1)}<span class="stat-unit">天</span></div></div>
                 <div class="stat-card"><div class="stat-label">总步数</div><div class="stat-value">${est.nsteps.toLocaleString()}</div></div>
             </div>
-            <div style="margin-top:12px;padding:12px;background:var(--bg-tertiary);border-radius:6px;">
-                <strong>预计运行时间:</strong> ${fmt(est.estimated_minutes,1)} 分钟 (${fmt(est.estimated_hours,2)} 小时)
-                <br><span style="font-size:11px;color:var(--text-muted);">* 基于串行版本估算，开启 OpenMP 多核后可显著缩短</span>
-            </div>
+            <section class="card" aria-labelledby="run-estimate-workload-title" style="margin-top:12px;padding:14px;">
+                <div class="card-title" id="run-estimate-workload-title">计算工作量</div>
+                <p style="margin:6px 0 0;color:var(--text-secondary);font-size:12px;line-height:1.7;">网格、垂向层、水域格、模拟时长与总步数用于描述计算规模；它们不是运行耗时或内存预测。</p>
+                <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+                    <strong style="font-size:13px;">耗时与内存：暂无同机、同案例实测值</strong>
+                    <div style="margin-top:4px;color:var(--text-muted);font-size:12px;line-height:1.7;">${est.runtime_estimate_note || '未在当前计算机与此案例配置下完成实测，暂不提供耗时或 RAM 数字。'} ${est.pilot_guidance || ''}</div>
+                </div>
+            </section>
+            <section class="card" aria-labelledby="run-estimate-protocol-title" style="margin-top:8px;padding:14px;">
+                <div class="card-title" id="run-estimate-protocol-title">学术验证流程</div>
+                <p style="margin:6px 0 0;color:var(--text-secondary);font-size:12px;line-height:1.7;"><strong>先由研究问题选择模型复杂度：</strong>单点或垂向温度目标可优先评估一维水柱模型；只有研究问题涉及水平输运或空间异质性时才需要三维水动力；只有生态变量是目标且有相应观测时才启用生态过程。三维可视化本身不意味着必须运行三维生态求解。</p>
+                <ol style="margin:8px 0 0;padding-left:20px;color:var(--text-secondary);font-size:12px;line-height:1.75;">
+                    <li><strong>软件链路短时检查：</strong>确认求解器可启动、运行稳定并产出可检查的结果；此检查只用于核对软件链路，不构成科学验证或模型充分性证据。</li>
+                    <li><strong>代表性时段试跑：</strong>按研究问题选取覆盖启动/预热及目标过程的时段，在案例副本上记录硬件、配置、墙钟时间和完成步数。先检查目标变量的观测支持与结果可解释性，再决定停止、增加代表性试跑或升级复杂度；只有同机同配置的记录可作为粗略工作量参考。</li>
+                    <li><strong>正式校准与独立期验证：</strong>仅在研究问题、可用观测与参数可辨识性支持时开展；预先说明目标函数和参数范围，并用独立时段检验。拟合结果不等同于独立验证。</li>
+                </ol>
+            </section>
             ${est.cfl_ok === false ? `<div style="margin-top:8px;padding:10px 12px;background:#fde8e8;border:1px solid #f5c2c7;border-radius:6px;color:#842029;font-size:13px;">
-                <strong>⚠ 时间步长 ${est.timestep}s 超过稳定上限 ${est.cfl_max}s</strong>（网格 CFL≈${Math.round(est.cfl_dt)}s 的 15 倍）。此步长会导致模型数值发散、输出全为 NaN，请改小（建议 60~${Math.round(est.cfl_dt*3)}s）。
-            </div>` : (est.cfl_max ? `<div style="margin-top:8px;font-size:11px;color:var(--text-muted);">当前步长 ${est.timestep}s ≤ 稳定上限 ${est.cfl_max}s ✓</div>` : '')}`;
+                <strong><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-warning"></use></svg> 时间步长 ${est.timestep}s 超过稳定上限 ${est.cfl_max}s</strong>（网格 CFL≈${Math.round(est.cfl_dt)}s 的 15 倍）。此步长会导致模型数值发散、输出全为 NaN，请改小（建议 60~${Math.round(est.cfl_dt*3)}s）。
+            </div>` : (est.cfl_max ? `<div style="margin-top:8px;font-size:11px;color:var(--text-muted);">当前步长 ${est.timestep}s ≤ 稳定上限 ${est.cfl_max}s ${StudioIcons.svg('check')}</div>` : '')}`;
     }
 }
 
 async function saveTimeSettings() {
+    let period;
+    try { period = _readModelPeriod('time-start', 'time-stop'); }
+    catch (error) { toast(error.message, 'error'); return; }
     const res = await api('/api/config/time', {method:'POST', body:{
-        start: $('time-start').value, stop: $('time-stop').value,
+        ...period,
         timestep: Number($('time-dt').value), step_2d: Number($('time-step2d').value),
     }});
     toast(res.success ? '时间设置已保存' : (res.error || '保存失败'), res.success?'success':'error');
@@ -1251,8 +1786,9 @@ function toggleHotstart(enabled) { $('hotstart-file-group').style.display = enab
 
 async function saveHotstart() {
     const enabled = document.querySelector('input[name="hotstart"]:checked').value === '1';
-    const res = await api('/api/config/hotstart', {method:'POST', body:{enabled, file:$('hotstart-file').value}});
-    toast(res.success ? '启动设置已保存' : '保存失败', res.success?'success':'error');
+    const res = await api('/api/config/hotstart', {method:'POST', body:{enabled, file:$('hotstart-file').value, save:$('hotstart-save').checked}});
+    toast(res.success ? '启动设置已保存' : (res.error || '保存失败'), res.success?'success':'error');
+    if (res.success) await loadTimeSettings();
 }
 
 // ── Initial Conditions ────────────────────────────────────────────────
@@ -1270,7 +1806,7 @@ function icIcDirty() {
 
 function markIcDirty() {
     const el = $('ic-save-status');
-    if (el) el.textContent = '● 有未保存的修改';
+    if (el) StudioIcons.setStatus(el, 'edit', '有未保存的修改', 'icon-status-warning');
 }
 
 function icFieldInput(el) {
@@ -1326,7 +1862,7 @@ async function loadInitConditions() {
     }
 
     // 3) water quality module list
-    renderIcWaterQuality();
+    renderIcWaterQuality(false);
 
     $('ic-save-status').textContent = '';
 }
@@ -1346,27 +1882,23 @@ function renderTrophicPicker(d) {
 function onTrophicChange(key) {
     state.icData.trophic = key;
     icIcDirty();
-    // refill the water quality inputs with the preset values
-    const presets = state.icData.preset_values || {};
-    if (presets[key]) {
-        const pv = presets[key];
-        const map = icPresetVarMap();
-        Object.keys(pv).forEach(f => {
-            const inputId = map[f];
-            if (inputId) { const el = $(inputId); if (el && el.dataset.icPreset === '0') el.value = pv[f]; }
-        });
-    }
+    applyPresetToFields();
     toast(`营养状态已设为「${(state.icData.trophic_presets || {})[key]}」，记得点「保存到案例」`, 'info');
 }
 
 // fabm variable name -> input element id
 function icPresetVarMap() {
     const map = {};
+    const bare = {};
     (state.icData.modules || []).forEach(m => {
         Object.keys(m.init || {}).forEach(p => {
-            if (map[p] === undefined) map[p] = `icv-${m.name}-${p}`;
+            const id = `icv-${m.name}-${p}`;
+            map[m.name+'_'+p] = id;
+            map[m.name+'.'+p] = id;
+            bare[p] = bare[p] === undefined ? id : null;
         });
     });
+    Object.keys(bare).forEach(p => { if (bare[p]) map[p] = bare[p]; });
     return map;
 }
 
@@ -1381,8 +1913,9 @@ function applyTrophicToFields() {
         const id = map[f];
         if (!id) return;
         const el = $(id);
-        if (el) { el.value = pv[f]; n++; }
+        if (el) { el.value = pv[f]; el.dataset.icPreset = '1'; delete el.dataset.icUser; n++; }
     });
+    captureIcDrafts();
     toast(`已回填 ${n} 个变量`, 'success');
     icIcDirty();
 }
@@ -1398,10 +1931,10 @@ function applyPresetToFields() {
     // apply onto every input that still holds its original factory value
     const map = icPresetVarMap();
     let n = 0;
-    document.querySelectorAll('[id^="icv-"]').forEach(el => {
-        const varName = (el.id || '').slice(4);
-        if (el.dataset.icPreset === '1' && pv[varName] !== undefined && !el.dataset.icUser) {
-            el.value = pv[varName]; n++;
+    Object.keys(pv).forEach(f => {
+        const el = map[f] && $(map[f]);
+        if (el && el.dataset.icPreset === '1' && !el.dataset.icUser) {
+            el.value = pv[f]; n++;
         }
     });
     // also fill inputs generated for variables the case does not declare yet
@@ -1411,22 +1944,22 @@ function applyPresetToFields() {
             if (!el2.dataset.icUser) { el2.value = pv[f]; n++; }
         }
     });
+    captureIcDrafts();
     toast(`已套用「${(state.icData.trophic_presets || {})[key]}」预设 ${n} 项`, 'success');
     icIcDirty();
 }
 
-function renderIcWaterQuality() {
+function renderIcWaterQuality(preserveDrafts = true) {
     const host = $('ic-wq-modules');
     if (!host) return;
     const d = state.icData || {};
+    if (preserveDrafts) captureIcDrafts();
     const mods = d.modules || [];
     const q = ($('ic-wq-search') ? $('ic-wq-search').value : '').trim().toLowerCase();
     const presets = d.preset_values || {};
     const pv = presets[d.trophic] || {};
-    const map = icPresetVarMap();
-
     if (!mods.length) {
-        host.innerHTML = `<div class="empty-state"><div class="icon">🧫</div>
+        host.innerHTML = `<div class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-flask"></use></svg></div>
             当前案例的 fabm.yaml 中没有带 initialization 的模块；可用「套用预设数值」生成初值。</div>`;
         renderIcExtraVars(pv);
         return;
@@ -1439,20 +1972,23 @@ function renderIcWaterQuality() {
         const cards = grouped[cat].map(m => {
             const docs = m.docs || {};
             const rows = Object.keys(m.init || {}).map(p => {
-                const id = map[p];
-                const val = m.init[p];
-                const isPreset = pv[p] !== undefined && Math.abs(Number(pv[p]) - Number(val)) < 1e-9;
+                const id = `icv-${m.name}-${p}`;
+                const draft = d.draftInputs?.[id];
+                const val = draft ? draft.value : m.init[p];
+                const presetValue = pv[m.name+'_'+p] ?? pv[m.name+'.'+p] ?? pv[p];
+                const isPreset = presetValue !== undefined && Math.abs(Number(presetValue) - Number(val)) < 1e-9;
                 const dd = docs[p] || {};
                 const unit = dd.unit || (m.units && m.units[p]) || 'g/m³';
                 const zh = dd.zh || '';
                 const en = dd.desc_en || dd.desc || '';
-                const descHtml = zh
-                    ? `<span class="ic-desc" title="${escapeAttr(zh + (en && en !== zh ? ' — ' + en : ''))}">${escapeHtml(zh)}</span>`
-                    : (en ? `<span class="ic-desc ic-desc-en" title="${escapeAttr(en)}">${escapeHtml(en)}</span>` : '');
+                const description = window.StudioI18n?.scientificText(zh,en) || [zh,en].filter(Boolean).join(' / ');
+                const descHtml = description
+                    ? `<span class="ic-desc" data-i18n-skip="true" data-scientific-zh="${escapeAttr(zh)}" data-scientific-en="${escapeAttr(en)}" title="${escapeAttr(description)}">${escapeHtml(description)}</span>`
+                    : '';
                 return `<div class="ic-row">
                     <label title="${escapeAttr(p)}">${escapeHtml(p)}</label>
-                    <input class="form-input" type="number" step="any" id="${id}" value="${val}"
-                           data-ic-preset="${isPreset ? 1 : 0}" onchange="onIcVarEdit(this)">
+                    <input class="form-input" type="number" step="any" id="${escapeAttr(id)}" value="${escapeAttr(val)}"
+                           data-ic-key="${escapeAttr(m.name+'.'+p)}" data-ic-preset="${isPreset ? 1 : 0}" ${draft?.user ? 'data-ic-user="1"' : ''} oninput="onIcVarEdit(this)">
                     <span class="ic-unit">${escapeHtml(unit)}</span>
                     ${descHtml}
                 </div>`;
@@ -1460,15 +1996,18 @@ function renderIcWaterQuality() {
             const searchHit = !q || m.name.toLowerCase().includes(q) ||
                 (m.long_name || '').toLowerCase().includes(q) ||
                 (m.desc || '').toLowerCase().includes(q) ||
+                (m.desc_en || '').toLowerCase().includes(q) ||
                 Object.keys(m.init || {}).some(p =>
                     p.toLowerCase().includes(q) ||
                     ((docs[p] || {}).desc || '').toLowerCase().includes(q));
             if (!searchHit) return '';
-            const modDesc = m.desc
-                ? `<div class="ic-mod-desc">${escapeHtml(m.desc)}${m.model ? ` <code>${escapeHtml(m.model)}</code>` : ''}</div>`
+            const moduleEn = m.desc_en || m.long_name || '';
+            const moduleText = window.StudioI18n?.scientificText(m.desc,moduleEn) || [m.desc,moduleEn].filter(Boolean).join(' / ');
+            const modDesc = moduleText
+                ? `<div class="ic-mod-desc"><span data-i18n-skip="true" data-scientific-zh="${escapeAttr(m.desc || '')}" data-scientific-en="${escapeAttr(moduleEn)}">${escapeHtml(moduleText)}</span>${m.model ? ` <code>${escapeAttr(m.model)}</code>` : ''}</div>`
                 : '';
             return `<div class="ic-mod">
-                <div class="ic-mod-title"><span style="color:${m.color};">●</span>
+                <div class="ic-mod-title">${StudioIcons.svg('modules')}
                     ${escapeHtml(m.name)}
                     <em>${escapeHtml(m.long_name)}</em>
                 </div>
@@ -1476,10 +2015,23 @@ function renderIcWaterQuality() {
                 <div class="ic-rows">${rows || '<div style="font-size:11px;color:var(--text-muted);">（无初始条件）</div>'}</div>
             </div>`;
         }).join('');
-        return `<div class="ic-group"><div class="ic-group-title">${escapeHtml(cat)}</div>${cards}</div>`;
-    }).join('') || '<div class="empty-state"><div class="icon">🔍</div>没有匹配的模块</div>';
+        const categoryEn = grouped[cat][0]?.category_en || '';
+        const categoryText = window.StudioI18n?.scientificText(cat,categoryEn) || [cat,categoryEn].filter(Boolean).join(' / ');
+        return `<div class="ic-group"><div class="ic-group-title" data-i18n-skip="true" data-scientific-zh="${escapeAttr(cat)}" data-scientific-en="${escapeAttr(categoryEn)}">${escapeHtml(categoryText)}</div>${cards}</div>`;
+    }).join('') || '<div class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-search"></use></svg></div>没有匹配的模块</div>';
 
     renderIcExtraVars(pv);
+}
+
+function captureIcDrafts() {
+    if (!state.icData || typeof document === 'undefined') return;
+    const drafts = state.icData.draftInputs ||= {};
+    document.querySelectorAll('[id^="icv-"]').forEach(el => {
+        const rest = el.id.slice(4), split = rest.indexOf('-');
+        const key = el.dataset?.icKey || (rest.startsWith('new-') ? rest.slice(4)
+            : split > 0 ? rest.slice(0,split)+'.'+rest.slice(split+1) : '');
+        if (key) drafts[el.id] = {key,value:el.value,user:el.dataset?.icUser === '1'};
+    });
 }
 
 // Variables that are not declared in fabm instances yet – allow typing them anyway
@@ -1487,29 +2039,30 @@ function renderIcExtraVars(pv) {
     const host = $('ic-wq-modules');
     if (!host) return;
     const d = state.icData || {};
-    const known = {};
-    (d.modules || []).forEach(m => Object.keys(m.init || {}).forEach(p => known[p] = 1));
-    const extra = Object.keys(pv).filter(f => !known[f] && f !== 'macro_sD');
+    const known = icPresetVarMap();
+    const extra = Object.keys(pv).filter(f => !known[f] && f !== 'macro_sD' &&
+        typeof pv[f] === 'number' && Number.isFinite(pv[f]));
     if (!extra.length) return;
     const rows = extra.map(f => {
         const has = document.getElementById(`icv-new-${f}`) !== null;
         if (has) return '';
         return `<div class="ic-row">
             <label title="${escapeAttr(f)}">${escapeHtml(f)}</label>
-            <input class="form-input" type="number" step="any" id="icv-new-${f}" value="${pv[f]}"
-                   data-ic-preset="1" onchange="onIcVarEdit(this)">
+            <input class="form-input" type="number" step="any" id="icv-new-${escapeAttr(f)}" value="${escapeAttr(d.draftInputs?.['icv-new-'+f]?.value ?? pv[f])}"
+                   data-ic-key="${escapeAttr(f)}" data-ic-preset="1" oninput="onIcVarEdit(this)">
             <span class="ic-unit">g/m³</span>
         </div>`;
     }).join('');
     if (!rows) return;
     const div = document.createElement('div');
     div.className = 'ic-group';
-    div.innerHTML = `<div class="ic-group-title">📋 预设中的其他变量</div><div class="ic-mod"><div class="ic-rows">${rows}</div></div>`;
+    div.innerHTML = `<div class="ic-group-title"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-list"></use></svg> 预设中的其他变量</div><div class="ic-mod"><div class="ic-rows">${rows}</div></div>`;
     host.appendChild(div);
 }
 
 function onIcVarEdit(el) {
     el.dataset.icUser = '1';
+    captureIcDrafts();
     icIcDirty();
 }
 
@@ -1525,21 +2078,15 @@ async function saveInitConditions() {
         datum_abs: $('ic-datum-abs') && $('ic-datum-abs').value !== '' ? Number($('ic-datum-abs').value) : null,
     };
 
-    // water quality: read every visible input back into "<instance>.<variable>"
+    // Include edits hidden by filtering; keep drafts separate from saved values.
+    captureIcDrafts();
     const water_quality = {};
-    const map = icPresetVarMap();
-    document.querySelectorAll('[id^="icv-"]').forEach(el => {
-        const id = el.id || '';
-        if (id.startsWith('icv-new-')) {
-            const varName = id.slice(8);
-            water_quality[varName] = Number(el.value);
-        } else {
-            const rest = id.slice(4);           // icv-<instance>-<variable>
-            const i = rest.indexOf('-');
-            if (i < 1) return;
-            water_quality[rest.slice(0, i) + '.' + rest.slice(i + 1)] = Number(el.value);
+    for (const draft of Object.values(d.draftInputs || {})) {
+        if (String(draft.value).trim()==='' || !Number.isFinite(Number(draft.value))) {
+            toast(`初始条件 ${draft.key} 必须填写有限数值`, 'error'); return;
         }
-    });
+        water_quality[draft.key] = Number(draft.value);
+    }
 
     const macroEl = $('ic-macro-sd');
     const macrophytes = macroEl && macroEl.value !== '' ? { sD_max: Number(macroEl.value) } : null;
@@ -1548,10 +2095,21 @@ async function saveInitConditions() {
         hydro, water_quality, macrophytes, trophic: d.trophic || null,
     }});
     if (res.error) { toast(res.error, 'error'); return; }
+    const warnings=Array.isArray(res.warnings) ? res.warnings.filter(Boolean) : [];
+    if(warnings.length) {
+        d.dirty = true;
+        StudioIcons.setStatus($('ic-save-status'), 'warning', '部分保存失败：' + warnings.join('；'), 'icon-status-warning');
+        toast('初始条件部分保存失败，请核对提示并重新保存', 'warning');
+        return;
+    }
+    (d.modules || []).forEach(m => Object.keys(m.init || {}).forEach(p => {
+        const key = m.name+'.'+p;
+        if (Object.hasOwn(water_quality,key)) m.init[p] = water_quality[key];
+    }));
     d.dirty = false;
     $('ic-save-status').textContent = res.notes && res.notes.length
-        ? '✔ ' + res.notes.join('；')
-        : '✔ 已保存';
+        ? '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-check"></use></svg> ' + res.notes.join('；')
+        : '<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-check"></use></svg> 已保存';
     toast(`初始条件已保存${res.n_written ? `（${res.n_written} 项水质初值）` : ''}`, 'success');
     setTimeout(() => { if ($('ic-save-status')) $('ic-save-status').textContent = ''; }, 6000);
 }
@@ -1572,21 +2130,283 @@ document.addEventListener('DOMContentLoaded', () => {
 // ── Run Control ───────────────────────────────────────────────────────
 async function startRun() {
     if (!state.activeCase) { toast('请先加载案例', 'error'); return; }
-    const res = await api('/api/run/start', {method:'POST'});
+    const mpi = !!document.getElementById('mpi-run-enabled')?.checked;
+    const processCount = Number(document.getElementById('mpi-process-count')?.value || 1);
+    const compressResults = !!document.getElementById('compress-run-results')?.checked;
+    const res = await api('/api/run/start', {method:'POST', body:{mpi, processes:processCount, compress_results:compressResults}});
     if (!res.success) { toast(res.error || '启动失败', 'error'); return; }
+    advanceOutputRevision();
     $('btn-start-run').disabled = true;
     $('btn-stop-run').disabled = false;
     $('run-log').innerHTML = '';
+    state.runLogLimit = 80;
+    state.runLogCursor = {lastLines: []};
+    $('run-console-log-status').textContent = '';
+    $('run-console-load-more').disabled = true;
     toast('模型已启动', 'success');
-    // Request browser notification permission so ETA/completion alerts can fire
-    if ('Notification' in window && Notification.permission === 'default') {
-        Notification.requestPermission().then(p => {
-            if (p === 'granted') toast('已启用运行通知', 'info');
-        });
-    }
+    updateRunNotificationStatus({status:'running',progress:null,eta_minutes:null,current_step:null,total_steps:null});
     state.etaNotified = new Set();  // reset ETA threshold tracker
+    state.previousEtaMinutes = null;
     state.lastRunStatus = 'running';
+    state.lastLogSnapshot = '';
+    clearInterval(state.runPollTimer);
+    // Status is lightweight and never opens in-progress model results.
     state.runPollTimer = setInterval(pollRunStatus, 2000);
+    pollRunStatus();
+}
+
+function appendRunLogLines(log, lines, cursor) {
+    const incoming = Array.isArray(lines) ? lines : [];
+    const previous = cursor.lastLines || [];
+    if (!incoming.length) return;
+    const followsTail = log.scrollHeight - log.scrollTop - log.clientHeight <= 12;
+    const oldHeight = log.scrollHeight;
+    let appendFrom = 0;
+    let prependCount = 0;
+
+    if (previous.length && incoming.length >= previous.length &&
+        previous.every((line, index) => line === incoming[index])) {
+        appendFrom = previous.length;
+    } else if (previous.length && incoming.length > previous.length &&
+        previous.every((line, index) => line === incoming[incoming.length - previous.length + index])) {
+        prependCount = incoming.length - previous.length;
+    } else if (previous.length) {
+        let overlap = Math.min(previous.length, incoming.length);
+        while (overlap > 0 && !previous.slice(-overlap).every((line, index) => line === incoming[index])) overlap--;
+        if (overlap) {
+            const dropped = previous.length - overlap;
+            if (dropped && log.children?.length) {
+                let removedHeight = 0;
+                for (let i = 0; i < dropped && log.firstChild; i++) {
+                    removedHeight += log.firstChild.getBoundingClientRect?.().height || 0;
+                    log.removeChild(log.firstChild);
+                }
+                if (!followsTail) log.scrollTop = Math.max(0, log.scrollTop - removedHeight);
+            }
+            appendFrom = overlap;
+        } else {
+            // A fresh run or rewritten log has no shared tail. Reset only on
+            // this discontinuity; normal polls append to the existing DOM.
+            log.replaceChildren();
+            cursor.lastLines = [];
+        }
+    }
+
+    const makeLine = line => {
+        const node = document.createElement('div');
+        node.className = 'log-line ' + (line.includes('ERROR') ? 'error' : line.includes('完成') ? 'success' : line.includes('INFO') ? 'info' : '');
+        node.textContent = ModelDates.formatText(line);
+        return node;
+    };
+    if (prependCount) {
+        for (let i = prependCount - 1; i >= 0; i--) log.insertBefore(makeLine(incoming[i]), log.firstChild);
+        if (!followsTail) log.scrollTop += log.scrollHeight - oldHeight;
+    } else {
+        for (let i = appendFrom; i < incoming.length; i++) log.appendChild(makeLine(incoming[i]));
+    }
+    cursor.lastLines = incoming.slice();
+    if (followsTail) log.scrollTop = Math.max(0, log.scrollHeight - log.clientHeight);
+}
+
+function syncRunLogContext(log, identity, cursor) {
+    if (!identity || identity === state.runLogIdentity) return false;
+    state.runLogIdentity = identity;
+    state.runLogLimit = 80;
+    state.lastLogSnapshot = '';
+    log.replaceChildren();
+    cursor.lastLines = [];
+    $('run-console-log-status').textContent = '';
+    return true;
+}
+
+async function loadMoreRunLogs() {
+    const limits = [80, 200, 500, 1000, 2000, 5000];
+    const current = state.runLogLimit || 80;
+    const next = limits.find(limit => limit > current);
+    if (!next) return;
+    state.runLogLimit = next;
+    await pollRunStatus();
+}
+
+async function copyRunLogs() {
+    const text = Array.from($('run-log').querySelectorAll('.log-line'), node => node.textContent).join('\n');
+    const status = $('run-console-log-status');
+    const translate = message => window.StudioI18n?.t(message) || message;
+    if (!text) { status.textContent = translate('没有可复制的运行日志。'); return; }
+    try {
+        await navigator.clipboard.writeText(text);
+        status.textContent = translate('运行日志已复制。');
+        toast(translate('运行日志已复制。'), 'success');
+    } catch (_) {
+        status.textContent = translate('无法访问剪贴板，请使用键盘选择日志并复制。');
+        toast(translate('无法访问剪贴板，请使用键盘选择日志并复制。'), 'warning');
+    }
+}
+
+async function loadMpiRunCapabilities() {
+    const panel = document.getElementById('mpi-run-control');
+    const toggle = document.getElementById('mpi-run-enabled');
+    const count = document.getElementById('mpi-process-count');
+    const note = document.getElementById('mpi-run-capability');
+    const detectButton = document.getElementById('mpi-detect-recommendation');
+    if (!panel || !toggle || !count || !note || !detectButton) return;
+    const request = state.mpiCapabilitiesRequest = (state.mpiCapabilitiesRequest || 0) + 1;
+    const caseRevision = state.caseRevision || 0;
+    const casePath = state.activeCasePath;
+    const caseType = state.caseType;
+    const isCurrent = () => request === state.mpiCapabilitiesRequest
+        && caseRevision === (state.caseRevision || 0)
+        && casePath === state.activeCasePath
+        && caseType === state.caseType;
+    // Lock the control while refreshing so a fast case switch cannot briefly
+    // leave MPI enabled for a read-only or single-column case.
+    toggle.checked = false;
+    toggle.disabled = true;
+    count.disabled = true;
+    detectButton.disabled = true;
+    try {
+        const capabilities = await api('/api/run/mpi-capabilities');
+        if (!isCurrent()) return;
+        const maxProcesses = Math.max(1, Number(capabilities.max_processes) || 1);
+        const targetProcesses = Math.max(1, Math.ceil(maxProcesses / 2));
+        const recommended = Math.max(1, Math.min(maxProcesses,
+            Number(capabilities.recommended_processes) || targetProcesses));
+        const allowedProcesses = Array.isArray(capabilities.allowed_processes)
+            ? [...new Set(capabilities.allowed_processes.map(Number)
+                .filter(value => Number.isInteger(value) && value >= 1 && value <= maxProcesses))]
+                .sort((a, b) => a - b)
+            : Array.from({length: maxProcesses}, (_, index) => index + 1);
+        const preference = state.mpiProcessCountByCase instanceof Map
+            ? state.mpiProcessCountByCase.get(casePath) : null;
+        const selectedCount = allowedProcesses.includes(preference) ? preference
+            : (allowedProcesses.includes(recommended) ? recommended
+                : ([...allowedProcesses].sort((a, b) =>
+                    Math.abs(a - targetProcesses) - Math.abs(b - targetProcesses) || a - b)[0] || 1));
+        count.replaceChildren(...allowedProcesses.map(value => {
+            const option = document.createElement('option');
+            option.value = String(value);
+            option.textContent = String(value);
+            return option;
+        }));
+        count.value = String(selectedCount);
+        const eligibleCase = !!casePath && caseType === 'getm' && !state.storageReadOnly;
+        const enabled = capabilities.enabled === true && eligibleCase && allowedProcesses.length > 0;
+        toggle.disabled = !enabled;
+        detectButton.disabled = !enabled;
+        if (enabled) {
+            const hasPreference = state.mpiSelectionByCase instanceof Map
+                && state.mpiSelectionByCase.has(casePath);
+            toggle.checked = hasPreference ? state.mpiSelectionByCase.get(casePath) : true;
+        } else {
+            toggle.checked = false;
+        }
+        count.disabled = !enabled || !toggle.checked;
+        note.textContent = !eligibleCase
+            ? (casePath ? 'MPI 仅适用于可写的 GETM 网格案例' : '请先加载可写的 GETM 网格案例')
+            : (capabilities.reason || `当前进程可用逻辑处理器：${maxProcesses}；建议 ${recommended} 个进程。建议值不保证最快。`);
+        toggle.onchange = () => {
+            if (!isCurrent() || !enabled) return;
+            count.disabled = !toggle.checked;
+            state.mpiSelectionByCase.set(casePath, toggle.checked);
+        };
+        count.onchange = () => {
+            if (!isCurrent() || !enabled || !allowedProcesses.includes(Number(count.value))) return;
+            state.mpiProcessCountByCase.set(casePath, Number(count.value));
+        };
+    } catch (error) {
+        if (!isCurrent()) return;
+        toggle.checked = false;
+        toggle.disabled = true;
+        count.disabled = true;
+        detectButton.disabled = true;
+        note.textContent = '无法读取 MPI 运行能力';
+    }
+}
+
+async function detectAndApplyMpiRecommendation() {
+    const toggle = document.getElementById('mpi-run-enabled');
+    const count = document.getElementById('mpi-process-count');
+    const note = document.getElementById('mpi-run-capability');
+    const detectButton = document.getElementById('mpi-detect-recommendation');
+    if (!toggle || !count || !note || !detectButton) return;
+
+    const request = state.mpiRecommendationRequest = (state.mpiRecommendationRequest || 0) + 1;
+    const caseRevision = state.caseRevision || 0;
+    const casePath = state.activeCasePath;
+    const caseType = state.caseType;
+    const isCurrent = () => request === state.mpiRecommendationRequest
+        && caseRevision === (state.caseRevision || 0)
+        && casePath === state.activeCasePath
+        && caseType === state.caseType;
+    const eligibleCase = !!casePath && caseType === 'getm' && !state.storageReadOnly;
+    if (!eligibleCase || toggle.disabled) return;
+
+    detectButton.disabled = true;
+    note.textContent = '正在创建隔离副本并实测候选进程数；过程包含输出合并，可持续数分钟…';
+    try {
+        const started = await api('/api/run/mpi-tuning', {method:'POST', body:{duration_seconds:10800,repetitions:2}});
+        if (!started.success) throw new Error(started.error || '无法启动测量');
+        const cancel = document.getElementById('mpi-tuning-cancel');
+        if (started.cached) {
+            applyMpiTuningResult(started.result, casePath, note, count);
+            return;
+        }
+        if (cancel) cancel.style.display = '';
+        const trialHours = Math.ceil(Number(started.duration_seconds || 0) / 3600);
+        note.textContent = `${started.candidate_count} 个候选 × ${started.repetitions} 次；每次覆盖至少 ${trialHours} 小时的模拟时段并按原设置输出。实际墙钟耗时取决于各进程数的实测，当前无法预估；可随时取消。`;
+        while (isCurrent()) {
+            await new Promise(resolve => setTimeout(resolve, 2500));
+            const status = await api('/api/run/mpi-tuning');
+            if (!isCurrent()) return;
+            if (status.status === 'completed') {
+                applyMpiTuningResult(status.result, casePath, note, count);
+                return;
+            }
+            if (status.status === 'failed') throw new Error(status.error || '所有候选测量均失败');
+            if (status.status === 'cancelled') { note.textContent = 'MPI 调优已取消；临时副本已清理。'; return; }
+            const p = status.progress;
+            note.textContent = p
+                ? `正在实测 ${p.candidate} 个进程（候选 ${p.repeat}/${p.repetitions}）；总计已用 ${Math.floor(p.elapsed_seconds || 0)} 秒，本次已用 ${Math.floor(p.current_trial_seconds || 0)} 秒…`
+                : `正在实测 ${started.candidate_processes?.join(', ') || '候选'} 个进程；包含结果合并…`;
+        }
+    } catch (error) {
+        if (!isCurrent()) return;
+        const detail = String(error?.message || error || '无法读取 MPI 运行能力');
+        note.textContent = `检测失败：${detail}`;
+    } finally {
+        if (isCurrent()) {
+            detectButton.disabled = toggle.disabled;
+            const cancel = document.getElementById('mpi-tuning-cancel');
+            if (cancel) cancel.style.display = 'none';
+        }
+    }
+}
+
+function applyMpiTuningResult(result, casePath, note, count) {
+    const selected = Number(result?.selected_processes);
+    if (!Number.isInteger(selected) || selected < 1) throw new Error('没有有效成功的测量结果');
+    const samples = result.measurements?.[String(selected)] || [];
+    count.value = String(selected);
+    state.mpiProcessCountByCase.set(casePath, selected);
+    const fastest = Math.min(...Object.values(result.measurements || {}).flat().map(Number));
+    note.textContent = `实测选择 ${selected} 个进程；本机/案例指纹已缓存。候选耗时含结果合并；最快样本 ${Number.isFinite(fastest) ? fastest.toFixed(1) : '—'} 秒。此结果不代表其他案例或硬件。`;
+}
+
+async function cancelMpiTuning() {
+    try {
+        await api('/api/run/mpi-tuning', {method:'DELETE'});
+        const note = document.getElementById('mpi-run-capability');
+        if (note) note.textContent = '正在停止当前试跑并清理隔离副本…';
+    } catch (error) {
+        toast(String(error?.message || error || '无法取消测量'), 'error');
+    }
+}
+document.addEventListener('DOMContentLoaded', loadMpiRunCapabilities);
+
+function advanceOutputRevision() {
+    state.outputRevision=(state.outputRevision || 0)+1;
+    window.Viz2DPlaybackPrefetch?.clear();
+    window.clearViz3dPlaybackPrefetch?.();
 }
 
 async function stopRun() {
@@ -1595,116 +2415,453 @@ async function stopRun() {
     toast('已发送停止指令', 'info');
 }
 
-function notifyUser(title, body) {
-    // Browser notification + visible toast (so it works even without permission)
+function appendRunNotificationFallback(title, body, kind='info') {
+    const center = $('run-notification-center');
+    const list = $('run-notification-list');
+    if (!center || !list) return;
+    center.hidden = false;
+    const item = document.createElement('li');
+    item.className = `run-notification-event ${kind}`;
+    item.setAttribute('role', 'listitem');
+    const iconKind = kind === 'completed' ? 'check' : kind === 'failed' ? 'error' : kind === 'stopped' ? 'stop' : 'info';
+    item.appendChild(StudioIcons.node(iconKind, kind === 'failed' ? 'icon-status-error' : kind === 'completed' ? 'icon-status-ok' : ''));
+    const message = document.createElement('span');
+    message.textContent = `${title}: ${body}`;
+    item.appendChild(message);
+    list.prepend(item);
+    while (list.children.length > 8) list.removeChild(list.lastElementChild);
+}
+
+function runFailureReason(status) {
+    const errors = (status?.logs || []).filter(line => /\[ERROR\]|\bFATAL\b|\bSTOP\s+1\b/i.test(String(line)));
+    const fromLog = errors.length ? String(errors[errors.length - 1]).replace(/^\s*\[ERROR\]\s*/i, '').trim() : '';
+    const reason = String(status?.failure_reason || status?.error || fromLog || '请查看运行日志排查原因').trim();
+    return reason.length > 280 ? `${reason.slice(0,277)}…` : reason;
+}
+
+function runStepSummary(status) {
+    const english = window.StudioI18n?.locale?.() === 'en-US';
+    const current = Number.isFinite(status?.current_step) ? status.current_step.toLocaleString() : (english ? 'Unknown' : '未知');
+    const total = Number.isFinite(status?.total_steps) ? status.total_steps.toLocaleString() : (english ? 'Unknown' : '未知');
+    const rate = Number.isFinite(status?.steps_per_second) ? `${fmt(status.steps_per_second,1)} ${english ? 'steps/s' : '步/秒'}` : (english ? 'Speed unknown' : '速度未知');
+    if (status?.phase === 'merging') {
+        const solverMode = status.performance?.solver_mode || (english ? 'Serial solver' : '串行求解器');
+        return english
+            ? `Steps: ${current} / ${total} · Merging outputs · ${solverMode}`
+            : `步数: ${current} / ${total} · 正在合并输出 · ${solverMode}`;
+    }
+    if (status?.phase === 'compressing') {
+        const solverMode = status.performance?.solver_mode || (english ? 'Serial solver' : '串行求解器');
+        return english
+            ? `Steps: ${current} / ${total} · Post-processing: compressing and verifying outputs · ${solverMode}`
+            : `步数: ${current} / ${total} · 求解后处理中：压缩并逐值核验输出 · ${solverMode}`;
+    }
+    if (!english) {
+        return `步数: ${current} / ${total} · ${rate} · ${status.performance?.solver_mode || '串行求解器'}`;
+    }
+    const solver = {
+        '预编译串行求解器': 'Precompiled serial solver',
+        '串行求解器': 'Serial solver'
+    }[status.performance?.solver_mode] || status.performance?.solver_mode || 'Serial solver';
+    return `Steps: ${current} / ${total} · ${rate} · ${solver}`;
+}
+
+function formatRemainingTime(seconds, english = window.StudioI18n?.locale?.() === 'en-US') {
+    const value = Number(seconds);
+    if (!Number.isFinite(value) || value <= 0) return '-';
+    const totalMinutes = Math.ceil(value / 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return english ? `${hours}h ${minutes}m` : `${hours}小时${minutes}分钟`;
+}
+
+function runEtaText(status, english = window.StudioI18n?.locale?.() === 'en-US') {
+    if (status?.status === 'running' && ['merging', 'compressing'].includes(status?.phase)) {
+        if (status.phase === 'compressing') return english ? 'Post-processing: compressing and verifying' : '求解已结束，压缩及核验后处理中';
+        return english ? 'Merging outputs' : '合并输出中';
+    }
+    if (status?.status === 'running' && !Number.isFinite(status?.eta_seconds) && !Number.isFinite(status?.eta_minutes)) {
+        return english ? 'Unknown' : '未知';
+    }
+    return formatRemainingTime(status?.eta_seconds ?? (Number(status?.eta_minutes) * 60), english);
+}
+
+function updateRunNotificationStatus(status) {
+    if (!status || !['running','completed','failed','stopped'].includes(status.status)) return;
+    const center = $('run-notification-center');
+    const summary = $('run-notification-status');
+    if (!center || !summary) return;
+    const english = window.StudioI18n?.locale?.() === 'en-US';
+    const labels = english
+        ? {running:'Running',completed:'Completed',failed:'Failed',stopped:'Stopped'}
+        : {running:'运行中',completed:'已完成',failed:'失败',stopped:'已停止'};
+    const progress = Number.isFinite(status.progress) ? `${fmt(status.progress,1)}%` : '';
+    const parts = [labels[status.status], progress].filter(Boolean);
+    if (status.status === 'running') {
+        if (['merging', 'compressing'].includes(status.phase)) {
+            parts.push(runEtaText(status, english));
+        } else {
+            const etaSeconds = Number(status.eta_seconds ?? (Number(status.eta_minutes) * 60));
+            parts.push(Number.isFinite(etaSeconds) && etaSeconds > 0
+                ? (english ? `ETA ${formatRemainingTime(etaSeconds, true)}` : `预计剩余 ${formatRemainingTime(etaSeconds, false)}`)
+                : (english ? 'ETA updating' : '预计剩余时间更新中'));
+        }
+    } else if (status.status === 'failed') {
+        const reason = runFailureReason(status);
+        parts.push(english ? `Failure reason: ${reason}` : `失败原因：${reason}`);
+    }
+    summary.textContent = parts.join(' · ');
+    summary.dataset.status = status.status;
+    const enableButton = $('run-notification-enable');
+    if (enableButton) enableButton.hidden = !('Notification' in window) || Notification.permission !== 'default';
+    center.hidden = false;
+}
+
+async function enableRunNotifications() {
+    if (!('Notification' in window)) {
+        toast('当前环境不支持桌面通知，运行状态仍会显示在本页。', 'info');
+        return;
+    }
+    if (Notification.permission !== 'default') return;
+    try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            $('run-notification-enable').hidden = true;
+            toast('已启用运行通知', 'info');
+        } else {
+            toast('未启用桌面通知，运行状态仍会显示在本页。', 'info');
+        }
+    } catch (error) {
+        console.warn('Notification permission request failed:', error);
+        toast('无法启用桌面通知，运行状态仍会显示在本页。', 'info');
+    }
+}
+
+function clearRunNotifications() {
+    $('run-notification-list')?.replaceChildren();
+    const status = $('run-notification-status');
+    if (status && !state.runPollTimer) {
+        status.textContent = '';
+        $('run-notification-center').hidden = true;
+    }
+}
+
+function notifyUser(title, body, kind='info') {
+    // Persistent in-app fallback is independent of WebView/browser permission.
+    appendRunNotificationFallback(title, body, kind);
     toast(`${title}: ${body}`, 'info');
     if ('Notification' in window && Notification.permission === 'granted') {
         try { new Notification(title, { body, icon: '/static/favicon.ico' }); } catch (e) {}
     }
 }
 
+function renderFabmRepairSummary(summary) {
+    const node = $('run-repair-summary');
+    if (!node) return;
+    if (!summary || summary.state !== 'available' || !summary.counts) {
+        node.textContent = summary?.state === 'running'
+            ? 'FABM 状态检查汇总：运行中，完成后读取本次运行日志。'
+            : 'FABM 状态检查汇总：未提供（本次日志没有完整且可识别的三项统计）。';
+        return;
+    }
+    const {interior, surface, bottom} = summary.counts;
+    const total = interior + surface + bottom;
+    const counts = `内部/表层/底层 ${interior}/${surface}/${bottom} 次`;
+    node.textContent = total > 0
+        ? `FABM 状态检查汇总：${counts}。计数表示检查事件，不是变量、网格单元或实际修改总数；存在状态越界并由求解器裁剪，建议检查完整日志与结果。单凭计数不能判定结果错误或物理无效。`
+        : `FABM 状态检查汇总：${counts}。计数表示检查事件，不是变量、网格单元或实际修改总数。`;
+}
+
 async function pollRunStatus() {
-    const s = await api('/api/run/status');
+    if (state.runPollBusy) return;
+    state.runPollBusy = true;
+    try {
+    const s = await api(`/api/run/status?log_limit=${state.runLogLimit || 80}`);
+    if (state.resultFilesStatus !== s.status) { state.resultFilesStatus = s.status; window.loadResultFiles?.(); }
+    if (s.error || !s.status) return;
+    renderFabmRepairSummary(s.fabm_repair_summary);
+    if (s.status === 'running') {
+        $('btn-start-run').disabled = true;
+        $('btn-stop-run').disabled = false;
+        if (!state.runPollTimer) state.runPollTimer = setInterval(pollRunStatus, 2000);
+    }
     $('run-stat-status').textContent = {idle:'空闲',running:'运行中',completed:'已完成',failed:'失败',stopped:'已停止'}[s.status] || s.status;
-    $('run-stat-progress').textContent = fmt(s.progress,1) + '%';
+    const hasProgress = Number.isFinite(s.progress);
+    const progressText = hasProgress ? `${fmt(s.progress,1)}%` : (window.StudioI18n?.locale?.() === 'en-US' ? 'Unknown' : '未知');
+    $('run-stat-progress').textContent = progressText;
     $('run-stat-elapsed').textContent = fmt(s.elapsed,0) + 's';
-    $('run-stat-eta').textContent = s.eta_minutes > 0 ? fmt(s.eta_minutes,1) + 'min' : '-';
-    $('run-progress-fill').style.width = s.progress + '%';
-    $('run-percent').textContent = fmt(s.progress,1) + '%';
-    $('run-step-info').textContent = `步数: ${s.current_step.toLocaleString()} / ${s.total_steps.toLocaleString()}`;
+    $('run-stat-eta').textContent = runEtaText(s);
+    $('run-progress-fill').style.width = (hasProgress ? s.progress : 0) + '%';
+    const progressBar = $('run-progress-fill').parentElement;
+    progressBar.setAttribute('aria-label', window.StudioI18n?.locale?.() === 'en-US' ? 'Run progress' : '运行进度');
+    if (hasProgress) {
+        progressBar.setAttribute('aria-valuenow', String(Math.round(s.progress)));
+        progressBar.setAttribute('aria-valuetext', progressText);
+    } else {
+        progressBar.removeAttribute('aria-valuenow');
+        progressBar.setAttribute('aria-valuetext', progressText);
+    }
+    $('run-percent').textContent = progressText;
+    $('run-step-info').textContent = runStepSummary(s);
     // Status display
     const dot = document.querySelector('#run-status-display .status-dot');
     dot.className = 'status-dot ' + s.status;
-    document.querySelector('#run-status-display').childNodes[1].textContent = {idle:'空闲',running:'运行中',completed:'已完成',failed:'失败',stopped:'已停止'}[s.status];
+    const runLabels = window.StudioI18n?.locale?.() === 'en-US'
+        ? {idle:'Idle',running:'Running',completed:'Completed',failed:'Failed',stopped:'Stopped'}
+        : {idle:'空闲',running:'运行中',completed:'已完成',failed:'失败',stopped:'已停止'};
+    const runLabel = runLabels[s.status] || s.status;
+    document.querySelector('#run-status-display').childNodes[1].textContent = runLabel;
+    $('run-console-state').textContent = runLabel;
+    $('run-console-case').textContent = s.log_case_directory || s.case_directory || (state.activeCasePath || state.activeCase || window.StudioI18n?.t?.('尚未加载案例') || '尚未加载案例');
+    updateRunPhysicsDisplay(s);
+    const loadMoreButton = $('run-console-load-more');
+    loadMoreButton.disabled = (s.total_logs || 0) <= (state.runLogLimit || 80) || (state.runLogLimit || 80) >= 5000;
+    const logStatus = $('run-console-log-status');
+    if ((state.runLogLimit || 80) > 80) {
+        const message = loadMoreButton.disabled
+            ? '已加载最近 {count} 行日志；已到当前保留范围上限。完整日志仍保存在 model_run.log。'
+            : '已加载最近 {count} 行日志。';
+        logStatus.textContent = window.StudioI18n?.t(message, {count: s.logs?.length || 0}) || message.replace('{count}', s.logs?.length || 0);
+    }
+    syncQgisStatusBar(runLabel);
+    updateRunNotificationStatus(s);
     // ETA threshold notifications (fire once per threshold as ETA decreases past it)
-    if (s.status === 'running' && s.eta_minutes > 0 && state.etaNotified) {
+    if (s.status === 'running' && Number.isFinite(s.eta_minutes) && s.eta_minutes > 0) {
+        state.etaNotified ||= new Set();
         for (const threshold of [60, 15, 5]) {
-            if (s.eta_minutes <= threshold && !state.etaNotified.has(threshold)) {
+            if (Number.isFinite(state.previousEtaMinutes) && state.previousEtaMinutes > threshold &&
+                s.eta_minutes <= threshold && !state.etaNotified.has(threshold)) {
                 state.etaNotified.add(threshold);
-                notifyUser('3DWET 运行提醒', `预计剩余 ${fmt(s.eta_minutes,0)} 分钟（${threshold}分钟阈值）`);
+                const english = window.StudioI18n?.locale?.() === 'en-US';
+                notifyUser(english ? '3DWET run update' : '3DWET 运行提醒', english
+                    ? `Estimated ${fmt(s.eta_minutes,0)} min remaining (${threshold}-minute threshold)`
+                    : `预计剩余 ${fmt(s.eta_minutes,0)} 分钟（${threshold}分钟阈值）`);
             }
         }
+        state.previousEtaMinutes = s.eta_minutes;
     }
     // Logs
-    const log = $('run-log');
-    const currentLines = log.children.length;
-    if (s.logs.length > currentLines) {
-        for (let i = currentLines; i < s.logs.length; i++) {
-            const line = s.logs[i];
-            const div = document.createElement('div');
-            div.className = 'log-line ' + (line.includes('ERROR')?'error':line.includes('完成')?'success':line.includes('INFO')?'info':'');
-            div.textContent = line;
-            log.appendChild(div);
-        }
-        log.scrollTop = log.scrollHeight;
-    }
+    const runLogCursor = state.runLogCursor ||= {lastLines: []};
+    syncRunLogContext($('run-log'), s.run_identity, runLogCursor);
+    appendRunLogLines($('run-log'), s.logs, runLogCursor);
     // Status flip notifications
     if (['completed','failed','stopped'].includes(s.status)) {
         clearInterval(state.runPollTimer);
+        state.runPollTimer = null;
         $('btn-start-run').disabled = false;
         $('btn-stop-run').disabled = true;
         if (state.lastRunStatus !== s.status) {
             state.lastRunStatus = s.status;
+            advanceOutputRevision();
             if (s.status === 'completed') {
-                notifyUser('🎉 模型运行完成', `共 ${s.current_step.toLocaleString()} 步，耗时 ${fmt(s.elapsed/60,1)} 分钟`);
+                const english = window.StudioI18n?.locale?.() === 'en-US';
+                const completedSteps = Number.isFinite(s.current_step) ? s.current_step.toLocaleString() : (english ? 'unknown' : '未知');
+                notifyUser(english ? 'Model run completed' : '模型运行完成', english
+                    ? `${completedSteps} steps · total task time ${fmt(s.elapsed/60,1)} min, including post-processing`
+                    : `共 ${completedSteps} 步，任务总用时 ${fmt(s.elapsed/60,1)} 分钟（含结果检查与后处理）`, 'completed');
                 loadVariables();
                 loadDashboardSummary();
             } else if (s.status === 'failed') {
-                notifyUser('❌ 模型运行失败', '请查看运行日志排查原因');
+                const english = window.StudioI18n?.locale?.() === 'en-US';
+                notifyUser(english ? 'Model run failed' : '模型运行失败', `${english ? 'Failure reason: ' : '失败原因：'}${runFailureReason(s)}`, 'failed');
             } else if (s.status === 'stopped') {
-                notifyUser('⏹ 模型已停止', `运行至第 ${s.current_step.toLocaleString()} 步`);
+                const english = window.StudioI18n?.locale?.() === 'en-US';
+                const stoppedStep = Number.isFinite(s.current_step) ? s.current_step.toLocaleString() : (english ? 'unknown' : '未知');
+                notifyUser(english ? 'Model run stopped' : '模型已停止', english
+                    ? `Stopped at step ${stoppedStep}`
+                    : `运行至第 ${stoppedStep} 步`, 'stopped');
             }
         }
     }
+    } finally { state.runPollBusy = false; }
+}
+
+function updateRunPhysicsDisplay(status) {
+    const english = window.StudioI18n?.locale?.() === 'en-US';
+    const labels = {
+        mpi: english ? 'Waiting for a complete point diagnostic from the MPI solver; older or unsupported runs may not emit one.'
+            : '等待 MPI 求解器提供完整点位诊断；旧版或不支持的运行可能不会输出。',
+        unsupported: english ? 'Point diagnostics are unsupported for this MPI configuration.'
+            : '此 MPI 配置不支持点位诊断。',
+        waiting: english ? 'Waiting for a validated solver diagnostic record.'
+            : '等待求解器提供可验证的物理诊断记录。',
+        unavailable: english ? 'The representative wet cell is currently unavailable.'
+            : '当前代表性湿格点不可用。',
+        available: english ? 'Representative central wet T-grid cell'
+            : '代表性中心湿格点（T 网格）',
+    };
+    state.runPhysicsDiagnosticState = window.RunPhysicsDiagnostics?.updateRunPhysicsDiagnostic(
+        status, state.runPhysicsDiagnosticState) || null;
+    const diagnostic = state.runPhysicsDiagnosticState?.diagnostic;
+    const mpi = String(status.performance?.solver_mode || '').startsWith('MPI');
+    const message = $('run-physics-status');
+    const point = $('run-physics-point');
+    const z = $('run-physics-z');
+    const h = $('run-physics-h');
+    const d = $('run-physics-d');
+    const velocityElements = {
+        status: $('run-physics-velocity-status'),
+        surfaceLayer: $('run-physics-velocity-surface-k'),
+        surfaceX: $('run-physics-velocity-surface-x'),
+        surfaceY: $('run-physics-velocity-surface-y'),
+        surfaceSpeed: $('run-physics-velocity-surface-speed'),
+        bottomLayer: $('run-physics-velocity-bottom-k'),
+        bottomX: $('run-physics-velocity-bottom-x'),
+        bottomY: $('run-physics-velocity-bottom-y'),
+        bottomSpeed: $('run-physics-velocity-bottom-speed'),
+    };
+    window.RunPhysicsDiagnostics?.renderRunPhysicsVelocity(diagnostic, velocityElements, english);
+    if (diagnostic?.status === 'available') {
+        message.textContent = labels.available;
+        point.textContent = window.RunPhysicsDiagnostics?.formatRunPhysicsPoint(
+            diagnostic, {mpi, english}) || '—';
+        z.textContent = Number(diagnostic.z_surface_m).toFixed(3);
+        h.textContent = Number(diagnostic.H_static_m).toFixed(3);
+        d.textContent = Number(diagnostic.D_total_m).toFixed(3);
+        return;
+    }
+    point.textContent = '—';
+    z.textContent = h.textContent = d.textContent = '—';
+    if (diagnostic?.status === 'unsupported') message.textContent = `${labels.unsupported} (${diagnostic.reason})`;
+    else if (mpi) message.textContent = labels.mpi;
+    else if (diagnostic?.status === 'unavailable') message.textContent = `${labels.unavailable} (${diagnostic.reason})`;
+    else message.textContent = labels.waiting;
 }
 
 // ── Variables ─────────────────────────────────────────────────────────
+const resultInventoryRequests = new Map();
+function resultInventoryCaseKey() {
+    return `${String(state.activeCasePath || state.activeCase || '')}\n${String(state.caseRevision ?? '')}`;
+}
+async function fetchResultInventory() {
+    const key = resultInventoryCaseKey();
+    let promise = resultInventoryRequests.get(key);
+    if (!promise) {
+        let request;
+        request = api('/api/results/variables').finally(() => {
+            if (resultInventoryRequests.get(key) === request) resultInventoryRequests.delete(key);
+        });
+        promise = request;
+        resultInventoryRequests.set(key, promise);
+    }
+    const result = await promise;
+    return key === resultInventoryCaseKey() ? result : {error: '案例已切换'};
+}
+
+function clearResultInventory() {
+    state.variables2d=[];state.variables3d=[];state.timeLabels2d=[];state.timeLabels3d=[];
+    state.resultTimeAxes={};state.timesteps2d=0;state.timesteps3d=0;
+    state.resultGeometry=null;
+    state.serverCaseGeneration=null;
+    state.viz2dRequest=(state.viz2dRequest||0)+1;state.viz2dAbort?.abort();
+    state.viz3dRequest=(state.viz3dRequest||0)+1;
+    ['viz2d-var','viz3d-var','viz3d-iso-var','viz3d-avg-var','ts-var','cal-var-select','cal-data-var']
+        .forEach(id=>$(id)?.replaceChildren());
+    window.ScientificWorkspace?.empty?.('viz2d','请先加载案例');
+    window.ScientificWorkspace?.empty?.('viz3d','请先加载案例');
+    window.ScientificWorkspace?.updateTimeControls?.('viz2d');
+    window.ScientificWorkspace?.updateTimeControls?.('viz3d');
+}
+
+async function restoreCurrentCase() {
+    const revision=state.caseRevision;
+    const data=await api('/api/case/current');
+    if(revision!==state.caseRevision || state.activeCasePath)return false;
+    if(data.error)return false;
+    if(!data.case_path){clearResultInventory();return false;}
+    state.caseRevision=(state.caseRevision||0)+1;
+    state.activeCase=data.case_name;state.activeCasePath=data.case_path;
+    state.caseType=data.case_type || null;state.storageReadOnly=!!data.storage_read_only;
+    state.serverCaseGeneration=Number.isInteger(data.case_generation)?data.case_generation:null;
+    document.body.classList.toggle('readonly-gotm', !!data.read_only);
+    document.body.classList.toggle('gotm-single-column', String(data.case_type || '').startsWith('gotm_'));
+    window.ObservationManager?.setColumnVariableInventory(data.native_column_variables || null);
+    const nativePeriod=Array.isArray(data.native_time_range)&&data.native_time_range.length===2
+        ? ` · ${data.native_time_range[0]} — ${data.native_time_range[1]}` : '';
+    renderProxyCaseStatus(data);
+    const calibrationDesc=$('calibration-page-desc');
+    if(calibrationDesc)calibrationDesc.textContent=data.read_only
+        ?'当前打开的是只读 GOTM 原生输出。请使用下方官方观测文件入口进行代表水柱比较；GETM 点位、运行和观测写入功能已停用。'
+        :'设置率定点位，输入实测数据，对比模拟-实测结果';
+    $('footer-status').textContent=`案例: ${data.case_name}`;syncQgisStatusBar();
+    refreshCaseStatistics(data);
+    if (data.has_results) {
+        loadDashboardSummary();
+    } else {
+        const empty = '<div class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-dashboard"></use></svg></div>当前案例尚无输出结果。运行模型后显示</div>';
+        $('dashboard-vars').innerHTML = empty;
+        loadDashboardStaticPreview();
+    }
+    loadMpiRunCapabilities();
+    return true;
+}
+
 async function loadVariables() {
-    const v = await api('/api/results/variables');
+    const revision=state.caseRevision,promise=loadResultVariables();
+    state.variablesPending={revision,promise};
+    try{return await promise;}
+    finally{if(state.variablesPending?.promise===promise)state.variablesPending=null;}
+}
+
+async function loadResultVariables() {
+    const request = state.variablesRequest = (state.variablesRequest || 0) + 1;
+    const revision = state.caseRevision;
+    const v = await fetchResultInventory();
+    if (request !== state.variablesRequest || revision !== state.caseRevision) return;
+    if (v.error) return;
     if (!v.error) {
         state.variables2d = v['2d'] || [];
         state.variables3d = v['3d'] || [];
+        state.resultGeometry = {twoD:v.geometry_2d||null,threeD:v.geometry_3d||null};
         // 时间轴真实日期：2d/3d 文件按 step_2d/step_3d 抽帧，间隔不一定是 1 天，
         // 所以必须按帧查日历日期，不能直接把滑块索引当成“第 N 天”。
         state.timeLabels2d = v['time_labels_2d'] || [];
         state.timeLabels3d = v['time_labels_3d'] || [];
-        state.timeLabels = (state.timeLabels3d.length >= state.timeLabels2d.length)
-            ? state.timeLabels3d : state.timeLabels2d;
-        // Set time slider max
-        const nt = Math.max(v.timesteps_2d||0, v.timesteps_3d||0);
-        $('viz2d-time').max = Math.max(0, nt-1);
+        state.resultTimeAxes = v.time_axes || {};
+        state.timesteps2d = Number(v.timesteps_2d || 0);
+        state.timesteps3d = Number(v.timesteps_3d || 0);
+        // The dashboard count describes availability; each view is bounded by
+        // the selected variable source after its options have been populated.
+        const nt = Math.max(state.timesteps2d,state.timesteps3d,
+            ...[...state.variables3d,...state.variables2d].map(item=>Number(item.ntimesteps)||0));
         $('stat-timesteps').textContent = nt || '-';
-        // 告知用户抽帧间隔，避免把“最后帧序号”误读成运行天数
-        if (state.timeLabels.length >= 2 && nt > 0) {
-            const stepDays = (() => {
-                const p = (s) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s); return m ? Date.UTC(+m[1], +m[2]-1, +m[3]) : null; };
-                const a = p(state.timeLabels[0]), b = p(state.timeLabels[1]);
-                return (a != null && b != null) ? (b - a) / 86400000 : null;
-            })();
-            $('stat-timesteps').title = stepDays
-                ? `共 ${nt} 帧，抽帧间隔 ${fmt(stepDays,2)} 天(${state.timeLabels[0]} → ${state.timeLabels[state.timeLabels.length-1]})`
-                : `共 ${nt} 帧(${state.timeLabels[0]} → ${state.timeLabels[state.timeLabels.length-1]})`;
-        }
+        $('stat-timesteps').title = `2D: ${state.timesteps2d} 帧 · 3D: ${state.timesteps3d} 帧；各变量按实际输出来源显示时刻`;
     }
     // Populate all variable selects
     const allVars = [...state.variables3d, ...state.variables2d];
     const unique = {};
     allVars.forEach(v => { if (!unique[v.name]) unique[v.name] = v; });
-    const varList = Object.values(unique);
+    const varList = prioritizeResultVariables(Object.values(unique));
+    const verticalDefaultVariable=varList.find(v=>v.name==='temp'&&hasVerticalResultDimension(v))
+        || varList.find(hasVerticalResultDimension);
+    const defaultVariable=verticalDefaultVariable || varList.find(v=>v.name==='temp') || varList[0];
     ['viz2d-var','viz3d-var','viz3d-iso-var','viz3d-avg-var','ts-var','cal-var-select','cal-data-var'].forEach(id => {
         const sel = $(id);
         if (!sel) return;
+        const selected = sel.value;
+        const requiresVertical=verticalResultSelectIds.has(id);
         sel.innerHTML = '';
         varList.forEach(v => {
             const opt = document.createElement('option');
             opt.value = v.name;
-            // 区分有无垂向层：4D(time,sigma,yc,xc) 才能做垂向热图；
-            // 3D 的通量/表层量物理上不随深度分层，单独标注避免误导。
-            const hasLev = v.ndim === 4 || (Array.isArray(v.dims) && v.dims.indexOf('sigma') >= 0);
-            opt.textContent = `${v.long_name || v.name} [${v.units||''}]${hasLev ? '' : ' ⊘无垂向层'}`;
+            const hasLev = hasVerticalResultDimension(v);
+            opt.disabled=requiresVertical && !hasLev;
+            const priority=resultVariablePriority(v);
+            opt.textContent = `${priority===2?'【按需】':'【默认优先】'} ${resultVariableOptionLabel(v,requiresVertical)}`;
+            if(opt.disabled)opt.title=resultVariableOptionLabel(v,true);
+            opt.dataset.i18nSkip='true';
             sel.appendChild(opt);
         });
+        if(requiresVertical){
+            if(varList.some(v=>v.name===selected&&hasVerticalResultDimension(v)))sel.value=selected;
+            else if(verticalDefaultVariable)sel.value=verticalDefaultVariable.name;
+            else sel.value='';
+        }else if (varList.some(v => v.name === selected)) sel.value = selected;
+        else if(defaultVariable)sel.value=defaultVariable.name;
     });
+    for(const id of ['viz2d-var','viz3d-iso-var'])updateResultVariableSearch(id,true);
+    window.VariableGuide?.setVariables(varList);
+    populateCalibrationVariables();
     // 无结果时给 2D/3D 视图注入“水深(地形)”占位变量：至少能看到湖泊网格与湖盆
     if (!varList.length) {
         ['viz2d-var','viz3d-iso-var'].forEach(id => {
@@ -1716,18 +2873,72 @@ async function loadVariables() {
             sel.appendChild(opt);
         });
     }
+    window.ScientificWorkspace?.updateTimeControls?.('viz2d');
+    window.ScientificWorkspace?.updateTimeControls?.('viz3d');
+}
+
+function updateResultVariableSearch(selectId,resetOptions=false) {
+    const select=$(selectId),search=$(selectId+'-search'),status=$(selectId+'-search-status');
+    if(!select || !search || !status)return;
+    const variables=[...state.variables3d,...state.variables2d],byName=new Map(variables.map(item=>[item.name,item]));
+    if(resetOptions || !Array.isArray(select._resultVariableOptions))select._resultVariableOptions=Array.from(select.options||[]);
+    const allOptions=select._resultVariableOptions,query=String(search.value||'').trim().toLocaleLowerCase();
+    const searchText=(zh,en)=>window.StudioI18n?.scientificText?.(zh,en)||zh;
+    const matched=[];
+    for(const option of allOptions){
+        const item=byName.get(option.value),text=[option.value,option.textContent,item?.name,item?.units,item?.long_name,item?.long_name_en,item?.meaning,item?.meaning_en,item?.zh_name,item?.en_name,item?.category,item?.category_en,
+            item?.ndim===4?'垂向层 sigma vertical layer':'无垂向层 no vertical layer'].filter(Boolean).join(' ').toLocaleLowerCase();
+        if(!query || text.includes(query))matched.push(option);
+    }
+    search.hidden=variables.length<60;
+    const current=allOptions.find(option=>option.value===select.value),visible=query?matched.slice():allOptions.slice();
+    if(query && current && !visible.includes(current))visible.unshift(current);
+    // The browser and accessibility tree see only actual matches, while the native select keeps full keyboard behavior.
+    if(visible.length!==select.options.length || visible.some((option,index)=>select.options[index]!==option))select.replaceChildren(...visible);
+    if(current)select.value=current.value;
+    status.textContent=query
+        ? matched.length?searchText(`已筛选 ${matched.length} 项；按 Tab 进入列表，再用上下键选择。当前选择保持不变。`,`Filtered to ${matched.length} items. Press Tab to focus the list, then use the arrow keys. The current selection is unchanged.`):searchText('没有匹配项；当前选择仍保留，清空搜索可恢复全部。','No matches. The current selection is retained; clear the search to restore all options.')
+        : (selectId==='viz3d-iso-var' && allOptions.some(option=>option.disabled)
+            ? searchText('无垂向层的变量已禁用；3D 需要真实垂向层（4D），请切换到 2D 查看。','Variables without vertical layers are disabled; 3D requires a real vertical dimension (4D). Use 2D to view them.')
+            : variables.length>=60?searchText(`共 ${allOptions.length} 项；可搜索中文名称、英文名称、代码或单位。`,`${allOptions.length} items. Search by Chinese or English name, code, or unit; press Tab to move to the list and use the arrow keys.`):'');
+    if(!search.dataset.bound){search.addEventListener('input',()=>updateResultVariableSearch(selectId));search.dataset.bound='true';}
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────
 async function loadDashboardSummary() {
-    const summary = await api('/api/dashboard/summary');
-    if (summary.error) return;
+    const request = state.dashboardSummaryRequest = (state.dashboardSummaryRequest || 0) + 1;
+    const revision = state.caseRevision;
+    const casePath = state.activeCasePath;
     const container = $('dashboard-vars');
-    const entries = Object.entries(summary).slice(0, 8);
-    if (!entries.length) { container.innerHTML = '<div class="empty-state">无数据</div>'; return; }
+    const heatmaps = $('dashboard-mini-heatmaps');
+    const loading = '<div class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-clock"></use></svg></div>正在读取当前案例结果…</div>';
+    container.innerHTML = loading;
+    if (heatmaps) heatmaps.innerHTML = loading;
+    const summary = await api('/api/dashboard/summary');
+    if (request !== state.dashboardSummaryRequest || revision !== state.caseRevision
+        || casePath !== state.activeCasePath) return;
+    if (summary.error) {
+        const message = `<div class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-info"></use></svg></div>${escapeHtml(summary.error)}</div>`;
+        container.innerHTML = message;
+        if (heatmaps) heatmaps.innerHTML = message;
+        // A results directory can exist without containing any model output.
+        // In that state the overview still has useful, clearly labelled static bathymetry.
+        if (/没有输出文件|no output files?/i.test(String(summary.error))) await loadDashboardStaticPreview();
+        return;
+    }
+    const entries = Object.entries(summary)
+        .map(([name,value],index)=>({name,value,index,priority:resultVariablePriority({...value,name})}))
+        .sort((a,b)=>a.priority-b.priority||a.index-b.index).slice(0,12)
+        .map(({name,value})=>[name,value]);
+    if (!entries.length) {
+        const message = '<div class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-info"></use></svg></div>当前输出中没有可汇总的关键变量</div>';
+        container.innerHTML = message;
+        if (heatmaps) heatmaps.innerHTML = message;
+        return;
+    }
     container.innerHTML = `<div class="grid-2">` + entries.map(([k,v]) => `
         <div style="padding:10px;background:var(--bg-tertiary);border-radius:6px;">
-            <div style="font-size:12px;color:var(--text-secondary);">${v.long_name || k}</div>
+            <div data-i18n-skip="true" style="font-size:12px;color:var(--text-secondary);">${escapeHtml(resultLabel(v,k))}</div>
             <div style="font-size:18px;font-weight:600;margin-top:2px;">${fmt(v.mean,3)} <span style="font-size:11px;color:var(--text-muted);">${v.units||''}</span></div>
             <div style="font-size:10px;color:var(--text-muted);">范围: ${fmt(v.min,3)} ~ ${fmt(v.max,3)}</div>
         </div>`).join('') + '</div>';
@@ -1735,79 +2946,310 @@ async function loadDashboardSummary() {
     loadDashboardMiniHeatmaps();
 }
 
+async function loadDashboardStaticPreview() {
+    const container = $('dashboard-mini-heatmaps');
+    if (!container || !state.activeCasePath) return;
+    const request = state.dashboardStaticRequest = (state.dashboardStaticRequest || 0) + 1;
+    const revision = state.caseRevision, casePath = state.activeCasePath;
+    const geometry = await getScientificGeometry();
+    if (request !== state.dashboardStaticRequest || revision !== state.caseRevision || casePath !== state.activeCasePath) return;
+    const depth = geometry?.depth;
+    if (!Array.isArray(depth) || !depth.length || !depth[0]?.length) {
+        const message = window.StudioI18n?.scientificText('当前案例没有可用水深预览。模型未运行。','No bathymetry preview is available for this case. Model not run.')
+            || '当前案例没有可用水深预览。模型未运行。';
+        container.classList.add('empty-state');
+        container.innerHTML = `<div class="empty-state">${escapeHtml(message)}</div>`;
+        return;
+    }
+    const label = window.StudioI18n?.scientificText('静态水深预览 · 模型未运行','Static depth preview · model not run')
+        || '静态水深预览 · 模型未运行';
+    const validated = window.ScientificHeatmap?.validateBoundary?.(geometry.authoritative_boundary, {
+        wetMask: geometry.wetMask, dryMask: geometry.dry_mask, xc: geometry.xc, yc: geometry.yc,
+        coordinateMode: geometry.coordinate_mode, rows: depth.length, cols: depth[0].length
+    });
+    const outline = validated
+        ? (window.StudioI18n?.scientificText(`显示轮廓：${validated.source}与湿干掩膜一致（仅用于显示裁切；地理/科学真实性未验证）`,`Display outline: ${validated.source} agrees with the wet/dry mask (display clipping only; geographic/scientific validity unverified)`) || `显示轮廓：${validated.source}与湿干掩膜一致（仅用于显示裁切；地理/科学真实性未验证）`)
+        : (window.StudioI18n?.scientificText('显示轮廓：湿格边缘代理；无有效保存边界','Display outline: wet-cell edge proxy; no valid saved boundary') || '显示轮廓：湿格边缘代理；无有效保存边界');
+    container.classList.remove('empty-state');
+    container.innerHTML = `<article class="workbench-heatmap-card dashboard-static-preview" data-preview-state="static" data-boundary-source="${validated ? 'authoritative' : 'wet-mask-proxy'}">
+        <div class="workbench-heatmap-title">${escapeHtml(label)}</div>
+        <canvas id="dashboard-static-bathymetry" class="workbench-heatmap" width="960" height="520" role="img" aria-label="${escapeAttr(label)}"></canvas>
+        <div class="workbench-heatmap-range">${escapeHtml(outline)} · ${escapeHtml(window.StudioI18n?.scientificText('水深 (m)','Depth (m)') || '水深 (m)')}</div>
+        <div class="workbench-heatmap-range">${escapeHtml(window.StudioI18n?.scientificText('静态 bathymetry.nc；未运行模型，非模拟输出。','Static bathymetry.nc; model has not run; this is not simulation output.') || '静态 bathymetry.nc；未运行模型，非模拟输出。')}</div>
+    </article>`;
+    const canvas = $('dashboard-static-bathymetry');
+    if (!canvas) return;
+    const wetDepth = depth.map(row => row.map(value => Number.isFinite(value) && value > 0 ? value : null));
+    const vmax = Math.max(0, ...wetDepth.flat().filter(Number.isFinite));
+    window.ScientificHeatmap?.draw(canvas, wetDepth, { min: 0, max: vmax, wetMask: geometry.wetMask,
+        dryMask: geometry.dry_mask, xc: geometry.xc, yc: geometry.yc,
+        coordinateMode: geometry.coordinate_mode, boundary: geometry.authoritative_boundary });
+}
+
 async function loadDashboardMiniHeatmaps() {
     const container = $('dashboard-mini-heatmaps');
     if (!container) return;
+    const variableSelect = $('dashboard-variable-select');
+    const request = state.dashboardHeatmapRequest = (state.dashboardHeatmapRequest || 0) + 1;
+    const revision = state.caseRevision;
+    const casePath = state.activeCasePath;
+    container.innerHTML = '<div class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-clock"></use></svg></div>正在读取当前案例空间分布…</div>';
+    const isCurrent = () => request === state.dashboardHeatmapRequest
+        && revision === state.caseRevision && casePath === state.activeCasePath;
     const data = await api('/api/results/state_vars_surface');
-    if (data.error) { container.innerHTML = `<div class="empty-state">${data.error}</div>`; return; }
+    if (!isCurrent()) return;
+    if (data.error) { container.innerHTML = `<div class="empty-state"><div class="icon"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-info"></use></svg></div>${escapeHtml(data.error)}</div>`; return; }
     const entries = Object.entries(data);
     if (!entries.length) { container.innerHTML = '<div class="empty-state">无变量数据</div>'; return; }
-    let html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
-    for (const [vname, info] of entries) {
-        const canvasId = `mini-heat-${vname.replace(/[^a-zA-Z0-9_]/g, '_')}`;
-        html += `<div style="background:var(--bg-tertiary);border-radius:6px;padding:8px;">
-            <div style="font-size:11px;color:var(--text-secondary);">${info.long_name || vname}</div>
-            <canvas id="${canvasId}" width="120" height="100" style="width:100%;background:#1a1d27;border-radius:4px;"></canvas>
-            <div style="font-size:10px;color:var(--text-muted);">${fmt(info.min,3)} ~ ${fmt(info.max,3)} ${info.units||''} (均值 ${fmt(info.mean,3)})</div>
-        </div>`;
+    container.classList.remove('empty-state');
+    const names = new Set(entries.map(([name]) => name));
+    let selected = names.has(variableSelect?.value) ? variableSelect.value : entries[0][0];
+    if (variableSelect) {
+        variableSelect.replaceChildren(...entries.map(([name, info]) => {
+            const item = document.createElement('option');
+            item.value = name;
+            item.textContent = `${resultLabel(info,name)}${info.units ? ` · ${info.units}` : ''}`;
+            return item;
+        }));
+        variableSelect.value = selected;
+        variableSelect.disabled = entries.length < 2;
     }
-    html += '</div>';
-    container.innerHTML = html;
-    // Render each mini-heatmap
-    for (const [vname, info] of entries) {
-        const canvasId = `mini-heat-${vname.replace(/[^a-zA-Z0-9_]/g, '_')}`;
-        drawHeatmap(canvasId, info.data, info.min, info.max);
-    }
+    const render = () => {
+        const primaryLabel = window.StudioI18n?.scientificText('主视图','Main view') || '主视图';
+        let html = '<div class="workbench-heatmap-grid">';
+        for (const [vname, info] of entries) {
+            const canvasId = `mini-heat-${vname.replace(/[^a-zA-Z0-9_]/g, '_')}`;
+            const label = resultLabel(info,vname);
+            html += `<article class="workbench-heatmap-card" data-dashboard-variable="${escapeAttr(vname)}" data-dashboard-primary="${String(vname===selected)}">
+                <div data-i18n-skip="true" class="workbench-heatmap-title">${escapeHtml(label)}${vname===selected?` · ${escapeHtml(primaryLabel)}`:''}</div>
+                <canvas id="${canvasId}" class="workbench-heatmap" width="480" height="300" role="img" aria-label="${escapeAttr(label)} 空间分布"></canvas>
+                <div class="workbench-heatmap-range">${fmt(info.min,3)} ~ ${fmt(info.max,3)} ${escapeHtml(info.units||'')} · 均值 ${fmt(info.mean,3)}</div>
+            </article>`;
+        }
+        html += '</div>';
+        container.innerHTML = html;
+        for (const [vname, info] of entries) {
+            const canvasId = `mini-heat-${vname.replace(/[^a-zA-Z0-9_]/g, '_')}`;
+            drawHeatmap(canvasId, info.data, info.min, info.max);
+        }
+    };
+    render();
+    if (variableSelect) variableSelect.onchange = () => {
+        if (!names.has(variableSelect.value) || variableSelect.value === selected) return;
+        selected = variableSelect.value;
+        render();
+    };
 }
 
 // ── 2D Visualization ──────────────────────────────────────────────────
+async function getScientificGeometry() {
+    const revision = state.caseRevision;
+    if (state.scientificGeometryRevision === revision && state.scientificGeometry) return state.scientificGeometry;
+    if (state.scientificGeometryPending?.revision === revision) return state.scientificGeometryPending.promise;
+    const promise = api('/api/geo/grid?display=scientific').then(data => {
+        if (revision !== state.caseRevision || !data || data.error) return null;
+        state.scientificGeometryRevision = revision;
+        state.scientificGeometry = data;
+        const shape=data.shape,gridStatus=typeof $==='function'?$('qgis-status-grid'):null;
+        if(gridStatus && shape?.length===2 && shape.every(n=>Number.isInteger(n)&&n>0))gridStatus.textContent=`${shape[1]} × ${shape[0]}`;
+        return data;
+    }).catch(() => null).finally(() => {
+        // An older case's completion must not remove its replacement request.
+        if (state.scientificGeometryPending?.promise === promise) state.scientificGeometryPending = null;
+    });
+    state.scientificGeometryPending = {revision, promise};
+    return promise;
+}
+
 async function initViz2d() {
+    if(state.currentCasePending)await state.currentCasePending;
+    if(!state.activeCasePath){clearResultInventory();return;}
+    state.scientificGeometry = null;
+    state.scientificGeometryPending = null;
+    const revision=state.caseRevision;
     if (!state.variables2d.length && !state.variables3d.length) await loadVariables();
-    if ($('viz2d-var').options.length) updateViz2d();
+    while(state.variablesPending && state.variablesPending.revision===revision)await state.variablesPending.promise;
+    if(revision!==state.caseRevision)return;
+    const singleColumn = state.resultGeometry?.threeD?.single_column === true;
+    const singleColumnMessage = $('viz2d-single-column-message');
+    const twoDMain = document.querySelector('#page-viz2d .sw-main');
+    if(singleColumnMessage){singleColumnMessage.hidden=!singleColumn;singleColumnMessage.style.display=singleColumn?'block':'';}
+    if(twoDMain){twoDMain.hidden=singleColumn;twoDMain.style.display=singleColumn?'none':'';}
+    if(singleColumn){window.ScientificWorkspace?.activate('viz2d');return;}
+    const changed = window.ScientificWorkspace?.activate('viz2d');
+    if ($('viz2d-var').options.length) {
+        const levels=$('viz2d-level'),name=$('viz2d-var').value;
+        const metadata=window.ScientificWorkspace?.variableMetadata?.(name)
+            || [...state.variables3d,...state.variables2d].find(v=>v.name===name);
+        const hasLayers=metadata?.ndim===4 || (Array.isArray(metadata?.dims)&&metadata.dims.includes('sigma'))
+            || (metadata?.ndim==null && state.variables3d.some(v=>v.name===name));
+        const nlev=hasLayers?(Number.isInteger(metadata?.nlev)&&metadata.nlev>0?metadata.nlev:state.nlev || 11):1;
+        const sameSelection=levels?.dataset.variable===name
+            && levels.dataset.caseRevision===String(revision ?? '')
+            && levels.dataset.casePath===String(state.activeCasePath || state.activeCase || '');
+        if (changed || !levels?.options.length || !sameSelection || levels.dataset.nlev!==String(nlev)
+                || levels.dataset.hasLayers!==String(hasLayers))await onViz2dVarChange(sameSelection);
+        else await updateViz2d();
+    }
 }
 
 async function updateViz2d() {
+    const request = state.viz2dRequest = (state.viz2dRequest || 0) + 1;
+    const revision = state.caseRevision;
+    const outputRevision=state.outputRevision || 0;
+    state.viz2dAbort?.abort();
+    const controller = typeof AbortController === 'function' ? new AbortController() : null;
+    state.viz2dAbort = controller;
+    const current = () => request === state.viz2dRequest && revision === state.caseRevision
+        && outputRevision === (state.outputRevision || 0);
+    const geometryMatches = (geometry, field) => {
+        const rows = field?.length, cols = field?.[0]?.length;
+        return Array.isArray(field) && rows > 0 && cols > 0 &&
+            field.every(row => Array.isArray(row) && row.length === cols) &&
+            geometry?.shape?.[0] === rows && geometry?.shape?.[1] === cols &&
+            Array.isArray(geometry.wetMask) && geometry.wetMask.length === rows &&
+            geometry.wetMask.every(row => Array.isArray(row) && row.length === cols);
+    };
     const varName = $('viz2d-var').value;
+    window.ScientificWorkspace?.syncFrom('viz2d');
+    window.ScientificWorkspace?.loading('viz2d');
     const timestep = Number($('viz2d-time').value);
+    const perfClock=()=>window.performance?.now?.() ?? Date.now();
+    const perf=window.PlaybackPerformance;
+    const perfTicket=perf?.begin('viz2d',timestep,$('viz2d-speed')?.value,window.ScientificWorkspace?.isPlaying?.('viz2d'));
     const level = Number($('viz2d-level').value);
-    const dateLabel = (state.timeLabels && state.timeLabels[timestep]) || null;
-    $('viz2d-time-label').textContent = dateLabel ? `第 ${timestep} 帧 · ${dateLabel}` : `${timestep}`;
+    const dateLabel = window.ScientificWorkspace?.dateLabel?.('viz2d',timestep,varName)
+        ?? ModelDates.format((state.timeLabels2d || state.timeLabels)?.[timestep] || null);
+    $('viz2d-time-label').textContent = dateLabel ? `${window.StudioI18n?.locale().startsWith('zh')===false?'Frame '+timestep:'第 '+timestep+' 帧'} · ${dateLabel}` : `${timestep}`;
     // 占位变量：无模型结果时显示湖盆水深（来自 bathymetry.nc）
     if (varName === '__bathy__') {
-        const g = await api('/api/geo/grid');
-        if (g.error) { toast(g.error, 'error'); return; }
+        const g = window.ScientificHeatmap ? await getScientificGeometry() : await api('/api/geo/grid');
+        if (!current()) return;
+        if (!g || g.error || (window.ScientificHeatmap && !geometryMatches(g,g.depth))) {
+            const message = g?.error || '湖盆几何不可用或湿掩膜形状不匹配';
+            window.ScientificWorkspace?.failure('viz2d',message);toast(message,'error');return;
+        }
         let vmax = 0;
         for (const row of g.depth) for (const v of row) if (v != null && v > vmax) vmax = v;
-        drawHeatmap('viz2d-canvas', g.depth, 0, vmax);
+        const wetDepth = g.depth.map(row=>row.map(v=>v > 0 ? v : null));
+        $('viz2d-canvas')._resultField = wetDepth;
+        $('viz2d-canvas')._scientificMetadata = g;
+        const range = window.ScientificStyle?.resolve({caseKey:state.activeCasePath || state.activeCase,variable:varName,min:0,max:vmax}) || {min:0,max:vmax};
+        $('viz2d-canvas')._scientificRange = range;
+        drawHeatmap('viz2d-canvas', wetDepth, range.min, range.max);
+        $('viz2d-canvas')._resultVariable = varName;
         $('viz2d-min').textContent = '0';
         $('viz2d-max').textContent = fmt(vmax, 4);
-        $('viz2d-info').textContent = `变量: 水深（地形 bathymetry.nc，尚无模型结果时的占位显示）| 形状: ${g.ny}×${g.nx}`;
-        drawColorbar('viz2d-colorbar', 0, vmax);
+        const validatedBoundary=window.ScientificHeatmap?.validateBoundary?.(g.authoritative_boundary,{
+            wetMask:g.wetMask,dryMask:g.dry_mask,xc:g.xc,yc:g.yc,coordinateMode:g.coordinate_mode,
+            rows:wetDepth.length,cols:wetDepth[0]?.length||0});
+        const outline=validatedBoundary
+            ? (window.StudioI18n?.scientificText(`边界：${validatedBoundary.source}与湿干掩膜一致（仅用于显示裁切；地理/科学真实性未验证）`,`Boundary: ${validatedBoundary.source} agrees with the wet/dry mask (display clipping only; geographic/scientific validity unverified)`)||`边界：${validatedBoundary.source}与湿干掩膜一致（仅用于显示裁切；地理/科学真实性未验证）`)
+            : (window.StudioI18n?.scientificText('边界：湿格边缘代理（未验证）','Boundary: wet-cell edge proxy (unverified)')||'边界：湿格边缘代理（未验证）');
+        $('viz2d-info').textContent = `${window.StudioI18n?.scientificText('变量：水深（静态地形 bathymetry.nc；模型未运行）','Variable: depth (static bathymetry.nc; model not run)')||'变量：水深（静态地形 bathymetry.nc；模型未运行）'} | ${outline} | ${wetDepth.length}×${wetDepth[0]?.length || 0}`;
+        drawColorbar('viz2d-colorbar', range.min, range.max, '湖盆水深', 'm');
+        window.ScientificWorkspace?.publish('viz2d',{variable:varName,label:'湖盆水深',units:'m',min:0,max:vmax,range,field:wetDepth,date:'地形预览',level:null});
+        setViz2dBoundarySummary(outline);
         return;
     }
-    const data = await api(`/api/results/2d?var=${varName}&time=${timestep}&level=${level}`);
-    if (data.error) { toast(data.error, 'error'); return; }
-    drawHeatmap('viz2d-canvas', data.data, data.min, data.max);
+    const resultUrl = `/api/results/2d?var=${encodeURIComponent(varName)}&time=${timestep}&level=${level}&include_bathymetry=0`;
+    const prefetch2d=window.Viz2DPlaybackPrefetch;
+    const selection={case:state.activeCasePath || state.activeCase || '',casePath:state.activeCasePath || null,
+        serverCaseGeneration:state.serverCaseGeneration,
+        rangeStart:Number($('viz2d-play-start')?.value),rangeEnd:Number($('viz2d-play-end')?.value),
+        revision,outputRevision,variable:varName,level};
+    const fetchResult=url=>api(url,{signal:url===resultUrl?controller?.signal:undefined});
+    const fetchBatch=({urls,identity:batchIdentity})=>api('/api/results/2d_batch',{method:'POST',body:{
+        var:varName,times:urls.map(url=>Number(new URL(url,window.location.href).searchParams.get('time'))),
+        level,aggregation:'layer',include_bathymetry:false,
+        expected_case_path:batchIdentity.casePath,
+        expected_case_generation:batchIdentity.serverCaseGeneration,
+    }});
+    const refreshCase=async()=>{
+        const refreshed=await api('/api/case/current');
+        const normalizePath=value=>String(value||'').replace(/\\/g,'/').replace(/\/+$/,'').toLocaleLowerCase();
+        if(current() && refreshed?.case_path &&
+            normalizePath(refreshed.case_path)===normalizePath(selection.casePath) &&
+            Number.isInteger(refreshed.case_generation))
+            state.serverCaseGeneration=refreshed.case_generation;
+        return refreshed;
+    };
+    const data = prefetch2d
+        ? await prefetch2d.fetchCurrent({url:resultUrl,identity:selection,
+            isPlaying:()=>window.ScientificWorkspace?.isPlaying?.('viz2d'),
+            isCurrent:()=>current() && $('viz2d-var')?.value===varName && Number($('viz2d-level')?.value)===level,
+            endFrame:Number($('viz2d-play-end')?.value),fetchResult,fetchBatch,refreshCase})
+        : await api(resultUrl,{signal:controller?.signal});
+    if (!current()) return;
+    if(data?._clientTiming){perf?.stage(perfTicket,'request',data._clientTiming.requestMs);perf?.stage(perfTicket,'decode',data._clientTiming.decodeMs);}
+    if (data.aborted) { if(current())window.ScientificWorkspace?.failure('viz2d','请求已取消，请重新加载当前帧'); return; }
+    if (data.error) { window.ScientificWorkspace?.failure('viz2d',data.error); toast(data.error, 'error'); return; }
+    let geometryStartedAt=perfClock();
+    if (window.ScientificHeatmap) {
+        const geometry = await getScientificGeometry();
+        if (!current()) return;
+        perf?.stage(perfTicket,'geometry',perfClock()-geometryStartedAt);
+        if (!geometryMatches(geometry,data.data)) {
+            const message = '湖盆几何不可用或湿掩膜与结果网格形状不匹配';
+            window.ScientificWorkspace?.failure('viz2d',message);toast(message,'error');return;
+        }
+        $('viz2d-canvas')._scientificMetadata = geometry;
+    }
+    $('viz2d-canvas')._resultField = data.data;
+    const assembleStartedAt=perfClock();
+    window.VariableGuide?.updateValues('viz2d-var', data);
+    const range = window.ScientificStyle?.resolve({caseKey:state.activeCasePath || state.activeCase,variable:varName,min:data.min,max:data.max}) || {min:data.min,max:data.max};
+    $('viz2d-canvas')._scientificRange = range;
+    perf?.stage(perfTicket,'assemble',perfClock()-assembleStartedAt);
+    const drawStartedAt=perfClock();
+    drawHeatmap('viz2d-canvas', data.data, range.min, range.max);
+    $('viz2d-canvas')._resultVariable = varName;
     $('viz2d-min').textContent = fmt(data.min,4);
     $('viz2d-max').textContent = fmt(data.max,4);
-    $('viz2d-info').textContent = `变量: ${varName} | 时步: ${timestep}${dateLabel ? ' (' + dateLabel + ')' : ''} | 均值: ${fmt(data.mean,4)} | 形状: ${data.shape?.join('×')}`;
-    drawColorbar('viz2d-colorbar', data.min, data.max);
+    const canvasMetadata=$('viz2d-canvas')._scientificMetadata;
+    const validatedBoundary=window.ScientificHeatmap?.validateBoundary?.(canvasMetadata?.authoritative_boundary,{
+        wetMask:canvasMetadata?.wetMask,dryMask:canvasMetadata?.dry_mask,xc:canvasMetadata?.xc,yc:canvasMetadata?.yc,
+        coordinateMode:canvasMetadata?.coordinate_mode,rows:data.data.length,cols:data.data[0]?.length||0});
+    const outline=validatedBoundary
+        ? (window.StudioI18n?.scientificText(`边界：${validatedBoundary.source}与湿干掩膜一致（仅用于显示裁切；地理/科学真实性未验证）`,`Boundary: ${validatedBoundary.source} agrees with the wet/dry mask (display clipping only; geographic/scientific validity unverified)`)||`边界：${validatedBoundary.source}与湿干掩膜一致（仅用于显示裁切；地理/科学真实性未验证）`)
+        : (window.StudioI18n?.scientificText('边界：湿格边缘代理（未验证）','Boundary: wet-cell edge proxy (unverified)')||'边界：湿格边缘代理（未验证）');
+    $('viz2d-info').textContent = `${window.StudioI18n?.scientificText('变量','Variable')||'变量'}: ${resultLabel(data,varName)} (${varName}) | ${outline} | ${window.StudioI18n?.scientificText('时步','Frame')||'时步'}: ${timestep}${dateLabel ? ' (' + dateLabel + ')' : ''} | ${window.StudioI18n?.scientificText('均值','Mean')||'均值'}: ${fmt(data.mean,4)} | ${window.StudioI18n?.scientificText('形状','Shape')||'形状'}: ${data.shape?.join('×')}`;
+    drawColorbar('viz2d-colorbar', range.min, range.max, resultLabel(data,varName), data.units);
+    perf?.stage(perfTicket,'draw',perfClock()-drawStartedAt);
+    window.ScientificWorkspace?.publish('viz2d',{variable:varName,label:resultLabel(data,varName),units:data.units,min:data.min,max:data.max,range,field:data.data,date:dateLabel,time:timestep,level});
+    setViz2dBoundarySummary(outline,`${resultLabel(data,varName)} (${data.units||''})`);
+    perf?.finish(perfTicket);
     // Overlay polygon vertices if any
     if (state.viz2dPolygon && state.viz2dPolygon.length) drawViz2dPolygonOverlay();
 }
 
+function setViz2dBoundarySummary(outline, baseLabel='湖盆水深 · m · 地形预览') {
+    const summary=$('viz2d-summary');
+    const base=baseLabel==='湖盆水深 · m · 地形预览'
+        ? (window.StudioI18n?.scientificText(baseLabel,'Basin depth · m · terrain preview')||baseLabel)
+        : baseLabel;
+    if(summary)summary.textContent=`${base} · ${outline}`;
+}
+
 // Variable change handler: populate layer dropdown based on variable dimension
-async function onViz2dVarChange() {
+async function onViz2dVarChange(preserveLayer=false) {
     const varName = $('viz2d-var').value;
     // Determine if 3D variable by checking variables3d list
-    const is3d = state.variables3d.some(v => v.name === varName);
+    const metadata = window.ScientificWorkspace?.variableMetadata?.(varName)
+        || [...state.variables3d,...state.variables2d].find(v=>v.name===varName);
+    const is3d = metadata?.ndim===4 || (Array.isArray(metadata?.dims)&&metadata.dims.includes('sigma'))
+        || (metadata?.ndim==null && state.variables3d.some(v=>v.name===varName));
     const levelSel = $('viz2d-level');
+    const previous=levelSel.value;
     levelSel.innerHTML = '';
+    levelSel.dataset.variable=varName;
+    levelSel.dataset.caseRevision=String(state.caseRevision ?? '');
+    levelSel.dataset.casePath=String(state.activeCasePath || state.activeCase || '');
+    levelSel.dataset.hasLayers=String(is3d);
+    const nlev=is3d?(Number.isInteger(metadata?.nlev)&&metadata.nlev>0?metadata.nlev:state.nlev || 11):1;
+    levelSel.dataset.nlev=String(nlev);
     if (is3d) {
         // GETM sigma: index 0=底, N-1=面. Default to surface (last).
-        // We don't know N without metadata; use 0..10 placeholder, surface as -1
-        // Real N comes from /api/results/variables; fall back to 0..10
-        const nlev = state.nlev || 11;
         for (let k = nlev - 1; k >= 0; k--) {
             const opt = document.createElement('option');
             opt.value = k;
@@ -1821,7 +3263,8 @@ async function onViz2dVarChange() {
         opt.textContent = '2D 变量（无垂向层）';
         levelSel.appendChild(opt);
     }
-    updateViz2d();
+    if(preserveLayer && Array.from(levelSel.options).some(option=>String(option.value)===previous))levelSel.value=previous;
+    await updateViz2d();
 }
 
 // ── Viz2d Interaction Tools ───────────────────────────────────────────
@@ -1849,6 +3292,10 @@ function getCanvasCell(evt) {
     const rect = canvas.getBoundingClientRect();
     const x = (evt.clientX - rect.left) * (canvas.width / rect.width);
     const y = (evt.clientY - rect.top) * (canvas.height / rect.height);
+    if (canvas._scientificGeometry) {
+        const cell = canvas._scientificGeometry.cellAt(x,y);
+        return cell ? {...cell,x,y} : null;
+    }
     const { cols, rows } = state.viz2dCellSize;
     if (!cols || !rows) return null;
     const cellW = canvas.width / cols, cellH = canvas.height / rows;
@@ -1864,7 +3311,10 @@ function setupViz2dCanvasHandlers() {
     canvas.addEventListener('mousemove', (e) => {
         const cell = getCanvasCell(e);
         if (!cell) return;
-        const coord = `i=${cell.i}, j=${cell.j}`;
+        const value=canvas._resultField?.[cell.j]?.[cell.i];
+        const wet = canvas._scientificMetadata?.wetMask?.[cell.j]?.[cell.i];
+        const detail=typeof value==='number' && Number.isFinite(value) ? window.VariableGuide?.valueText(canvas._resultVariable,value) : wet===true ? '水域：此变量无有效值' : wet===false ? '陆地' : '无有效值（湿掩膜不可用）';
+        const coord = `i=${cell.i}, j=${cell.j} · ${detail || ''}`;
         $('viz2d-coord').textContent = coord + (state.viz2dTool === 'polygon' && state.viz2dPolygon.length
             ? `  |  顶点数: ${state.viz2dPolygon.length}` : '');
     });
@@ -1881,6 +3331,7 @@ function setupViz2dCanvasHandlers() {
         } else if (state.viz2dTool === 'calibpt') {
             $('calib-add-i').value = cell.i;
             $('calib-add-j').value = cell.j;
+            populateCalibrationVariables();
             showModal('modal-add-calib');
         }
     });
@@ -1892,25 +3343,25 @@ function drawViz2dPolygonOverlay() {
     const { cols, rows } = state.viz2dCellSize;
     if (!cols || !rows || !state.viz2dPolygon.length) return;
     const cellW = canvas.width / cols, cellH = canvas.height / rows;
+    const center = (i,j) => canvas._scientificGeometry?.center(i,j) || {x:(i+0.5)*cellW,y:(j+0.5)*cellH};
     ctx.strokeStyle = '#fbbf24';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2*(canvas._scientificPixelRatio || 1);
     ctx.beginPath();
     state.viz2dPolygon.forEach(([i, j], idx) => {
-        const x = (i + 0.5) * cellW;
-        const y = (j + 0.5) * cellH;
+        const {x,y} = center(i,j);
         if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     });
     if (state.viz2dPolygon.length >= 3) {
         const [i0, j0] = state.viz2dPolygon[0];
-        ctx.lineTo((i0 + 0.5) * cellW, (j0 + 0.5) * cellH);
+        const p0 = center(i0,j0); ctx.lineTo(p0.x,p0.y);
     }
     ctx.stroke();
     // Vertex markers
     ctx.fillStyle = '#fbbf24';
     state.viz2dPolygon.forEach(([i, j]) => {
-        const x = (i + 0.5) * cellW, y = (j + 0.5) * cellH;
+        const {x,y} = center(i,j);
         ctx.beginPath();
-        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.arc(x, y, 4*(canvas._scientificPixelRatio || 1), 0, Math.PI * 2);
         ctx.fill();
     });
 }
@@ -1950,10 +3401,10 @@ async function extractCellTimeseries(i, j) {
 function renderCellTsChart(times, values, label, units) {
     if (state.charts.cellTs) state.charts.cellTs.destroy();
     const ctx = $('cell-ts-chart').getContext('2d');
-    state.charts.cellTs = new Chart(ctx, {
+    state.charts.cellTs = localizedChart(ctx, {
         type: 'line',
         data: {
-            labels: times,
+            labels: ModelDates.chartLabels(times),
             datasets: [{
                 label: `${label} (${units||''})`,
                 data: values,
@@ -1970,11 +3421,180 @@ function renderCellTsChart(times, values, label, units) {
     });
 }
 
+async function updateSpatialSection() {
+    const axis = $('viz3d-section-axis').value;
+    const index = Number($('viz3d-section-index').value);
+    if (!Number.isInteger(index) || index < 0) { toast('剖面格点索引必须是非负整数', 'error'); return; }
+    if (!window.renderSpatialSection) { toast('剖面渲染器未加载', 'error'); return; }
+    const name=$('viz3d-iso-var').value, timestep=Number($('viz3d-iso-time').value);
+    const main=window.ScientificWorkspace?.current('viz3d');
+    const appState=typeof state==='undefined'?{}:state;
+    const revision=appState.caseRevision;
+    const request=appState.spatialSectionRequest=(appState.spatialSectionRequest || 0)+1;
+    const matchesMain=main?.variable===name && main.time===timestep;
+    const data = await window.renderSpatialSection(name,timestep,axis,index,{
+        containerId:'viz3d-section-plot',caseKey:appState.activeCasePath || appState.activeCase,
+        timeLabel:window.ScientificWorkspace?.dateLabel?.('viz3d',timestep,name)
+            ?? (typeof ModelDates==='undefined'?'':ModelDates.format((appState.timeLabels3d || appState.timeLabels)?.[timestep] || null) || ''),
+        ve:matchesMain && Number.isFinite(main.ve)?main.ve:Number($('viz3d-iso-ve')?.value || 0),
+        range:matchesMain?main.range:undefined,
+    });
+    if(request!==appState.spatialSectionRequest || revision!==appState.caseRevision)return;
+    if (data?.grid_shape) $('viz3d-section-index').max = data.grid_shape[axis === 'xz' ? 0 : 1] - 1;
+    await window.set3DSectionIndicator?.(data?.grid_shape?axis:null,index,data);
+}
+
+// ── Calibration workflow helpers ──────────────────────────────────────
+function refreshScientificTerms() {
+    document.querySelectorAll('[data-scientific-zh]').forEach(element => {
+        element.dataset.i18nSkip = 'true';
+        element.textContent = calibrationScientificText(element.dataset.scientificZh, element.dataset.scientificEn);
+    });
+}
+
+function toggleAutoCalMethod() {
+    const abc = $('ac-method').value === 'pyabc';
+    $('ac-abc-controls').style.display = abc ? '' : 'none';
+    $('ac-iterations-hint').dataset.i18nSkip = 'true';
+    $('ac-iterations-hint').textContent = abc
+        ? calibrationScientificText('ABC-SMC: 迭代次数为种群代数，每代需接受指定规模的粒子；模型评估次数另受上限约束。', 'ABC-SMC: iterations count populations; each population accepts the requested number of particles. The simulation budget limits model evaluations.')
+        : calibrationScientificText('SciPy: 优化器迭代次数；每次迭代可包含多次模型评估。', 'SciPy: optimizer iterations; each iteration may require multiple model evaluations.');
+}
+
+function calibrationScientificText(zh, en) {
+    const text = window.StudioI18n?.scientificText(zh, en) || `${zh} / ${en}`;
+    if (!state.scientificTerms) state.scientificTerms = new Map();
+    state.scientificTerms.set(text,{zh,en});
+    return text;
+}
+
+function selectedCalibrationVariables(id) {
+    return Array.from($(id).selectedOptions, option => option.value);
+}
+
+function populateCalibrationVariables() {
+    const variables = [...new Map([...(state.variables3d || []), ...(state.variables2d || [])].map(v => [v.name, v])).values()];
+    // Temperature is usable before the first results file exists.
+    if (!variables.length) variables.push({name:'temp', zh_name:'水温', en_name:'Water temperature'});
+    for (const id of ['calib-add-vars', 'new-point-vars']) {
+        const select = $(id);
+        if (!select) continue;
+        const selected = new Set(Array.from(select.selectedOptions, option => option.value));
+        const available = variables.some(v => selected.has(v.name));
+        const defaultName = variables.some(v => v.name === 'temp') ? 'temp' : variables[0].name;
+        select.replaceChildren();
+        variables.forEach(v => {
+            const option = document.createElement('option');
+            option.value = v.name;
+            option.textContent = `${calibrationScientificText(v.zh_name || v.name, v.en_name || v.long_name_en || v.long_name || v.name)} · ${v.name} [${v.units || ''}]`;
+            option.dataset.i18nSkip = 'true';
+            option.selected = available ? selected.has(v.name) : v.name === defaultName;
+            select.appendChild(option);
+        });
+    }
+}
+
+async function runCalModelAndCompare() {
+    if (state.calManualRunning) return;
+    const pid = $('cal-point-select').value, variable = $('cal-var-select').value;
+    if (!state.activeCase || !pid || !variable) { toast('请先加载案例并选择点位和变量', 'error'); return; }
+    const button = $('cal-run-compare');
+    state.calManualRunning = true;
+    button.disabled = true;
+    try {
+        const result = await api('/api/run/start', {method:'POST'});
+        if (!result.success) throw new Error(result.error || '启动失败');
+        $('cal-stats').textContent = calibrationScientificText('模型运行中，完成后对比', 'Running model; comparison follows completion');
+        while (true) {
+            const status = await api('/api/run/status');
+            if (status.error) throw new Error(status.error);
+            if (status.status === 'completed') break;
+            if (status.status !== 'running') throw new Error(`模型未完成: ${status.status || 'unknown'}`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+        await loadVariables();
+        $('cal-point-select').value = pid;
+        $('cal-var-select').value = variable;
+        await updateCalComparison(pid, variable);
+    } catch (error) {
+        $('cal-stats').textContent = error.message;
+        toast(error.message, 'error');
+    } finally {
+        state.calManualRunning = false;
+        button.disabled = false;
+    }
+}
+
+function renderAutoCalConvergence(history) {
+    const canvas = $('ac-convergence-chart');
+    if (!canvas) return;
+    const valid = history.filter(row => Number.isFinite(row.objective));
+    let best = Infinity;
+    const bestValues = valid.map(row => best = Math.min(best, row.objective));
+    if (state.charts.calConvergence) state.charts.calConvergence.destroy();
+    state.charts.calConvergence = localizedChart(canvas.getContext('2d'), {
+        type:'line', data:{labels:valid.map(row => row.iteration), datasets:[
+            {label:calibrationScientificText('目标函数', 'Objective'), data:valid.map(row => row.objective), borderColor:'#3b82f6', pointRadius:2, tension:0},
+            {label:calibrationScientificText('最优目标值', 'Best objective'), data:bestValues, borderColor:'#10b981', pointRadius:0, tension:0}
+        ]}, options:{responsive:true, maintainAspectRatio:false,
+            scales:{x:{title:{display:true,text:calibrationScientificText('模型评估次数','Model evaluations')}},y:{title:{display:true,text:calibrationScientificText('目标函数值','Objective value')}}}}
+    });
+}
+
+function renderCalibrationWeights(points) {
+    const container = $('ac-objective-weights');
+    if (!container) return;
+    const previous = new Map(Array.from(container.querySelectorAll('.ac-weight-row'), row => [
+        `${row.dataset.pointId}:${row.dataset.variable}`,
+        [row.querySelector('[data-role=weight]').value,row.querySelector('[data-role=scale]').value]
+    ]));
+    container.replaceChildren();
+    points.forEach(point => (point.variables || []).forEach(variable => {
+        const row = document.createElement('div');
+        row.className = 'ac-weight-row form-row';
+        row.dataset.pointId = point.id;
+        row.dataset.variable = variable;
+        const label = document.createElement('span');
+        label.textContent = `${point.name} · ${variable}`;
+        row.appendChild(label);
+        const values = previous.get(`${point.id}:${variable}`) || ['',''];
+        ['weight','scale'].forEach((role,index) => {
+            const label = document.createElement('label');
+            label.dataset.i18nSkip = 'true';
+            label.textContent = calibrationScientificText(index ? '尺度' : '权重', index ? 'Scale' : 'Weight');
+            const input = document.createElement('input');
+            input.className = 'form-input'; input.type = 'number'; input.step = 'any';
+            input.min = index ? '0.000000000001' : '0';
+            input.placeholder = '1'; input.value = values[index]; input.dataset.role = role;
+            input.style.width = '90px';
+            label.appendChild(input); row.appendChild(label);
+        });
+        container.appendChild(row);
+    }));
+}
+
+function collectCalibrationWeights(pointIds) {
+    const container = $('ac-objective-weights');
+    if (!container) return [];
+    const rows = [];
+    container.querySelectorAll('.ac-weight-row').forEach(row => {
+        if (!pointIds.includes(row.dataset.pointId)) return;
+        const weightText = row.querySelector('[data-role=weight]').value;
+        const scaleText = row.querySelector('[data-role=scale]').value;
+        if (weightText === '' && scaleText === '') return;
+        const weight = weightText === '' ? 1 : Number(weightText), scale = scaleText === '' ? 1 : Number(scaleText);
+        if (!Number.isFinite(weight) || weight < 0) throw new Error('权重 Weight 必须是非负有限数值');
+        if (!Number.isFinite(scale) || scale <= 0) throw new Error('尺度 Scale 必须是正有限数值');
+        rows.push({point_id:row.dataset.pointId, variable:row.dataset.variable, weight, scale});
+    });
+    return rows;
+}
+
 async function confirmAddCalibPoint() {
     const name = $('calib-add-name').value.trim();
     const i = Number($('calib-add-i').value);
     const j = Number($('calib-add-j').value);
-    const vars = $('calib-add-vars').value.split(',').map(s => s.trim()).filter(Boolean);
+    const vars = selectedCalibrationVariables('calib-add-vars');
     if (!name) { toast('请填写点位名称', 'error'); return; }
     if (!vars.length) { toast('请填写率定变量', 'error'); return; }
     const res = await api('/api/calibration/points', { method: 'POST', body: { name, i, j, variables: vars } });
@@ -1990,6 +3610,40 @@ function setNlev(nlev) { state.nlev = nlev; }
 
 function drawHeatmap(canvasId, data, vmin, vmax) {
     const canvas = $(canvasId);
+    if (canvasId === 'viz2d-canvas' && window.ScientificHeatmap) {
+        const meta = canvas._scientificMetadata;
+        const sameShape = meta?.shape?.[0] === data?.length && meta?.shape?.[1] === data?.[0]?.length;
+        const paint=(width,height)=>{
+            let pixelRatio=1;
+            if(Number.isFinite(width)&&width>0&&Number.isFinite(height)&&height>0){
+                pixelRatio=Math.max(1,Math.min(4,Number(window.devicePixelRatio)||1));
+                canvas.style.width=width+'px';canvas.style.height=height+'px';
+                const w=Math.round(width*pixelRatio),h=Math.round(height*pixelRatio);
+                if(canvas.width!==w)canvas.width=w;if(canvas.height!==h)canvas.height=h;
+            }
+            canvas._scientificPixelRatio=pixelRatio;
+            canvas._scientificGeometry = window.ScientificHeatmap.draw(canvas,data,{
+                min:vmin,max:vmax,palette:canvas._scientificRange?.palette || 'lake',style:canvas._scientificRange,pixelRatio,
+                wetMask:sameShape ? meta.wetMask : undefined,
+                xc:sameShape && meta.coordinate_mode==='projected' ? meta.xc : undefined,
+                yc:sameShape && meta.coordinate_mode==='projected' ? meta.yc : undefined,
+                dryMask:sameShape ? meta.dry_mask : undefined,
+                coordinateMode:sameShape ? meta.coordinate_mode : undefined,
+                boundary:sameShape ? meta.authoritative_boundary : undefined,
+                showGrid:!!document.getElementById('viz2d-grid')?.checked,
+            });
+            state.viz2dCellSize = {rows:data.length,cols:data[0].length};
+            setupViz2dCanvasHandlers();
+            if(state.viz2dPolygon?.length)drawViz2dPolygonOverlay();
+        };
+        canvas._scientificResize=paint;
+        const host=canvas.parentElement;
+        const styles=host && typeof getComputedStyle==='function'?getComputedStyle(host):{};
+        const inset=(a,b)=>(parseFloat(styles[a])||0)+(parseFloat(styles[b])||0);
+        if(host?.classList?.contains('vc-canvas-viewport'))paint(host.clientWidth-inset('paddingLeft','paddingRight'),host.clientHeight-inset('paddingTop','paddingBottom'));
+        else paint();
+        return;
+    }
     const ctx = canvas.getContext('2d');
     if (!data || !data.length) return;
     const rows = data.length, cols = data[0].length;
@@ -2000,20 +3654,29 @@ function drawHeatmap(canvasId, data, vmin, vmax) {
     for (let j = 0; j < rows; j++) {
         for (let i = 0; i < cols; i++) {
             const v = data[j][i];
-            if (v === null || v === undefined || isNaN(v)) {
-                ctx.fillStyle = '#1a1d27';
+            if (!Number.isFinite(v)) {
+                ctx.fillStyle = '#f1f4f5';
             } else {
                 const t = Math.max(0, Math.min(1, (v - vmin) / range));
                 ctx.fillStyle = heatColor(t);
             }
-            ctx.fillRect(i * cellW, j * cellH, cellW + 0.5, cellH + 0.5);
+            ctx.fillRect(i * cellW, j * cellH, cellW, cellH);
         }
     }
-    // Grid lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-    ctx.lineWidth = 0.5;
-    for (let i = 0; i <= cols; i++) { ctx.beginPath(); ctx.moveTo(i*cellW,0); ctx.lineTo(i*cellW,ch); ctx.stroke(); }
-    for (let j = 0; j <= rows; j++) { ctx.beginPath(); ctx.moveTo(0,j*cellH); ctx.lineTo(cw,j*cellH); ctx.stroke(); }
+    // Trace the supplied wet mask exactly; interior cell edges stay hidden.
+    const wet = (i,j) => i>=0 && i<cols && j>=0 && j<rows && Number.isFinite(data[j][i]);
+    ctx.strokeStyle = '#54798b';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let j=0;j<rows;j++) for (let i=0;i<cols;i++) {
+        if (!wet(i,j)) continue;
+        const x=i*cellW,y=j*cellH;
+        if (!wet(i,j-1)) {ctx.moveTo(x,y);ctx.lineTo(x+cellW,y);}
+        if (!wet(i,j+1)) {ctx.moveTo(x,y+cellH);ctx.lineTo(x+cellW,y+cellH);}
+        if (!wet(i-1,j)) {ctx.moveTo(x,y);ctx.lineTo(x,y+cellH);}
+        if (!wet(i+1,j)) {ctx.moveTo(x+cellW,y);ctx.lineTo(x+cellW,y+cellH);}
+    }
+    ctx.stroke();
     // Record cell layout + attach canvas click handlers (viz2d only)
     if (canvasId === 'viz2d-canvas') {
         state.viz2dCellSize = { rows, cols, w: cellW, h: cellH };
@@ -2022,8 +3685,10 @@ function drawHeatmap(canvasId, data, vmin, vmax) {
 }
 
 function heatColor(t) {
-    // Blue-Green-Yellow-Red colormap
-    const stops = [[0,0,128],[0,128,255],[0,200,150],[255,220,0],[255,100,0],[200,0,0]];
+    if (window.ScientificStyle) return window.ScientificStyle.color(t);
+    // Sequential lake blue; shared by the 2D cells and their quantitative legend.
+    const stops = [[225,241,246],[179,217,232],[115,181,209],[57,139,179],[30,97,139],[18,58,95]];
+    t = Math.max(0, Math.min(1, Number.isFinite(t) ? t : 0));
     const idx = t * (stops.length - 1);
     const lo = Math.floor(idx), hi = Math.min(lo+1, stops.length-1);
     const f = idx - lo;
@@ -2033,69 +3698,208 @@ function heatColor(t) {
     return `rgb(${r},${g},${b})`;
 }
 
-function drawColorbar(id, vmin, vmax) {
+function drawColorbar(id, vmin, vmax, label = '', units = '') {
     const el = $(id);
-    const stops = [];
-    for (let i = 0; i <= 10; i++) {
-        const t = i / 10;
-        stops.push(`${heatColor(t)} ${t*100}%`);
-    }
+    if (!el) return;
+    const range=id==='viz2d-colorbar' ? $('viz2d-canvas')?._scientificRange : undefined;
+    const scale=range?.colorscale || window.ScientificStyle?.colorscale?.(range || {palette:'lake'})
+        || Array.from({length:11},(_,i)=>[i/10,heatColor(i/10)]);
+    const stops=scale.map(([t,color])=>`${color} ${t*100}%`);
     el.style.background = `linear-gradient(to right, ${stops.join(',')})`;
+    const select = $(id === 'viz2d-colorbar' ? 'viz2d-var' : 'viz3d-avg-var');
+    const title = label || select?.selectedOptions?.[0]?.textContent || '数值';
+    el.setAttribute('aria-label', `${title}${units ? ' ('+units+')' : ''}：${vmin} – ${vmax}`);
+    el.classList.add('scientific-colorbar');
+    // Construct text nodes rather than trusting model metadata as HTML.
+    el.replaceChildren();
+    const heading = document.createElement('span');
+    heading.className = 'scientific-colorbar-title';
+    heading.textContent = `${title}${units ? ' ('+units+')' : ''}`;
+    el.appendChild(heading);
+    const marks = window.ScientificStyle?.legendTicks?.(vmin,vmax,el.clientWidth || 200)
+        || window.ScientificStyle?.ticks(vmin,vmax) || {values:Array.from({length:5},(_,i)=>vmin+(vmax-vmin)*i/4)};
+    for (let i=0;i<marks.values.length;i++) {
+        const tick = document.createElement('span');
+        tick.className = 'scientific-colorbar-tick';
+        if(marks.values.length>1)tick.dataset.edge=i===0?'start':i===marks.values.length-1?'end':'middle';
+        tick.style.left = `${marks.values.length===1 ? 50 : i/(marks.values.length-1)*100}%`;
+        const value = marks.values[i];
+        tick.textContent = marks.labels?.[i] || (Number.isFinite(value) ? Number(value.toPrecision(4)).toString() : '—');
+        el.appendChild(tick);
+    }
 }
 
 // ── 3D Visualization ──────────────────────────────────────────────────
 async function initViz3d() {
+    if(state.currentCasePending)await state.currentCasePending;
+    if(!state.activeCasePath){clearResultInventory();return;}
+    const revision=state.caseRevision;
+    const sectionReady=initScientificSectionDefault();
     if (!state.variables3d.length) await loadVariables();
-    updateViz3d();
-    updateViz3dAvg();
-    updateViz3dIso();
+    while(state.variablesPending && state.variablesPending.revision===revision)await state.variablesPending.promise;
+    await sectionReady;
+    if(revision!==state.caseRevision)return;
+    window.ScientificWorkspace?.activate('viz3d');
+    if($('viz3d-var')?.value)updateViz3d();
+    if($('viz3d-avg-var')?.value)updateViz3dAvg();
+    return updateViz3dIso();
+}
+
+async function initScientificSectionDefault() {
+    const axis=$('viz3d-section-axis'),index=$('viz3d-section-index');
+    const path=String(state.activeCasePath || state.activeCase || ''),revision=state.caseRevision;
+    if(!axis || !index || !path || typeof getScientificGeometry!=='function')return;
+    const key=JSON.stringify([path,revision ?? null]);
+    if(state.scientificSectionDefaultKey===key)return;
+    if(state.scientificSectionDefaultPending?.key===key){
+        await state.scientificSectionDefaultPending.promise;
+        return;
+    }
+    let finish;const pending=new Promise(resolve=>{finish=resolve;});
+    state.scientificSectionDefaultPending={key,promise:pending};
+    const initialAxis=axis.value,initialIndex=index.value;
+    let edited=false,applied=false;const onEdit=()=>{edited=true;};
+    for(const control of [axis,index])for(const event of ['input','change'])control.addEventListener(event,onEdit);
+    try{
+        const geometry=await getScientificGeometry(),mask=geometry?.wetMask;
+        if(edited || revision!==state.caseRevision || path!==String(state.activeCasePath || state.activeCase || '')
+                || axis.value!==initialAxis || index.value!==initialIndex)return;
+        const rows=mask?.length,cols=mask?.[0]?.length;
+        if(!Array.isArray(mask) || !rows || !cols || geometry?.shape?.[0]!==rows || geometry?.shape?.[1]!==cols
+                || !mask.every(row=>Array.isArray(row)&&row.length===cols) || !['xz','yz'].includes(initialAxis))return;
+        const count=initialAxis==='xz'?rows:cols,midpoint=(count-1)/2;
+        let selected=-1,distance=Infinity;
+        for(let k=0;k<count;k++){
+            const wet=initialAxis==='xz'?mask[k].some(value=>value===true):mask.some(row=>row[k]===true);
+            if(wet && Math.abs(k-midpoint)<distance){selected=k;distance=Math.abs(k-midpoint);}
+        }
+        if(selected>=0){index.value=String(selected);index.max=String(count-1);applied=true;}
+    }catch{
+        // The main result remains usable when the optional geometry lookup fails.
+    }finally{
+        for(const control of [axis,index])for(const event of ['input','change'])control.removeEventListener(event,onEdit);
+        if(revision===state.caseRevision && path===String(state.activeCasePath || state.activeCase || '')
+                && (applied || edited || axis.value!==initialAxis || index.value!==initialIndex))state.scientificSectionDefaultKey=key;
+        if(state.scientificSectionDefaultPending?.promise===pending)state.scientificSectionDefaultPending=null;
+        finish();
+    }
 }
 
 async function updateViz3dIso() {
+    const playbackRequest=state.viz3dPlaybackRequest=(state.viz3dPlaybackRequest||0)+1,playbackRevision=state.caseRevision;
+    window.invalidateScientific3D?.();
     const varName = $('viz3d-iso-var')?.value;
     if (!varName) return;
+    window.ScientificWorkspace?.syncFrom('viz3d');
+    const timestep = Number($('viz3d-iso-time')?.value || 0);
+    const options = {
+        ve: Number($('viz3d-iso-ve')?.value || 0),
+        opacity: Number($('viz3d-opacity')?.value || 1),
+        meshMode: $('viz3d-mesh-mode')?.value || 'continuous',
+        lineDensity: Number($('viz3d-line-density')?.value || 1),
+        lineOpacity: Number($('viz3d-line-opacity')?.value ?? .3),
+        showNetworkNodes: $('viz3d-mesh-nodes')?.checked === true,
+        showLand: $('viz3d-show-land')?.checked !== false,
+        caseKey: state.activeCasePath || state.activeCase || '',
+        timeLabel: window.ScientificWorkspace?.dateLabel?.('viz3d',timestep,varName)
+            ?? (ModelDates.format((state.timeLabels3d || state.timeLabels)?.[timestep] || null) || ''),
+    };
+    if(playbackRequest!==state.viz3dPlaybackRequest || playbackRevision!==state.caseRevision || varName!==$('viz3d-iso-var')?.value || timestep!==Number($('viz3d-iso-time')?.value||0))return;
+    const timeLabel = document.getElementById('viz3d-iso-time-label');
+    if (timeLabel) timeLabel.textContent = options.timeLabel || `帧 ${timestep}`;
     // 占位变量：无模型结果时显示湖盆 3D 地形
     if (varName === '__bathy__') {
-        if (typeof renderBathymetry3D === 'function') await renderBathymetry3D();
+        if (typeof renderBathymetry3D === 'function') await renderBathymetry3D(options);
         return;
     }
-    const timestep = Number($('viz3d-iso-time')?.value || 0);
-    const render = $('viz3d-iso-render')?.value || 'waterbody';  // waterbody / isosurface / cloud / surface2d
-    const target = Number($('viz3d-iso-quality')?.value || 26);  // 每轴降采样格数（质量档）
+    const metadata=window.ScientificWorkspace?.variableMetadata?.(varName)
+        || [...(state.variables3d || []),...(state.variables2d || [])].find(v=>v.name===varName);
+    const renderSelect=$('viz3d-iso-render');
+    let render = renderSelect?.value || 'waterbody';  // waterbody / isosurface / cloud / surface2d
+    const renderHint=$('viz3d-iso-render-hint');
+    // GETM D is water depth, not a tracer to lift onto a variable-height surface.
+    // In waterbody mode it selects static basin terrain; explicit surface2d remains available.
+    if(varName==='D' && render==='waterbody'){
+        if(renderHint){renderHint.hidden=true;renderHint.textContent='';}
+        if(typeof renderBathymetry3D==='function')await renderBathymetry3D(options);
+        return;
+    }
+    if(metadata && !hasVerticalResultDimension(metadata)){
+        const message=window.StudioI18n?.scientificText(
+            '该变量没有真实垂向层，已切换到“变量高度表面”；表面高度由变量值决定，不代表真实水深或水面。',
+            'This variable has no real vertical layers. Switched to variable-height surface; its height represents the variable value, not bathymetry or the water surface.'
+        ) || '该变量没有真实垂向层，已切换到“变量高度表面”；表面高度由变量值决定，不代表真实水深或水面。';
+        if(render!=='surface2d'){
+            if(renderSelect)renderSelect.value='surface2d';
+            toast(message,'info');
+        }
+        render='surface2d';
+        if(renderHint){renderHint.hidden=false;renderHint.textContent=message;}
+    }else if(renderHint){renderHint.hidden=true;renderHint.textContent='';}
+    if(render==='waterbody' && $('viz3d-iso-overlay')?.checked===false){
+        if(typeof renderBathymetry3D==='function')await renderBathymetry3D(options);
+        return;
+    }
+    if(render!=='surface2d' && metadata?.ndim!=null && metadata.ndim!==4){
+        const message=window.StudioI18n?.scientificText('该变量没有真实垂向层（4D），请选择变量高度表面或含垂向层的变量。','This variable has no real vertical dimension (4D). Select variable-height surface or a variable with vertical layers.')
+            || '该变量没有真实垂向层（4D），请选择变量高度表面或含垂向层的变量。';
+        window.invalidateScientific3D?.(message);
+        window.ScientificWorkspace?.failure('viz3d',message);toast(message,'error');return;
+    }
+    if(Number.isInteger(metadata?.nlev)&&metadata.nlev>0){
+        for(const id of ['viz3d-iso-layer','viz3d-iso-level']){
+            const control=$(id);if(!control)continue;
+            control.max=String(metadata.nlev-1);
+            control.value=String(Math.max(id==='viz3d-iso-layer'?-1:0,Math.min(metadata.nlev-1,Number(control.value)||0)));
+        }
+    }
+    const target = Number($('viz3d-iso-quality')?.value || 96);  // 每轴降采样格数（质量档）
     const level = Number($('viz3d-iso-level')?.value || 0);
     if (render === 'waterbody') {
         // 立体水体：湖底地形 + 逐层半透明分层面 + 四周剖面墙 + 垂向放大
         if (typeof render3DWaterBody === 'function') {
             await render3DWaterBody(varName, timestep, {
+                ...options,
                 target,
                 level: Number($('viz3d-iso-layer')?.value ?? -1),   // -1 = 最上层
-                ve: Number($('viz3d-iso-ve')?.value || 100),        // 垂向放大倍数
-                stack: !$('viz3d-iso-stack')?.checked,              // 勾选则只显示单层
+                stack: !!$('viz3d-iso-stack')?.checked,
+                overlay: !!$('viz3d-iso-overlay')?.checked,
             });
         }
     } else if (render === 'cloud') {
-        if (typeof render3DCloud === 'function') await render3DCloud(varName, timestep, target);
+        if (typeof render3DCloud === 'function') await render3DCloud(varName, timestep, target, options);
     } else if (render === 'isosurface') {
-        if (typeof render3DSurface === 'function') await render3DSurface(varName, timestep, target);
+        if (typeof render3DSurface === 'function') await render3DSurface(varName, timestep, target, options);
     } else {
-        if (typeof render2DAs3DSurface === 'function') await render2DAs3DSurface(varName, timestep, level);
+        if (typeof render2DAs3DSurface === 'function') await render2DAs3DSurface(varName, timestep, level, options);
+    }
+    const main=window.ScientificWorkspace?.current('viz3d');
+    if(main?.variable===varName && main.time===timestep && document.querySelector?.('#page-viz3d .sw-section-analysis[open]')){
+        if(window.ScientificWorkspace?.isPlaying?.('viz3d'))window.setSpatialSectionPlaybackStatus?.(timestep,options.timeLabel);
+        else await updateSpatialSection();
     }
 }
 
 async function updateViz3d() {
+    const request = state.profileRequest = (state.profileRequest || 0) + 1;
+    const revision = state.caseRevision;
     const varName = $('viz3d-var').value;
     const i = Number($('viz3d-i').value), j = Number($('viz3d-j').value);
     const t = Number($('viz3d-time').value);
     const _lbl = document.getElementById('viz3d-time-label');
-    if (_lbl) _lbl.textContent = (state.timeLabels && state.timeLabels[t]) ? `第 ${t} 帧 · ${state.timeLabels[t]}` : `第 ${t} 帧`;
+    const dateLabel=window.ScientificWorkspace?.dateLabel?.('viz3d',t,varName)
+        ?? ModelDates.format((state.timeLabels3d || state.timeLabels)?.[t] || null);
+    if (_lbl) _lbl.textContent = `${window.StudioI18n?.locale().startsWith('zh')===false?'Frame '+t:'第 '+t+' 帧'}${dateLabel?' · '+dateLabel:''}`;
     const data = await api(`/api/results/profile?var=${varName}&time=${t}&i=${i}&j=${j}`);
+    if (request !== state.profileRequest || revision !== state.caseRevision) return;
     if (data.error) return;
+    window.VariableGuide?.updateValues('viz3d-var', {data:data.profile,var_name:varName});
     if (state.charts.profile) state.charts.profile.destroy();
     const ctx = $('viz3d-profile-chart').getContext('2d');
-    state.charts.profile = new Chart(ctx, {
+    state.charts.profile = localizedChart(ctx, {
         type: 'line',
         data: { labels: data.sigma.map(s=>s.toFixed(2)), datasets: [{
-            label: `${varName} (${data.units||''})`,
+            label: `${resultLabel(data,varName)} (${data.units||''})`,
             data: data.profile,
             borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)',
             fill: true, tension: 0.3, pointRadius: 3,
@@ -2108,17 +3912,47 @@ async function updateViz3d() {
 }
 
 async function updateViz3dAvg() {
+    const request = state.depthMeanRequest = (state.depthMeanRequest || 0) + 1;
+    const revision = state.caseRevision;
     const varName = $('viz3d-avg-var').value;
     const t = Number($('viz3d-avg-time').value);
-    const data = await api(`/api/results/2d?var=${varName}&time=${t}&level=0`);
-    if (data.error) return;
+    const data = await api(`/api/results/2d?var=${encodeURIComponent(varName)}&time=${t}&aggregation=depth_mean`);
+    if (request !== state.depthMeanRequest || revision !== state.caseRevision) return;
+    if (data.error) { toast(data.error, 'error'); return; }
+    window.VariableGuide?.updateValues('viz3d-avg-var', data);
     drawHeatmap('viz3d-avg-canvas', data.data, data.min, data.max);
-    drawColorbar('viz3d-colorbar', data.min, data.max);
+    drawColorbar('viz3d-colorbar', data.min, data.max, resultLabel(data,varName), data.units);
 }
 
 // ── Time Series ───────────────────────────────────────────────────────
+async function constrainPointInputsToGrid(prefix) {
+    try {
+        if (state.currentCasePending) await state.currentCasePending;
+    } catch (_) { return false; }
+    const path = String(state.activeCasePath || state.activeCase || ''), revision = state.caseRevision;
+    if (!path || typeof getScientificGeometry !== 'function') return false;
+    const iInput = $(`${prefix}-i`), jInput = $(`${prefix}-j`);
+    if (!iInput || !jInput) return false;
+    let geometry;
+    try { geometry = await getScientificGeometry(); } catch (_) { return false; }
+    if (revision !== state.caseRevision || path !== String(state.activeCasePath || state.activeCase || '')) return false;
+    const shape = geometry?.shape, rows = shape?.[0], cols = shape?.[1];
+    if (!Array.isArray(shape) || shape.length !== 2
+            || !Number.isInteger(rows) || rows < 1 || !Number.isInteger(cols) || cols < 1) return false;
+    iInput.min = jInput.min = '0';
+    iInput.max = String(cols - 1); jInput.max = String(rows - 1);
+    iInput.step = jInput.step = '1';
+    const clampIndex = (input, max) => {
+        const value = Number(input.value), index = Number.isFinite(value) ? Math.trunc(value) : 0;
+        input.value = String(Math.max(0, Math.min(max, index)));
+    };
+    clampIndex(iInput, cols - 1); clampIndex(jInput, rows - 1);
+    return true;
+}
+
 async function initTimeseries() {
     if (!$('ts-var').options.length) await loadVariables();
+    await constrainPointInputsToGrid('ts');
 }
 
 function toggleTsMode() {
@@ -2132,15 +3966,22 @@ function toggleTsMode() {
 }
 
 async function extractTimeseries() {
+    const request = state.timeseriesRequest = (state.timeseriesRequest || 0) + 1;
+    const revision = state.caseRevision;
     const varName = $('ts-var').value;
     const mode = $('ts-mode').value;
     const scope = mode === 'layer' ? $('ts-layer-scope').value : mode;
+    if (scope === 'point') {
+        await constrainPointInputsToGrid('ts');
+        if (revision !== state.caseRevision) return;
+    }
     let url = `/api/results/timeseries?var=${encodeURIComponent(varName)}`;
     if (scope === 'point') url += `&i=${$('ts-i').value}&j=${$('ts-j').value}`;
     else if (scope === 'region') url += `&region=${$('ts-region').value}`;
     else if (scope === 'lake') url += `&lake_avg=1`;
     if (mode === 'layer') url += `&per_layer=1`;
     const data = await api(url);
+    if (request !== state.timeseriesRequest || revision !== state.caseRevision) return;
     if (data.error) { toast(data.error, 'error'); return; }
     if (state.charts.ts) state.charts.ts.destroy();
     const ctx = $('ts-chart').getContext('2d');
@@ -2175,11 +4016,11 @@ async function extractTimeseries() {
         }
         chartCfg = {
             type: 'line',
-            data: { labels: data.times, datasets },
+            data: { labels: ModelDates.chartLabels(data.times), datasets },
             options: { responsive: true, maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
                 plugins: { legend: { display: false },
-                    title: { display: true, text: `${data.long_name || varName} · 每一层 (${nlev} 层) @ ${label}`, color: '#ccc' } },
+                    title: { display: true, text: `${resultLabel(data,varName)} · 每一层 (${nlev} 层) @ ${label}`, color: '#ccc' } },
                 scales: { x: { ticks: { color: '#999', maxTicksLimit: 12 }, grid: { color: '#222' } },
                           y: { ticks: { color: '#999' }, grid: { color: '#333' }, title: { display: true, text: data.units || '', color: '#999' } } }
             }
@@ -2197,8 +4038,8 @@ async function extractTimeseries() {
     } else {
         chartCfg = {
             type: 'line',
-            data: { labels: data.times, datasets: [{
-                label: `${data.long_name || varName} @ ${label}`,
+            data: { labels: ModelDates.chartLabels(data.times), datasets: [{
+                label: `${resultLabel(data,varName)} @ ${label}`,
                 data: data.values, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)',
                 fill: true, tension: 0.2, pointRadius: 0, borderWidth: 1.5,
             }]},
@@ -2209,15 +4050,13 @@ async function extractTimeseries() {
         };
         toast('时间序列已提取', 'success');
     }
-    state.charts.ts = new Chart(ctx, chartCfg);
+    state.charts.ts = localizedChart(ctx, chartCfg);
 }
 
 // ── Vertical Heatmap (垂向热图) ───────────────────────────────────────
 // 用 Plotly heatmap 绘制「层 × 时间」热图：悬停可读数值、可框选缩放、可导出 PNG。
 // 纵轴默认水面在顶部，自下而上为 sigma 由大到小（层号由高到低）。
 let _vheatLast = null;        // 最近一次 per_layer 结果（供"时间序列"页复用）
-let _vheatDepthGrid = null;   // /api/geo/grid 水深网格（真实深度纵轴用）
-let _vheatH = null;           // 换算深度用的局部水深（m）
 
 /** 变量是否带垂向层（能生成垂向热图）。4D(time,sigma,yc,xc)，或 dims 含 sigma。 */
 function varHasLevel(v) {
@@ -2230,11 +4069,12 @@ function makeVarOption(v, withName) {
     const opt = document.createElement('option');
     const name = v.name || String(v);
     opt.value = name;
-    const nm = v.long_name || name;
+    const nm = resultLabel(v,name);
+    opt.dataset.i18nSkip='true';
     const hasLev = varHasLevel(v);
     opt.textContent = withName
-        ? `${nm} (${name})${hasLev ? '' : ' ⊘无垂向层'}`
-        : `${nm} [${v.units || ''}]${hasLev ? '' : ' ⊘无垂向层'}`;
+        ? `${nm} (${name})${hasLev ? '' : ' ('+(window.StudioI18n?.t('无垂向层') || '无垂向层')+')'}`
+        : `${nm} [${v.units || ''}]${hasLev ? '' : ' ('+(window.StudioI18n?.t('无垂向层') || '无垂向层')+')'}`;
     opt.dataset.hasLevel = hasLev ? '1' : '';
     return opt;
 }
@@ -2267,6 +4107,8 @@ async function initVHeat() {
             else if (withLev.length) sel.value = withLev[0].name;
         }
     }
+    await constrainPointInputsToGrid('vheat');
+    window.VariableGuide?.refresh('vheat-var');
     toggleVHeatScope();
 }
 
@@ -2274,33 +4116,6 @@ function toggleVHeatScope() {
     const scope = $('vheat-scope')?.value || 'point';
     ['vheat-point-group', 'vheat-point-group2'].forEach(id => { const el = $(id); if (el) el.style.display = scope === 'point' ? 'block' : 'none'; });
     const rg = $('vheat-region-group'); if (rg) rg.style.display = scope === 'region' ? 'block' : 'none';
-}
-
-/** 载入水深网格并求出当前范围代表水深，用于"深度(m)"纵轴换算。 */
-async function ensureVHeatDepth(scope) {
-    if (_vheatDepthGrid) { _vheatLocalH(scope); return; }
-    try {
-        const g = await api('/api/geo/grid');
-        _vheatDepthGrid = (g && g.depth) || null;
-    } catch (e) { _vheatDepthGrid = null; }
-    _vheatLocalH(scope);
-}
-
-function _vheatLocalH(scope) {
-    _vheatH = null;
-    if (!_vheatDepthGrid) return;
-    try {
-        if (scope === 'point') {
-            const i = Number($('vheat-i')?.value), j = Number($('vheat-j')?.value);
-            const row = _vheatDepthGrid[j];
-            if (row) { const h = row[i]; if (typeof h === 'number' && !isNaN(h) && h > 0) _vheatH = h; }
-            if (!_vheatH) { let mx = 0; _vheatDepthGrid.forEach(r => r.forEach(v => { if (typeof v === 'number' && isFinite(v) && v > mx) mx = v; })); _vheatH = mx || null; }
-        } else {
-            let mx = 0;
-            _vheatDepthGrid.forEach(r => r.forEach(v => { if (typeof v === 'number' && isFinite(v) && v > mx) mx = v; }));
-            _vheatH = mx || null;
-        }
-    } catch (e) { _vheatH = null; }
 }
 
 /** 与 varName 同模块（同前缀）且带垂向层的候选变量，用于无层变量时的引导。 */
@@ -2332,6 +4147,11 @@ async function updateVHeat() {
         const m = $('vheat-meta'); if (m) m.innerHTML = msg;
         return;
     }
+    if (scope === 'point') {
+        const revision = state.caseRevision;
+        await constrainPointInputsToGrid('vheat');
+        if (revision !== state.caseRevision) return;
+    }
     let url = `/api/results/timeseries?var=${encodeURIComponent(varName)}&per_layer=1`;
     if (scope === 'point') url += `&i=${$('vheat-i').value}&j=${$('vheat-j').value}`;
     else if (scope === 'region') url += `&region=${$('vheat-region').value}`;
@@ -2358,14 +4178,20 @@ async function updateVHeat() {
     }
     _vheatLast = data;
     const axis = $('vheat-axis') ? $('vheat-axis').value : 'sigma';
-    if (axis === 'depth') await ensureVHeatDepth(scope);
+    const physicalDepth = axis === 'depth' ? _vheatBuildPhysicalCells(data) : null;
+    if (physicalDepth && physicalDepth.error) {
+        const m = $('vheat-meta');
+        if (m) m.innerHTML = physicalDepth.error;
+        toast(physicalDepth.error, 'error');
+        return;
+    }
     drawVerticalHeatmap('vheat-plotly', data, axis);
     const nlev = data.series.length;
     const ntime = data.times ? data.times.length : 0;
     const scopeLabel = scope === 'lake' ? '全湖平均' : scope === 'region' ? `区域 ${$('vheat-region').value}` : `点位 (${$('vheat-i').value},${$('vheat-j').value})`;
     const m = $('vheat-meta');
     if (m) m.innerHTML =
-        `变量：<b>${data.long_name || varName}</b><br>范围：${scopeLabel}<br>垂向层数：<b>${nlev}</b><br>时间采样：<b>${ntime}</b> 点（步长 ${data.tstride || '?'}）<br>单位：${data.units || ''}<br>纵轴：${axis === 'depth' ? '真实深度 (m)' : axis === 'level' ? '层号' : 'sigma 坐标'}<br>鼠标悬停查看数值，可框选缩放`;
+        `变量：<b>${resultLabel(data,varName)}</b><br>范围：${scopeLabel}<br>垂向层数：<b>${nlev}</b><br>时间采样：<b>${ntime}</b> 点（步长 ${data.tstride || '?'}）<br>单位：${data.units || ''}<br>纵轴：${axis === 'depth' ? `逐时真实深度 (m)，${escapeHtml(physicalDepth.source)}` : axis === 'level' ? '层号' : 'sigma 坐标'}<br>鼠标悬停查看数值，可框选缩放`;
     toast('垂向热图已生成', 'success');
 }
 
@@ -2381,6 +4207,62 @@ function _vheatDepthFrac(sigma) {
     if (!isFinite(sMax)) return (sigma || []).map((_, k) => k / Math.max(1, (sigma || []).length - 1));
     const span = (sMax - sMin) || 1;
     return (sigma || []).map(s => (typeof s === 'number' && isFinite(s)) ? (sMax - s) / span : 1);
+}
+
+/**
+ * Validate the strict physical-depth contract and build time-varying layer
+ * cell bounds. Centers are positive-down meters, indexed [level][time].
+ * Layer order may be top-down or bottom-up; this sorts geometrically while
+ * retaining the original level index used by `series`.
+ */
+function _vheatBuildPhysicalCells(data) {
+    const centers = data && data.layer_center_depth_m;
+    const values = data && data.series;
+    const nlev = Array.isArray(values) ? values.length : 0;
+    const ntime = Array.isArray(data && data.times) ? data.times.length : 0;
+    const source = data && data.layer_center_depth_source;
+    const fail = error => ({ cells: [], depthMax: null, error });
+    if (!nlev || !ntime || !Array.isArray(centers) || centers.length !== nlev || !String(source || '').trim())
+        return fail('真实深度几何缺失：需要 layer_center_depth_m（层×时刻）及 layer_center_depth_source；无法用静态水深估算代替。');
+    if (centers.some(row => !Array.isArray(row) || row.length !== ntime) || values.some(row => !Array.isArray(row) || row.length !== ntime))
+        return fail('真实深度几何维度错误：layer_center_depth_m 和 series 必须都是 nlev × ntime。');
+    const cells = [];
+    let depthMax = 0;
+    for (let t = 0; t < ntime; t++) {
+        const hasData = values.some(row => row[t] !== null && row[t] !== undefined && Number.isFinite(Number(row[t])));
+        if (!hasData) continue;
+        const column = [];
+        for (let k = 0; k < nlev; k++) {
+            const value = values[k][t];
+            const depth = centers[k][t];
+            if (depth === null || depth === undefined || !Number.isFinite(Number(depth)) || Number(depth) <= 0)
+                return fail(`真实深度几何在时刻 ${t + 1}、层 ${k + 1} 缺失或非法；无法确定该时刻的层厚。`);
+            column.push({ levelIndex: k, center: Number(depth), value: value === null || value === undefined || !Number.isFinite(Number(value)) ? null : Number(value) });
+        }
+        if (!column.length) continue;
+        if (column.length < 2) return fail(`时刻 ${t + 1} 可用真实层中心少于 2 个，无法确定层厚。`);
+        column.sort((a, b) => a.center - b.center);
+        for (let i = 1; i < column.length; i++) if (!(column[i].center > column[i - 1].center))
+            return fail(`时刻 ${t + 1} 的真实层中心重复或非单调，无法确定层界面。`);
+        for (let i = 0; i < column.length; i++) {
+            const top = i === 0 ? Math.max(0, column[i].center - (column[i + 1].center - column[i].center) / 2)
+                : (column[i - 1].center + column[i].center) / 2;
+            const bottom = i === column.length - 1 ? column[i].center + (column[i].center - column[i - 1].center) / 2
+                : (column[i].center + column[i + 1].center) / 2;
+            if (column[i].value !== null) cells.push({ ...column[i], timeIndex: t, top, bottom });
+            depthMax = Math.max(depthMax, bottom);
+        }
+    }
+    if (!cells.length) return fail('没有有效的垂向数据值，无法生成深度热图。');
+    return { cells, depthMax: depthMax || null, error: null, source: String(source).trim() };
+}
+
+function _vheatColorAt(value, min, max) {
+    const stops = [[0, [0, 0, 128]], [.2, [0, 128, 255]], [.4, [0, 200, 150]], [.6, [255, 220, 0]], [.8, [255, 100, 0]], [1, [200, 0, 0]]];
+    const x = max === min ? .5 : Math.max(0, Math.min(1, (value - min) / (max - min)));
+    let i = 1; while (i < stops.length - 1 && x > stops[i][0]) i++;
+    const a = stops[i - 1], b = stops[i], f = (x - a[0]) / (b[0] - a[0]);
+    return `rgb(${a[1].map((v, k) => Math.round(v + (b[1][k] - v) * f)).join(',')})`;
 }
 
 /**
@@ -2402,16 +4284,51 @@ function drawVerticalHeatmap(containerId, data, axisMode) {
         return;
     }
 
+    if (axisMode === 'depth') {
+        const physical = _vheatBuildPhysicalCells(data);
+        if (physical.error) {
+            el.innerHTML = `<div style="padding:16px;color:#f87171">${physical.error}</div>`;
+            return;
+        }
+        const values = physical.cells.map(cell => cell.value);
+        const min = Math.min(...values), max = Math.max(...values);
+        const times = data.times || [];
+        const timeAxis = ModelDates.plotlyAxis(times);
+        const tx = timeAxis.x;
+        const xAt = i => timeAxis.axis.type === 'category' ? i : tx[i];
+        const xBounds = i => {
+            const x = xAt(i);
+            if (tx.length === 1) return [x - .5, x + .5];
+            return [i === 0 ? x - (xAt(1) - x) / 2 : (xAt(i - 1) + x) / 2,
+                i === tx.length - 1 ? x + (x - xAt(i - 1)) / 2 : (x + xAt(i + 1)) / 2];
+        };
+        const traces = physical.cells.map(cell => {
+            const [x0, x1] = xBounds(cell.timeIndex), color = _vheatColorAt(cell.value, min, max);
+            const timeLabel = timeAxis.labels[cell.timeIndex];
+            return { type: 'scatter', mode: 'lines', x: [x0, x1, x1, x0, x0], y: [cell.top, cell.top, cell.bottom, cell.bottom, cell.top],
+                fill: 'toself', fillcolor: color, line: { color, width: 0.5 },
+                customdata: Array(5).fill([cell.value, cell.center, timeLabel, cell.levelIndex]),
+                hovertemplate: '%{customdata[2]}<br>实际深度中心: %{customdata[1]:.2f} m<br>层: %{customdata[3]}<br><b>%{customdata[0]}</b> ' + (data.units || '') + '<extra></extra>',
+                showlegend: false, name: `层 ${cell.levelIndex}` };
+        });
+        traces.push({ type: 'scatter', mode: 'markers', x: [xAt(0)], y: [0], marker: { size: 0.1, color: [min], cmin: min, cmax: max === min ? min + 1 : max,
+            colorscale: [[0, 'rgb(0,0,128)'], [.2, 'rgb(0,128,255)'], [.4, 'rgb(0,200,150)'], [.6, 'rgb(255,220,0)'], [.8, 'rgb(255,100,0)'], [1, 'rgb(200,0,0)']], showscale: true,
+            colorbar: { title: { text: data.units || '' }, thickness: 14, len: .85 } }, hoverinfo: 'skip', showlegend: false });
+        const layout = { paper_bgcolor: 'var(--bg-secondary)', plot_bgcolor: 'var(--bg-primary)', font: { family: 'Microsoft YaHei, sans-serif', size: 10, color: '#cbd5e1' },
+            margin: { l: 62, r: 60, t: 26, b: 46 }, xaxis: { ...timeAxis.axis, title: { text: '年份 + 年内儒略日 (DOY)', font: { size: 11 } }, tickangle: -30, automargin: true, showgrid: false },
+            yaxis: { title: { text: '真实深度 (m, 正值向下)' }, range: [physical.depthMax, 0], automargin: true, tickfont: { size: 9 } },
+            meta: { layer_center_depth_source: physical.source } };
+        Plotly.react(el, traces, layout, { responsive: true, displaylogo: false, toImageButtonOptions: { format: 'png', filename: `vheat_${data.var_name || 'profile'}` } });
+        return;
+    }
+
     // 纵轴标签：自上而下（层 nlev-1 → 层 0），水面在顶部
     const dfc = _vheatDepthFrac(data.layers || []);
     const yLabels = new Array(nlev);
     for (let r = 0; r < nlev; r++) {
         const k = nlev - 1 - r;
         if (axisMode === 'level') yLabels[r] = `层 ${k}`;
-        else if (axisMode === 'depth') {
-            const h = _vheatH;
-            yLabels[r] = h ? (h * dfc[k]).toFixed(1) : String(k);
-        } else {
+        else {
             const s = (data.layers && data.layers[k] !== undefined) ? Number(data.layers[k]) : k;
             yLabels[r] = isFinite(s) ? s.toFixed(2) : String(k);
         }
@@ -2423,9 +4340,11 @@ function drawVerticalHeatmap(containerId, data, axisMode) {
     }
 
     const times = data.times || [];
+    const timeAxis = ModelDates.plotlyAxis(times);
     const trace = {
         type: 'heatmap',
-        x: times,
+        x: timeAxis.x,
+        customdata: zRows.map(() => timeAxis.labels),
         y: yLabels,
         z: zRows,
         // 与 viz2d/drawHeatmap 一致的色阶
@@ -2435,14 +4354,14 @@ function drawVerticalHeatmap(containerId, data, axisMode) {
         ],
         showscale: true,
         colorbar: { title: { text: data.units || '' }, thickness: 14, len: 0.85 },
-        hovertemplate: '%{y}　%{x}<br><b>%{z}</b> ' + (data.units || '') + '<extra></extra>',
+        hovertemplate: '%{y}　%{customdata}<br><b>%{z}</b> ' + (data.units || '') + '<extra></extra>',
         xgap: 0.5, ygap: 0.5,
     };
     const layout = {
         paper_bgcolor: 'var(--bg-secondary)', plot_bgcolor: 'var(--bg-primary)',
         font: { family: 'Microsoft YaHei, sans-serif', size: 10, color: '#cbd5e1' },
         margin: { l: 62, r: 60, t: 26, b: 46 },
-        xaxis: { title: { text: '时间', font: { size: 11 } }, tickangle: -30, automargin: true, showgrid: false },
+        xaxis: { ...timeAxis.axis, title: { text: '年份 + 年内儒略日 (DOY)', font: { size: 11 } }, tickangle: -30, automargin: true, showgrid: false },
         yaxis: { title: { text: axisMode === 'depth' ? '深度 (m)' : axisMode === 'level' ? '层号' : 'σ (sigma，顶=水面)' }, automargin: true, tickfont: { size: 9 } },
     };
     Plotly.react(el, [trace], layout, {
@@ -2453,12 +4372,31 @@ function drawVerticalHeatmap(containerId, data, axisMode) {
 
 // ── Calibration ───────────────────────────────────────────────────────
 async function initCalibrate() {
+    // The template includes a default temperature option before a case is
+    // loaded, so option count cannot tell us whether result variables exist.
+    if (state.activeCase && !state.variables3d.length && !state.variables2d.length) {
+        await loadVariables();
+    }
     await loadCalPoints();
-    if (!$('cal-var-select').options.length) await loadVariables();
 }
 
 async function loadCalPoints() {
     const points = await api('/api/calibration/points');
+    if (!Array.isArray(points)) { toast(points.error || '无法加载率定点位', 'error'); return; }
+    renderCalibrationWeights(points);
+    const autoPoints = $('ac-points');
+    if (autoPoints) {
+        const selected = new Set(Array.from(autoPoints.selectedOptions, o => o.value));
+        const initialized = autoPoints.dataset.initializedCase === String(state.activeCase);
+        autoPoints.replaceChildren();
+        points.forEach(p => {
+            const option = document.createElement('option');
+            option.value = p.id; option.textContent = `${p.name} (${p.i},${p.j})`;
+            option.selected = initialized ? selected.has(p.id) : true;
+            autoPoints.appendChild(option);
+        });
+        autoPoints.dataset.initializedCase = String(state.activeCase);
+    }
     const tbody = $('cal-points-table').querySelector('tbody');
     tbody.innerHTML = '';
     $('cal-point-select').innerHTML = '';
@@ -2475,12 +4413,13 @@ async function loadCalPoints() {
     });
 }
 
-function showAddPointModal() { showModal('modal-add-point'); }
+function showAddPointModal() { populateCalibrationVariables(); showModal('modal-add-point'); }
 
 async function addCalPoint() {
     const name = $('new-point-name').value || '未命名';
     const i = Number($('new-point-i').value), j = Number($('new-point-j').value);
-    const vars = $('new-point-vars').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const vars = selectedCalibrationVariables('new-point-vars');
+    if (!vars.length) { toast('请选择率定变量', 'error'); return; }
     const res = await api('/api/calibration/points', {method:'POST', body:{name, i, j, variables:vars}});
     if (res.success) { toast('点位已添加', 'success'); closeModal('modal-add-point'); loadCalPoints(); }
 }
@@ -2497,6 +4436,10 @@ async function saveCalData() {
     let values;
     try { values = JSON.parse($('cal-data-values').value); }
     catch { toast('JSON 格式错误', 'error'); return; }
+    try {
+        if (!Array.isArray(values)) throw new Error('实测数据须为 JSON 数组');
+        values = values.map(row => ({...row, time: ModelDates.toIso(row.time)}));
+    } catch (error) { toast(error.message, 'error'); return; }
     const res = await api('/api/calibration/data', {method:'POST', body:{point_id:pid, variable:varName, values}});
     toast(res.success ? '实测数据已保存' : '保存失败', res.success?'success':'error');
 }
@@ -2537,47 +4480,54 @@ async function uploadCalData() {
     xhr.send(formData);
 }
 
-async function updateCalComparison() {
-    const pid = $('cal-point-select').value;
-    const varName = $('cal-var-select').value;
+async function updateCalComparison(pointId, variable) {
+    const pid = pointId || $('cal-point-select').value;
+    const varName = variable || $('cal-var-select').value;
     if (!pid || !varName) return;
-    const data = await api(`/api/calibration/comparison?point_id=${pid}&variable=${varName}`);
+    const data = await api(`/api/calibration/comparison?point_id=${encodeURIComponent(pid)}&variable=${encodeURIComponent(varName)}`);
     if (data.error) { $('cal-stats').innerHTML = `<span style="color:var(--danger)">${data.error}</span>`; return; }
     state.calLastData = data; // cache for scatter modal
+    const comparisonNotes = () => {
+        const source = data.mass_basis_source ? `basis来源：${data.mass_basis_source}` : 'basis尚未由模型来源确认';
+        const basis = data.mass_basis ? `物质基础：${data.mass_basis}` : '';
+        const evidence = data.mass_basis_provenance?.basis_evidence || '';
+        const mapping = data.mapping_note || '';
+        const reasons = (data.diagnostics || []).reduce((counts,item)=>{
+            const reason=String(item.reason||'unknown');counts[reason]=(counts[reason]||0)+1;return counts;
+        },{});
+        const diagnosis = Object.entries(reasons).map(([reason,count])=>`${reason} × ${count}`).join('；');
+        return `<details class="form-hint"><summary>来源与配对诊断</summary><div>${[source,basis,evidence,mapping,diagnosis].filter(Boolean).map(escapeHtml).join('<br>')}</div></details>`;
+    };
     if (state.charts.cal) state.charts.cal.destroy();
+    const pairs = (Array.isArray(data.scatter_pairs) ? data.scatter_pairs : [])
+        .map((pair, order) => {
+            const parsed = ModelDates.parse(pair.time);
+            return { pair, order, timestamp: parsed?.date?.getTime() };
+        })
+        .filter(item => Number.isFinite(item.timestamp) &&
+            Number.isFinite(item.pair.sim) && Number.isFinite(item.pair.obs))
+        .sort((a, b) => a.timestamp - b.timestamp || a.order - b.order)
+        .map(item => item.pair);
+    if (!pairs.length) {
+        state.charts.cal = null;
+        const count = (data.observed || []).length;
+        $('cal-stats').innerHTML = `<div style="font-size:12px;color:var(--text-muted);"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-warning"></use></svg> ${calibrationScientificText('无有效配对，无法绘制率定对比曲线','No valid pairs are available for the calibration comparison')}（${calibrationScientificText('实测','observations')} ${count}）</div>${comparisonNotes()}`;
+        return;
+    }
     const ctx = $('cal-chart').getContext('2d');
-    const simVals = data.simulated?.values || [];
-    const simTimes = data.simulated?.times || [];
-    const obsVals = (data.observed||[]).map(o=>o.value);
-    const obsTimes = (data.observed||[]).map(o=>o.time);
-    // Build unified x-axis: combine sim and obs times, dedup, sort
-    const allTimes = Array.from(new Set([...simTimes, ...obsTimes])).sort();
-    const simIdx = {}; simTimes.forEach((t, i) => { simIdx[t] = i; });
-    const obsIdx = {}; obsTimes.forEach((t, i) => { obsIdx[t] = i; });
-    const simSeries = allTimes.map(t => {
-        if (t in simIdx) return simVals[simIdx[t]];
-        // try nearest within 1 day; otherwise null
-        const ot = new Date(t).getTime();
-        if (isNaN(ot)) return null;
-        let bestI = -1, bestLag = Infinity;
-        for (let i=0;i<simTimes.length;i++) {
-            const lag = Math.abs(new Date(simTimes[i]).getTime() - ot);
-            if (lag < bestLag) { bestLag = lag; bestI = i; }
-        }
-        if (bestI<0 || bestLag > 86400000) return null;
-        return simVals[bestI];
-    });
-    const obsSeries = allTimes.map(t => {
-        if (t in obsIdx) return obsVals[obsIdx[t]];
-        return null;
-    });
-    const varLabel = data.simulated?.long_name || varName;
-    const units = data.simulated?.units || '';
-    state.charts.cal = new Chart(ctx, {
+    // The native model values are [time][layer]. scatter_pairs contains the
+    // scalar model values already interpolated at each observation's true
+    // time and depth, so preserve each pair (including equal timestamps).
+    const allTimes = pairs.map(pair => pair.time);
+    const simSeries = pairs.map(pair => pair.sim);
+    const obsSeries = pairs.map(pair => pair.obs);
+    const varLabel = resultLabel(data.simulated, varName) || data.simulated?.long_name || varName;
+    const units = data.simulated?.unit || data.simulated?.units || '';
+    state.charts.cal = localizedChart(ctx, {
         type: 'line',
-        data: { labels: allTimes, datasets: [
-            { label:`模拟 ${varName}`, data:simSeries, borderColor:'#3b82f6', backgroundColor:'transparent', tension:0.2, pointRadius:0, borderWidth:2, spanGaps:true },
-            { label:`实测 ${varName}`, data:obsSeries, borderColor:'#f59e0b', backgroundColor:'transparent', pointRadius:4, borderWidth:0, showLine:false },
+        data: { labels: ModelDates.chartLabels(allTimes), datasets: [
+            { label:`${calibrationScientificText('模拟（配对时刻/深度）','Simulated at paired times/depths')} ${varName}`, data:simSeries, borderColor:'#3b82f6', backgroundColor:'transparent', tension:0.2, pointRadius:0, borderWidth:2, spanGaps:true },
+            { label:`${calibrationScientificText('实测','Observed')} ${varName}`, data:obsSeries, borderColor:'#f59e0b', backgroundColor:'#f59e0b', pointBackgroundColor:'#f59e0b', pointBorderColor:'#9a5a00', pointBorderWidth:1.5, pointRadius:5, borderWidth:1.5, showLine:false },
         ]},
         options: { responsive:true, maintainAspectRatio:false,
             plugins:{ legend:{labels:{color:'#ccc'}},
@@ -2587,13 +4537,11 @@ async function updateCalComparison() {
         }
     });
     // Compute metrics using paired data from backend
-    if (typeof computeMetrics === 'function' && data.scatter_pairs && data.scatter_pairs.length) {
-        const simArr = data.scatter_pairs.map(p => p.sim);
-        const obsArr = data.scatter_pairs.map(p => p.obs);
+    if (typeof computeMetrics === 'function') {
+        const simArr = pairs.map(p => p.sim);
+        const obsArr = pairs.map(p => p.obs);
         const metrics = computeMetrics(obsArr, simArr);
-        $('cal-stats').innerHTML = renderMetricsHTML(metrics);
-    } else {
-        $('cal-stats').innerHTML = `<div style="font-size:12px;color:var(--text-muted);">⚠️ 无配对数据 (实测 ${obsVals.length} 点，模拟 ${simVals.length} 时步)。需先上传实测数据并运行模型。</div>`;
+        $('cal-stats').innerHTML = renderMetricsHTML(metrics) + comparisonNotes();
     }
 }
 
@@ -2606,9 +4554,12 @@ function showScatterModal() {
     const pid = $('cal-point-select').value;
     const pointName = ($('cal-point-select').options[$('cal-point-select').selectedIndex] || {}).text || pid;
     const varName = data.variable;
-    const units = data.simulated?.units || '';
+    const units = data.simulated?.unit || data.simulated?.units || '';
     showModal('modal-scatter');
-    $('scatter-meta').innerHTML = `点位: <strong>${pointName}</strong> | 变量: <strong>${varName}</strong> | 配对数: <strong>${data.scatter_pairs.length}</strong>${units ? ` | 单位: ${units}` : ''}`;
+    const basis = data.mass_basis ? ` | 物质基础: ${data.mass_basis}` : ' | 物质基础未确认';
+    const basisSource = data.mass_basis_source ? ` | 来源: ${data.mass_basis_source}` : '';
+    const mappingNote = data.mapping_note ? `<div class="form-hint">${escapeHtml(data.mapping_note)}</div>` : '';
+    $('scatter-meta').innerHTML = `点位: <strong>${escapeHtml(pointName)}</strong> | 变量: <strong>${escapeHtml(varName)}</strong> | 配对数: <strong>${data.scatter_pairs.length}</strong>${units ? ` | 单位: ${escapeHtml(units)}` : ''}${basis}${escapeHtml(basisSource)}${mappingNote}`;
     const obsArr = data.scatter_pairs.map(p => p.obs);
     const simArr = data.scatter_pairs.map(p => p.sim);
     const metrics = computeMetrics(obsArr, simArr);
@@ -2619,7 +4570,7 @@ function showScatterModal() {
         x: obsArr, y: simArr, mode: 'markers', type: 'scatter',
         name: '实测 vs 模拟',
         marker: { color: '#3b82f6', size: 8, line: { color: '#1e3a8a', width: 1 }, opacity: 0.8 },
-        text: data.scatter_pairs.map(p => p.time),
+        text: data.scatter_pairs.map(p => ModelDates.format(p.time)),
         hovertemplate: '实测: %{x:.3f}<br>模拟: %{y:.3f}<br>时间: %{text}<extra></extra>',
     };
     const trace11 = {
@@ -2639,6 +4590,8 @@ function showScatterModal() {
 
 // ── Auto Calibration ──────────────────────────────────────────────────
 function initAutoCal() {
+    refreshScientificTerms();
+    toggleAutoCalMethod();
     // Common preset parameters (will be augmented with case-specific ones below)
     const commonParams = [
         {module:'diatoms', param:'cMuMax', default:2.4, min:1.0, max:3.5},
@@ -2733,28 +4686,49 @@ async function startAutoCal() {
     });
     if (!params.length) { toast('请至少选择一个率定参数', 'error'); return; }
     if (!state.activeCase) { toast('请先加载案例', 'error'); return; }
+    const point_ids = Array.from($('ac-points').selectedOptions, option => option.value);
+    if (!point_ids.length) { toast('请至少选择一个率定点位', 'error'); return; }
     if (!state.calibPointsLoaded) {
         // Verify at least one calibration point with data exists
         const points = await api('/api/calibration/points');
         if (!points.length) { toast('请先在率定分析页添加至少一个率定点位并上传实测数据', 'error'); return; }
         state.calibPointsLoaded = true;
     }
-    const res = await api('/api/calibration/auto/start', {method:'POST', body:{method, iterations, objective, params}});
+    let objective_weights;
+    try { objective_weights = typeof collectCalibrationWeights === 'function' ? collectCalibrationWeights(point_ids) : []; }
+    catch (error) { toast(error.message, 'error'); return; }
+    if (objective_weights.length && objective !== 'rmse') { toast('配置权重或尺度时请选择 RMSE', 'error'); return; }
+    const body = {method, iterations, objective, params, point_ids, objective_weights};
+    const maxSimulations = $('ac-max-simulations').value.trim();
+    if (maxSimulations) body.max_simulations = Number(maxSimulations);
+    if (!Number.isInteger(body.max_simulations) || body.max_simulations < 1 || body.max_simulations > 10000000) {
+        toast('请填写 1 至 10000000 之间的模型评估上限', 'error'); return;
+    }
+    if (method === 'pyabc') {
+        body.population_size = Number($('ac-population-size').value);
+        body.minimum_epsilon = Number($('ac-minimum-epsilon').value);
+        if (!Number.isInteger(body.population_size) || body.population_size < 2 || body.population_size > 200 ||
+            !Number.isFinite(body.minimum_epsilon) || body.minimum_epsilon < 0 ||
+            body.max_simulations < 2 * body.population_size) {
+            toast('请检查 ABC 种群规模、模拟上限和最小容差', 'error'); return;
+        }
+    }
+    const res = await api('/api/calibration/auto/start', {method:'POST', body});
     if (res.error) { toast(res.error, 'error'); return; }
     state.calibJobId = res.job_id;
     state.calibPollTimer = setInterval(pollAutoCalStatus, 3000);
     const paramSummary = params.map(p => `&nbsp;&nbsp;• ${p.module}.${p.param} [${p.min}, ${p.max}]`).join('<br>');
     $('ac-progress').innerHTML = `
         <div style="padding:20px;">
-            <div style="font-size:14px;margin-bottom:12px;">🚀 自动率定已启动 (任务: ${res.job_id})</div>
+            <div style="font-size:14px;margin-bottom:12px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-play"></use></svg> 自动率定已启动 (任务: ${res.job_id})</div>
             <div style="font-size:12px;color:var(--text-secondary);line-height:1.8;">
                 方法: <strong>${method}</strong> | 目标函数: <strong>${objective}</strong> | 最大迭代: <strong>${iterations}</strong><br>
                 率定参数: <strong>${params.length}</strong> 个<br>
                 ${paramSummary}
             </div>
-            <div id="ac-progress-detail" style="margin-top:16px;font-size:12px;">⏳ 等待第一次迭代结果...</div>
+            <div id="ac-progress-detail" style="margin-top:16px;font-size:12px;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-clock"></use></svg> 等待第一次迭代结果...</div>
             <div style="margin-top:12px;display:flex;gap:8px;">
-                <button class="btn btn-sm btn-danger" onclick="stopAutoCal()">⏹ 停止</button>
+                <button class="btn btn-sm btn-danger" onclick="stopAutoCal()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-stop"></use></svg> 停止</button>
             </div>
         </div>`;
     toast(res.message || '自动率定已启动', 'success');
@@ -2772,42 +4746,56 @@ async function pollAutoCalStatus() {
     const status = data.status;
     const hist = data.history || [];
     const last = hist.length ? hist[hist.length - 1] : null;
+    const budgetExhausted = Boolean(data.result?.budget_exhausted);
+    const statusLabel = budgetExhausted ? '探索评估上限已到（非收敛）' : status;
     let html = `<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
         <div style="flex:1;background:var(--bg-tertiary);border-radius:6px;overflow:hidden;height:18px;">
             <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,#3b82f6,#10b981);transition:width 0.3s;"></div>
         </div>
         <span style="font-size:12px;">${pct}%</span>
-        <span style="font-size:12px;color:var(--text-muted);">${status}</span>
+        <span style="font-size:12px;color:${budgetExhausted ? 'var(--warning-text, #92400e)' : 'var(--text-muted)'};">${statusLabel}</span>
     </div>`;
     if (last) {
         const paramStr = (last.params || []).map(p => `${p.module}.${p.param}=${p.value.toFixed(4)}`).join(', ');
         html += `<div style="font-size:11px;color:var(--text-secondary);line-height:1.6;">
-            迭代 #${last.iteration} | 目标=${(last.objective||0).toFixed(4)}<br>
+            迭代 #${last.iteration} | 目标=${Number.isFinite(last.objective) ? last.objective.toFixed(4) : '—'}<br>
             当前参数: ${paramStr}
         </div>`;
     }
     if (data.fallback) {
-        html += `<div style="margin-top:8px;padding:8px;background:#fef3c7;border-radius:6px;font-size:11px;color:#92400e;">⚠️ ${data.fallback}</div>`;
+        html += `<div style="margin-top:8px;padding:8px;background:#fef3c7;border-radius:6px;font-size:11px;color:#92400e;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-warning"></use></svg> ${data.fallback}</div>`;
     }
     if (data.error) {
         html += `<div style="margin-top:8px;color:var(--danger);font-size:11px;white-space:pre-wrap;">${data.error}</div>`;
     }
-    $('ac-progress-detail').innerHTML = html;
+    $('ac-progress-detail').innerHTML = ModelDates.formatText(html);
+    if (typeof renderAutoCalConvergence === 'function') renderAutoCalConvergence(hist);
     if (status === 'completed' || status === 'failed' || status === 'stopped') {
         clearInterval(state.calibPollTimer); state.calibPollTimer = null;
         if (status === 'completed' && data.result && data.result.best_params) {
             const best = data.result.best_params.map(p => `${p.module}.${p.param}=${p.value.toFixed(4)}`).join('<br>');
-            const bestObj = (data.result.best_objective||NaN).toFixed(4);
+            const bestObj = Number.isFinite(data.result.best_objective) ? data.result.best_objective.toFixed(4) : '—';
+            const budgetNotice = data.result.budget_exhausted
+                ? '<strong>探索评估上限已用尽。</strong>以下为截至上限的最佳已试值；这不表示优化收敛或科学充分性。'
+                : '';
+            const resultTitle = data.result.budget_exhausted ? '探索上限已到，非收敛结果' : '率定完成';
+            const resultIcon = data.result.budget_exhausted ? 'warning' : 'check';
+            const resultColor = data.result.budget_exhausted ? '#92400e' : 'var(--success)';
+            const resultBorder = data.result.budget_exhausted ? '#d6a84f' : '#10b981';
+            const resultBackground = data.result.budget_exhausted ? 'rgba(245,158,11,0.12)' : 'rgba(16,185,129,0.1)';
+            const applyLabel = data.result.budget_exhausted ? '将试算值作为参数起点' : '应用最优参数到 fabm.yaml';
             $('ac-progress-detail').innerHTML += `
-                <div style="margin-top:12px;padding:12px;background:rgba(16,185,129,0.1);border:1px solid #10b981;border-radius:6px;">
-                    <div style="font-size:13px;color:var(--success);font-weight:600;">✅ 率定完成</div>
+                <div style="margin-top:12px;padding:12px;background:${resultBackground};border:1px solid ${resultBorder};border-radius:6px;">
+                    <div style="font-size:13px;color:${resultColor};font-weight:600;"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-${resultIcon}"></use></svg> ${resultTitle}</div>
                     <div style="font-size:11px;margin-top:6px;line-height:1.6;">
+                        ${budgetNotice}<br>
                         最优目标值: <strong>${bestObj}</strong><br>
                         最优参数:<br>&nbsp;&nbsp;${best}
                     </div>
-                    <button class="btn btn-sm btn-success" style="margin-top:8px;" onclick="applyAutoCalResult()">💾 应用最优参数到 fabm.yaml</button>
+                    <button class="btn btn-sm ${data.result.budget_exhausted ? 'btn-warning' : 'btn-success'}" style="margin-top:8px;" onclick="applyAutoCalResult()"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-save"></use></svg> ${applyLabel}</button>
                 </div>`;
-            toast('自动率定完成', 'success');
+            if (data.result.budget_exhausted) toast('模型评估上限已用尽；返回最佳已试值，不代表收敛', 'info');
+            else toast('自动率定完成', 'success');
         } else if (status === 'failed') {
             toast('自动率定失败，请查看日志', 'error');
         } else if (status === 'stopped') {
@@ -2853,6 +4841,8 @@ async function loadMapGrid() {
         const g = await api('/api/geo/grid');
         if (g.error) { $('map-status').textContent = '加载失败: ' + g.error; return; }
         mapState.grid = g;
+        const qgisGrid = $('qgis-status-grid');
+        if (qgisGrid) qgisGrid.textContent = `${g.nx} × ${g.ny}`;
         initLeafletMap(g);
         drawMapLayer();
         await loadMapFieldVars();
@@ -2871,6 +4861,8 @@ function resetMapView() {
     mapState.field = null;
     mapState.cellsLayer = null;
     mapState.marker = null;
+    const qgisGrid = $('qgis-status-grid');
+    if (qgisGrid) qgisGrid.textContent = '待加载';
     if (mapState.map) { try { mapState.map.remove(); } catch (e) {} mapState.map = null; }
     const c = $('map-container');
     if (c) c.innerHTML = '';
@@ -2881,11 +4873,13 @@ function initLeafletMap(g) {
     if (mapState.map) { mapState.map.remove(); mapState.map = null; }
     el.innerHTML = '';
     let map;
+    let fitBounds = null;
     if (g.has_lonlat && g.bounds) {
         mapState.xyMode = false;
         const b = g.bounds;
-        map = L.map(el, { preferCanvas: true, zoomSnap: 0.5 }).fitBounds(
-            [[b.s, b.w], [b.n, b.e]]);
+        fitBounds = [[b.s, b.w], [b.n, b.e]];
+        map = L.map(el, { preferCanvas: true, zoomSnap: 0.5 });
+        map.fitBounds(fitBounds);
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 18, attribution: '© OpenStreetMap contributors',
         }).addTo(map);
@@ -2899,7 +4893,22 @@ function initLeafletMap(g) {
     mapState.map = map;
     map.on('click', onMapClick);
     // 页面从隐藏切换到显示时 Leaflet 量不到容器尺寸，必须 invalidateSize 才会渲染
-    setTimeout(() => { if (mapState.map) mapState.map.invalidateSize(); }, 80);
+    if (!fitBounds && mapState.xyMode) {
+        const rects = _cellRectanglesXY(g);
+        if (rects.length) {
+            const south = Math.min(...rects.map(rect => rect.s));
+            const north = Math.max(...rects.map(rect => rect.n));
+            const west = Math.min(...rects.map(rect => rect.w));
+            const east = Math.max(...rects.map(rect => rect.e));
+            fitBounds = [[south, west], [north, east]];
+        }
+    }
+    const mapInstance = map;
+    setTimeout(() => {
+        if (mapState.map !== mapInstance) return;
+        mapInstance.invalidateSize({ pan: false });
+        if (fitBounds) mapInstance.fitBounds(fitBounds, { animate: false });
+    }, 120);
 }
 
 function _cellRectangles(g) {
@@ -2964,7 +4973,9 @@ function drawMapLayer() {
     const rects = mapState.xyMode ? _cellRectanglesXY(g) : _cellRectangles(g);
     for (const r of rects) {
         const v = (values && values[r.j] ? values[r.j][r.i] : null);
-        if (v == null) continue;
+        // GETM/FABM fields can contain large finite sentinels (for example
+        // -2.00000004e20) for dry or missing cells. Keep ordinary negatives.
+        if (!Number.isFinite(v) || Math.abs(v) >= 1e19) continue;
         const col = _mapColorScale(v, vmin, vmax);
         if (!col) continue;
         L.rectangle([[r.s, r.w], [r.n, r.e]], {
@@ -2985,7 +4996,7 @@ function drawMapLayer() {
 async function loadMapFieldVars() {
     const sel = $('map-field-var');
     if (!sel) return;
-    const vs = await api('/api/results/variables');
+    const vs = await fetchResultInventory();
     // 端点返回 {"2d":[{name,...}],"3d":[...]} —— 不是 {variables:[...]}，
     // 旧代码对字典直接 .slice 会 TypeError 并中断整个地图加载
     let names = [];
@@ -3044,7 +5055,7 @@ async function onMapClick(e) {
         : `${best.la.toFixed(4)}°N ${best.lo.toFixed(4)}°E`;
     $('map-picked').innerHTML = `已选网格 <strong>i=${best.i}, j=${best.j}</strong>
         （${coordTxt}，水深 ${depth != null ? depth.toFixed(2) + ' m' : '陆地'}）
-        <button class="btn btn-sm" style="margin-left:8px;" onclick="mapPickTimeseries(${best.i},${best.j})">📈 提取该点时间序列</button>`;
+        <button class="btn btn-sm" style="margin-left:8px;" onclick="mapPickTimeseries(${best.i},${best.j})"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-chart"></use></svg> 提取该点时间序列</button>`;
 }
 
 async function mapPickTimeseries(i, j) {
@@ -3056,7 +5067,7 @@ async function mapPickTimeseries(i, j) {
     $('ts-i').value = i;
     $('ts-j').value = j;
     if (tsVar && !tsVar.value) {
-        const vs = await api('/api/results/variables');
+        const vs = await fetchResultInventory();
         const list = Array.isArray(vs) ? vs
             : (vs && !vs.error ? ([]).concat(vs['3d'] || [], vs['2d'] || []) : []);
         if (list.length) { tsVar.value = (list.find(v => v.name === varName) ? varName : list[0].name); }
@@ -3065,14 +5076,80 @@ async function mapPickTimeseries(i, j) {
 }
 
 // ── Init ──────────────────────────────────────────────────────────────
+function ensureViz3dVolumePresetCompatibility() {
+    const mesh = document.getElementById('viz3d-mesh-mode');
+    const stack = document.getElementById('viz3d-iso-stack');
+    const layer = document.getElementById('viz3d-iso-layer');
+    const controls = document.querySelector('.sw-3d-display-controls');
+    if (!mesh || !stack || !layer || !controls) return false;
+
+    let button = document.getElementById('viz3d-volume-preset');
+    if (!button) {
+        button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn btn-sm';
+        button.id = 'viz3d-volume-preset';
+        button.setAttribute('aria-pressed', 'false');
+        button.setAttribute('data-i18n', '体网格预设');
+        button.setAttribute('title', '此预设临时启用派生三角显示剖分与全部可用垂向层。再次点击后恢复预设前的剖分与叠层选择。');
+        button.textContent = '体网格预设';
+        controls.appendChild(button);
+    }
+
+    if (window.Viz3dVolumePreset) {
+        window.Viz3dVolumePreset.bind();
+        return true;
+    }
+    if (!document.querySelector('script[data-viz3d-volume-preset-compat]')) {
+        const script = document.createElement('script');
+        script.src = '/static/js/viz3d_volume_preset.js?v=1';
+        script.setAttribute('data-viz3d-volume-preset-compat', '');
+        script.onload = () => window.Viz3dVolumePreset?.bind?.();
+        (document.head || document.body).appendChild(script);
+    }
+    return true;
+}
+
 window.addEventListener('load', () => {
+    // Older cached templates have the mesh/layer controls but predate the
+    // combined volume preset. The current app.js asset can bridge that markup.
+    ensureViz3dVolumePresetCompatibility();
+    refreshScientificTerms();
     loadCases();
-    // Auto-load first case if exists
-    setTimeout(async () => {
-        const cases = await api('/api/cases');
-        if (cases.length) {
-            // Don't auto-load, just show on dashboard
-            $('stat-water').textContent = '-';
-        }
-    }, 500);
+    const pending=(async()=>{
+        if(await restoreCurrentCase())await loadVariables();
+        else $('stat-water').textContent='-';
+    })();
+    state.currentCasePending=pending;
+    pending.finally(()=>{
+        if(state.currentCasePending===pending)state.currentCasePending=null;
+        if(document.getElementById('page-viz2d')?.classList.contains('active'))initViz2d();
+        if(document.getElementById('page-viz3d')?.classList.contains('active'))initViz3d();
+    });
 });
+
+// Language changes update labels and redraw the visible result without a solver run.
+document.addEventListener('studio-language-changed',()=>{
+    refreshScientificTerms();
+    populateCalibrationVariables();
+    if ($('ac-method')) toggleAutoCalMethod();
+    if(state.currentParams.length) filterParams();
+    Object.values(state.charts).forEach(chart=>{if(chart){translateChartLabels(chart.config._config);chart.update('none');}});
+    const vars=new Map([...state.variables2d,...state.variables3d].map(v=>[v.name,v]));
+    document.querySelectorAll('select option').forEach(option=>{
+        const variable=vars.get(option.value);
+        if(variable) {
+            const requiresVertical=verticalResultSelectIds.has(option.closest('select')?.id);
+            option.dataset.i18nSkip='true';
+            option.disabled=requiresVertical&&!hasVerticalResultDimension(variable);
+            option.textContent=`${resultVariablePriority(variable)===2?'【按需】':'【默认优先】'} ${resultVariableOptionLabel(variable,requiresVertical)}`;
+            if(option.disabled)option.title=option.textContent;
+        }
+    });
+    if(state.activeCase) {
+        if(document.getElementById('page-dashboard')?.classList.contains('active')) loadDashboardSummary();
+        if(document.getElementById('page-viz2d')?.classList.contains('active')) updateViz2d();
+        if(document.getElementById('page-viz3d')?.classList.contains('active')) initViz3d();
+    }
+});
+

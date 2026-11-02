@@ -1,0 +1,3 @@
+﻿[js]      0 ready
+pid 30928
+done

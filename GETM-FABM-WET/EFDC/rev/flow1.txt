@@ -1,0 +1,24 @@
+﻿[js]    NaN loaded
+[js]      0 diag12 ready
+pid 50180
+[js]     34 ENTER CheckLicensing
+[js]     45 __vbaNew2 classinfo=0x4eb84c +4=004eba14 +18=0032002e from EFDC_Explorer8.4.exe+0x41bde4
+[js]     48 __vbaNew classinfo=0x454c64
+[js]     49 __vbaNew classinfo=0x454c64
+[js]     49 __vbaNew classinfo=0x454c64
+[js]     51 __vbaNew classinfo=0x4ea944
+[js]     97 __vbaNew classinfo=0x4f9f3c
+[js]    116 __vbaNew classinfo=0x454c64
+[js]    116 __vbaNew classinfo=0x454c64
+[js]    142 __vbaNew classinfo=0x454c64
+[js]    210 ready
+[js]   1213 __vbaNew classinfo=0x454c64
+[js]   1214 __vbaNew classinfo=0x454c64
+[js]   1217 __vbaNew classinfo=0x454c64
+[js]   1288 __vbaNew classinfo=0x4facdc
+[js]   1297 __vbaNew classinfo=0x454c64
+[js]   1297 __vbaNew classinfo=0x4f3b90
+[js]   1297 __vbaNew classinfo=0x4f3bc0
+[js]   1326 __vbaNew classinfo=0x4facdc
+[js]   3640 __vbaNew2 classinfo=0x4d5204 +4=004dd8a0 +18=004df874 from EFDC_Explorer8.4.exe+0x116ab9a
+done alive check...

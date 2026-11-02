@@ -1,0 +1,39 @@
+{
+  "case_name": "UI Random Lake 1208",
+  "engines": {
+    "eco": true,
+    "fish": true,
+    "ghg": true,
+    "hydro": true
+  },
+  "files": [
+    "UI_RANDOM_LAKE_1208_WET.2d.nc",
+    "UI_RANDOM_LAKE_1208_WET.3d.nc",
+    "bathymetry.nc",
+    "fabm.yaml",
+    "fabm_init.nc",
+    "getm.inp",
+    "getm_fabm.inp",
+    "gotm_fabm.yaml",
+    "gotmturb.nml",
+    "initial_conditions.json",
+    "meteo.nc",
+    "meteo_draft.json",
+    "meteo_input.txt",
+    "model_run.log",
+    "output.nc",
+    "output.yaml",
+    "riverinfo.dat",
+    "rivers.nc",
+    "rivers_setup.json"
+  ],
+  "notes": [
+    "模块组合：水动力✓ · 水质生态✓ · 鱼类✓ · 温室气体✓",
+    "生态初值预设: 富营养（藻类浊水态）（13 个参数已写入 fabm.yaml）"
+  ],
+  "params_applied": 13,
+  "preset": "eutrophic",
+  "preset_label": "富营养（藻类浊水态）",
+  "success": true,
+  "warnings": []
+}

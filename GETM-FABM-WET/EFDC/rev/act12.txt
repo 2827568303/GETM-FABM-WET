@@ -1,0 +1,3 @@
+     0 diag51 ready
+     0 diag97 ready
+  3285 [wait1] show 0x2780ad6 title="Activation Wizard" prev=24 vis=1

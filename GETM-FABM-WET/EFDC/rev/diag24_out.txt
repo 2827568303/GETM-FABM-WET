@@ -1,0 +1,5 @@
+﻿[js]      0 diag24 ready
+pid 49188
+[js]     31 CoCreateInstanceEx clsid=01fe430d93f0cf11894000a0c9054228 riid= hr=0x80012
+[js]     64 CoCreateInstanceEx clsid=c8e29963e463314f823cd256c17e7a13 riid= hr=0x80012
+done

@@ -1,0 +1,16 @@
+     0 diag51 ready
+     2 diag96 ready
+  1836 FileOpen C:\Users\Public\DSI\EEMS8.3\EEMS.ini
+  1838 FileOpen C:\Users\Public\DSI\EFDC_Explorer8.0\EFDC_Explorer.ini
+  1933 FileOpen C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+  1934 FileOpen C:\Users\Public\DSI\EEMS8.3\EEMS.ini
+  1935 FileOpen C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+  1944 FileOpen C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+  1954 FileOpen C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+  2173 WaitForSingleObjectEx 2002ms ret=258  clr.dll+0x1dfcd <- combase.dll+0xe1c75 <- ntdll.dll+0x61160 <- msvcp_win.dll+0x3b092 <- KERNEL32.DLL+0x15d49 <- ntdll.dll+0x6c75b <- ntdll.dll+0x6c6e1
+  3683 FileOpen C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+  3828 FileOpen C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+  3829 FileOpen C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+  3840 FileOpen C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+  3851 FileOpen C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+ 10857 WaitForMultipleObjects 6706ms ret=0  KERNEL32.DLL+0x6cf56 <- KERNEL32.DLL+0x6cb43 <- KERNEL32.DLL+0x39799 <- KERNELBASE.dll+0x259d5b <- ntdll.dll+0x4e1fe <- ntdll.dll+0x6dd4b <- ntdll.dll+0x6df00 <- MSVBVM60.DLL+0x86515 <- ntdll.dll+0xb61e2 <- ntdll.dll+0xb61b4 <- ntdll.dll+0x6dc53 <- MSVBVM60.DLL+0x3d5e7

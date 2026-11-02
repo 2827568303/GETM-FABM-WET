@@ -1,0 +1,6 @@
+     0 diag51 ready
+     1 ready
+  2062 HIT 0x156ABD3
+  2062 HIT 0x156ABDC
+  2062 HIT 0x156ABE3
+  2064 === MSGBOX ===

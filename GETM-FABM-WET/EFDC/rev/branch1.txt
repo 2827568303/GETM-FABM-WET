@@ -1,0 +1,6 @@
+﻿[js]      1 hook fail 0x156ABE1
+[js]      1 ready
+pid 14976
+[js]     96 __vbaNew2 classinfo=0x4eb84c
+[js]   4791 __vbaNew2 classinfo=0x4d5204
+done

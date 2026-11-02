@@ -1,0 +1,5 @@
+     1 diag51 ready
+     0 ready
+  2580 MsgWaitForMultipleObjectsEx 1244ms tid=21944 count=1 handles=2096 timeout=10000 ret=1 from USER32.DLL+0x38b1f
+  2580 MsgWaitForMultipleObjects 1245ms tid=21944 count=1 handles=2096 timeout=10000 ret=1 from winhttpcom.dll+0xa23b
+  2657 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8

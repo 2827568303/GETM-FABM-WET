@@ -1,0 +1,97 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const storage = new Map();
+const context = vm.createContext({window:{},console,Intl,Map,Set,WeakMap,JSON,Promise,
+    localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},
+    fetch:async()=>({ok:true,json:async()=>JSON.parse(fs.readFileSync('3DWET/app/static/i18n/en.json','utf8'))})});
+vm.runInContext(fs.readFileSync('3DWET/app/static/js/i18n.js','utf8'),context);
+(async()=>{
+    const i=context.window.StudioI18n;
+    await i.ready;
+    assert.equal(i.locale(),'zh-CN');
+    assert.equal(i.t('仪表盘'),'仪表盘');
+    await i.setLocale('en-US');
+    assert.equal(i.t('仪表盘'),'Dashboard');
+    assert.equal(i.t('中等'),'Medium');
+    assert.equal(i.t('生成剖面'),'Generate section');
+    assert.equal(i.t('3D 可视化'),'3D visualization');
+    assert.equal(i.t('表层 (k=5)'),'Surface (k=5)');
+    assert.equal(i.t('底层 (k=0)'),'Bottom (k=0)');
+    assert.equal(i.t('富营养（藻类浊水态）'),'Eutrophic (algae-dominated turbid state)');
+    assert.equal(i.t('变量: Water temperature (temp) | 时步: 0 | 均值: 16.2468 | 形状: 14×19'),
+        'Variable: Water temperature (temp) | Time step: 0 | Mean: 16.2468 | Shape: 14×19');
+    assert.equal(i.t('  取消  '),'  Cancel  ');
+    assert.equal(i.t('🗺️ 查看2D结果'),'🗺️ View 2D results');
+    assert.equal(i.t('时步 12 · 层 3 · 垂向 20×'),'Time step 12 · Layer 3 · Vertical 20×');
+    assert.equal(i.t('文件: C:\\案例\\模型.nc'),'File: C:\\案例\\模型.nc','path characters remain exact');
+    assert.equal(storage.get('3dwet.locale'),'en-US');
+    assert.equal(i.t('这是未知字段'),'这是未知字段');
+    assert.ok(i.stats().fallbacks.includes('这是未知字段'));
+    const v=i.variable({name:'temp',long_name:'水温',long_name_en:'Water temperature',meaning_en:'Temperature of the water'});
+    assert.equal(v.long_name,'Water temperature');
+    assert.equal(v.meaning,'Temperature of the water');
+    assert.equal(i.variable(undefined).display_name,'');
+    assert.equal(i.variable({en_name:'Preferred',long_name_en:'Fallback'}).display_name,'Preferred');
+    await i.setLocale('zh-CN');
+    assert.equal(i.t('仪表盘'),'仪表盘');
+    assert.equal(i.variable({name:'temp',long_name:'水温'}).long_name,'水温');
+    assert.throws(()=>i.importPack('{"locale":"fr-FR","name":"French","messages":{"__proto__":"bad"}}'),/unsafe|prototype/i);
+    assert.throws(()=>i.importPack({locale:'fr-FR',name:'French',messages:{取消:'<script>alert(1)</script>'}}),/HTML|plain text/i);
+    assert.throws(()=>i.importPack('x'.repeat(262145)),/size|large/i);
+    for(const locale of ['en-12','en-US-12']) assert.throws(()=>i.importPack({locale,name:'Invalid',messages:{}}),/locale/i);
+    assert.throws(()=>i.importPack({locale:'../../evil',name:'Evil',messages:{}}),/locale/i);
+    assert.throws(()=>i.importPack({locale:'en-US',name:'Overwrite',messages:{}}),/reserved/i);
+    i.importPack({locale:'fr-FR',name:'Français',messages:{取消:'Annuler'}});
+    await i.setLocale('fr-FR');
+    assert.equal(i.t('取消'),'Annuler');
+    assert.equal(i.t('仪表盘'),'Dashboard','missing imported translations use built-in English');
+    assert.equal(i.t('无词条的内容'),'无词条的内容','unknown translations remain original');
+    await i.setLocale('zh-CN');
+    assert.equal(i.t('取消'),'取消');
+    assert.ok(storage.get('3dwet.languagePacks').includes('Français'));
+    // A small DOM fixture exercises the same WeakMap source tracking used by
+    // MutationObserver, including external dynamic updates and protected nodes.
+    const element=(attrs={},skip=false)=>({nodeType:1,attrs:{...attrs},closest:()=>skip,
+        getAttribute(name){return this.attrs[name]??null;},setAttribute(name,value){this.attrs[name]=value;}});
+    const root=element(), input=element({placeholder:'搜索参数'}), protectedEl=element({},true);
+    input.value='用户输入: temp = 22';
+    const text={nodeType:3,nodeValue:'仪表盘',parentElement:root};
+    const code={nodeType:3,nodeValue:'案例管理',parentElement:protectedEl};
+    const path={nodeType:3,nodeValue:'C:\\案例\\模型.nc',parentElement:root};
+    const canvas=element({'aria-label':'当前变量的二维空间分布；数值读数见图例与坐标信息',role:'img'});
+    canvas.matches=selector=>selector==='canvas.viz-canvas[role="img"]';
+    canvas.closest=selector=>selector.includes('canvas');
+    const canvasText={nodeType:3,nodeValue:'原始模型值 temp = 22',parentElement:canvas};
+    const protectedCanvas=element({'aria-label':'当前变量的二维空间分布；数值读数见图例与坐标信息',role:'img'},true);
+    protectedCanvas.matches=canvas.matches;
+    const nodes=[input,text,code,path,canvas,canvasText,protectedCanvas];
+    const events=[];
+    context.document={documentElement:root,dispatchEvent:event=>events.push(event),
+        createTreeWalker:()=>{let n=0;return {nextNode:()=>nodes[n++]||null};}};
+    context.CustomEvent=class {constructor(type,options){this.type=type;this.detail=options.detail;}};
+    await i.setLocale('en-US');
+    assert.equal(text.nodeValue,'Dashboard');
+    assert.equal(input.attrs.placeholder,'Search parameters');
+    assert.equal(input.value,'用户输入: temp = 22');
+    assert.equal(code.nodeValue,'案例管理');
+    assert.equal(path.nodeValue,'C:\\案例\\模型.nc');
+    assert.equal(canvas.attrs['aria-label'],"Current variable's 2D distribution; see the legend and coordinates for numerical values",'canvas accessibility names must follow the locale');
+    assert.equal(canvasText.nodeValue,'原始模型值 temp = 22','canvas model content remains protected');
+    assert.equal(protectedCanvas.attrs['aria-label'],'当前变量的二维空间分布；数值读数见图例与坐标信息','explicit skip still protects attributes');
+    await i.setLocale('zh-CN');
+    assert.equal(text.nodeValue,'仪表盘');
+    assert.equal(input.attrs.placeholder,'搜索参数');
+    assert.equal(canvas.attrs['aria-label'],'当前变量的二维空间分布；数值读数见图例与坐标信息');
+    text.nodeValue='案例管理';
+    await i.setLocale('en-US');
+    assert.equal(text.nodeValue,'Case management','external dynamic changes become new original sources');
+    await i.setLocale('zh-CN');
+    assert.equal(text.nodeValue,'案例管理');
+    assert.equal(events.at(-1).type,'studio-language-changed');
+    assert.equal(events.at(-1).detail.locale,'zh-CN');
+    const inventory=JSON.parse(fs.readFileSync('3DWET/tests/i18n_source_inventory.json','utf8'));
+    const catalog=JSON.parse(fs.readFileSync('3DWET/app/static/i18n/en.json','utf8')).messages;
+    for(const label of inventory) assert.ok(Object.hasOwn(catalog,label),'missing static label: '+label);
+    console.log('i18n: locale persistence, reversible source translation, unknown fallback and safe language packs PASS');
+})().catch(e=>{console.error(e);process.exitCode=1;});

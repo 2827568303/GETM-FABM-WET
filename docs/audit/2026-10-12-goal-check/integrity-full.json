@@ -1,0 +1,744 @@
+[
+  {
+    "started_at": 1791788728.3167808,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788728296715400,
+        "mtime": 1791788728.2967155
+      },
+      {
+        "name": "output.nc",
+        "mtime_ns": 1791788728319767200,
+        "mtime": 1791788728.3197672
+      }
+    ],
+    "health": {
+      "ready": true,
+      "files": [
+        {
+          "file": "output.nc",
+          "records": 2,
+          "variables": [
+            {
+              "variable": "time",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": null,
+              "reason": ""
+            },
+            {
+              "variable": "temp",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": 1,
+              "reason": ""
+            }
+          ],
+          "bytes_read": 24,
+          "final_time": "2020-01-01T00:20:00",
+          "scheduled_final_time": "2020-01-01T00:20:00"
+        }
+      ],
+      "skipped": [],
+      "bad_variables": [],
+      "errors": [],
+      "bytes_read": 24,
+      "max_chunk_elements_read": 1,
+      "duration_seconds": 0.016616
+    }
+  },
+  {
+    "started_at": 1791788728.371562,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788728360505800,
+        "mtime": 1791788728.3605058
+      }
+    ],
+    "health": {
+      "ready": false,
+      "files": [],
+      "skipped": [],
+      "bad_variables": [],
+      "errors": [
+        "No current-run output files with model results were produced"
+      ],
+      "bytes_read": 0,
+      "max_chunk_elements_read": 0,
+      "duration_seconds": 0.003909
+    }
+  },
+  {
+    "started_at": 1791788728.4300544,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788728419393200,
+        "mtime": 1791788728.4193933
+      },
+      {
+        "name": "output.nc",
+        "mtime_ns": 1791788728444150000,
+        "mtime": 1791788728.44415
+      }
+    ],
+    "health": {
+      "ready": false,
+      "files": [
+        {
+          "file": "output.nc",
+          "records": 2,
+          "variables": [
+            {
+              "variable": "time",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": null,
+              "reason": ""
+            },
+            {
+              "variable": "temp",
+              "unmasked_values": 1,
+              "finite_values": 0,
+              "finite_wet_values": 0,
+              "reason": "1 nonfinite unmasked values in latest record; no finite unmasked values on the active wet grid"
+            }
+          ],
+          "bytes_read": 24
+        }
+      ],
+      "skipped": [],
+      "bad_variables": [
+        {
+          "file": "output.nc",
+          "variable": "temp",
+          "reason": "1 nonfinite unmasked values in latest record; no finite unmasked values on the active wet grid"
+        }
+      ],
+      "errors": [],
+      "bytes_read": 24,
+      "max_chunk_elements_read": 1,
+      "duration_seconds": 0.016632
+    }
+  },
+  {
+    "started_at": 1791788728.4772887,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788728469433700,
+        "mtime": 1791788728.4694338
+      },
+      {
+        "name": "output.nc",
+        "mtime_ns": 1791788728494563600,
+        "mtime": 1791788728.4945636
+      }
+    ],
+    "health": {
+      "ready": false,
+      "files": [
+        {
+          "file": "output.nc",
+          "records": 2,
+          "variables": [
+            {
+              "variable": "time",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": null,
+              "reason": ""
+            },
+            {
+              "variable": "temp",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": 1,
+              "reason": ""
+            }
+          ],
+          "bytes_read": 24,
+          "final_time": "2020-01-01T00:01:00",
+          "scheduled_final_time": "2020-01-01T00:20:00"
+        }
+      ],
+      "skipped": [],
+      "bad_variables": [],
+      "errors": [
+        "output.nc: final time 2020-01-01 00:01:00 does not reach configured stop 2020-01-01 00:20:00"
+      ],
+      "bytes_read": 24,
+      "max_chunk_elements_read": 1,
+      "duration_seconds": 0.022833
+    }
+  },
+  {
+    "started_at": 1791788729.051094,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788729023699700,
+        "mtime": 1791788729.0236998
+      },
+      {
+        "name": "output.nc",
+        "mtime_ns": 1791788729053093900,
+        "mtime": 1791788729.053094
+      }
+    ],
+    "health": {
+      "ready": true,
+      "files": [
+        {
+          "file": "output.nc",
+          "records": 2,
+          "variables": [
+            {
+              "variable": "time",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": null,
+              "reason": ""
+            },
+            {
+              "variable": "temp",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": 1,
+              "reason": ""
+            }
+          ],
+          "bytes_read": 24,
+          "final_time": "2020-01-01T00:20:00",
+          "scheduled_final_time": "2020-01-01T00:20:00"
+        }
+      ],
+      "skipped": [],
+      "bad_variables": [],
+      "errors": [],
+      "bytes_read": 24,
+      "max_chunk_elements_read": 1,
+      "duration_seconds": 0.015344
+    }
+  },
+  {
+    "started_at": 1791788729.0901215,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788729079470800,
+        "mtime": 1791788729.0794709
+      },
+      {
+        "name": "output.nc",
+        "mtime_ns": 1791788729108480300,
+        "mtime": 1791788729.1084802
+      }
+    ],
+    "health": {
+      "ready": true,
+      "files": [
+        {
+          "file": "output.nc",
+          "records": 2,
+          "variables": [
+            {
+              "variable": "time",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": null,
+              "reason": ""
+            },
+            {
+              "variable": "temp",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": 1,
+              "reason": ""
+            }
+          ],
+          "bytes_read": 24,
+          "final_time": "2020-01-01T00:10:00",
+          "scheduled_final_time": "2020-01-01T00:10:00"
+        }
+      ],
+      "skipped": [],
+      "bad_variables": [],
+      "errors": [],
+      "bytes_read": 24,
+      "max_chunk_elements_read": 1,
+      "duration_seconds": 0.019445
+    }
+  },
+  {
+    "started_at": 1791788729.1532912,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788729140478900,
+        "mtime": 1791788729.1404788
+      },
+      {
+        "name": "output.nc",
+        "mtime_ns": 1791788729171639400,
+        "mtime": 1791788729.1716394
+      }
+    ],
+    "health": {
+      "ready": true,
+      "files": [
+        {
+          "file": "output.nc",
+          "records": 2,
+          "variables": [
+            {
+              "variable": "time",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": null,
+              "reason": ""
+            },
+            {
+              "variable": "temp",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": 1,
+              "reason": ""
+            }
+          ],
+          "bytes_read": 24,
+          "final_time": "2020-01-01T00:19:10",
+          "scheduled_final_time": "2020-01-01T00:19:10"
+        }
+      ],
+      "skipped": [],
+      "bad_variables": [],
+      "errors": [],
+      "bytes_read": 24,
+      "max_chunk_elements_read": 1,
+      "duration_seconds": 0.016206
+    }
+  },
+  {
+    "started_at": 1791788729.211307,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788729199779000,
+        "mtime": 1791788729.199779
+      },
+      {
+        "name": "output.nc",
+        "mtime_ns": 1791788729227839100,
+        "mtime": 1791788729.227839
+      }
+    ],
+    "health": {
+      "ready": true,
+      "files": [
+        {
+          "file": "output.nc",
+          "records": 2,
+          "variables": [
+            {
+              "variable": "time",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": null,
+              "reason": ""
+            },
+            {
+              "variable": "temp",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": 1,
+              "reason": ""
+            }
+          ],
+          "bytes_read": 24,
+          "final_time": "2020-01-01T00:19:50",
+          "scheduled_final_time": "2020-01-01T00:19:50"
+        }
+      ],
+      "skipped": [],
+      "bad_variables": [],
+      "errors": [],
+      "bytes_read": 24,
+      "max_chunk_elements_read": 1,
+      "duration_seconds": 0.018698
+    }
+  },
+  {
+    "started_at": 1791788753.9213321,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788753900762100,
+        "mtime": 1791788753.900762
+      },
+      {
+        "name": "output.nc",
+        "mtime_ns": 1791788753925782600,
+        "mtime": 1791788753.9257827
+      }
+    ],
+    "health": {
+      "ready": true,
+      "files": [
+        {
+          "file": "output.nc",
+          "records": 2,
+          "variables": [
+            {
+              "variable": "time",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": null,
+              "reason": ""
+            },
+            {
+              "variable": "temp",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": 1,
+              "reason": ""
+            }
+          ],
+          "bytes_read": 24,
+          "final_time": "2020-01-01T00:20:00",
+          "scheduled_final_time": "2020-01-01T00:20:00"
+        }
+      ],
+      "skipped": [],
+      "bad_variables": [],
+      "errors": [],
+      "bytes_read": 24,
+      "max_chunk_elements_read": 1,
+      "duration_seconds": 0.017318
+    }
+  },
+  {
+    "started_at": 1791788753.9682271,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788753956044400,
+        "mtime": 1791788753.9560444
+      }
+    ],
+    "health": {
+      "ready": false,
+      "files": [],
+      "skipped": [],
+      "bad_variables": [],
+      "errors": [
+        "No current-run output files with model results were produced"
+      ],
+      "bytes_read": 0,
+      "max_chunk_elements_read": 0,
+      "duration_seconds": 0.003268
+    }
+  },
+  {
+    "started_at": 1791788754.0194025,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788754013370900,
+        "mtime": 1791788754.013371
+      },
+      {
+        "name": "output.nc",
+        "mtime_ns": 1791788754035973100,
+        "mtime": 1791788754.035973
+      }
+    ],
+    "health": {
+      "ready": false,
+      "files": [
+        {
+          "file": "output.nc",
+          "records": 2,
+          "variables": [
+            {
+              "variable": "time",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": null,
+              "reason": ""
+            },
+            {
+              "variable": "temp",
+              "unmasked_values": 1,
+              "finite_values": 0,
+              "finite_wet_values": 0,
+              "reason": "1 nonfinite unmasked values in latest record; no finite unmasked values on the active wet grid"
+            }
+          ],
+          "bytes_read": 24
+        }
+      ],
+      "skipped": [],
+      "bad_variables": [
+        {
+          "file": "output.nc",
+          "variable": "temp",
+          "reason": "1 nonfinite unmasked values in latest record; no finite unmasked values on the active wet grid"
+        }
+      ],
+      "errors": [],
+      "bytes_read": 24,
+      "max_chunk_elements_read": 1,
+      "duration_seconds": 0.017739
+    }
+  },
+  {
+    "started_at": 1791788754.0721357,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788754063134000,
+        "mtime": 1791788754.063134
+      },
+      {
+        "name": "output.nc",
+        "mtime_ns": 1791788754086071600,
+        "mtime": 1791788754.0860715
+      }
+    ],
+    "health": {
+      "ready": false,
+      "files": [
+        {
+          "file": "output.nc",
+          "records": 2,
+          "variables": [
+            {
+              "variable": "time",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": null,
+              "reason": ""
+            },
+            {
+              "variable": "temp",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": 1,
+              "reason": ""
+            }
+          ],
+          "bytes_read": 24,
+          "final_time": "2020-01-01T00:01:00",
+          "scheduled_final_time": "2020-01-01T00:20:00"
+        }
+      ],
+      "skipped": [],
+      "bad_variables": [],
+      "errors": [
+        "output.nc: final time 2020-01-01 00:01:00 does not reach configured stop 2020-01-01 00:20:00"
+      ],
+      "bytes_read": 24,
+      "max_chunk_elements_read": 1,
+      "duration_seconds": 0.017884
+    }
+  },
+  {
+    "started_at": 1791788754.1873035,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788754163053000,
+        "mtime": 1791788754.163053
+      },
+      {
+        "name": "output.nc",
+        "mtime_ns": 1791788754192230700,
+        "mtime": 1791788754.1922307
+      }
+    ],
+    "health": {
+      "ready": true,
+      "files": [
+        {
+          "file": "output.nc",
+          "records": 2,
+          "variables": [
+            {
+              "variable": "time",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": null,
+              "reason": ""
+            },
+            {
+              "variable": "temp",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": 1,
+              "reason": ""
+            }
+          ],
+          "bytes_read": 24,
+          "final_time": "2020-01-01T00:20:00",
+          "scheduled_final_time": "2020-01-01T00:20:00"
+        }
+      ],
+      "skipped": [],
+      "bad_variables": [],
+      "errors": [],
+      "bytes_read": 24,
+      "max_chunk_elements_read": 1,
+      "duration_seconds": 0.017329
+    }
+  },
+  {
+    "started_at": 1791788754.2401679,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788754227687100,
+        "mtime": 1791788754.2276871
+      },
+      {
+        "name": "output.nc",
+        "mtime_ns": 1791788754253016200,
+        "mtime": 1791788754.2530162
+      }
+    ],
+    "health": {
+      "ready": true,
+      "files": [
+        {
+          "file": "output.nc",
+          "records": 2,
+          "variables": [
+            {
+              "variable": "time",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": null,
+              "reason": ""
+            },
+            {
+              "variable": "temp",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": 1,
+              "reason": ""
+            }
+          ],
+          "bytes_read": 24,
+          "final_time": "2020-01-01T00:10:00",
+          "scheduled_final_time": "2020-01-01T00:10:00"
+        }
+      ],
+      "skipped": [],
+      "bad_variables": [],
+      "errors": [],
+      "bytes_read": 24,
+      "max_chunk_elements_read": 1,
+      "duration_seconds": 0.017403
+    }
+  },
+  {
+    "started_at": 1791788754.3029501,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788754288198400,
+        "mtime": 1791788754.2881985
+      },
+      {
+        "name": "output.nc",
+        "mtime_ns": 1791788754320023100,
+        "mtime": 1791788754.320023
+      }
+    ],
+    "health": {
+      "ready": true,
+      "files": [
+        {
+          "file": "output.nc",
+          "records": 2,
+          "variables": [
+            {
+              "variable": "time",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": null,
+              "reason": ""
+            },
+            {
+              "variable": "temp",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": 1,
+              "reason": ""
+            }
+          ],
+          "bytes_read": 24,
+          "final_time": "2020-01-01T00:19:10",
+          "scheduled_final_time": "2020-01-01T00:19:10"
+        }
+      ],
+      "skipped": [],
+      "bad_variables": [],
+      "errors": [],
+      "bytes_read": 24,
+      "max_chunk_elements_read": 1,
+      "duration_seconds": 0.016906
+    }
+  },
+  {
+    "started_at": 1791788754.3654363,
+    "files": [
+      {
+        "name": "bathymetry.nc",
+        "mtime_ns": 1791788754353640800,
+        "mtime": 1791788754.3536408
+      },
+      {
+        "name": "output.nc",
+        "mtime_ns": 1791788754381987400,
+        "mtime": 1791788754.3819873
+      }
+    ],
+    "health": {
+      "ready": true,
+      "files": [
+        {
+          "file": "output.nc",
+          "records": 2,
+          "variables": [
+            {
+              "variable": "time",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": null,
+              "reason": ""
+            },
+            {
+              "variable": "temp",
+              "unmasked_values": 1,
+              "finite_values": 1,
+              "finite_wet_values": 1,
+              "reason": ""
+            }
+          ],
+          "bytes_read": 24,
+          "final_time": "2020-01-01T00:19:50",
+          "scheduled_final_time": "2020-01-01T00:19:50"
+        }
+      ],
+      "skipped": [],
+      "bad_variables": [],
+      "errors": [],
+      "bytes_read": 24,
+      "max_chunk_elements_read": 1,
+      "duration_seconds": 0.019972
+    }
+  }
+]

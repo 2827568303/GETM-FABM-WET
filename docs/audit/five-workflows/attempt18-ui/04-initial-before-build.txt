@@ -1,0 +1,149 @@
+- img "3DWET"
+- heading "3DWET Studio" [level=1]
+- paragraph: 湖泊生态 · 三维建模工作台
+- generic: 总览
+- generic: 📊
+- text: 仪表盘
+- generic: 📁
+- text: 案例管理
+- generic: 前处理
+- generic: 🛠️
+- text: 前处理
+- generic: ▦
+- text: 交互网格编辑
+- generic: 📥
+- text: 输入数据
+- generic: 🧩
+- text: 模块配置
+- generic: ⚙️
+- text: 参数编辑
+- generic: 🧪
+- text: 初始条件
+- generic: ⏱️
+- text: 时间设置
+- generic: 运行
+- generic: ▶️
+- text: 运行控制
+- generic: 后处理
+- generic: 🌐
+- text: 地图视图
+- generic: 🗺️
+- text: 2D 可视化
+- generic: 🧊
+- text: 3D 可视化
+- generic: 🔥
+- text: 垂向热图
+- generic: 📈
+- text: 时间序列
+- generic: 率定
+- generic: 🎯
+- text: 率定分析
+- generic: 🔄
+- text: 自动率定
+- generic: 工作台
+- generic: ◉
+- text: 环境与启动诊断
+- generic: 📋
+- text: 项目导入与物理设置
+- generic: "案例: UI_2026101501"
+- menubar "工作台菜单":
+  - button "项目"
+  - button "编辑"
+  - button "视图"
+  - button "图层"
+  - button "运行"
+  - button "设置"
+  - button "帮助"
+  - button "语言"
+  - generic: 3DWET Studio · GIS 工作台
+- toolbar "常用工具":
+  - button "▣ 案例":
+    - generic: ▣
+    - generic: 案例
+  - button "⚒ 前处理":
+    - generic: ⚒
+    - generic: 前处理
+  - button "▦ 网格":
+    - generic: ▦
+    - generic: 网格
+  - button "▶ 运行":
+    - generic: ▶
+    - generic: 运行
+  - button "⌖ 地图":
+    - generic: ⌖
+    - generic: 地图
+  - button "▤ 2D":
+    - generic: ▤
+    - generic: 2D
+  - button "◇ 3D":
+    - generic: ◇
+    - generic: 3D
+  - button "⚙ 诊断":
+    - generic: ⚙
+    - generic: 诊断
+- generic: 初始条件
+- generic: UI_2026101501
+- button "100%"
+- generic: 空闲
+- generic: 初始条件
+- generic: 设置初始水位、水温与各类水质变量的初始状态（冷启动初值）
+- generic: ▶
+- text: 💧 初始水位与水温
+- text: 初始水位
+- emphasis: （相对地形基准，m）
+- spinbutton: "0.15"
+- text: 湖面绝对高程
+- emphasis: （m, 如滇池 1884）
+- spinbutton
+- text: 地形基准面绝对高程
+- emphasis: （m）
+- spinbutton
+- text: 初始水温
+- emphasis: （℃）
+- spinbutton: "18.51"
+- text: 地形
+- code: bathymetry.nc
+- text: ：水域格 193 个，水深范围 3.000 ~ 7.000 m，均值 4.990 m。
+- text: 水位填 0 即湖面恰好位于地形零点；此处最大水深 7.000 m。
+- text: 💡 水位怎么填？ GETM 的
+- code: m2d/elev_const
+- text: 是「相对地形零点」的水面高度，和
+- code: bathymetry.nc
+- text: 用同一个零点。若你的地形文件是滇池那种「相对 1884 m 基准面的水深」， 则湖面就在 1884 m，elev_const 填 0；填 1884 会把水面抬到 3788 m。 用上面的「湖面绝对高程 − 地形基准面绝对高程」两栏也能自动算出 elev_const。
+- generic: ▶
+- text: 🌱 营养状态预设（一键填充水质初值）
+- radio "富营养（藻类浊水态）"
+- text: 富营养（藻类浊水态）
+- radio "重富营养（蓝藻水华频发）"
+- text: 重富营养（蓝藻水华频发）
+- radio "中营养（水草清水态）" [checked]
+- text: 中营养（水草清水态）
+- text: 选择一个营养状态，下方「水质初始条件」里各变量会自动填入该状态的标准初值，之后再可单独微调。 同时用于生成
+- code: fabm_init.nc
+- text: （沉水植物生物量随水深分布）。
+- text: 沉水植物生物量上限
+- emphasis: gDW/m²
+- spinbutton
+- generic: ▶
+- text: 🧫 水质初始条件（按模块，单位 g/m³）
+- generic: 💾 应用初始条件
+- button "💾 保存到案例"
+- button "🔄 重新读取"
+- text: 保存会写入
+- code: getm.inp
+- text: （m2d/elev_const、temp/temp_const）、
+- code: fabm.yaml
+- text: （各模块 initialization） 与
+- code: fabm_init.nc
+- text: （沉水植物）。修改后若想让模型使用新初值，请保持冷启动。
+- status:
+  - generic: 项目
+  - strong: UI_2026101501
+  - generic: 网格
+  - strong: 待加载
+  - generic: 运行
+  - strong: 空闲
+  - generic: 视图
+  - strong: 100%
+  - generic: 坐标系
+  - strong: —

@@ -1,0 +1,15 @@
+﻿[js] ready
+pid 30520
+[js] slot 4014f8 -> 0x602aa44a  MSVBVM60.DLL+0xa44a
+[js] slot 401668 -> 0x602bde9b  MSVBVM60.DLL+0x1de9b
+[js] slot 4014c0 -> 0x602a5560  MSVBVM60.DLL+0x5560
+[js] slot 401160 -> 0x603a60ef  MSVBVM60.DLL+0x1060ef
+[js] slot 401504 -> 0x602ab540  MSVBVM60.DLL+0xb540
+[js] slot 40129c -> 0x602bd872  MSVBVM60.DLL+0x1d872
+[js] slot 401220 -> 0x602e27c2  MSVBVM60.DLL+0x427c2
+[js] slot 40154c -> 0x602bd8f4  MSVBVM60.DLL+0x1d8f4
+[js] slot 401144 -> 0x602d8388  MSVBVM60.DLL+0x38388
+[js] slot 4012a0 -> 0x6038e26a  MSVBVM60.DLL+0xee26a
+[js] slot 4012a4 -> 0x602bd94b  MSVBVM60.DLL+0x1d94b
+[js] slot 40118c -> 0x603a68d4  MSVBVM60.DLL+0x1068d4
+[js] slot 4011ac -> 0x602bda3e  MSVBVM60.DLL+0x1da3e

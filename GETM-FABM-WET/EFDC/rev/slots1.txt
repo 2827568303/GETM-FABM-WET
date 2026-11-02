@@ -1,0 +1,6 @@
+﻿[js]      0 diag41 ready
+pid 54832
+[js]   2963 form obj=0xdd42958 classinfo=0dd42958
+[js]   2963 hook vtable 0x163c1f4 (form)
+[js]   2972   call slot 0x1b8 (id 0x6e)
+done

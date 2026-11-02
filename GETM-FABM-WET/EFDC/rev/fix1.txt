@@ -1,0 +1,5 @@
+﻿[js]      2 diag51 ready
+pid 30916
+[js]   2401 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8
+PROCESS EXITED code=0 at 9.4s
+elapsed=9.4

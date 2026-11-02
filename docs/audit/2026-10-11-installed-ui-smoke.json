@@ -1,0 +1,51 @@
+{
+  "application": "3dwet-studio",
+  "python": "3.10.11",
+  "frozen": true,
+  "model_root": "C:\\Users\\23801\\AppData\\Local\\Programs\\3DWET Studio\\3DWET",
+  "writable": true,
+  "dependencies": {
+    "Flask": true,
+    "numpy": true,
+    "scipy": true,
+    "netCDF4": true,
+    "PyYAML": true,
+    "pyshp": true,
+    "pyproj": true,
+    "psutil": true,
+    "waitress": true,
+    "pywebview": true
+  },
+  "solver": {
+    "path": "C:\\Users\\23801\\AppData\\Local\\Programs\\3DWET Studio\\3DWET\\bin\\getm_cartesian.exe",
+    "exists": true,
+    "runtime_verified": false,
+    "runtime": {
+      "ready": true,
+      "missing": [],
+      "loader_verified": false,
+      "runtime_dir": "C:\\Users\\23801\\AppData\\Local\\Programs\\3DWET Studio\\3DWET\\bin\\runtime",
+      "detail": "运行库文件完整；尚未执行加载检查。"
+    },
+    "note": "Loader verification does not verify scientific execution."
+  },
+  "ui_smoke": {
+    "passed": true,
+    "renderer": "edgechromium",
+    "ready_state": "complete",
+    "hero_count": 0,
+    "bridge_ready": true,
+    "layout_visible": true,
+    "health_ready": true,
+    "application": "3dwet-studio",
+    "model_root": "C:\\Users\\23801\\AppData\\Local\\Programs\\3DWET Studio\\3DWET",
+    "instance_id": "8aa5d8d0f0174a4cae234418a0612b0e",
+    "model_status": "idle",
+    "title": "3DWET 生态水动力模型系统",
+    "scripts": {
+      "chart": true,
+      "plotly": true,
+      "leaflet": true
+    }
+  }
+}

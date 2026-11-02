@@ -1,0 +1,5 @@
+﻿variant EE_MULTI_TRIAL_8_4             alive=True  windows=['#32770|EFDC_Explorer8.4|ȷ�� / There is an error when checking the license. Error 481 (Invalid picture)']
+variant EEMS_MULTI_TRIAL               alive=True  windows=['#32770|EFDC_Explorer8.4|ȷ�� / There is an error when checking the license. Error 481 (Invalid picture)']
+variant EEMS_MULTI_TRIAL_8_4           alive=True  windows=['#32770|EFDC_Explorer8.4|ȷ�� / There is an error when checking the license. Error 481 (Invalid picture)']
+variant EE_MULTI_TRIAL_8_0             alive=True  windows=['#32770|EFDC_Explorer8.4|ȷ�� / There is an error when checking the license. Error 481 (Invalid picture)']
+variant PND_EE_MULTI_TRIAL_20160225    alive=True  windows=['#32770|EFDC_Explorer8.4|ȷ�� / There is an error when checking the license. Error 481 (Invalid picture)']

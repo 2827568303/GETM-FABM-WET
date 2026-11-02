@@ -1,0 +1,63 @@
+{
+  "returncode": 0,
+  "advance_seconds": 2,
+  "differences": {
+    "loop": {
+      "max_absolute_error": 480.0,
+      "index": []
+    },
+    "z": {
+      "max_absolute_error": 8.294065846452259e-11,
+      "index": [
+        13,
+        19
+      ]
+    },
+    "U": {
+      "max_absolute_error": 1.7803592699758026e-11,
+      "index": [
+        18,
+        11
+      ]
+    },
+    "V": {
+      "max_absolute_error": 2.072065097844314e-08,
+      "index": [
+        12,
+        19
+      ]
+    },
+    "tke": {
+      "max_absolute_error": 1e-08,
+      "index": [
+        0,
+        0,
+        0
+      ]
+    },
+    "num": {
+      "max_absolute_error": 3.627493647833322e-24,
+      "index": [
+        0,
+        0,
+        0
+      ]
+    },
+    "nuh": {
+      "max_absolute_error": 3.627493647833322e-24,
+      "index": [
+        0,
+        0,
+        0
+      ]
+    },
+    "S": {
+      "max_absolute_error": 9999.0,
+      "index": [
+        0,
+        0,
+        0
+      ]
+    }
+  }
+}

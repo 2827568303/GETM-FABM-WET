@@ -1,0 +1,17 @@
+﻿powershell : Start-Process : Cannot perform operation because the wildcard path C:\Users\23801\Desktop\GETM-FABM-WET-26
+0928\GETM-FAB
+所在位置 行:1 字符: 373
++ ... lyContinue; powershell -NoProfile -ExecutionPolicy Bypass -File .\rev ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Start-Process :...260928\GETM-FAB:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+M-WET\EFDC\EFDC 鍟嗕笟鐗?.4 did not resolve to a file.
+At C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\plainwatch.ps1:5 char:6
++ $p = Start-Process -FilePath $exe -WorkingDirectory $dir -PassThru
++      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OpenError: (C:\Users\23801\...DC\EFDC 鍟嗕笟鐗?.4:String) [Start-Process], FileNotFoundExcep 
+   tion
+    + FullyQualifiedErrorId : FileOpenFailure,Microsoft.PowerShell.Commands.StartProcessCommand
+started pid= at 14:41:58
+alive=True

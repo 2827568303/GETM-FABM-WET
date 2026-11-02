@@ -1,0 +1,129 @@
+{
+  "files": [
+    {
+      "path": ".trae/documents/3DWET_GUI_完成方案.md",
+      "bytes": 15113,
+      "sha256": "d69488b2a39831c666d153b812f3470dec5bc90fbbb68f046ea7d14ef1751319"
+    },
+    {
+      "path": ".trae/documents/preprocess_redesign.md",
+      "bytes": 10059,
+      "sha256": "8d192f6e799efc684b9409e4eed47047f7ce0852ea29ad15dd6984dcf6855599"
+    },
+    {
+      "path": "release/installer-manifest.json",
+      "bytes": 1579,
+      "sha256": "75716fe48757f10d69cc4dba6d4eb1fa662ffa62956f79f9ddf05b6fcd517ea2"
+    },
+    {
+      "path": "3DWET/app/server.py",
+      "bytes": 327451,
+      "sha256": "ddfbac0f8dc36b2d8a2e96a8de4e04d17ed947d2b588fc852188ae1ee75ca057"
+    },
+    {
+      "path": "3DWET/app/calibration.py",
+      "bytes": 33622,
+      "sha256": "3f05c1623f5d4c993cad10f732b6b1742afbf3de0f46b8f95d1c460838135b6a"
+    },
+    {
+      "path": "3DWET/app/hotstart.py",
+      "bytes": 6626,
+      "sha256": "0b53fe280fab3e555cc6e9edb838a843061d08f3b349e60b5635a3f3afd9bf93"
+    },
+    {
+      "path": "3DWET/app/static/js/app.js",
+      "bytes": 184914,
+      "sha256": "ef9ac24c160c0f9409d052f09e0364af8dd08137a385eb51956a3ef1191e303d"
+    },
+    {
+      "path": "3DWET/app/static/js/i18n.js",
+      "bytes": 18823,
+      "sha256": "34a440e74944a5b8887ff64380699825cde7004ce7b1ffcbd465cbb09f947511"
+    },
+    {
+      "path": "3DWET/app/static/js/viz3d.js",
+      "bytes": 37121,
+      "sha256": "82de3a2b9c33e675c5b0ec068c092149b56dd52f804cf93b7349ceaeec283daf"
+    },
+    {
+      "path": "scripts/build_app.py",
+      "bytes": 11919,
+      "sha256": "1abf73e6487efe51f9b283abcd0604248653b41ca2b7f7154faa096e3bc157ea"
+    },
+    {
+      "path": "requirements.txt",
+      "bytes": 188,
+      "sha256": "45a77d6dcad88a52ccaee8f19b08917b853f6e449a7dc2b8fa32cae72b806b64"
+    },
+    {
+      "path": "3DWET/bin/getm_cartesian.exe",
+      "bytes": 5317304,
+      "sha256": "f06a7219490a9d160f72c18788db463fe9cf1ec4881b0b0c52141d8762e65e8a"
+    },
+    {
+      "path": "build/native-restart-fix/getm_cartesian.exe",
+      "bytes": 5351077,
+      "sha256": "15884cc236ef8526cd28f51dde491e95d6bd87a0f340c291bcce10aa8bbdf9e4"
+    },
+    {
+      "path": "build/builtin-restart-candidate-20261012-01/3DWET/bin/getm_cartesian.exe",
+      "bytes": 5351077,
+      "sha256": "54ad5ac9e352aa678e420e93c138c3d7679cbe2f2284a2509a6b07b1dfb48bf6"
+    },
+    {
+      "path": "build/external-candidate-20261012-01/3DWET/bin/getm_cartesian.exe",
+      "bytes": 5351077,
+      "sha256": "15884cc236ef8526cd28f51dde491e95d6bd87a0f340c291bcce10aa8bbdf9e4"
+    }
+  ],
+  "integration_reports": {
+    "builtin-restart-candidate-20261012-01": {
+      "report": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\builtin-restart-candidate-20261012-01\\verification.json",
+      "report_sha256": "b519144e79aef0f5d4a62e360393fea09334df8cda13f8105fb1576e91b5c3a9",
+      "passed": true,
+      "scope": "Short native integration and numerical-finiteness checks; not scientific accuracy or annual stability validation.",
+      "keep_defaults": true,
+      "cases": [
+        {
+          "name": "Lake Dianchi",
+          "passed": true,
+          "variables": null,
+          "result_features_passed": true
+        },
+        {
+          "name": "Lake Luoma",
+          "passed": true,
+          "variables": null,
+          "result_features_passed": true
+        },
+        {
+          "name": "NativeTest",
+          "passed": true,
+          "variables": null,
+          "result_features_passed": true
+        },
+        {
+          "name": "Theoretical lake",
+          "passed": true,
+          "variables": null,
+          "result_features_passed": true
+        },
+        {
+          "name": "_fish_probe",
+          "passed": true,
+          "variables": null,
+          "result_features_passed": true
+        }
+      ]
+    },
+    "external-candidate-20261012-01": {
+      "report": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\external-candidate-20261012-01\\verification.json",
+      "report_sha256": "27244ba7ee2d66a0bedfb920d07127d4c88eaf7a7935fb5da013a165de1cedde",
+      "passed": true,
+      "scope": "Deterministic synthetic integration scenario; not observational, scientific-accuracy, annual stability, or complete browser UX validation.",
+      "keep_defaults": null,
+      "seed": 2026101201,
+      "features": true
+    }
+  }
+}

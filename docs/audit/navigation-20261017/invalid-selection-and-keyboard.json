@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-17",
+  "sourcePreview": "http://127.0.0.1:59122/",
+  "case": "UI_2026101601",
+  "invalidVariable": {
+    "name": "D",
+    "phase": "error",
+    "stale": true,
+    "observation": "No real vertical dimension; retained graph explicitly labeled as previous selection."
+  },
+  "recoveredVariable": {
+    "name": "salt",
+    "phase": "ready",
+    "stale": false
+  },
+  "keyboard": {
+    "spaceOpensModelGroup": true,
+    "spaceClosesModelGroup": true,
+    "otherGroupsClosed": true,
+    "activePageRetained": "page-viz3d",
+    "escapeClosesDrawer": true,
+    "focusRestored": "studio-nav-toggle"
+  },
+  "formalAcceptanceCount": 0
+}

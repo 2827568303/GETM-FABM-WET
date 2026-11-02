@@ -319,6 +319,11 @@ subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
               (sDPOMSTot / (sDIMS+NearZero) + self%cRhoOM / self%cRhoIM)                                            ! burial_flux_of_DW_in_inorganic_matter_in_lake
          tDBurOM = sDPOMSTot / (sDIMS+NearZero) * tDBurIM                                                           ! burial_flux_of_DW_in_organic_matter_in_lake
          tDBurPOM = sDPOMS /(sDPOMSTot) * tDBurOM                                                                   ! burial_flux_of_DW_in_POM_in_lake per POM group (dim: nPOM)
+         ! Positive organic burial is fully allocated to POM groups; no residual humus flux remains.
+         tDBurHum = 0.0_rk
+         tPBurHum = 0.0_rk
+         tNBurHum = 0.0_rk
+         tCBurHum = 0.0_rk
          tDBurDOM = sDDOMS *(vDeltaS / cDepthS)                                                                     ! burial_flux_of_DDOM_in_lake (dim: nDOM)
          !::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!
          ! 2.2.2 P                                                                                                  !

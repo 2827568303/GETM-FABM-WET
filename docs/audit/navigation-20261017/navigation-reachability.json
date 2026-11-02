@@ -1,0 +1,100 @@
+{
+  "scope": "UI navigation reachability only, not business-function acceptance",
+  "routes": [
+    {
+      "requested": "dashboard",
+      "current": "dashboard",
+      "page": "page-dashboard"
+    },
+    {
+      "requested": "cases",
+      "current": "cases",
+      "page": "page-cases"
+    },
+    {
+      "requested": "projecttools",
+      "current": "projecttools",
+      "page": "page-projecttools"
+    },
+    {
+      "requested": "preprocess",
+      "current": "preprocess",
+      "page": "page-preprocess"
+    },
+    {
+      "requested": "input",
+      "current": "input",
+      "page": "page-input"
+    },
+    {
+      "requested": "gridstudio",
+      "current": "gridstudio",
+      "page": "page-gridstudio"
+    },
+    {
+      "requested": "modules",
+      "current": "modules",
+      "page": "page-modules"
+    },
+    {
+      "requested": "parameters",
+      "current": "parameters",
+      "page": "page-parameters"
+    },
+    {
+      "requested": "initial",
+      "current": "initial",
+      "page": "page-initial"
+    },
+    {
+      "requested": "time",
+      "current": "time",
+      "page": "page-time"
+    },
+    {
+      "requested": "run",
+      "current": "run",
+      "page": "page-run"
+    },
+    {
+      "requested": "system",
+      "current": "system",
+      "page": "page-system"
+    },
+    {
+      "requested": "map",
+      "current": "map",
+      "page": "page-map"
+    },
+    {
+      "requested": "viz2d",
+      "current": "viz2d",
+      "page": "page-viz2d"
+    },
+    {
+      "requested": "viz3d",
+      "current": "viz3d",
+      "page": "page-viz3d"
+    },
+    {
+      "requested": "vheat",
+      "current": "vheat",
+      "page": "page-vheat"
+    },
+    {
+      "requested": "timeseries",
+      "current": "timeseries",
+      "page": "page-timeseries"
+    },
+    {
+      "requested": "calibrate",
+      "current": "calibrate",
+      "page": "page-calibrate"
+    },
+    {
+      "requested": "autocal",
+      "current": "autocal",
+      "page": "page-autocal"
+    }
+  ]
+}

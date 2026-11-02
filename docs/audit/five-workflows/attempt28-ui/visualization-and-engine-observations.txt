@@ -1,0 +1,23 @@
+Attempt 28 UI observations
+Date: 2026-10-18 (Asia/Shanghai)
+Source: 503b5224467f32ea0433833ae0c8474611484dab8998523ab3e4691bc2728e60
+Seed: 2026101809
+Clone URL: http://127.0.0.1:59129/
+Generated case: Imported Random Lake; 155 wet cells; 18 x 14 grid; 6 vertical layers; 20 output timesteps.
+
+Visualization and playback
+- Opened the generated Imported Random Lake in the isolated attempt-28 UI clone.
+- 3D renderer shows water over a neutral surrounding-land demonstration plane, shoreline, bathymetry, and 3D depth layers.
+- Changed mesh selector from triangles to orthogonal. The rendered result changed from triangular wire network to rectangular/orthogonal wire grid; changed back and visually verified triangle edges.
+- Set playback range frames 5 through 12. Started playback, then physically dragged the time slider with CUA mouse from frame 8 to 11 while playback was active. Result: frame index 11, 2020-DOY001 00:12:00, play control returned to the play icon (paused), and the slider stayed at 11 after waiting. The 3D plot refreshed to the same timestamp after its explicit loading state completed. The short loading state retains the previous successful plot and labels it; it did not revert the slider.
+- Switched to 2D at the same timestamp. The complete wet mask was filled by the selected data color; no white cells appeared inside the wet lake. Surrounding dry mask was separately labeled.
+
+Color controls
+- Selected the built-in Lake Blue scale and verified the 2D plot changed to the blue scale.
+- Opened the color editor, selected Custom, changed color node 3 to #0b61a4, added a new node at 70%, and applied. The 2D palette selector showed Custom and the water colors visibly changed. The color editor exposes node positions, node colors, reverse, continuous/discrete mode, class count, missing-wet color, import/export, and apply/cancel.
+
+Independent model engines
+- On the generated case, disabled Ecology; water quality remained enabled. Disabled water quality while ecology stayed disabled. Re-enabled water quality, then re-enabled ecology. Verified both final UI engine cards were enabled and the attempt-28 case file selection reflected eco=true and water_quality=true. Fish remained disabled as before.
+
+Backend status
+- The same attempt-28 report records successful external, feature-matrix, results, SciPy, ABC, and restart stages and is awaiting completion of every required UI group. This note only covers the UI observations above; it does not assert the full UI checklist passed.

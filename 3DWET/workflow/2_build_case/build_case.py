@@ -207,10 +207,10 @@ def gen_getm_inp(config, case_dir):
     save_taub = .false.
     first_2d = 1
     step_2d = {out['freq_2d']}
-    sync_2d = {out['freq_2d']}
+    sync_2d = 1
     first_3d = 1
     step_3d = {out['freq_3d']}
-    sync_3d = {out['freq_3d']}
+    sync_3d = 1
     save_meteo = .false.
     save_numerical_analyses = .false.
 /

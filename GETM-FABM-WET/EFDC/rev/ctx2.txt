@@ -1,0 +1,7 @@
+﻿[js]      1 diag51 ready
+[js]      0 ready (ExitProcess blocked)
+pid 1284
+[js]   2386 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8
+form hwnds ['0x5d13fa']
+form thread id 1284
+OpenThread -> 0 err 87

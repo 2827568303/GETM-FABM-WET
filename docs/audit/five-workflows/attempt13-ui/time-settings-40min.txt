@@ -1,0 +1,239 @@
+- img "3DWET"
+- heading "3DWET Studio" [level=1]
+- paragraph: 湖泊生态 · 三维建模工作台
+- generic: 总览
+- generic: 📊
+- text: 仪表盘
+- generic: 📁
+- text: 案例管理
+- generic: 前处理
+- generic: 🛠️
+- text: 前处理
+- generic: ▦
+- text: 交互网格编辑
+- generic: 📥
+- text: 输入数据
+- generic: 🧩
+- text: 模块配置
+- generic: ⚙️
+- text: 参数编辑
+- generic: 🧪
+- text: 初始条件
+- generic: ⏱️
+- text: 时间设置
+- generic: 运行
+- generic: ▶️
+- text: 运行控制
+- generic: 后处理
+- generic: 🌐
+- text: 地图视图
+- generic: 🗺️
+- text: 2D 可视化
+- generic: 🧊
+- text: 3D 可视化
+- generic: 🔥
+- text: 垂向热图
+- generic: 📈
+- text: 时间序列
+- generic: 率定
+- generic: 🎯
+- text: 率定分析
+- generic: 🔄
+- text: 自动率定
+- generic: 工作台
+- generic: ◉
+- text: 环境与启动诊断
+- generic: 📋
+- text: 项目导入与物理设置
+- generic: "案例: Round13 UI Lake 1403"
+- menubar "工作台菜单":
+  - button "项目"
+  - button "编辑"
+  - button "视图"
+  - button "图层"
+  - button "运行"
+  - button "设置"
+  - button "帮助"
+  - button "语言"
+  - generic: 3DWET Studio · GIS 工作台
+- toolbar "常用工具":
+  - button "▣ 案例":
+    - generic: ▣
+    - generic: 案例
+  - button "⚒ 前处理":
+    - generic: ⚒
+    - generic: 前处理
+  - button "▦ 网格":
+    - generic: ▦
+    - generic: 网格
+  - button "▶ 运行":
+    - generic: ▶
+    - generic: 运行
+  - button "⌖ 地图":
+    - generic: ⌖
+    - generic: 地图
+  - button "▤ 2D":
+    - generic: ▤
+    - generic: 2D
+  - button "◇ 3D":
+    - generic: ◇
+    - generic: 3D
+  - button "⚙ 诊断":
+    - generic: ⚙
+    - generic: 诊断
+- generic: 时间设置
+- generic: Round13 UI Lake 1403
+- button "100%"
+- generic: 空闲
+- generic: 时间设置
+- generic: 配置时间步长、运行周期和冷/热启动。所有日期使用年份 + 年内儒略日（DOY）。
+- generic: ⏱️ 时间步长与周期
+- generic: 开始时间（年份 + 年内儒略日）
+- textbox "开始时间（年份 + 年内儒略日）":
+  - /placeholder: 2000-DOY001 00:00:00
+  - text: 2020-DOY001 00:00:00
+- generic: 结束时间（年份 + 年内儒略日）
+- textbox "结束时间（年份 + 年内儒略日）":
+  - /placeholder: 2000-DOY366 00:00:00
+  - text: 2020-DOY001 00:40:00
+- generic: 时间步长 (秒)
+- spinbutton: "2"
+- generic: 2D输出步长 (步)
+- spinbutton: "30"
+- generic: 年内儒略日 DOY：平年 001–365，闰年 001–366；格式 YYYY-DOYDDD HH:mm:ss（模型时间）。
+- button "💾 保存时间设置" [active]
+- generic: 🔥 冷启动 / 热启动
+- generic: 启动方式
+- radio "冷启动" [checked]
+- text: 冷启动
+- radio "热启动"
+- text: 热启动
+- checkbox "结束时保存重启检查点 / Save restart checkpoint at completion"
+- text: 结束时保存重启检查点 / Save restart checkpoint at completion
+- button "💾 保存启动设置"
+- strong: 说明：
+- text: • 冷启动：从初始条件开始运行（首次运行使用）
+- text: • 热启动：从之前保存的 restart.out 检查点继续；结束时间必须晚于检查点
+- text: • 热启动可用于延长模拟时间或做情景分析
+- generic: 📤 输出配置 (output.yaml)
+- generic: 时间单位
+- combobox:
+  - option "day (天)"
+  - option "hour (小时)"
+  - option "second (秒)" [selected]
+- generic: 时间步长
+- spinbutton: "60"
+- generic: sync_interval（必须 ≥ 1）
+- spinbutton: "1"
+- button "💾 保存输出配置"
+- generic: sync_interval=0 会导致输出文件 time 维度为 0，所有模拟结果丢失。建议设为 1（每个时间步同步）。
+- strong: 🧾 输出变量订阅
+- button "精简（仅水动力）"
+- button "标准（水动力+关键生态）"
+- 'button "全部（source: *）"'
+- button "💾 保存订阅"
+- text: FABM 按“模块分类”订阅：
+- code: 模块名/*
+- text: 。默认
+- code: "source: *"
+- text: 会写出模型注册的每一个变量 （滇池 362 天实测
+- strong: 17.9 GB
+- text: ），请按需勾选。
+- checkbox "temp" [checked]
+- text: temp
+- checkbox "salt" [checked]
+- text: salt
+- checkbox "hn" [checked]
+- text: hn
+- checkbox "z" [checked]
+- text: z
+- checkbox "D" [checked]
+- text: D
+- generic: "生态模块（自动转换为模型支持的变量）:"
+- generic "wet/abiotic_water":
+  - checkbox "abiotic_water" [checked]
+  - text: abiotic_water
+- generic "wet/abiotic_sediment":
+  - checkbox "abiotic_sediment" [checked]
+  - text: abiotic_sediment
+- generic "wet/bot_pel_interface":
+  - checkbox "bot_pel_interface" [checked]
+  - text: bot_pel_interface
+- generic "wet/burial":
+  - checkbox "burial" [checked]
+  - text: burial
+- generic "wet/sediment_exchange":
+  - checkbox "sediment_exchange" [checked]
+  - text: sediment_exchange
+- generic "wet/om_pool":
+  - checkbox "POM" [checked]
+  - text: POM
+- generic "wet/om_pool":
+  - checkbox "DOM" [checked]
+  - text: DOM
+- generic "wet/om_pool":
+  - checkbox "humus" [checked]
+  - text: humus
+- generic "wet/macrophytes":
+  - checkbox "macrophytes" [checked]
+  - text: macrophytes
+- generic "wet/phytoplankton":
+  - checkbox "cyanobacteria" [checked]
+  - text: cyanobacteria
+- generic "wet/phytoplankton":
+  - checkbox "diatoms" [checked]
+  - text: diatoms
+- generic "wet/phytoplankton":
+  - checkbox "greens" [checked]
+  - text: greens
+- generic "wet/zooplankton":
+  - checkbox "cladocerans" [checked]
+  - text: cladocerans
+- generic "wet/zooplankton":
+  - checkbox "copepods" [checked]
+  - text: copepods
+- generic "wet/zoobenthos":
+  - checkbox "zoobenthos" [checked]
+  - text: zoobenthos
+- generic "wet/inorganic_carbon":
+  - checkbox "inorganic_carbon" [checked]
+  - text: inorganic_carbon
+- generic "wet/fish":
+  - checkbox "JuFish" [checked]
+  - text: JuFish
+- generic "wet/fish":
+  - checkbox "AdFish" [checked]
+  - text: AdFish
+- generic "wet/fish":
+  - checkbox "PiscFish" [checked]
+  - text: PiscFish
+- generic "wet/methane":
+  - checkbox "methane" [checked]
+  - text: methane
+- strong: 预计输出 ≈ 44 MB
+- text: — 21 时步 × 144 水格 × 600 变量 （变量数为估算）
+- generic: 📊 运行预估
+- generic: 网格
+- generic: 20x13
+- generic: 水域格
+- generic: "144"
+- generic: 模拟时长
+- generic: 0.0天
+- generic: 总步数
+- generic: 1,200
+- strong: "预计运行时间:"
+- text: 0.3 分钟 (0.00 小时)
+- text: "* 基于串行版本估算，开启 OpenMP 多核后可显著缩短"
+- generic: 当前步长 2s ≤ 稳定上限 2.6685836719785447s ✓
+- status:
+  - generic: 项目
+  - strong: Round13 UI Lake 1403
+  - generic: 网格
+  - strong: 待加载
+  - generic: 运行
+  - strong: 空闲
+  - generic: 视图
+  - strong: 100%
+  - generic: 坐标系
+  - strong: —
+- generic: 时间设置已保存

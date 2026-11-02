@@ -1,0 +1,9 @@
+﻿[js]      0 diag51 ready
+pid 38964
+[ 0.21] WIN VBMsoStdCompMgr        ''                             vis=0
+[ 0.21] WIN ThunderRT6Main         'EFDC_Explorer8.4'             vis=1
+[ 0.21] WIN IME                    'Default IME'                  vis=0
+[js]   2406 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8
+[ 2.52] WIN ThunderRT6FormDC       'EFDC_Explore8.0'              vis=0
+[ 8.89] EXITED code=0
+done

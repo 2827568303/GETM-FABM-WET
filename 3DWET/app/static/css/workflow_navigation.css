@@ -1,0 +1,37 @@
+/* Workflow tree: keep the original workbench tools and business-page hooks. */
+.sidebar .nav-menu{padding:10px 9px;overflow-y:auto}
+.nav-group{margin:3px 0;border:0;border-radius:5px}
+.nav-group>summary{display:flex;align-items:center;gap:9px;position:relative;cursor:pointer;
+    padding:12px 22px 12px 10px;list-style:none;color:#e3eaee;font-size:13px;font-weight:600;border-radius:4px}
+.nav-group>summary::-webkit-details-marker{display:none}
+.nav-group>summary::after{content:'';position:absolute;right:12px;width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg)}
+.nav-group[open]>summary::after{transform:rotate(90deg)}
+.nav-group>summary:hover{background:#4a5963}
+.nav-group>summary:focus-visible{outline:2px solid #b6d59f;outline-offset:-2px}
+.nav-group-items{margin:0 0 9px 16px;padding-left:7px;border-left:1px solid #6b7881}
+.sidebar .nav-item{display:flex;align-items:center;width:100%;margin:2px 0;padding:9px 8px;
+    min-height:35px;text-align:left;background:transparent;border:0;border-radius:4px;font-family:inherit;
+    font-size:12px;font-weight:400;color:#d0dade;cursor:pointer;gap:7px;line-height:1.5}
+.sidebar .nav-item:hover{background:#4a5963;color:#fff}
+.sidebar .nav-item.active{background:#263e49;color:#dcefcf}
+.sidebar .nav-item.active::before{display:none}
+.sidebar .nav-item:focus-visible{outline:2px solid #b6d59f;outline-offset:-2px}
+#studio-nav-toggle,#studio-nav-close,#studio-nav-backdrop{display:none}
+@media(max-width:720px), (max-width:950px) and (max-height:500px){
+    .sidebar,body:has(.scientific-workspace.active) .sidebar{display:none}
+    #studio-nav-toggle{display:inline-flex;align-items:center;justify-content:center;flex:0 0 38px;
+        width:38px;min-height:36px;border:1px solid #aebbc4;border-radius:4px;background:#fff;color:#263e49;cursor:pointer}
+    body.studio-nav-open .sidebar,body.studio-nav-open:has(.scientific-workspace.active) .sidebar{
+        display:flex;position:fixed;inset:0 auto 0 0;width:min(300px,85vw);height:100dvh;z-index:10002;
+        flex-direction:column;box-shadow:5px 0 28px #15293655}
+    .studio-nav-open #studio-nav-close{display:block;position:absolute;right:10px;top:12px;
+        width:36px;height:36px;font-size:24px;background:transparent;border:1px solid #80939e;color:#edf2f4;border-radius:4px}
+    .studio-nav-open #studio-nav-backdrop:not([hidden]){display:block;position:fixed;inset:0;border:0;
+        background:#10263566;z-index:10001;cursor:default}
+    .sidebar .nav-group>summary{min-height:44px;font-size:14px}
+    .sidebar .nav-item{min-height:42px;font-size:13px}
+    .qgis-menu-bar,body:has(.scientific-workspace.active) .qgis-menu-bar{display:flex;overflow-x:auto;white-space:nowrap}
+    .qgis-tool-bar,body:has(.scientific-workspace.active) .qgis-tool-bar{display:flex;overflow-x:auto;flex-wrap:nowrap}
+    .qgis-menu-item,.qgis-tool-btn{flex-shrink:0}
+    .main-content{min-width:0;width:100%}
+}

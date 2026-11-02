@@ -1,0 +1,301 @@
+﻿pid=1372
+[js] {"dll": "C:\\WINDOWS\\SYSTEM32\\VB6CHS.DLL"}
+[js] {"dll": "IMM32.DLL"}
+[js] {"dll": "C:\\WINDOWS\\system32\\uxtheme.dll"}
+[js] {"dll": "C:\\ProgramData\\A-Volute\\A-Volute.Nahimic\\Modules\\Scheduled\\AudioDevProps2.dll"}
+[js] {"dll": "ntdll.dll"}
+[js] {"dll": "ntdll.dll"}
+[js] {"dll": "api-ms-win-core-synch-l1-2-0"}
+[js] {"dll": "api-ms-win-core-fibers-l1-1-1"}
+[js] {"dll": "api-ms-win-core-synch-l1-2-0"}
+[js] {"dll": "api-ms-win-core-fibers-l1-1-1"}
+[js] {"dll": "api-ms-win-core-localization-l1-2-1"}
+[js] {"dll": "OLEAUT32.DLL"}
+[js] {"dll": "SXS.DLL"}
+[js] {"dll": "IMM32.DLL"}
+[js] {"dll": "kernel32.dll"}
+[js] {"dll": "shell32.dll"}
+[js] {"dll": "comctl32.dll"}
+[js] {"dll": "kernel32"}
+[js] {"dll": "kernel32"}
+[js] {"dll": "C:\\Windows\\SysWOW64\\wshom.ocx"}
+[js] {"com": "CoCreateInstance {72c24dd5-d70a-438b-8a42-98424b88afb8} hr=0x0 obj=0x24815bc vtable=0x623c12a8 (wshom.ocx+0x12a8) vt[0]=0x623c3630 (wshom.ocx+0x3630)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"dll": "C:\\Windows\\SysWOW64\\scrrun.dll"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {0d43fe01-f093-11cf-8940-00a0c9054228} hr=0x0 obj=0x2483658 vtable=0x608f1144 (ScrRun.dll+0x1144) vt[0]=0x608f3c20 (ScrRun.dll+0x3c20)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {0d43fe01-f093-11cf-8940-00a0c9054228} hr=0x0 obj=0x2483658 vtable=0x608f1144 (ScrRun.dll+0x1144) vt[0]=0x608f3c20 (ScrRun.dll+0x3c20)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {0d43fe01-f093-11cf-8940-00a0c9054228} hr=0x0 obj=0x2483658 vtable=0x608f1144 (ScrRun.dll+0x1144) vt[0]=0x608f3c20 (ScrRun.dll+0x3c20)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {0d43fe01-f093-11cf-8940-00a0c9054228} hr=0x0 obj=0x2483658 vtable=0x608f1144 (ScrRun.dll+0x1144) vt[0]=0x608f3c20 (ScrRun.dll+0x3c20)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"dll": "advapi32.dll"}
+[js] {"dll": "sspicli.dll"}
+[js] {"dll": "kernel32"}
+[js] {"dll": "kernel32"}
+[js] {"dll": "mscoree.dll"}
+[js] {"dll": "ADVAPI32.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\mscoreei.dll"}
+[js] {"dll": "api-ms-win-core-synch-l1-2-0"}
+[js] {"dll": "api-ms-win-core-fibers-l1-1-1"}
+[js] {"dll": "api-ms-win-core-synch-l1-2-0"}
+[js] {"dll": "api-ms-win-core-fibers-l1-1-1"}
+[js] {"dll": "api-ms-win-core-localization-l1-2-1"}
+[js] {"dll": "ADVAPI32.dll"}
+[js] {"dll": "api-ms-win-appmodel-runtime-l1-1-2.dll"}
+[js] {"dll": "sxs.dll"}
+[js] {"dll": "VERSION.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\clr.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\clr.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\clr.dll"}
+[js] {"dll": "api-ms-win-core-synch-l1-2-0"}
+[js] {"dll": "api-ms-win-core-fibers-l1-1-1"}
+[js] {"dll": "api-ms-win-core-synch-l1-2-0"}
+[js] {"dll": "api-ms-win-core-fibers-l1-1-1"}
+[js] {"dll": "api-ms-win-core-localization-l1-2-1"}
+[js] {"dll": "kernel32"}
+[js] {"dll": "api-ms-win-core-synch-l1-2-0"}
+[js] {"dll": "api-ms-win-core-fibers-l1-1-1"}
+[js] {"dll": "USER32.dll"}
+[js] {"dll": "api-ms-win-core-quirks-l1-1-0.dll"}
+[js] {"dll": "api-ms-win-appmodel-runtime-l1-1-2.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\mscoree.dll"}
+[js] {"dll": "mscoree.dll"}
+[js] {"dll": "SHLWAPI.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\combase.dll"}
+[js] {"dll": "psapi.dll"}
+[js] {"dll": "C:\\WINDOWS\\assembly\\NativeImages_v4.0.30319_32\\mscorlib\\b0b4a7cdec92f6bd0d5bf836501fd2a0\\mscorlib.ni.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\ole32.dll"}
+[js] {"dll": "ole32.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\api-ms-win-core-winrt-l1-1-0.dll"}
+[js] {"dll": "api-ms-win-core-winrt-l1-1-0.dll"}
+[js] {"dll": "sxs.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\clr.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\clr.dll"}
+[js] {"dll": "kernel32.dll"}
+[js] {"dll": "wldp.dll"}
+[js] {"dll": "api-ms-win-core-xstate-l2-1-0.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\clrjit.dll"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_32\\mscorlib\\v4.0_4.0.0.0__b77a5c561934e089\\bcrypt.dll"}
+[js] {"dll": "bcrypt.dll"}
+[js] {"dll": "C:\\WINDOWS\\assembly\\NativeImages_v4.0.30319_32\\System\\9e446ceabf7f5847bb25428784763e98\\System.ni.dll"}
+[js] {"dll": "C:\\WINDOWS\\assembly\\NativeImages_v4.0.30319_32\\System.Core\\bdedcc0cc8f6af44262cebd7e832c1f7\\System.Core.ni.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\bcryptprimitives.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "kernel32.dll"}
+[js] {"dll": "bcrypt"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_MSIL\\System.Core\\v4.0_4.0.0.0__b77a5c561934e089\\bcrypt"}
+[js] {"dll": "bcrypt"}
+[js] {"dll": "ole32.dll"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_32\\mscorlib\\v4.0_4.0.0.0__b77a5c561934e089\\shell32.dll"}
+[js] {"dll": "shell32.dll"}
+[js] {"dll": "advapi32.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\clr.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\clr.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\clr.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\clr.dll"}
+[js] {"dll": "kernel32.dll"}
+[js] {"dll": "wldp.dll"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_32\\mscorlib\\v4.0_4.0.0.0__b77a5c561934e089\\oleaut32.dll"}
+[js] {"dll": "oleaut32.dll"}
+[js] {"dll": "C:\\EFDC84_STOCK\\DSILIC1\\lmgract.dll"}
+[js] {"dll": "shfolder.dll"}
+[js] {"dll": "lmgract_libFNP.dll"}
+[js] {"dll": "tzres.dll"}
+[js] {"dll": "tzres.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\wbem\\wbemdisp.dll"}
+[js] {"dll": "API-MS-Win-Core-LocalRegistry-L1-1-0.dll"}
+[js] {"com": "CoGetClassObject {172bddf8-ceea-11d1-8b05-00600806d9b6} hr=0x80040154"}
+[js] {"dll": "C:\\WINDOWS\\system32\\advapi32.dll"}
+[js] {"com": "CoCreateInstance {172bddf8-ceea-11d1-8b05-00600806d9b6} hr=0x0 obj=0x1d739a0 vtable=0x60331ca4 (wbemdisp.dll+0x1ca4) vt[0]=0x6033eef0 (wbemdisp.dll+0xeef0)"}
+[js] {"dll": "C:\\WINDOWS\\system32\\wbem\\wbemprox.dll"}
+[js] {"com": "CoCreateInstance {4590f811-1d3a-11d0-891f-00aa004b2e24} hr=0x0 obj=0x1d739d0 vtable=0x70e41020 (wbemprox.dll+0x1020) vt[0]=0x70e44480 (wbemprox.dll+0x4480)"}
+[js] {"dll": "C:\\WINDOWS\\system32\\wbem\\wmiutils.dll"}
+[js] {"com": "CoCreateInstance {cf4cc405-e2c5-4ddd-b3ce-5e7582d8c9fa} hr=0x0 obj=0x1d46e00 vtable=0x6c0d109c (wmiutils.dll+0x109c) vt[0]=0x6c0daf50 (wmiutils.dll+0xaf50)"}
+[js] {"com": "CoCreateInstance {cf4cc405-e2c5-4ddd-b3ce-5e7582d8c9fa} hr=0x0 obj=0x1d47030 vtable=0x6c0d109c (wmiutils.dll+0x109c) vt[0]=0x6c0daf50 (wmiutils.dll+0xaf50)"}
+[js] {"com": "CoCreateInstance {cf4cc405-e2c5-4ddd-b3ce-5e7582d8c9fa} hr=0x0 obj=0x1d46e70 vtable=0x6c0d109c (wmiutils.dll+0x109c) vt[0]=0x6c0daf50 (wmiutils.dll+0xaf50)"}
+[js] {"com": "CoCreateInstance {cf4cc405-e2c5-4ddd-b3ce-5e7582d8c9fa} hr=0x0 obj=0x1d47730 vtable=0x6c0d109c (wmiutils.dll+0x109c) vt[0]=0x6c0daf50 (wmiutils.dll+0xaf50)"}
+[js] {"com": "CoCreateInstance {cf4cc405-e2c5-4ddd-b3ce-5e7582d8c9fa} hr=0x0 obj=0x1d46ee0 vtable=0x6c0d109c (wmiutils.dll+0x109c) vt[0]=0x6c0daf50 (wmiutils.dll+0xaf50)"}
+[js] {"com": "CoCreateInstance {0000032a-0000-0000-c000-000000000046} hr=0x0 obj=0x1d73a60 vtable=0x75ca8458 (combase.dll+0x8458) vt[0]=0x75dbd730 (combase.dll+0x11d730)"}
+[js] {"com": "CoCreateInstance {00000339-0000-0000-c000-000000000046} hr=0x0 obj=0x1d9ea80 vtable=0x75ca29e0 (combase.dll+0x29e0) vt[0]=0x75d6ad60 (combase.dll+0xcad60)"}
+[js] {"dll": "C:\\WINDOWS\\system32\\wbem\\wbemsvc.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\wbem\\fastprox.dll"}
+[js] {"com": "CoCreateInstance {674b6698-ee92-11d0-ad71-00c04fd8fdff} hr=0x0 obj=0x1d74cc0 vtable=0x70aa1800 (fastprox.dll+0x1800) vt[0]=0x70ac91e0 (fastprox.dll+0x291e0)"}
+[js] {"dll": "api-ms-win-core-localization-l1-2-0.dll"}
+[js] {"dll": "api-ms-win-core-localization-obsolete-l1-1-0.dll"}
+[js] {"dll": "amsi.dll"}
+[js] {"dll": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.26100.4-0\\X86\\MpOav.dll"}
+[js] {"dll": "api-ms-win-core-synch-l1-2-0"}
+[js] {"dll": "api-ms-win-core-fibers-l1-1-1"}
+[js] {"dll": "api-ms-win-core-synch-l1-2-0"}
+[js] {"dll": "api-ms-win-core-localization-l1-2-1"}
+[js] {"dll": "kernel32"}
+[js] {"dll": "C:\\WINDOWS\\system32\\version.dll"}
+[js] {"com": "CoGetClassObject {e7d35cfa-348b-485e-b524-252725d697ca} hr=0x0 obj=0x70d2bd24 vtable=0x75caf730 (combase.dll+0xf730) vt[0]=0x75da2c20 (combase.dll+0x102c20)"}
+[js] {"com": "CoGetClassObject {e7d35cfa-348b-485e-b524-252725d697ca} hr=0x0 obj=0x70d2bd24 vtable=0x75caf730 (combase.dll+0xf730) vt[0]=0x75da2c20 (combase.dll+0x102c20)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoGetClassObject {e7d35cfa-348b-485e-b524-252725d697ca} hr=0x0 obj=0x70d2bd24 vtable=0x75caf730 (combase.dll+0xf730) vt[0]=0x75da2c20 (combase.dll+0x102c20)"}
+[js] {"com": "CoGetClassObject {e7d35cfa-348b-485e-b524-252725d697ca} hr=0x0 obj=0x70d2bd24 vtable=0x75caf730 (combase.dll+0xf730) vt[0]=0x75da2c20 (combase.dll+0x102c20)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoGetClassObject {172bddf8-ceea-11d1-8b05-00600806d9b6} hr=0x80004002"}
+[js] {"com": "CoCreateInstance {172bddf8-ceea-11d1-8b05-00600806d9b6} hr=0x0 obj=0x1d739a0 vtable=0x60331ca4 (wbemdisp.dll+0x1ca4) vt[0]=0x6033eef0 (wbemdisp.dll+0xeef0)"}
+[js] {"com": "CoCreateInstance {4590f811-1d3a-11d0-891f-00aa004b2e24} hr=0x0 obj=0x1d73ab0 vtable=0x70e41020 (wbemprox.dll+0x1020) vt[0]=0x70e44480 (wbemprox.dll+0x4480)"}
+[js] {"com": "CoCreateInstance {cf4cc405-e2c5-4ddd-b3ce-5e7582d8c9fa} hr=0x0 obj=0x1d47880 vtable=0x6c0d109c (wmiutils.dll+0x109c) vt[0]=0x6c0daf50 (wmiutils.dll+0xaf50)"}
+[js] {"com": "CoCreateInstance {cf4cc405-e2c5-4ddd-b3ce-5e7582d8c9fa} hr=0x0 obj=0x1d46f50 vtable=0x6c0d109c (wmiutils.dll+0x109c) vt[0]=0x6c0daf50 (wmiutils.dll+0xaf50)"}
+[js] {"com": "CoCreateInstance {cf4cc405-e2c5-4ddd-b3ce-5e7582d8c9fa} hr=0x0 obj=0x1d47810 vtable=0x6c0d109c (wmiutils.dll+0x109c) vt[0]=0x6c0daf50 (wmiutils.dll+0xaf50)"}
+[js] {"com": "CoCreateInstance {cf4cc405-e2c5-4ddd-b3ce-5e7582d8c9fa} hr=0x0 obj=0x1d46f50 vtable=0x6c0d109c (wmiutils.dll+0x109c) vt[0]=0x6c0daf50 (wmiutils.dll+0xaf50)"}
+[js] {"com": "CoCreateInstance {cf4cc405-e2c5-4ddd-b3ce-5e7582d8c9fa} hr=0x0 obj=0x1d47110 vtable=0x6c0d109c (wmiutils.dll+0x109c) vt[0]=0x6c0daf50 (wmiutils.dll+0xaf50)"}
+[js] {"com": "CoCreateInstance {00000339-0000-0000-c000-000000000046} hr=0x0 obj=0x7cfd990 vtable=0x75ca29e0 (combase.dll+0x29e0) vt[0]=0x75d6ad60 (combase.dll+0xcad60)"}
+[js] {"com": "CoCreateInstance {674b6698-ee92-11d0-ad71-00c04fd8fdff} hr=0x0 obj=0x1d74ec0 vtable=0x70aa1800 (fastprox.dll+0x1800) vt[0]=0x70ac91e0 (fastprox.dll+0x291e0)"}
+[js] {"com": "CoGetClassObject {e7d35cfa-348b-485e-b524-252725d697ca} hr=0x0 obj=0x70d2bd24 vtable=0x75caf730 (combase.dll+0xf730) vt[0]=0x75da2c20 (combase.dll+0x102c20)"}
+[js] {"com": "CoGetClassObject {e7d35cfa-348b-485e-b524-252725d697ca} hr=0x0 obj=0x70d2bd24 vtable=0x75caf730 (combase.dll+0xf730) vt[0]=0x75da2c20 (combase.dll+0x102c20)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoGetClassObject {e7d35cfa-348b-485e-b524-252725d697ca} hr=0x0 obj=0x70d2bd24 vtable=0x75caf730 (combase.dll+0xf730) vt[0]=0x75da2c20 (combase.dll+0x102c20)"}
+[js] {"com": "CoGetClassObject {e7d35cfa-348b-485e-b524-252725d697ca} hr=0x0 obj=0x70d2bd24 vtable=0x75caf730 (combase.dll+0xf730) vt[0]=0x75da2c20 (combase.dll+0x102c20)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"dll": "C:\\WINDOWS\\assembly\\NativeImages_v4.0.30319_32\\System.Xml\\56513c88f585a473bc0613919051dcca\\System.Xml.ni.dll"}
+[js] {"dll": "advapi32.dll"}
+[js] {"dll": "shell32.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\WINDOWS\\assembly\\NativeImages_v4.0.30319_32\\System.Configuration\\b8ddf31c0892b7e18e822bf6977437a1\\System.Configuration.ni.dll"}
+[js] {"dll": "ntdll.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\zh-CN\\mscorrc.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\zh-Hans\\mscorrc.dll"}
+[js] {"dll": "C:\\WINDOWS\\System32\\msxml3.dll"}
+[js] {"dll": "C:\\WINDOWS\\System32\\msxml3r.dll"}
+[js] {"com": "CoCreateInstance {72c24dd5-d70a-438b-8a42-98424b88afb8} hr=0x0 obj=0x248059c vtable=0x623c12a8 (wshom.ocx+0x12a8) vt[0]=0x623c3630 (wshom.ocx+0x3630)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {0d43fe01-f093-11cf-8940-00a0c9054228} hr=0x0 obj=0x24815b0 vtable=0x608f1144 (ScrRun.dll+0x1144) vt[0]=0x608f3c20 (ScrRun.dll+0x3c20)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {0d43fe01-f093-11cf-8940-00a0c9054228} hr=0x0 obj=0x24815b0 vtable=0x608f1144 (ScrRun.dll+0x1144) vt[0]=0x608f3c20 (ScrRun.dll+0x3c20)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {0d43fe01-f093-11cf-8940-00a0c9054228} hr=0x0 obj=0x24815b0 vtable=0x608f1144 (ScrRun.dll+0x1144) vt[0]=0x608f3c20 (ScrRun.dll+0x3c20)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {0d43fe01-f093-11cf-8940-00a0c9054228} hr=0x0 obj=0x24815b0 vtable=0x608f1144 (ScrRun.dll+0x1144) vt[0]=0x608f3c20 (ScrRun.dll+0x3c20)"}
+[js] {"dll": "advapi32.dll"}
+[js] {"dll": "advapi32.dll"}
+[js] {"dll": "advapi32.dll"}
+[js] {"com": "CoCreateInstance {72c24dd5-d70a-438b-8a42-98424b88afb8} hr=0x0 obj=0x24815a4 vtable=0x623c12a8 (wshom.ocx+0x12a8) vt[0]=0x623c3630 (wshom.ocx+0x3630)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {0d43fe01-f093-11cf-8940-00a0c9054228} hr=0x0 obj=0x24815e0 vtable=0x608f1144 (ScrRun.dll+0x1144) vt[0]=0x608f3c20 (ScrRun.dll+0x3c20)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {0d43fe01-f093-11cf-8940-00a0c9054228} hr=0x0 obj=0x24815e0 vtable=0x608f1144 (ScrRun.dll+0x1144) vt[0]=0x608f3c20 (ScrRun.dll+0x3c20)"}
+[js] {"dll": "C:\\Program Files (x86)\\Common Files\\System\\ado\\msado15.dll"}
+[js] {"com": "CoGetClassObject {00000514-0000-0010-8000-00aa006d2ea4} hr=0x0 obj=0x1d8fb18 vtable=0x5bb51cf4 (msado15.dll+0x1cf4) vt[0]=0x5bb94a10 (msado15.dll+0x44a10)"}
+[js] {"com": "CoGetClassObject {00000535-0000-0010-8000-00aa006d2ea4} hr=0x0 obj=0x1d8f9e0 vtable=0x5bb51cf4 (msado15.dll+0x1cf4) vt[0]=0x5bb94a10 (msado15.dll+0x44a10)"}
+[js] {"dll": "C:\\Program Files (x86)\\Common Files\\System\\Ole DB\\oledb32.dll"}
+[js] {"dll": "Comctl32.dll"}
+[js] {"dll": "C:\\Program Files (x86)\\Common Files\\System\\Ole DB\\OLEDB32R.DLL"}
+[js] {"dll": "C:\\Windows\\SysWOW64\\comsvcs.dll"}
+[js] {"com": "CoCreateInstance {ecabb0c0-7f19-11d2-978e-0000f8757e2a} hr=0x0 obj=0x1d944a4 vtable=0x5b9e1c28 (comsvcs.dll+0x1c28) vt[0]=0x5ba30740 (comsvcs.dll+0x50740)"}
+[js] {"com": "CoCreateInstance {2206cdb0-19c1-11d1-89e0-00c04fd7a829} hr=0x0 obj=0x7ce3248 vtable=0x5f6c136c (oledb32.dll+0x136c) vt[0]=0x5f6f7560 (oledb32.dll+0x37560)"}
+[js] {"dll": "C:\\Windows\\SysWOW64\\msjetoledb40.dll"}
+[js] {"com": "CoGetClassObject {dee35070-506b-11cf-b1aa-00aa00b8de95} hr=0x0 obj=0x2480570 vtable=0x602a107c (msjetoledb40.dll+0x107c) vt[0]=0x602af7a0 (msjetoledb40.dll+0xf7a0)"}
+[js] {"com": "CoCreateInstance {c8b522d1-5cf3-11ce-ade5-00aa0044773d} hr=0x0 obj=0x1d75f0c vtable=0x5f6c1e1c (oledb32.dll+0x1e1c) vt[0]=0x5f6fb3f0 (oledb32.dll+0x3b3f0)"}
+[js] {"com": "CoCreateInstance {ecabb0c0-7f19-11d2-978e-0000f8757e2a} hr=0x0 obj=0x1d944a4 vtable=0x5b9e1c28 (comsvcs.dll+0x1c28) vt[0]=0x5ba30740 (comsvcs.dll+0x50740)"}
+[js] {"com": "CoCreateInstance {c8b522cf-5cf3-11ce-ade5-00aa0044773d} hr=0x0 obj=0x7ce3ac8 vtable=0x5f6c1160 (oledb32.dll+0x1160) vt[0]=0x5f6ed680 (oledb32.dll+0x2d680)"}
+[js] {"com": "CoCreateInstance {c8b522cf-5cf3-11ce-ade5-00aa0044773d} hr=0x0 obj=0x7ce3b48 vtable=0x5f6c1160 (oledb32.dll+0x1160) vt[0]=0x5f6ed680 (oledb32.dll+0x2d680)"}
+[js] {"com": "CoCreateInstance {c8b522cf-5cf3-11ce-ade5-00aa0044773d} hr=0x0 obj=0x7ce3f08 vtable=0x5f6c1160 (oledb32.dll+0x1160) vt[0]=0x5f6ed680 (oledb32.dll+0x2d680)"}
+[js] {"com": "CoCreateInstance {c8b522cf-5cf3-11ce-ade5-00aa0044773d} hr=0x0 obj=0x7ce3b48 vtable=0x5f6c1160 (oledb32.dll+0x1160) vt[0]=0x5f6ed680 (oledb32.dll+0x2d680)"}
+[js] {"com": "CoCreateInstance {dee35071-506b-11cf-b1aa-00aa00b8de95} hr=0x0 obj=0x248c938 vtable=0x602a1440 (msjetoledb40.dll+0x1440) vt[0]=0x602af1f0 (msjetoledb40.dll+0xf1f0)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {0d43fe01-f093-11cf-8940-00a0c9054228} hr=0x0 obj=0x248c588 vtable=0x608f1144 (ScrRun.dll+0x1144) vt[0]=0x608f3c20 (ScrRun.dll+0x3c20)"}
+[js] {"dll": "C:\\WINDOWS\\system32\\shell32.dll"}
+[js] {"com": "CoCreateInstance {13709620-c279-11ce-a49e-444553540000} hr=0x0 obj=0x1d96cf8 vtable=0x762316b8 (SHELL32.dll+0x16b8) vt[0]=0x7639fc80 (SHELL32.dll+0x16fc80)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {0d43fe01-f093-11cf-8940-00a0c9054228} hr=0x0 obj=0x248c588 vtable=0x608f1144 (ScrRun.dll+0x1144) vt[0]=0x608f3c20 (ScrRun.dll+0x3c20)"}
+[js] {"com": "CoCreateInstance {00000346-0000-0000-c000-000000000046} hr=0x0 obj=0x75efa128 vtable=0x75caed08 (combase.dll+0xed08) vt[0]=0x75e2aa70 (combase.dll+0x18aa70)"}
+[js] {"com": "CoCreateInstance {0d43fe01-f093-11cf-8940-00a0c9054228} hr=0x0 obj=0x2481590 vtable=0x608f1144 (ScrRun.dll+0x1144) vt[0]=0x608f3c20 (ScrRun.dll+0x3c20)"}
+[js] {"dll": "wininet.dll"}
+[js] {"dll": "user32.dll"}
+[js] {"dll": "ondemandconnroutehelper.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\mswsock.dll"}
+[js] {"dll": "winhttp.dll"}
+[js] {"dll": "kernel32"}
+[js] {"dll": "kernel32"}
+[js] {"dll": "kernel32"}
+[js] {"dll": "C:\\WINDOWS\\system32\\winhttpcom.dll"}
+[js] {"com": "CoCreateInstance {2087c2f4-2cef-4953-a8ab-66779b670495} hr=0x0 obj=0x1d6a228 vtable=0x608d10f0 (winhttpcom.dll+0x10f0) vt[0]=0x608d77a0 (winhttpcom.dll+0x77a0)"}
+[js] {"com": "CoCreateInstance {afba6b42-5692-48ea-8141-dc517dcf0ef1} hr=0x0 obj=0x8190378 vtable=0x5bc788bc (msxml3.dll+0x88bc) vt[0]=0x5bcec5b0 (msxml3.dll+0x7c5b0)"}
+[js] {"dll": "C:\\WINDOWS\\system32\\mlang.dll"}
+[js] {"com": "CoCreateInstance {275c23e2-3747-11d0-9fea-00aa003f8646} hr=0x0 obj=0x248c588 vtable=0x5fdc10e8 (mlang.dll+0x10e8) vt[0]=0x5fdcadf0 (mlang.dll+0xadf0)"}
+[js] {"dll": "winnlsres.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\mswsock.dll"}
+[js] {"dll": "C:\\WINDOWS\\System32\\mswsock.dll"}
+[js] {"dll": "C:\\Windows\\System32\\rasadhlp.dll"}
+[js] {"dll": "C:\\WINDOWS\\System32\\fwpuclnt.dll"}
+[js] {"dll": "C:\\WINDOWS\\System32\\mswsock.dll"}
+[js] {"dll": "C:\\WINDOWS\\System32\\mswsock.dll"}
+[js] {"dll": "C:\\WINDOWS\\System32\\mswsock.dll"}
+[js] {"dll": "C:\\WINDOWS\\System32\\mswsock.dll"}
+[js] {"dll": "C:\\WINDOWS\\System32\\mswsock.dll"}
+[js] {"dll": "C:\\WINDOWS\\System32\\mswsock.dll"}
+[js] {"dll": "C:\\WINDOWS\\System32\\wshqos.dll"}
+[js] {"dll": "C:\\WINDOWS\\System32\\wshqos.dll"}
+[js] {"dll": "C:\\WINDOWS\\System32\\wshqos.dll"}
+[js] {"dll": "C:\\WINDOWS\\System32\\wshqos.dll"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_MSIL\\System\\v4.0_4.0.0.0__b77a5c561934e089\\iphlpapi.dll"}
+[js] {"dll": "iphlpapi.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\VERSION.dll"}
+[js] {"dll": "VERSION.dll"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_32\\System.Web\\v4.0_4.0.0.0__b03f5f7f11d50a3a\\System.Web.dll"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_32\\System.Web\\v4.0_4.0.0.0__b03f5f7f11d50a3a\\System.Web.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\WINDOWS\\system32\\rsaenh.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\\\webengine4.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\zh-CN\\aspnet_rc.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\zh-CHS\\aspnet_rc.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\zh-Hans\\aspnet_rc.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\webengine4.dll"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_32\\System.Web\\v4.0_4.0.0.0__b03f5f7f11d50a3a\\webengine4.dll"}
+[js] {"dll": "webengine4.dll"}
+[js] {"dll": "ole32.dll"}
+[js] {"dll": "ADVAPI32.dll"}
+[js] {"dll": "mscoree.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\clr.dll"}
+[js] {"dll": "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\clr.dll"}
+[js] {"dll": "ntdll.dll"}
+[js] {"dll": "kernel32.dll"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_MSIL\\System.Web.Extensions\\v4.0_4.0.0.0__31bf3856ad364e35\\System.Web.Extensions.dll"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_MSIL\\System.Web.Extensions\\v4.0_4.0.0.0__31bf3856ad364e35\\System.Web.Extensions.dll"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_MSIL\\System\\v4.0_4.0.0.0__b77a5c561934e089\\psapi.dll"}
+[js] {"dll": "psapi.dll"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_MSIL\\System\\v4.0_4.0.0.0__b77a5c561934e089\\rasapi32.dll"}
+[js] {"dll": "rasapi32.dll"}
+[js] {"dll": "RASMAN.DLL"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_MSIL\\System\\v4.0_4.0.0.0__b77a5c561934e089\\ws2_32.dll"}
+[js] {"dll": "ws2_32.dll"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_MSIL\\System\\v4.0_4.0.0.0__b77a5c561934e089\\winhttp.dll"}
+[js] {"dll": "winhttp.dll"}
+[js] {"dll": "C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_MSIL\\System\\v4.0_4.0.0.0__b77a5c561934e089\\secur32.dll"}
+[js] {"dll": "secur32.dll"}
+[js] {"dll": "C:\\WINDOWS\\SysWOW64\\schannel.dll"}
+[js] {"dll": "C:\\EFDC84_LIC\\vb6\\MSCOMCTL.OCX"}
+[js] {"dll": "imm32.dll"}
+[js] {"com": "CoGetClassObject {2c247f23-8591-11d1-b16a-00c0f0283628} hr=0x0 obj=0xcb23040 vtable=0x27583068 (MSCOMCTL.OCX+0x3068) vt[0]=0x275bf75a (MSCOMCTL.OCX+0x3f75a)"}
+[js] {"dll": "ext-ms-win-kernel32-errorhandling-l1-1-0.dll"}
+[ 6.50] CHILD pid=29636 EFDC_Explorer8.4.exe
+[ 6.50] CHILD pid=33644 WerFault.exe
+done

@@ -1,0 +1,29 @@
+﻿pid=52916
+[js] {"t": 63, "fn": "__vbaNew", "objConst": "0x454c64", "caller": "EFDC_Explorer8.4.exe+0x438386"}
+[js] {"t": 63, "fn": "__vbaNew", "objConst": "0x454c64", "caller": "EFDC_Explorer8.4.exe+0x438386"}
+[js] {"t": 63, "fn": "__vbaNew", "objConst": "0x454c64", "caller": "EFDC_Explorer8.4.exe+0x438386"}
+[js] {"t": 96, "fn": "__vbaNew", "objConst": "0x4ea944", "caller": "EFDC_Explorer8.4.exe+0x41def6"}
+[js] {"t": 134, "fn": "__vbaNew", "objConst": "0x4f9f3c", "caller": "EFDC_Explorer8.4.exe+0x41df14"}
+[js] {"t": 150, "fn": "__vbaNew", "objConst": "0x454c64", "caller": "EFDC_Explorer8.4.exe+0x438386"}
+[js] {"t": 150, "fn": "__vbaNew", "objConst": "0x454c64", "caller": "EFDC_Explorer8.4.exe+0x438386"}
+[js] {"t": 166, "fn": "__vbaNew", "objConst": "0x454c64", "caller": "EFDC_Explorer8.4.exe+0x438386"}
+[js] {"t": 1226, "fn": "__vbaNew", "objConst": "0x454c64", "caller": "EFDC_Explorer8.4.exe+0x438386"}
+[js] {"t": 1229, "fn": "__vbaNew", "objConst": "0x454c64", "caller": "EFDC_Explorer8.4.exe+0x438386"}
+[js] {"t": 1230, "fn": "__vbaNew", "objConst": "0x454c64", "caller": "EFDC_Explorer8.4.exe+0x438386"}
+[js] {"t": 1505, "fn": "__vbaNew", "objConst": "0x4facdc", "caller": "EFDC_Explorer8.4.exe+0x420e43"}
+[js] {"t": 1509, "fn": "__vbaNew", "objConst": "0x454c64", "caller": "EFDC_Explorer8.4.exe+0x438386"}
+[js] {"t": 1512, "fn": "__vbaNew", "objConst": "0x4f3b90", "caller": "EFDC_Explorer8.4.exe+0x42a807"}
+[js] {"t": 1513, "fn": "__vbaNew", "objConst": "0x4f3bc0", "caller": "EFDC_Explorer8.4.exe+0x42a81b"}
+[js] {"t": 1606, "fn": "__vbaNew", "objConst": "0x4facdc", "caller": "EFDC_Explorer8.4.exe+0x420e43"}
+[js] {"t": 2700, "fn": "__vbaNew", "objConst": "0x4facdc", "caller": "EFDC_Explorer8.4.exe+0x424df7"}
+[js] {"t": 2718, "fn": "__vbaNew2", "arg0": "0x4d5204", "objConst": "0x16249b0", "caller": "EFDC_Explorer8.4.exe+0x116ab9a"}
+[js] {"t": 3054, "fn": "__vbaNew", "objConst": "0x453d2c", "caller": "EFDC_Explorer8.4.exe+0xedd14b"}
+[js] {"t": 3054, "fn": "__vbaNew", "objConst": "0x453b28", "caller": "EFDC_Explorer8.4.exe+0xedd275"}
+[js] {"t": 3054, "fn": "__vbaNew", "objConst": "0x4ee408", "caller": "EFDC_Explorer8.4.exe+0x406a97"}
+[js] {"t": 3058, "fn": "__vbaNew", "objConst": "0x454c64", "caller": "EFDC_Explorer8.4.exe+0x438386"}
+[js] {"t": 3063, "fn": "__vbaNew", "objConst": "0x454c64", "caller": "EFDC_Explorer8.4.exe+0x438386"}
+[js] {"t": 3947, "fn": "__vbaNew2", "arg0": "0x461d44", "objConst": "0x1626304", "caller": "EFDC_Explorer8.4.exe+0xede71a"}
+[js] {"t": 3984, "fn": "__vbaNew2", "arg0": "0x4eb84c", "objConst": "0x1af538", "caller": "EFDC_Explorer8.4.exe+0xedc884"}
+[js] {"t": 6503, "fn": "__vbaNew2", "arg0": "0x48fe70", "objConst": "0x16204b4", "caller": "EFDC_Explorer8.4.exe+0x116ac4f"}
+[js] {"t": 6525, "fn": "__vbaNew", "objConst": "0x4facdc", "caller": "EFDC_Explorer8.4.exe+0x420e43"}
+done

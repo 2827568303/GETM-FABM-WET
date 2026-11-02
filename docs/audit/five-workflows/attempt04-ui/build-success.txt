@@ -1,0 +1,446 @@
+- img "3DWET"
+- heading "3DWET Studio" [level=1]
+- paragraph: 湖泊生态 · 三维建模工作台
+- generic: 总览
+- generic: 📊
+- text: 仪表盘
+- generic: 📁
+- text: 案例管理
+- generic: 前处理
+- generic: 🛠️
+- text: 前处理
+- generic: ▦
+- text: 交互网格编辑
+- generic: 📥
+- text: 输入数据
+- generic: 🧩
+- text: 模块配置
+- generic: ⚙️
+- text: 参数编辑
+- generic: 🧪
+- text: 初始条件
+- generic: ⏱️
+- text: 时间设置
+- generic: 运行
+- generic: ▶️
+- text: 运行控制
+- generic: 后处理
+- generic: 🌐
+- text: 地图视图
+- generic: 🗺️
+- text: 2D 可视化
+- generic: 🧊
+- text: 3D 可视化
+- generic: 🔥
+- text: 垂向热图
+- generic: 📈
+- text: 时间序列
+- generic: 率定
+- generic: 🎯
+- text: 率定分析
+- generic: 🔄
+- text: 自动率定
+- generic: 工作台
+- generic: ◉
+- text: 环境与启动诊断
+- generic: 📋
+- text: 项目导入与物理设置
+- generic: "案例: Round4 UI Lake 1302"
+- menubar "工作台菜单":
+  - button "项目"
+  - button "编辑"
+  - button "视图"
+  - button "图层"
+  - button "运行"
+  - button "设置"
+  - button "帮助"
+  - button "语言"
+  - generic: 3DWET Studio · GIS 工作台
+- toolbar "常用工具":
+  - button "▣ 案例":
+    - generic: ▣
+    - generic: 案例
+  - button "⚒ 前处理":
+    - generic: ⚒
+    - generic: 前处理
+  - button "▦ 网格":
+    - generic: ▦
+    - generic: 网格
+  - button "▶ 运行":
+    - generic: ▶
+    - generic: 运行
+  - button "⌖ 地图":
+    - generic: ⌖
+    - generic: 地图
+  - button "▤ 2D":
+    - generic: ▤
+    - generic: 2D
+  - button "◇ 3D":
+    - generic: ◇
+    - generic: 3D
+  - button "⚙ 诊断":
+    - generic: ⚙
+    - generic: 诊断
+- generic: 输入数据
+- generic: Round4 UI Lake 1302
+- button "100%"
+- generic: 空闲
+- generic: 输入数据
+- generic: 录入气象/河流时间序列数据，一键构建完整可运行案例
+- generic: 📁 输入文件清单
+- table:
+  - rowgroup:
+    - row "文件 状态 大小 修改时间 变量数 说明 操作":
+      - columnheader "文件"
+      - columnheader "状态"
+      - columnheader "大小"
+      - columnheader "修改时间"
+      - columnheader "变量数"
+      - columnheader "说明"
+      - columnheader "操作"
+  - rowgroup:
+    - row "bathymetry.nc ✅ 存在 17.0 KB 2026-DOY286 12:40:23 6 水下地形（网格+水深） 🛠️ 前处理":
+      - cell "bathymetry.nc":
+        - code: bathymetry.nc
+      - cell "✅ 存在"
+      - cell "17.0 KB"
+      - cell "2026-DOY286 12:40:23"
+      - cell "6"
+      - cell "水下地形（网格+水深）"
+      - cell "🛠️ 前处理":
+        - button "🛠️ 前处理"
+    - row "fabm.yaml ✅ 存在 31.0 KB 2026-DOY286 12:50:49 - 生态模型配置（模块+参数） 🏗️ 去构建":
+      - cell "fabm.yaml":
+        - code: fabm.yaml
+      - cell "✅ 存在"
+      - cell "31.0 KB"
+      - cell "2026-DOY286 12:50:49"
+      - cell "-"
+      - cell "生态模型配置（模块+参数）"
+      - cell "🏗️ 去构建":
+        - button "🏗️ 去构建"
+    - row "meteo.nc ✅ 存在 98.9 KB 2026-DOY286 12:40:48 11 气象强迫数据 🌦️ 填气象":
+      - cell "meteo.nc":
+        - code: meteo.nc
+      - cell "✅ 存在"
+      - cell "98.9 KB"
+      - cell "2026-DOY286 12:40:48"
+      - cell "11"
+      - cell "气象强迫数据"
+      - cell "🌦️ 填气象":
+        - button "🌦️ 填气象"
+    - row "riverinfo.dat ✅ 存在 43 B 2026-DOY286 12:50:48 - 河流配置（入/出流位置） 🏞️ 配河流":
+      - cell "riverinfo.dat":
+        - code: riverinfo.dat
+      - cell "✅ 存在"
+      - cell "43 B"
+      - cell "2026-DOY286 12:50:48"
+      - cell "-"
+      - cell "河流配置（入/出流位置）"
+      - cell "🏞️ 配河流":
+        - button "🏞️ 配河流"
+    - row "rivers.nc ✅ 存在 44.7 KB 2026-DOY286 12:50:48 11 河流流量与水质时间序列 🏞️ 配河流":
+      - cell "rivers.nc":
+        - code: rivers.nc
+      - cell "✅ 存在"
+      - cell "44.7 KB"
+      - cell "2026-DOY286 12:50:48"
+      - cell "11"
+      - cell "河流流量与水质时间序列"
+      - cell "🏞️ 配河流":
+        - button "🏞️ 配河流"
+    - row "fabm_init.nc ✅ 存在 23.6 KB 2026-DOY286 12:50:49 8 生态初始条件 🏗️ 去构建":
+      - cell "fabm_init.nc":
+        - code: fabm_init.nc
+      - cell "✅ 存在"
+      - cell "23.6 KB"
+      - cell "2026-DOY286 12:50:49"
+      - cell "8"
+      - cell "生态初始条件"
+      - cell "🏗️ 去构建":
+        - button "🏗️ 去构建"
+    - row "getm.inp ✅ 存在 2.8 KB 2026-DOY286 12:50:48 - GETM 主配置文件 🏗️ 去构建":
+      - cell "getm.inp":
+        - code: getm.inp
+      - cell "✅ 存在"
+      - cell "2.8 KB"
+      - cell "2026-DOY286 12:50:48"
+      - cell "-"
+      - cell "GETM 主配置文件"
+      - cell "🏗️ 去构建":
+        - button "🏗️ 去构建"
+    - row "gotmturb.nml ✅ 存在 1.3 KB 2026-DOY179 14:32:16 - 湍流模型配置 🏗️ 去构建":
+      - cell "gotmturb.nml":
+        - code: gotmturb.nml
+      - cell "✅ 存在"
+      - cell "1.3 KB"
+      - cell "2026-DOY179 14:32:16"
+      - cell "-"
+      - cell "湍流模型配置"
+      - cell "🏗️ 去构建":
+        - button "🏗️ 去构建"
+    - row "output.yaml ✅ 存在 104 B 2026-DOY286 12:50:49 - 输出配置（sync_interval 等） 🏗️ 去构建":
+      - cell "output.yaml":
+        - code: output.yaml
+      - cell "✅ 存在"
+      - cell "104 B"
+      - cell "2026-DOY286 12:50:49"
+      - cell "-"
+      - cell "输出配置（sync_interval 等）"
+      - cell "🏗️ 去构建":
+        - button "🏗️ 去构建"
+- generic: 🌦️ 气象强迫数据（meteo.nc）
+- text: "CSV 列（别名自动识别）:"
+- code: date,u10,v10,slp,t2,rh,tcc,precip,evap
+- text: 。日期采用
+- code: 2020-DOY001
+- text: "（年份 + 年内儒略日；兼容已有日历日期文件）。 单位: 风速 m/s、气压 hPa、气温 ℃、湿度/云量 0-1（或 %）、降雨/蒸发 mm/day。站点数据将广播到全湖网格。"
+- button "⬇️ 下载 CSV 模板"
+- button "Choose File"
+- button "📤 上传 CSV"
+- button "💾 生成 meteo.nc"
+- text: 草稿共
+- strong: "8"
+- text: "行，可直接修改数值后生成 meteo.nc。单位: 风 m/s、气压 hPa、气温 ℃、湿度/云量 0-1、降雨/蒸发 mm/day（后端自动换算）。"
+- table:
+  - rowgroup:
+    - row "date（年内儒略日） u10 v10 slp t2 rh tcc precip evap":
+      - columnheader "date（年内儒略日）"
+      - columnheader "u10"
+      - columnheader "v10"
+      - columnheader "slp"
+      - columnheader "t2"
+      - columnheader "rh"
+      - columnheader "tcc"
+      - columnheader "precip"
+      - columnheader "evap"
+  - rowgroup:
+    - row "2020-DOY001 0.954 0.248 1016.759 14.375 0.698 0.388 0.013 0.464":
+      - cell "2020-DOY001"
+      - cell "0.954":
+        - spinbutton: "0.954"
+      - cell "0.248":
+        - spinbutton: "0.248"
+      - cell "1016.759":
+        - spinbutton: "1016.759"
+      - cell "14.375":
+        - spinbutton: "14.375"
+      - cell "0.698":
+        - spinbutton: "0.698"
+      - cell "0.388":
+        - spinbutton: "0.388"
+      - cell "0.013":
+        - spinbutton: "0.013"
+      - cell "0.464":
+        - spinbutton: "0.464"
+    - row "2020-DOY002 1.015 0.070 1014.471 14.140 0.654 0.271 1.315 0.530":
+      - cell "2020-DOY002"
+      - cell "1.015":
+        - spinbutton: "1.015"
+      - cell "0.070":
+        - spinbutton: "0.070"
+      - cell "1014.471":
+        - spinbutton: "1014.471"
+      - cell "14.140":
+        - spinbutton: "14.140"
+      - cell "0.654":
+        - spinbutton: "0.654"
+      - cell "0.271":
+        - spinbutton: "0.271"
+      - cell "1.315":
+        - spinbutton: "1.315"
+      - cell "0.530":
+        - spinbutton: "0.530"
+    - row "2020-DOY003 0.957 0.084 1010.978 17.530 0.825 0.527 0.418 0.617":
+      - cell "2020-DOY003"
+      - cell "0.957":
+        - spinbutton: "0.957"
+      - cell "0.084":
+        - spinbutton: "0.084"
+      - cell "1010.978":
+        - spinbutton: "1010.978"
+      - cell "17.530":
+        - spinbutton: "17.530"
+      - cell "0.825":
+        - spinbutton: "0.825"
+      - cell "0.527":
+        - spinbutton: "0.527"
+      - cell "0.418":
+        - spinbutton: "0.418"
+      - cell "0.617":
+        - spinbutton: "0.617"
+    - row "2020-DOY004 1.318 0.234 1010.906 16.634 0.778 0.259 1.791 0.701":
+      - cell "2020-DOY004"
+      - cell "1.318":
+        - spinbutton: "1.318"
+      - cell "0.234":
+        - spinbutton: "0.234"
+      - cell "1010.906":
+        - spinbutton: "1010.906"
+      - cell "16.634":
+        - spinbutton: "16.634"
+      - cell "0.778":
+        - spinbutton: "0.778"
+      - cell "0.259":
+        - spinbutton: "0.259"
+      - cell "1.791":
+        - spinbutton: "1.791"
+      - cell "0.701":
+        - spinbutton: "0.701"
+    - row "2020-DOY005 1.182 -0.140 1013.919 14.935 0.671 0.522 1.505 0.593":
+      - cell "2020-DOY005"
+      - cell "1.182":
+        - spinbutton: "1.182"
+      - cell "-0.140":
+        - spinbutton: "-0.140"
+      - cell "1013.919":
+        - spinbutton: "1013.919"
+      - cell "14.935":
+        - spinbutton: "14.935"
+      - cell "0.671":
+        - spinbutton: "0.671"
+      - cell "0.522":
+        - spinbutton: "0.522"
+      - cell "1.505":
+        - spinbutton: "1.505"
+      - cell "0.593":
+        - spinbutton: "0.593"
+    - row "2020-DOY006 1.397 -0.212 1013.518 14.807 0.665 0.549 0.384 0.343":
+      - cell "2020-DOY006"
+      - cell "1.397":
+        - spinbutton: "1.397"
+      - cell "-0.212":
+        - spinbutton: "-0.212"
+      - cell "1013.518":
+        - spinbutton: "1013.518"
+      - cell "14.807":
+        - spinbutton: "14.807"
+      - cell "0.665":
+        - spinbutton: "0.665"
+      - cell "0.549":
+        - spinbutton: "0.549"
+      - cell "0.384":
+        - spinbutton: "0.384"
+      - cell "0.343":
+        - spinbutton: "0.343"
+    - row "2020-DOY007 1.316 -0.265 1011.345 15.023 0.832 0.218 0.126 0.887":
+      - cell "2020-DOY007"
+      - cell "1.316":
+        - spinbutton: "1.316"
+      - cell "-0.265":
+        - spinbutton: "-0.265"
+      - cell "1011.345":
+        - spinbutton: "1011.345"
+      - cell "15.023":
+        - spinbutton: "15.023"
+      - cell "0.832":
+        - spinbutton: "0.832"
+      - cell "0.218":
+        - spinbutton: "0.218"
+      - cell "0.126":
+        - spinbutton: "0.126"
+      - cell "0.887":
+        - spinbutton: "0.887"
+    - row "2020-DOY008 0.926 -0.229 1013.267 15.706 0.768 0.561 1.397 0.553":
+      - cell "2020-DOY008"
+      - cell "0.926":
+        - spinbutton: "0.926"
+      - cell "-0.229":
+        - spinbutton: "-0.229"
+      - cell "1013.267":
+        - spinbutton: "1013.267"
+      - cell "15.706":
+        - spinbutton: "15.706"
+      - cell "0.768":
+        - spinbutton: "0.768"
+      - cell "0.561":
+        - spinbutton: "0.561"
+      - cell "1.397":
+        - spinbutton: "1.397"
+      - cell "0.553":
+        - spinbutton: "0.553"
+- generic: 🏞️ 河流数据（rivers.nc + riverinfo.dat）
+- text: "CSV 列:"
+- code: date,Q,temp,nh4,no3,po4
+- text: 。日期采用
+- code: 2020-DOY001
+- text: （兼容已有日历日期文件）。Q 单位 m³/s，
+- strong: 正值=入流、负值=出流
+- text: ；营养盐 g/m³（列缺失用默认值填充）。 河流位置来自前处理标记，也可在下方手动添加。
+- generic: 河名(英文)
+- textbox "PANLONG"
+- generic: i 列号
+- spinbutton
+- generic: j 行号
+- spinbutton
+- button "➕ 添加河流"
+- generic: ▲
+- strong: SEED_IN
+- generic: i=11, j=6
+- generic: ✅ 8 行
+- button "📈 曲线"
+- button "📤 上传CSV"
+- button "删除"
+- generic: ▲
+- strong: SEED_OUT
+- generic: i=4, j=9
+- generic: ✅ 8 行
+- button "📈 曲线"
+- button "📤 上传CSV"
+- button "删除"
+- generic: "CSV 列: date,Q,temp,nh4,no3,po4；Q 正=入流、负=出流（m³/s）。rivers.nc 已存在，重新生成会覆盖。"
+- button "💾 生成 rivers.nc + riverinfo.dat"
+- generic: 🏗️ 构建完整案例（getm.inp / fabm.yaml 等 9 个文件）
+- text: 配齐气象/河流数据后，设定模拟时段，一键生成全部配置文件，案例即可运行。重复构建会覆盖配置文件（数据文件保留）。
+- text: 模块的启用状态取自「模块配置」页所选组合；水质/水位初值请在
+- link "🧪 初始条件":
+  - /url: "#"
+- text: 页设置（预设构建时一并写入，之后可随时改）。
+- generic: 年内儒略日 DOY：平年 001–365，闰年 001–366；格式 YYYY-DOYDDD HH:mm:ss。
+- generic: 开始时间（年份 + 年内儒略日）
+- textbox "开始时间（年份 + 年内儒略日）":
+  - /placeholder: 2020-DOY001 00:00:00
+  - text: 2020-DOY001 00:00:00
+- generic: 结束时间（年份 + 年内儒略日）
+- textbox "结束时间（年份 + 年内儒略日）":
+  - /placeholder: 2020-DOY365 00:00:00
+  - text: 2020-DOY001 00:20:00
+- generic: 时间步长 (秒)
+- spinbutton: "2"
+- generic: 垂向层数
+- spinbutton: "6"
+- button "🏗️ 一键构建" [active]
+- text: ✓ 构建成功：预设
+- strong: 富营养（藻类浊水态）
+- text: ，13 个生态参数已写入 fabm.yaml
+- generic: ℹ 模块组合：水动力✓ · 水质生态✓ · 鱼类✓ · 温室气体✗
+- generic: "ℹ 生态初值预设: 富营养（藻类浊水态）（13 个参数已写入 fabm.yaml）"
+- generic: "案例文件: bathymetry.nc, fabm.yaml, fabm_init.nc, getm.inp, getm_fabm.inp, gotm_fabm.yaml, gotmturb.nml, initial_conditions.json, meteo.nc, meteo_draft.json, meteo_input.txt, output.yaml, riverinfo.dat, rivers.nc, rivers_setup.json"
+- generic: 📊 数据概览
+- text: "案例:"
+- strong: Round4 UI Lake 1302
+- text: "路径:"
+- code: C:\Users\23801\Desktop\GETM-FABM-WET-260928\build\full-workflow-20261013-attempt04\external\3DWET\case\Round4 UI Lake 1302
+- text: "文件:"
+- strong: 9 存在
+- text: /
+- strong: 0 缺失
+- text: "总大小:"
+- strong: 219.5 KB
+- text: "生态模块:"
+- strong: "20"
+- text: 个
+- text: "总参数:"
+- strong: "566"
+- text: 个
+- status:
+  - generic: 项目
+  - strong: Round4 UI Lake 1302
+  - generic: 网格
+  - strong: 待加载
+  - generic: 运行
+  - strong: 空闲
+  - generic: 视图
+  - strong: 100%
+  - generic: 坐标系
+  - strong: —

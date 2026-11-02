@@ -1,0 +1,10 @@
+........................................................................ [ 24%]
+...................................................................s.... [ 48%]
+......ss................................................................ [ 73%]
+........................................................................ [ 97%]
+.......                                                                  [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_project_api.py:138: Creating symlinks requires Windows developer mode or administrator rights
+SKIPPED [1] tests\test_result_files.py:106: Creating symlinks requires OS privilege
+SKIPPED [1] tests\test_result_files.py:119: Creating symlinks requires OS privilege
+292 passed, 3 skipped in 19.15s

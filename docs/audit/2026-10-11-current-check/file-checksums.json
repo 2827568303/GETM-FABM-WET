@@ -1,0 +1,74 @@
+[
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\.trae\\documents\\3DWET_GUI_完成方案.md",
+    "bytes": 15113,
+    "modified": "2026-09-17T16:19:30.0000000+08:00",
+    "sha256": "D69488B2A39831C666D153B812F3470DEC5BC90FBBB68F046EA7D14EF1751319"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\.trae\\documents\\preprocess_redesign.md",
+    "bytes": 10059,
+    "modified": "2026-09-17T17:32:44.0000000+08:00",
+    "sha256": "8D192F6E799EFC684B9409E4EED47047F7CE0852EA29AD15DD6984DCF6855599"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\3DWET\\app\\server.py",
+    "bytes": 325748,
+    "modified": "2026-10-11T19:34:37.7538661+08:00",
+    "sha256": "81A0F597DD837FED2DF94B39F8A1001C768A7C25EBF9BD27D161A4423BC13EA0"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\3DWET\\app\\calibration.py",
+    "bytes": 35169,
+    "modified": "2026-10-11T19:33:27.1850754+08:00",
+    "sha256": "B32348C53BEC0158366C5E36E576CE1730EB8B5B66616F94A4A34D140FD4EDD7"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\3DWET\\app\\spatial_sections.py",
+    "bytes": 8573,
+    "modified": "2026-10-11T19:24:18.4321828+08:00",
+    "sha256": "8346F1B7ABC3CA194E26736E178BE39EC977BC02BF83B809E6AF34B4C5569A38"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\3DWET\\app\\parameter_defaults.py",
+    "bytes": 5733,
+    "modified": "2026-10-11T19:33:01.8812697+08:00",
+    "sha256": "903AFFA1E22321B27DEDC5ABDE0A7F083E0ACE2020232C7AAEE1C94173FBBC1C"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\3DWET\\app\\static\\js\\app.js",
+    "bytes": 184053,
+    "modified": "2026-10-11T19:30:39.0413492+08:00",
+    "sha256": "404BCF3288711A6325221D73F0BE3072A96C11611720A8746685897A6405EEE3"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\3DWET\\app\\static\\js\\viz3d.js",
+    "bytes": 37121,
+    "modified": "2026-10-11T19:32:24.6480946+08:00",
+    "sha256": "82DE3A2B9C33E675C5B0EC068C092149B56DD52F804CF93B7349CEAEEC283DAF"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\scripts\\build_app.py",
+    "bytes": 11898,
+    "modified": "2026-10-11T13:07:25.9465759+08:00",
+    "sha256": "9D0CE4BB4AE84CA0C501DA192013A0609847055A4B4924AADE64BB7F1799CA7B"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\requirements.txt",
+    "bytes": 188,
+    "modified": "2026-10-11T19:25:43.3870674+08:00",
+    "sha256": "45A77D6DCAD88A52CCAEE8F19B08917B853F6E449A7DC2B8FA32CAE72B806B64"
+  },
+  {
+    "path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\release\\installer-manifest.json",
+    "bytes": 1579,
+    "modified": "2026-10-11T18:47:46.6317792+08:00",
+    "sha256": "75716FE48757F10D69CC4DBA6D4EB1FA662FFA62956F79F9DDF05B6FCD517EA2"
+  },
+  {
+    "path": "C:\\Users\\23801\\AppData\\Local\\Programs\\3DWET Studio\\3DWETStudio.exe",
+    "bytes": 9106011,
+    "modified": "2026-10-11T18:45:10.0000000+08:00",
+    "sha256": "A5657126B593EDBD47371BC072AECCECE6A4B311FCE1750D14B91316C6ABF29F"
+  }
+]

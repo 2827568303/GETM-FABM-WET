@@ -1,0 +1,6 @@
+﻿[js]      0 ready
+pid 2340
+[js]   3758 RtlExitUserProcess from KERNEL32.DLL+0x2b6f3
+[js]   4017 ACC: KERNEL32.DLL+0x2b6f3 <- ntdll.dll+0x322c0 <- MSVBVM60.DLL+0x2ad05 <- EFDC_Explorer8.4.exe+0x5195e <- ntdll.dll+0x6c75b <- ntdll.dll+0x6c6e1
+PROCESS EXITED code=0 at 4.1s
+elapsed=4.1

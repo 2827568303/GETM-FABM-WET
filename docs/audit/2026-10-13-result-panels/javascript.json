@@ -1,0 +1,157 @@
+[
+  {
+    "file": "test_build_confirmation.js",
+    "exit_code": 0,
+    "output": "Build confirmation: waits, cancellation leaves inputs intact, acceptance starts once PASS"
+  },
+  {
+    "file": "test_calibration_param_baseline.js",
+    "exit_code": 0,
+    "output": "parameter baseline: saved case values are clean; save refreshes baseline; reset remains PASS"
+  },
+  {
+    "file": "test_calibration_real_scientific_language.js",
+    "exit_code": 0,
+    "output": "real scientific language: charts follow selected language and switch existing imported labels PASS"
+  },
+  {
+    "file": "test_calibration_scientific_charts.js",
+    "exit_code": 0,
+    "output": "scientific charts: replace old paired labels with one selected language PASS"
+  },
+  {
+    "file": "test_calibration_spatial_controls.js",
+    "exit_code": 0,
+    "output": "spatial section controls: selected variable, time, fixed axis/index PASS"
+  },
+  {
+    "file": "test_calibration_ui.js",
+    "exit_code": 0,
+    "output": "calibration UI: selected station payload and zero objective rendering PASS"
+  },
+  {
+    "file": "test_calibration_workflow.js",
+    "exit_code": 0,
+    "output": "calibration workflow: actual variables, run completion, failure isolation, zero convergence, weights PASS"
+  },
+  {
+    "file": "test_canvas_size_controls.js",
+    "exit_code": 0,
+    "output": "2D size controls: initial, numeric, native resize, fit and bounds PASS"
+  },
+  {
+    "file": "test_chart_language.js",
+    "exit_code": 0,
+    "output": "chart language: existing dataset/title switches both ways, numeric arrays and dates preserved PASS"
+  },
+  {
+    "file": "test_chart_lifecycle.js",
+    "exit_code": 0,
+    "output": "Chart.js lifecycle: null canvas cleanup, observers/listeners/toolbars, five redraws PASS"
+  },
+  {
+    "file": "test_confirm_dialog.js",
+    "exit_code": 0,
+    "output": "In-app confirm/prompt: wait, cancel, accept, text, focus and concurrent protection PASS"
+  },
+  {
+    "file": "test_dashboard_scientific_language.js",
+    "exit_code": 0,
+    "output": "dashboard scientific language: summary and six-field labels use the selected scientific name PASS"
+  },
+  {
+    "file": "test_i18n.js",
+    "exit_code": 0,
+    "output": "i18n: locale persistence, reversible source translation, unknown fallback and safe language packs PASS"
+  },
+  {
+    "file": "test_initial_drafts.js",
+    "exit_code": 0,
+    "output": "initial drafts: filter, hidden save, rerender and invalid empty input PASS"
+  },
+  {
+    "file": "test_initial_instance_inputs.js",
+    "exit_code": 0,
+    "output": "initial conditions: independent instance inputs and saved values PASS"
+  },
+  {
+    "file": "test_initial_presets.js",
+    "exit_code": 0,
+    "output": "Initial full presets: metadata excluded, aliases unique, refill targeted, user drafts preserved PASS"
+  },
+  {
+    "file": "test_initial_scientific_language.js",
+    "exit_code": 0,
+    "output": "initial conditions show only selected English descriptions and retain source metadata PASS"
+  },
+  {
+    "file": "test_model_dates_ui.js",
+    "exit_code": 0,
+    "output": "model dates UI: charts, heatmap hover, inputs and solver ISO compatibility PASS"
+  },
+  {
+    "file": "test_model_dates.js",
+    "exit_code": 0,
+    "output": "model dates: ordinal conversions, validation, UTC and chart spacing PASS"
+  },
+  {
+    "file": "test_parameter_types.js",
+    "exit_code": 0,
+    "output": "parameter types: boolean/string/number save, invalid rejection, empty-string reset PASS"
+  },
+  {
+    "file": "test_preprocess_case_load.js",
+    "exit_code": 0,
+    "output": "preprocess case load: common state, saved preview and failure handling PASS"
+  },
+  {
+    "file": "test_result_panel_order.js",
+    "exit_code": 0,
+    "output": "Profile, depth mean and time series: latest response wins; stale cases/errors ignored PASS"
+  },
+  {
+    "file": "test_result_request_order.js",
+    "exit_code": 0,
+    "output": "Result requests: preserve selection, latest inventory/field wins, obsolete errors and cases ignored PASS"
+  },
+  {
+    "file": "test_run_notifications.js",
+    "exit_code": 0,
+    "output": "run notifications: true ETA crossings, invalid estimates, deduplication and terminal states PASS"
+  },
+  {
+    "file": "test_scientific_language.js",
+    "exit_code": 0,
+    "output": "scientific language: selected language only, imported metadata fallback, reversible switches PASS"
+  },
+  {
+    "file": "test_spatial_sections.js",
+    "exit_code": 0,
+    "output": "Spatial section rendering passed"
+  },
+  {
+    "file": "test_variable_guide.js",
+    "exit_code": 0,
+    "output": "Variable guide: missing values, lower bounds, initial comparison PASS"
+  },
+  {
+    "file": "test_view_controls.js",
+    "exit_code": 0,
+    "output": "view controls: bounds and cursor-anchored zoom PASS\n2D viewport: narrow, wide and tall fitting preserves aspect PASS"
+  },
+  {
+    "file": "test_viz_geometry.js",
+    "exit_code": 0,
+    "output": "lake geometry: shoreline, holes, disconnected cells, masks, scale and sigma PASS"
+  },
+  {
+    "file": "test_viz_render.js",
+    "exit_code": 0,
+    "output": "lake render: masks, true depth labels, volume arrays, empty data and preview PASS"
+  },
+  {
+    "file": "test_viz_scientific_language.js",
+    "exit_code": 0,
+    "output": "Plotly scientific labels switch between English, Chinese and imported language PASS"
+  }
+]

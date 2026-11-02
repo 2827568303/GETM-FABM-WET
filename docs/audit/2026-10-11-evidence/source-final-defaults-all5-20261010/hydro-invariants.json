@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "case": "Lake Dianchi",
+      "frames": 21,
+      "minimum_depth_m": 0.49757054448127747,
+      "minimum_layer_m": 0.049757055938243866,
+      "depth_equals_bathymetry_plus_level_error_m": 9.117078175369109e-05,
+      "summed_layer_depth_error_m": 9.143352508544922e-05,
+      "tolerance_m": 0.001,
+      "passed": true
+    },
+    {
+      "case": "Lake Luoma",
+      "frames": 21,
+      "minimum_depth_m": 0.6464308500289917,
+      "minimum_layer_m": 0.06464308500289917,
+      "depth_equals_bathymetry_plus_level_error_m": 0.00018979626707782415,
+      "summed_layer_depth_error_m": 0.00019073486328125,
+      "tolerance_m": 0.001,
+      "passed": true
+    },
+    {
+      "case": "NativeTest",
+      "frames": 21,
+      "minimum_depth_m": 1.0011272430419922,
+      "minimum_layer_m": 0.10011183470487595,
+      "depth_equals_bathymetry_plus_level_error_m": 9.126822114069455e-06,
+      "summed_layer_depth_error_m": 1.0013580322265625e-05,
+      "tolerance_m": 0.001,
+      "passed": true
+    },
+    {
+      "case": "Theoretical lake",
+      "frames": 21,
+      "minimum_depth_m": 1.0011287927627563,
+      "minimum_layer_m": 0.10011198371648788,
+      "depth_equals_bathymetry_plus_level_error_m": 9.125320106662116e-06,
+      "summed_layer_depth_error_m": 1.0013580322265625e-05,
+      "tolerance_m": 0.001,
+      "passed": true
+    },
+    {
+      "case": "_fish_probe",
+      "frames": 21,
+      "minimum_depth_m": 0.49757054448127747,
+      "minimum_layer_m": 0.049757055938243866,
+      "depth_equals_bathymetry_plus_level_error_m": 9.117078175369109e-05,
+      "summed_layer_depth_error_m": 9.143352508544922e-05,
+      "tolerance_m": 0.001,
+      "passed": true
+    }
+  ]
+}

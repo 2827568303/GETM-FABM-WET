@@ -1,0 +1,7 @@
+﻿pid=6076 exe=C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\EFDC ��ҵ��8.4\EFDC_Explorer8.4.exe
+[ 0.26] NEW  cls='VBMsoStdCompMgr'    title=''                             vis=0 rect=(0,0 0x0) hwnd=0x281430
+[ 0.26] NEW  cls='ThunderRT6Main'     title='EFDC_Explorer8.4'             vis=1 rect=(853,533 0x0) hwnd=0xb31352
+[ 0.26] NEW  cls='IME'                title='Default IME'                  vis=0 rect=(0,0 0x0) hwnd=0x12d0e7e
+[ 4.12] NEW  cls='#32770'             title='EFDC_Explorer8.4'             vis=1 rect=(646,484 421x153) hwnd=0x3c10e8e
+[ 4.12] NEW  cls='MSCTFIME UI'        title='MSCTFIME UI'                  vis=0 rect=(0,0 0x0) hwnd=0xca1328
+done alive=True

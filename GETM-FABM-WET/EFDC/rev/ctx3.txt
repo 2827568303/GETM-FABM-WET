@@ -1,0 +1,6 @@
+     0 diag51 ready
+     0 ready (ExitProcess blocked)
+     0 diag87 ready
+  2368 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8
+  9016 form thread=50080
+  9064 ExitProcess(0) blocked; sleeping forever on tid=20248

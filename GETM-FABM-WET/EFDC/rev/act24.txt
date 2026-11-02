@@ -1,0 +1,2 @@
+     1 diag51 ready
+     0 diag106 ready (main-thread WaitForMultipleObjects replaced by pumping wait)

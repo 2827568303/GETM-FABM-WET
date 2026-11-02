@@ -1,0 +1,8 @@
+﻿[js]      0 hooked OleLoadPicture
+[js]      0 hooked OleLoadPictureEx
+[js]      0 hooked OleLoadPicturePath
+[js]      0 diag21 ready
+pid 47132
+[js]   4973 after __vbaNew2
+[js]   4973 ENTER method[obj+0x1B8]
+done

@@ -29,6 +29,8 @@
    public                              :: wait_halo_mpi
    public                              :: set_flag_mpi
    public:: part_domain_mpi
+   public                              :: runtime_physics_diag_dynamic_supported
+   public                              :: runtime_physics_diag_velocity_supported
    integer, public, parameter          :: H_TAG=10,HU_TAG=11,HV_TAG=12
    integer, public, parameter          :: D_TAG=20,DU_TAG=21,DV_TAG=22
    integer, public, parameter          :: z_TAG=30,U_TAG=31,V_TAG=32
@@ -101,6 +103,21 @@
 !BOC
 
    contains
+
+! Report whether live diagnostics can rely on the UI's deterministic dynamic
+! Cartesian decomposition. Unsupported layouts must not enter diagnostic collectives.
+   logical function runtime_physics_diag_dynamic_supported()
+   IMPLICIT NONE
+   runtime_physics_diag_dynamic_supported = (mesh_method .eq. TWOD_MESH .and. .not. re_order)
+   end function runtime_physics_diag_dynamic_supported
+
+! Velocity diagnostics require the communication mode validated for 2D halos.
+! Other modes may leave partition-edge face masks or transports stale.
+   logical function runtime_physics_diag_velocity_supported()
+   IMPLICIT NONE
+   runtime_physics_diag_velocity_supported = &
+      (mesh_method .eq. TWOD_MESH .and. .not. re_order .and. comm_method .eq. TWOD_NONBLOCKING)
+   end function runtime_physics_diag_velocity_supported
 
 !-----------------------------------------------------------------------
 !BOP

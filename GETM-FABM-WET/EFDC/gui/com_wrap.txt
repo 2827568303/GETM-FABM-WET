@@ -1,0 +1,5 @@
+﻿pid=38368
+[js] {"created": "{72C24DD5-D70A-438B-8A42-98424B88AFB8}", "obj": "0x3ca15bc"}
+[ 0.34] CHILD pid=31036 EFDC_Explorer8.4.exe
+[ 0.34] CHILD pid=31388 WerFault.exe
+done

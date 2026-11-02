@@ -1,0 +1,105 @@
+{
+  "returncode": 0,
+  "advance_seconds": 2,
+  "differences": {
+    "loop": {
+      "max_absolute_error": 480.0,
+      "index": []
+    },
+    "z": {
+      "max_absolute_error": 8.294108607385942e-11,
+      "index": [
+        13,
+        19
+      ]
+    },
+    "U": {
+      "max_absolute_error": 1.765196842862249e-11,
+      "index": [
+        18,
+        11
+      ]
+    },
+    "V": {
+      "max_absolute_error": 2.072075791677286e-08,
+      "index": [
+        12,
+        19
+      ]
+    },
+    "tke": {
+      "max_absolute_error": 1e-08,
+      "index": [
+        0,
+        0,
+        0
+      ]
+    },
+    "num": {
+      "max_absolute_error": 3.627493647833322e-24,
+      "index": [
+        0,
+        0,
+        0
+      ]
+    },
+    "nuh": {
+      "max_absolute_error": 3.627493647833322e-24,
+      "index": [
+        0,
+        0,
+        0
+      ]
+    },
+    "S": {
+      "max_absolute_error": 9999.0,
+      "index": [
+        0,
+        0,
+        0
+      ]
+    },
+    "D": {
+      "max_absolute_error": 8.294098741146172e-11,
+      "index": [
+        13,
+        19
+      ]
+    },
+    "DU": {
+      "max_absolute_error": 3.824340844005292e-11,
+      "index": [
+        15,
+        16
+      ]
+    },
+    "DV": {
+      "max_absolute_error": 2.0388135624216375e-11,
+      "index": [
+        18,
+        12
+      ]
+    },
+    "studio_met_shf": {
+      "max_absolute_error": 1.7801250215891287,
+      "index": [
+        15,
+        8
+      ]
+    },
+    "studio_met_tausx": {
+      "max_absolute_error": 1.1241839910402699e-08,
+      "index": [
+        15,
+        8
+      ]
+    },
+    "studio_met_tausy": {
+      "max_absolute_error": 1.5545705243176847e-05,
+      "index": [
+        15,
+        8
+      ]
+    }
+  }
+}

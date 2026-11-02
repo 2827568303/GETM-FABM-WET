@@ -1,0 +1,12 @@
+﻿[js]      0 diag18 ready
+pid 48228
+[js]     25 ENTER CheckLicensing
+[js]  14010 --- EIP ���� top 20 (inside=true) ---
+[js]  14010   329  ntdll.dll+0x7a0bc
+[js]  14010   208  ntdll.dll+0x787fc
+[js]  14010   76  ntdll.dll+0x7858c
+[js]  14010   47  ntdll.dll+0x7826c
+[js]  14010   34  win32u.dll+0x123c
+[js]  14010   7  win32u.dll+0x5fac
+[js]  14010   1  ntdll.dll+0x7861c
+done

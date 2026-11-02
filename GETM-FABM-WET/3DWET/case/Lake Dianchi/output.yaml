@@ -1,0 +1,6 @@
+output:
+   time_unit: second
+   time_step: 86400
+   sync_interval: 1
+   variables:
+      - source: *

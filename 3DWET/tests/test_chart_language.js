@@ -1,0 +1,17 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const source=fs.readFileSync('3DWET/app/static/js/app.js','utf8');
+let locale='zh-CN';
+const context=vm.createContext({window:{StudioI18n:{t:s=>s,variable:v=>({...v,display_name:locale==='zh-CN'?v.zh_name:v.en_name})}}});
+vm.runInContext(source.slice(0,source.indexOf('function localizedVariableLabel')),context);
+vm.runInContext("state.variables3d=[{name:'temp',zh_name:'水温',en_name:'Water temperature'}]; this.config={type:'line',data:{labels:['2020-DOY001'],datasets:[{label:'水温 (Celsius)',data:[1,2,3]}]},options:{plugins:{title:{text:'水温'}}}};translateChartLabels(config);",context);
+assert.equal(context.config.data.datasets[0].label,'水温 (Celsius)');
+locale='en-US';vm.runInContext('translateChartLabels(config)',context);
+assert.equal(context.config.data.datasets[0].label,'Water temperature (Celsius)');
+assert.equal(context.config.options.plugins.title.text,'Water temperature');
+locale='zh-CN';vm.runInContext('translateChartLabels(config)',context);
+assert.equal(context.config.data.datasets[0].label,'水温 (Celsius)');
+assert.deepEqual(Array.from(context.config.data.datasets[0].data),[1,2,3]);
+assert.equal(context.config.data.labels[0],'2020-DOY001');
+console.log('chart language: existing dataset/title switches both ways, numeric arrays and dates preserved PASS');

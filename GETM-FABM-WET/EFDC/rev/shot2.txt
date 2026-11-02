@@ -1,0 +1,10 @@
+﻿[js]      0 diag51 ready
+[js]      0 diag39 ready
+pid 51632
+[js]   2377 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8
+[js]   9186 RtlExitUserProcess(0)
+[js]   9188   �˳�ʱ�Ĵ���: ThunderRT6FormDC|"EFDC_Explore8.0"|vis=0|0x39b1342 ;; VBMsoStdCompMgr|""|vis=0|0xa6043e ;; ThunderRT6Main|"EFDC_Explorer8.4"|vis=1|0x2bed12de ;; IME|"Default IME"|vis=0|0x1670e5a
+[js]   9213   forced show 0x39b1342 now vis=1
+[js]   9213 �����Խ���Ϣѭ������ֹ�˳���
+WIN ThunderRT6FormDC 'EFDC_Explore8.0' vis=1 rect=(0,5 815x639)
+saved C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\app_shot2.png (815, 639)

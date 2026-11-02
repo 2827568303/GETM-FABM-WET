@@ -1,0 +1,5 @@
+     0 diag51 ready
+     0 ready (ExitProcess blocked)
+     1 ready
+  9040 [0x4016A4] = 0x6169d8cd  module=MSVBVM60.DLL  export=__vbaFreeStr
+  9041 ExitProcess(0) blocked; sleeping forever on tid=19440

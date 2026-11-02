@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-labelledby="title">
+<title id="title">3DWET technical lake model mark</title>
+<path d="M3 3H45V45H3Z" fill="#f5f1e8" stroke="#d5d0c4" stroke-width="1.4"/>
+<path d="M8 17L24 9L40 17L24 25Z M8 22L24 30L40 22 M8 27L24 35L40 27" fill="none" stroke="#657e86" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M8 17V29L24 39L40 29V17 M24 25V39 M16 13L32 21 M16 25L32 33" fill="none" stroke="#75836d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12 41H36" fill="none" stroke="#987746" stroke-width="1.7" stroke-linecap="round"/>
+</svg>

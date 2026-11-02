@@ -1,0 +1,9 @@
+﻿pid 39596
+form ['0x169600fe']
+kids [('ThunderRT6Frame', ''), ('ThunderRT6CommandButton', '&Activate'), ('ThunderRT6CheckBox', 'Report EEMS Usage Statistics:'), ('ThunderRT6Frame', ''), ('ThunderRT6TextBox', ''), ('ThunderRT6TextBox', ''), ('ThunderRT6TextBox', ''), ('ThunderRT6TextBox', ''), ('ThunderRT6TextBox', ''), ('ThunderRT6TextBox', ''), ('ThunderRT6OptionButton', 'Activate with License Code'), ('ThunderRT6OptionButton', 'Activate with a Dongle'), ('ThunderRT6CommandButton', 'Copy'), ('ThunderRT6Frame', ''), ('ThunderRT6TextBox', ''), ('ThunderRT6CommandButton', 'Browse...'), ('ThunderRT6Frame', ''), ('ThunderRT6CommandButton', '&Select Version'), ('ThunderRT6CommandButton', '&Buy Now'), ('ThunderRT6CommandButton', '&Quit and Exit')]
+click 0x4370ff4 &Activate
+click 0x2540d10 Copy
+click 0x51420 Browse...
+click 0x10141e &Select Version
+click 0x4dc1342 &Buy Now
+click 0x2142e &Quit and Exit

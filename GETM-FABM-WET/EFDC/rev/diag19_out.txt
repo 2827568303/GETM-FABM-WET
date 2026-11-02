@@ -1,0 +1,11 @@
+﻿[js]      0 hooked user32.dll!MessageBoxTimeoutW @0x7744a400
+[js]      0 hooked user32.dll!MessageBoxTimeoutA @0x7744a310
+[js]      0 hooked user32.dll!MessageBoxExW @0x7744a110
+[js]      0 no export win32u.dll!SoftModalMessageBox
+[js]      0 hooked user32.dll!SoftModalMessageBox @0x7744a600
+[js]      0 hooked user32.dll!DialogBoxParamW @0x77421270
+[js]      2 hooked user32.dll!CreateDialogParamW @0x77420c50
+[js]      2 diag19 ready
+pid 55712
+[js]   3436 SoftModalMessageBox(u32)
+done

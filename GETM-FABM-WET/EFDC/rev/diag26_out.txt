@@ -1,0 +1,18 @@
+﻿[js]      0 diag24 ready
+pid 32904
+[js]     41 CoCreateInstanceEx clsid=01fe430d93f0cf11894000a0c9054228 riid= hr=0x80012
+[js]     41    -> cmq=4 iid=0000000000000000c000000000000046
+[js]     41    -> pItf=0x3bd3630 qi.hr=0x0
+[js]    191 CoCreateInstanceEx clsid=c8e29963e463314f823cd256c17e7a13 riid= hr=0x80012
+[js]    191    -> cmq=4 iid=0000000000000000c000000000000046
+[js]    191    -> pItf=0x78a002c qi.hr=0x0
+[js]    197 CoCreateInstanceEx clsid=a9130d33beb2cf4c9b8adc2047fb3d33 riid= hr=0x80012
+[js]    197    -> cmq=4 iid=0000000000000000c000000000000046
+[js]    197    -> pItf=0x78a000c qi.hr=0x0
+[js]   1376 CoCreateInstanceEx clsid=110fd9f6739cd311b32e00c04f990bb4 riid= hr=0x80012
+[js]   1376    -> cmq=4 iid=0000000000000000c000000000000046
+[js]   1376    -> pItf=0x7b53b30 qi.hr=0x0
+[js]   1392 CoCreateInstanceEx clsid=110fd9f6739cd311b32e00c04f990bb4 riid= hr=0x80012
+[js]   1392    -> cmq=4 iid=0000000000000000c000000000000046
+[js]   1392    -> pItf=0x7b53b30 qi.hr=0x0
+done

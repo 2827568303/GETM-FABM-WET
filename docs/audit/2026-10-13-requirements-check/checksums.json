@@ -1,0 +1,52 @@
+[
+  {
+    "path": ".trae/documents/3DWET_GUI_完成方案.md",
+    "bytes": 15113,
+    "sha256": "d69488b2a39831c666d153b812f3470dec5bc90fbbb68f046ea7d14ef1751319"
+  },
+  {
+    "path": ".trae/documents/preprocess_redesign.md",
+    "bytes": 10059,
+    "sha256": "8d192f6e799efc684b9409e4eed47047f7ce0852ea29ad15dd6984dcf6855599"
+  },
+  {
+    "path": "3DWET/app/static/js/app.js",
+    "bytes": 186987,
+    "sha256": "03a145554cdd43766d05b1929466979bd70b48688d6ce48a6780e21125ebcdd3"
+  },
+  {
+    "path": "3DWET/app/static/js/i18n.js",
+    "bytes": 18823,
+    "sha256": "34a440e74944a5b8887ff64380699825cde7004ce7b1ffcbd465cbb09f947511"
+  },
+  {
+    "path": "3DWET/app/server.py",
+    "bytes": 328662,
+    "sha256": "af4ba72dfbc7fd6210540e0a999e155d317b8f478e18316f16909d2a537c6661"
+  },
+  {
+    "path": "3DWET/src/wet/src/wet_model_library.F90",
+    "bytes": 3176,
+    "sha256": "e680454652e94febcdfe25444ec62051df8ede53c6b63773caabf5ced4063ec6"
+  },
+  {
+    "path": "release/installer-manifest.json",
+    "bytes": 1579,
+    "sha256": "75716fe48757f10d69cc4dba6d4eb1fa662ffa62956f79f9ddf05b6fcd517ea2"
+  },
+  {
+    "path": "3DWET/bin/getm_cartesian.exe",
+    "bytes": 5317304,
+    "sha256": "f06a7219490a9d160f72c18788db463fe9cf1ec4881b0b0c52141d8762e65e8a"
+  },
+  {
+    "path": "build/native-fish-fix/getm_cartesian.exe",
+    "bytes": 5351589,
+    "sha256": "4dff1d27b7044a1925545f84384093c8982958de704e7a2654ed640b35aceb09"
+  },
+  {
+    "path": "docs/audit/five-workflows/ledger.json",
+    "bytes": 1598,
+    "sha256": "87ea0e694c3246b3323a587e0f29e6a66d24fa60ae57f0fdd80715b233e16a02"
+  }
+]

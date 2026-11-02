@@ -1,0 +1,1 @@
+[('EFDC_Explorer8.4', ['确定', 'Error saving INI file. Check path and permissions.'])]

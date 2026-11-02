@@ -1,0 +1,5 @@
+﻿d=open('eems1183_setup.exe','rb').read()
+i=d.find(b'7z\xbc\xaf\x27\x1c')
+print('7z sig at',hex(i),'of',len(d))
+open('eems_payload.7z','wb').write(d[i:])
+print('wrote',len(d)-i)

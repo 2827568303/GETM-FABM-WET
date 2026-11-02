@@ -1,0 +1,8 @@
+﻿[js]      0 diag40 ready
+pid 54332
+[js]   2926 form object = 0xd3e9730
+[js]   2926 vtable = 0x163c1f4
+[js]   2926 calling method[0x250](obj, &var) ...
+[js]   2934   call threw: Error: access violation accessing 0x0
+[js]   2938 windows after call: ThunderRT6FormDC|vis=0|0x1a1e07ba
+done

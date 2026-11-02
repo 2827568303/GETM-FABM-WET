@@ -1,0 +1,11 @@
+     0 diag51 ready
+     0 hooked checkA
+     1 hooked checkB
+     1 hooked checkC
+     1 ready
+  3771 checkC -> 0x0 (ax=0x0)
+  3771 checkA -> 0x0 (ax=0x0)
+  3777 checkA -> 0x0 (ax=0x0)
+  3777 checkB -> 0x0 (ax=0x0)
+  3777 checkC -> 0x0 (ax=0x0)
+  3777 at 0x81CA01 jne: eax=0x1 ebx=0x1

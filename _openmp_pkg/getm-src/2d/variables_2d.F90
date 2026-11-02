@@ -1,0 +1,264 @@
+#include "cppdefs.h"
+!-----------------------------------------------------------------------
+!BOP
+!
+! !MODULE: variables_2d - global variables for 2D model
+!
+! !INTERFACE:
+   module variables_2d
+!
+! !DESCRIPTION:
+!  This modules contains declarations for all variables related to 2D
+!  hydrodynamical calculations. Information about the calculation domain
+!  is included from the {\tt domain} module.
+!  The module contains public subroutines to initialise and cleanup.
+!  Depending whether the compiler option {STATIC} is set or not,
+!  memory for 2D variables is statically or dynamically allocated, see
+!  {\tt PUBLIC DATA MEMBERS}.
+!
+! !USES:
+   use domain, only: imin,imax,jmin,jmax
+   use field_manager
+   IMPLICIT NONE
+!
+! !PUBLIC DATA MEMBERS:
+   integer, parameter                  :: rk = kind(_ONE_)
+#ifdef STATIC
+#include "static_2d.h"
+#else
+#include "dynamic_declarations_2d.h"
+#endif
+   integer                             :: size2d_field
+   integer                             :: mem2d
+!
+! !REVISION HISTORY:
+!  Original author(s): Karsten Bolding & Hans Burchard
+!
+!EOP
+!-----------------------------------------------------------------------
+
+   contains
+
+!-----------------------------------------------------------------------
+!BOP
+!
+! !IROUTINE: init_variables_2d - initialise 2D related stuff.
+!
+! !INTERFACE:
+   subroutine init_variables_2d(runtype)
+   IMPLICIT NONE
+!
+! !DESCRIPTION:
+!  Allocates memory (unless {\tt STATIC} is set) for 2D related fields,
+!  by an include statement. Furthermore all public 2D variables are
+!  initialised to zero. Those are listed in table \ref{table_2d_variables}
+!  on page \pageref{table_2d_variables}.
+!
+!  \begin{table}[h]
+!  \begin{center}
+!  \begin{tabular}{lll}
+! {\tt z } & sea surface elevation in T-point & [m] \\
+! {\tt U } & $x$ component of transport in U-point & [m$^2$s$^{-1}$] \\
+! {\tt DU } & water depth in U-point & [m] \\
+! {\tt fU } & Coriolis term for $V$-equation in V-point & [m$^2$s$^{-2}$] \\
+! {\tt SlUx } & slow term for $U$-equation in U-point & [m$^2$s$^{-2}$] \\
+! {\tt Slru } &slow bottom friction for $U$-equation in U-point &
+! [m$^2$s$^{-2}$]\\
+! {\tt V } & $y$ component of transport in V-point & [m$^2$s$^{-1}$]\\
+! {\tt DV } & water depth in V-point & [m] \\
+! {\tt fV } &  Coriolis term for $U$-equation in U-point & [m$^2$s$^{-2}$]\\
+! {\tt SlVx } & slow term for $V$-equation in V-point & [m$^2$s$^{-2}$] \\
+! {\tt Slrv } &slow bottom friction for $V$-equation in V-point &
+! [m$^2$s$^{-2}$]\\
+! {\tt Uint } & $x$-component of mean transport in U-point & [m$^2$s$^{-1}$]\\
+! {\tt Vint } & $y$-component of mean transport in V-point & [m$^2$s$^{-1}$]\\
+! {\tt UEx } & sum of explicit terms for for $U$-equation in U-point & [m$^2$s$^{-2}$]\\
+! {\tt VEx } &sum of explicit terms for for $V$-equation in V-point & [m$^2$s$^{-2}$]\\
+! {\tt ru } & bottom friction for $U$-equation in U-point & [m$^2$s$^{-2}$]\\
+! {\tt rv } &bottom friction for $V$-equation in V-point & [m$^2$s$^{-2}$]\\
+! {\tt res\_du } & residual depth in U-point & [m]\\
+! {\tt res\_u } & $x$-component of residual transport in U-point &
+! [m$^2$s$^{-1}$]\\
+! {\tt res\_dv } & residual depth in V-point & [m] \\
+! {\tt res\_v } &$y$-component of residual transport in V-point &
+! [m$^2$s$^{-1}$]\\
+! \end{tabular}
+! \caption{Public 2D variables.}
+! \label{table_2d_variables}
+! \end{center}
+! \end{table}
+!
+! !INPUT PARAMETERS:
+   integer, intent(in)                 :: runtype
+!
+! !LOCAL VARIABLES:
+   integer                   :: rc
+!EOP
+!-------------------------------------------------------------------------
+!BOC
+#ifdef DEBUG
+   integer, save :: Ncall = 0
+   Ncall = Ncall+1
+   write(debug,*) 'init_variables_2d() # ',Ncall
+#endif
+
+   LEVEL2 'init_variables_2d'
+   size2d_field=((imax+HALO)-(imin+HALO)+1)*((jmax+HALO)-(jmin+HALO)+1)
+   mem2d=n2d_fields*size2d_field*REAL_SIZE
+
+!  Allocates memory for the public data members - if not static
+#ifndef STATIC
+#include "dynamic_allocations_2d.h"
+#endif
+
+#ifdef USE_BREAKS
+   break_stat = 0
+#endif
+
+   z  = -9999._rk ; zo =_ZERO_
+
+   zub=_ZERO_ ; zub0=_ZERO_
+   zvb=_ZERO_ ; zvb0=_ZERO_
+
+   U = _ZERO_; DU = _ZERO_; fU = _ZERO_; Uint = _ZERO_; UEx = _ZERO_
+   V = _ZERO_; DV = _ZERO_; fV = _ZERO_; Vint = _ZERO_; VEx = _ZERO_
+
+   ru = _ZERO_; ruu=_ZERO_; Uinto=_ZERO_
+   rv = _ZERO_; rvv=_ZERO_; Vinto=_ZERO_
+
+   res_du = _ZERO_; res_u = _ZERO_
+   res_dv = _ZERO_; res_v = _ZERO_
+
+   SlUx=_ZERO_; Slru=_ZERO_
+   SlVx=_ZERO_; Slrv=_ZERO_
+
+   fwf     = _ZERO_
+   fwf_int = _ZERO_
+
+   EWbdy=_ZERO_
+   ENbdy=_ZERO_
+   EEbdy=_ZERO_
+   ESbdy=_ZERO_
+
+#ifdef DEBUG
+   write(debug,*) 'Leaving init_variables_2d()'
+   write(debug,*)
+#endif
+   return
+   end subroutine init_variables_2d
+!EOC
+
+!-----------------------------------------------------------------------
+!BOP
+!
+! !ROUTINE: register_2d_variables() - register GETM variables.
+!
+! !INTERFACE:
+   subroutine register_2d_variables(fm)
+!
+! !DESCRIPTION:
+!
+! !USES:
+!   use variables_2d
+   IMPLICIT NONE
+!
+! !INPUT PARAMETERS:
+   type (type_field_manager) :: fm
+!
+! !REVISION HISTORY:
+!  Original author(s): Karsten Bolding & Jorn Bruggeman
+!
+! !LOCAL VARIABLES:
+   logical :: used
+!EOP
+!-----------------------------------------------------------------------
+!BOC
+   LEVEL2 'register_2d_variables()'
+
+!D(E2DFIELD)
+!DU,DV
+!z(E2DFIELD)
+!zo(E2DFIELD)
+!U(E2DFIELD)
+!V(E2DFIELD)
+!UEx(E2DFIELD)
+!VEx(E2DFIELD)
+!fU(E2DFIELD)
+!fV(E2DFIELD)
+!ru(E2DFIELD)
+!rv(E2DFIELD)
+!Uint(E2DFIELD)
+!Vint(E2DFIELD)
+!Uinto(E2DFIELD)
+!Vinto(E2DFIELD)
+!res_du(E2DFIELD)
+!res_u(E2DFIELD)
+!res_dv(E2DFIELD)
+!res_v(E2DFIELD)
+!kbk
+!SlUx(E2DFIELD)
+!SlVx(E2DFIELD)
+!Slru(E2DFIELD)
+!Slrv(E2DFIELD)
+!zub(E2DFIELD)
+!zvb(E2DFIELD)
+!zub0(E2DFIELD)
+!zvb0(E2DFIELD)
+!An(E2DFIELD)
+!AnX(E2DFIELD)
+!fwf(E2DFIELD)
+!fwf_int(E2DFIELD)
+!EWbdy(jmax),ENbdy(imax),EEbdy(jmax),ESbdy(imax)
+
+
+!  category - 2d
+   call fm%register('z', 'm', 'sea surface elevation', standard_name='sea surface elevation', fill_value=-9999.0_rk, data2d=z(_2D_W_), category="2d", part_of_state=.true.)
+   call fm%register('zo', 'm', 'sea surface elevation', standard_name='sea surface elevation', fill_value=-9999.0_rk, data2d=zo(_2D_W_), category="2d", output_level=output_level_debug)
+   call fm%register('D', 'm', 'water depth', standard_name='water depth', fill_value=-10009.0_rk, data2d=D(_2D_W_), category="2d", part_of_state=.true.)
+   call fm%register('DU', 'm', 'water depth - U-points', standard_name='water depth', data2d=DU(_2D_W_), category='2d', output_level=output_level_debug)
+   call fm%register('DV', 'm', 'water depth - V-points', standard_name='water depth', data2d=DV(_2D_W_), category='2d', output_level=output_level_debug)
+   call fm%register('U', 'm2/s', 'transport in local x-direction', standard_name='', data2d=U(_2D_W_), category='2d', output_level=output_level_debug, part_of_state=.true.)
+   call fm%register('V', 'm2/s', 'transport in local y-direction', standard_name='', data2d=V(_2D_W_), category='2d', output_level=output_level_debug, part_of_state=.true.)
+
+   return
+   end subroutine register_2d_variables
+!EOC
+
+!-----------------------------------------------------------------------
+!BOP
+!
+! !IROUTINE: clean_variables_2d - cleanup after 2D run.
+!
+! !INTERFACE:
+   subroutine clean_variables_2d()
+   IMPLICIT NONE
+!
+! !DESCRIPTION:
+!  This routine is currently empty.
+!
+! !LOCAL VARIABLES:
+!
+!EOP
+!-----------------------------------------------------------------------
+!BOC
+#ifdef DEBUG
+   integer, save :: Ncall = 0
+   Ncall = Ncall+1
+   write(debug,*) 'clean_variables_2d() # ',Ncall
+#endif
+
+#ifdef DEBUG
+   write(debug,*) 'Leaving clean_variables_2d()'
+   write(debug,*)
+#endif
+   return
+   end subroutine clean_variables_2d
+!EOC
+
+!-----------------------------------------------------------------------
+
+   end module variables_2d
+
+!-----------------------------------------------------------------------
+! Copyright (C) 2001 - Hans Burchard and Karsten Bolding (BBH)         !
+!-----------------------------------------------------------------------

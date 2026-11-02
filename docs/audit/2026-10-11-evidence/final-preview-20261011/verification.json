@@ -1,0 +1,922 @@
+{
+  "passed": true,
+  "duration_seconds": 1200,
+  "scope": "Deterministic synthetic integration scenario; not observational, scientific-accuracy, annual stability, or complete browser UX validation.",
+  "health": {
+    "application": "3dwet-studio",
+    "instance_id": "d648a0ecb4b44ecb88629a95fa527f39",
+    "model_root": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-preview-20261011\\3DWET",
+    "pid": 26692,
+    "ready": true
+  },
+  "data": {
+    "seed": 20261010,
+    "description": "Synthetic realistic test data; not observations",
+    "samples": 250,
+    "boundary_vertices": 121,
+    "days": 8,
+    "sha256": {
+      "boundary.dbf": "17d3bf3c5fcc426b5aebfc8d8ef76bc6ef36dc6e71e21014fc25365112844776",
+      "boundary.prj": "99a5a32f41f7df7e52e869dca1b2df8b2009ba20c28dbf95e61dc9c891dffd38",
+      "boundary.shp": "1a95c067f98af995528a6eb7679fa3f23be70c859686485eaab43a74887dbfd1",
+      "boundary.shx": "c42e12fde332f0759d3b3d24a04107ba88a2ab2ed1d699fdaaea82388ef12e62",
+      "depth.csv": "962088aa224b212ee49eaa273da909e52de2370b71dd422b7fc8082e6a0b089a",
+      "depth_points.dbf": "e7f45a2c8a678f852f3684c9c82ce0293bcbfd10f30a13b4e0d2f38ad038896a",
+      "depth_points.prj": "99a5a32f41f7df7e52e869dca1b2df8b2009ba20c28dbf95e61dc9c891dffd38",
+      "depth_points.shp": "3faab2acd9f3585c6ce6bd2bc33d477a13e39758cfc89652f39905cb55fb3e00",
+      "depth_points.shx": "9d9d4f7340744bde9be4c5415fd54ccf404b1c72748c0074a4a423290c36402e",
+      "hypsograph.dat": "5a077043f03a95d87ca33bd74583fb31b9898baf8502acab9ea395ff4beb53d8",
+      "inflow.csv": "f5bf2c715c879ab4854e1ddf9f54c4ae495435a7661d344bf7bc56af19fcccb0",
+      "meteo.csv": "fbf2e701b03779179230dc43393f9bb167c507258d5b57dc83285063c4b1ad73",
+      "outflow.csv": "5e67ba2b86a66d002dccddb4a5bef9e9d1f2e0a2da0af6a1b29a6ca22da3ba5a"
+    },
+    "initial_temp": 14.925148680730599,
+    "import_files": 15,
+    "imported_case": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-preview-20261011\\3DWET\\case\\Imported Random Lake"
+  },
+  "repair": {
+    "action": "fix_sync_interval",
+    "backup": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-preview-20261011\\3DWET\\case\\Imported Random Lake\\backups\\output.yaml.20261011T045006950862-b1c8eefc.bak",
+    "case_path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-preview-20261011\\3DWET\\case\\Imported Random Lake",
+    "file": "output.yaml",
+    "revision": "103acbd07aaff586adf48c1c56fde4148740857a37333ef2fda5f9c9c624845c",
+    "success": true
+  },
+  "preflight": {
+    "blocking": 0,
+    "case_path": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\final-preview-20261011\\3DWET\\case\\Imported Random Lake",
+    "checks": [
+      {
+        "actions": [
+          {
+            "control": "pp-grid-canvas",
+            "file": "bathymetry.nc",
+            "label": "定位设置",
+            "page": "preprocess",
+            "type": "locate"
+          }
+        ],
+        "detail": "164 个水格（bathymetry.nc）",
+        "fix": null,
+        "id": "bathymetry",
+        "level": "ok",
+        "source_file": "bathymetry.nc",
+        "target": {
+          "control": "pp-grid-canvas",
+          "file": "bathymetry.nc",
+          "page": "preprocess"
+        },
+        "title": "地形"
+      },
+      {
+        "actions": [
+          {
+            "control": "time-dt",
+            "file": "getm.inp",
+            "label": "定位设置",
+            "page": "time",
+            "type": "locate"
+          }
+        ],
+        "detail": "2s ≤ 重力波 CFL 估计上限 2.65113s；此检查不保证生态过程稳定，需短时试运行检查输出。",
+        "fix": null,
+        "id": "configuration",
+        "level": "ok",
+        "source_file": "getm.inp",
+        "target": {
+          "control": "time-dt",
+          "file": "getm.inp",
+          "page": "time"
+        },
+        "title": "时间步长"
+      },
+      {
+        "actions": [
+          {
+            "control": "physics-rows",
+            "file": "getm.inp",
+            "label": "定位设置",
+            "page": "projecttools",
+            "selector": "[aria-label=\"domain.check_cfl\"]",
+            "type": "locate"
+          },
+          {
+            "file": "getm.inp",
+            "id": "enable_cfl",
+            "label": "启用 CFL 检查",
+            "type": "repair"
+          }
+        ],
+        "detail": "check_cfl=.false. 时 GETM 不会执行自身的重力波 CFL 检查，超限可能导致数值发散。",
+        "fix": "建议设为 .true.，并检查短时试运行输出。",
+        "id": "cfl-disabled",
+        "level": "warn",
+        "repair": {
+          "file": "getm.inp",
+          "id": "enable_cfl",
+          "label": "启用 CFL 检查"
+        },
+        "source_file": "getm.inp",
+        "target": {
+          "control": "physics-rows",
+          "file": "getm.inp",
+          "page": "projecttools",
+          "selector": "[aria-label=\"domain.check_cfl\"]"
+        },
+        "title": "check_cfl 已关闭"
+      },
+      {
+        "actions": [
+          {
+            "control": "output-modules",
+            "file": "output.yaml",
+            "label": "定位设置",
+            "page": "time",
+            "type": "locate"
+          },
+          {
+            "file": "output.yaml",
+            "id": "standard_output",
+            "label": "采用当前案例的标准输出订阅",
+            "type": "repair"
+          }
+        ],
+        "detail": "source: * 会写出模型注册的每一个变量。预计约 0.05 GB。（滇池 362 天实测 17.9 GB）",
+        "fix": "改用“标准”订阅：水动力 + 关键生态模块。",
+        "id": "output-all",
+        "level": "warn",
+        "repair": {
+          "file": "output.yaml",
+          "id": "standard_output",
+          "label": "采用当前案例的标准输出订阅"
+        },
+        "source_file": "output.yaml",
+        "target": {
+          "control": "output-modules",
+          "file": "output.yaml",
+          "page": "time"
+        },
+        "title": "输出全部变量"
+      },
+      {
+        "actions": [
+          {
+            "control": "output-modules",
+            "file": "output.yaml",
+            "label": "定位设置",
+            "page": "time",
+            "type": "locate"
+          }
+        ],
+        "detail": "预计输出 0.05 GB，可用 452.4 GB",
+        "fix": null,
+        "id": "disk-space",
+        "level": "ok",
+        "source_file": "output.yaml",
+        "target": {
+          "control": "output-modules",
+          "file": "output.yaml",
+          "page": "time"
+        },
+        "title": "磁盘空间"
+      }
+    ],
+    "n_warn": 2,
+    "ok": true,
+    "revision": "103acbd07aaff586adf48c1c56fde4148740857a37333ef2fda5f9c9c624845c"
+  },
+  "run": {
+    "status": "not_exercised",
+    "reason": "--skip-run requested"
+  },
+  "api_calls": [
+    {
+      "method": "GET",
+      "path": "/api/system/health",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 206
+    },
+    {
+      "method": "GET",
+      "path": "/api/system/diagnostics",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 869
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/case/create",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 176
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/boundary/upload",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 9396
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/bathymetry/upload_xyz",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 8202
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/bathymetry/upload",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 9834
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/hypsograph",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 7803
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/grid/generate",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 2254
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/bathymetry/interpolate",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 2529
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/bathymetry/interpolate",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 3900
+    },
+    {
+      "method": "GET",
+      "path": "/api/preprocess/preview?boundary_id=bnd_a9f7c5d5&grid_id=grid_539d9daf",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 10087
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/save",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 321
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/meteo/upload",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 564
+    },
+    {
+      "method": "GET",
+      "path": "/api/input/meteo/draft",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 743
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/meteo/save",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 92
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/upload",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 195
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/upload",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 199
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/save",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 113
+    },
+    {
+      "method": "GET",
+      "path": "/api/input/rivers/series?name=SEED_IN",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 867
+    },
+    {
+      "method": "GET",
+      "path": "/api/input/rivers/series?name=SEED_OUT",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 886
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/build",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 823
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/init_conditions",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 248
+    },
+    {
+      "method": "GET",
+      "path": "/api/case/init_conditions",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 24346
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/output",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 203
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/import",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 3489
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/load",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 250715
+    },
+    {
+      "method": "GET",
+      "path": "/api/run/check",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 4053
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/repair",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 455
+    },
+    {
+      "method": "GET",
+      "path": "/api/run/check",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 3327
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/stop",
+      "passed": true,
+      "http_status": 200,
+      "response_bytes": 17
+    }
+  ],
+  "route_coverage": [
+    {
+      "method": "DELETE",
+      "path": "/api/calibration/points",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/config",
+      "status": "not_exercised",
+      "reason": "Optimization requires a separate repeated solver/calibration study; this harness checks observed/simulated comparison only."
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/auto/status",
+      "status": "not_exercised",
+      "reason": "Optimization requires a separate repeated solver/calibration study; this harness checks observed/simulated comparison only."
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/comparison",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/data",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/calibration/points",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/case/init_conditions",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/case/inputs",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/cases",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/engines",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/fabm",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/ghg",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/hotstart",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/modules",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/output",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/config/time",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/dashboard/summary",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/ecology/network",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/geo/field",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/geo/grid",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/grid/editor",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/input/meteo/draft",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/input/rivers",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/input/rivers/series",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/physics/config",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/preprocess/help",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/preprocess/preview",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/results/2d",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/results/3d_surface",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/results/profile",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/results/state_vars_surface",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/results/timeseries",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/results/timeseries_cell",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/results/variables",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/run/check",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/run/estimate",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/run/status",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/system/diagnostics",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/system/health",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/system/list_dir",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "GET",
+      "path": "/api/system/pick_folder_result",
+      "status": "not_applicable",
+      "reason": "Interactive OS picker/Explorer is excluded from headless API validation."
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/apply",
+      "status": "not_exercised",
+      "reason": "Optimization requires a separate repeated solver/calibration study; this harness checks observed/simulated comparison only."
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/config",
+      "status": "not_exercised",
+      "reason": "Optimization requires a separate repeated solver/calibration study; this harness checks observed/simulated comparison only."
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/start",
+      "status": "not_exercised",
+      "reason": "Optimization requires a separate repeated solver/calibration study; this harness checks observed/simulated comparison only."
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/auto/stop",
+      "status": "not_exercised",
+      "reason": "Optimization requires a separate repeated solver/calibration study; this harness checks observed/simulated comparison only."
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/data",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/points",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/calibration/upload",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/build",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/delete",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/init_conditions",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/load",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/open",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/case/save_as",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/engines",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/fabm/module",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/fabm/param",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/ghg",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/hotstart",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/modules",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/output",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/config/time",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/ecology/network",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/grid/edit",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/meteo/save",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/meteo/upload",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/add",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/delete",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/save",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/input/rivers/upload",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/physics/config",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/bathymetry/interpolate",
+      "status": "passed",
+      "reason": "2 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/bathymetry/upload",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/bathymetry/upload_xyz",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/boundary/upload",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/case/create",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/grid/generate",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/hypsograph",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/preprocess/save",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/import",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/results/timeseries_polygon",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/repair",
+      "status": "passed",
+      "reason": "1 HTTP requests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/start",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/run/stop",
+      "status": "not_exercised",
+      "reason": "Outside this external import/build/result integration scenario; not claimed tested."
+    },
+    {
+      "method": "POST",
+      "path": "/api/system/explore",
+      "status": "not_applicable",
+      "reason": "Interactive OS picker/Explorer is excluded from headless API validation."
+    },
+    {
+      "method": "POST",
+      "path": "/api/system/pick_folder",
+      "status": "not_applicable",
+      "reason": "Interactive OS picker/Explorer is excluded from headless API validation."
+    }
+  ]
+}

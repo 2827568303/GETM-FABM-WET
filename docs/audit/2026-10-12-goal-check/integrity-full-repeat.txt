@@ -1,0 +1,54 @@
+Attempt 1/3
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+...............................s...........ss........................... [ 63%]
+........................................................................ [ 84%]
+...................................................                      [100%]
+336 passed, 3 skipped in 25.79s
+Attempt 2/3
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+...............................s...........ss........................... [ 63%]
+................................................F....................... [ 84%]
+...................................................                      [100%]
+================================== FAILURES ===================================
+____________________ RuntimeTests.test_check_writes_report ____________________
+
+self = <test_runtime.RuntimeTests testMethod=test_check_writes_report>
+
+    def test_check_writes_report(self):
+        import launcher
+        report = {'dependencies': {}, 'solver': {'exists': True}, 'application': '3dwet-studio'}
+        with tempfile.TemporaryDirectory() as folder, \
+                patch.object(launcher, 'configure_logging'), \
+                patch.object(launcher, 'diagnostics', return_value=report):
+            output = Path(folder) / 'check.json'
+>           self.assertEqual(launcher.main(['--check', '--report', str(output)]), 0)
+E           AssertionError: 1 != 0
+
+folder     = 'C:\\Users\\23801\\AppData\\Local\\Temp\\tmp5o7xneob'
+launcher   = <module 'launcher' from 'C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\3DWET\\app\\launcher.py'>
+output     = WindowsPath('C:/Users/23801/AppData/Local/Temp/tmp5o7xneob/check.json')
+report     = {'dependencies': {}, 'solver': {'exists': True}, 'application': '3dwet-studio'}
+self       = <test_runtime.RuntimeTests testMethod=test_check_writes_report>
+
+tests\test_runtime.py:190: AssertionError
+---------------------------- Captured stdout call -----------------------------
+{
+  "application": "3dwet-studio",
+  "error": "Model tree not found (requires bin and case directories). Set WET_MODEL_ROOT to the writable 3DWET directory. Searched: C:\\Users\\23801\\AppData\\Local\\Temp\\tmpkivnka04"
+}
+---------------------------- Captured stderr call -----------------------------
+Model tree not found (requires bin and case directories). Set WET_MODEL_ROOT to the writable 3DWET directory. Searched: C:\Users\23801\AppData\Local\Temp\tmpkivnka04
+Log: <MagicMock name='configure_logging()' id='2126796513264'>
+------------------------------ Captured log call ------------------------------
+ERROR    root:launcher.py:346 Studio launch failed
+Traceback (most recent call last):
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\3DWET\app\launcher.py", line 248, in main
+    root = resolve_model_root()
+  File "C:\Users\23801\Desktop\GETM-FABM-WET-260928\3DWET\app\runtime.py", line 38, in resolve_model_root
+    raise FileNotFoundError('Model tree not found (requires bin and case directories). '
+FileNotFoundError: Model tree not found (requires bin and case directories). Set WET_MODEL_ROOT to the writable 3DWET directory. Searched: C:\Users\23801\AppData\Local\Temp\tmpkivnka04
+=========================== short test summary info ===========================
+FAILED tests/test_runtime.py::RuntimeTests::test_check_writes_report - Assert...
+1 failed, 335 passed, 3 skipped in 25.55s

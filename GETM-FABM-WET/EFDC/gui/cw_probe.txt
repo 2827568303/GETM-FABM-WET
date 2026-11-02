@@ -1,0 +1,5 @@
+﻿[js] {"err": "CreateWindowExA:TypeError: not a function"}
+[js] {"err": "CreateWindowExW:TypeError: not a function"}
+pid=51168
+[js] {"totalCreations": 0}
+done

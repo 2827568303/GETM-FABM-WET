@@ -424,6 +424,7 @@ subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
         ! 2.2 calculate bio-transformation (aka decomposition or remineralization)                                  !
         !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!
         if (self%lRefrpool) then                                                                                    ! bio-transformation dependent on oxic sediment fraction
+            _GET_HORIZONTAL_(self%id_afOxySed,afOxySed)
             tDMin = self%kDMinS * uFunTmMinS * sDS * afOxySed                                                       !    calculate DW bio-transform. of refractory OM pool
             tNMin = self%kNMinS * uFunTmMinS * sNS * afOxySed                                                       !    calculate N bio-transform. of refractory OM pool
             tPMin = self%kPMinS * uFunTmMinS * sPS * afOxySed                                                       !    calculate P bio-transform. of refractory OM pool

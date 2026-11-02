@@ -1,0 +1,8 @@
+﻿[js]      0 diag51 ready
+[js]      0 ready (ExitProcess blocked)
+pid 30652
+[js]   2543 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8
+[js]   9194 ExitProcess(0) blocked; sleeping forever on tid=23500
+t=10s ['ThunderRT6FormDC|EFDC_Explore8.0|vis=0', 'ThunderRT6Main|EFDC_Explorer8.4|vis=1']
+t=16s ['ThunderRT6FormDC|EFDC_Explore8.0|vis=0', 'ThunderRT6Main|EFDC_Explorer8.4|vis=1']
+t=24s ['ThunderRT6FormDC|EFDC_Explore8.0|vis=0', 'ThunderRT6Main|EFDC_Explorer8.4|vis=1']

@@ -1,0 +1,12 @@
+Flask>=3.0,<4
+numpy>=1.26,<3
+scipy>=1.11,<2
+netCDF4>=1.6,<2
+openpyxl>=3.1.5,<4
+pyabc>=0.12.15,<0.13
+PyYAML>=6,<7
+pyshp>=2.3,<4
+pyproj>=3.6,<4
+psutil>=5.9,<8
+waitress>=3,<4
+pywebview>=5,<7

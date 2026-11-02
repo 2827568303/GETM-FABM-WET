@@ -1,0 +1,155 @@
+- img "3DWET"
+- heading "3DWET Studio" [level=1]
+- paragraph: Lake ecology · 3D modelling workbench
+- generic: Overview
+- generic: 📊
+- text: Tableau de bord
+- generic: 📁
+- text: Case management
+- generic: Preprocessing
+- generic: 🛠️
+- text: Preprocessing
+- generic: ▦
+- text: Interactive grid editor
+- generic: 📥
+- text: Input data
+- generic: 🧩
+- text: Module configuration
+- generic: ⚙️
+- text: Parameter editor
+- generic: 🧪
+- text: Initial conditions
+- generic: ⏱️
+- text: Time settings
+- generic: Run
+- generic: ▶️
+- text: Run control
+- generic: Postprocessing
+- generic: 🌐
+- text: Map view
+- generic: 🗺️
+- text: 2D visualization
+- generic: 🧊
+- text: 3D visualization
+- generic: 🔥
+- text: Vertical heatmap
+- generic: 📈
+- text: Time series
+- generic: Calibration
+- generic: 🎯
+- text: Calibration analysis
+- generic: 🔄
+- text: Automatic calibration
+- generic: Workbench
+- generic: ◉
+- text: Environment and startup diagnostics
+- generic: 📋
+- text: Project import and physics settings
+- generic: "Status: ready"
+- menubar "Workbench menu":
+  - button "Project"
+  - button "Edit"
+  - button "View"
+  - button "Layers"
+  - button "Run"
+  - button "Settings"
+  - button "Help"
+  - button "Language"
+  - generic: 3DWET Studio · GIS workbench
+- toolbar "Common tools":
+  - button "▣ Case":
+    - generic: ▣
+    - generic: Case
+  - button "⚒ Preprocessing":
+    - generic: ⚒
+    - generic: Preprocessing
+  - button "▦ Grid":
+    - generic: ▦
+    - generic: Grid
+  - button "▶ Run":
+    - generic: ▶
+    - generic: Run
+  - button "⌖ Map":
+    - generic: ⌖
+    - generic: Map
+  - button "▤ 2D":
+    - generic: ▤
+    - generic: 2D
+  - button "◇ 3D":
+    - generic: ◇
+    - generic: 3D
+  - button "⚙ Diagnostics":
+    - generic: ⚙
+    - generic: Diagnostics
+- generic: Tableau de bord
+- button "100%"
+- generic: Idle
+- button "01 Project":
+  - generic: "01"
+  - text: Project
+- button "02 Data and grid":
+  - generic: "02"
+  - text: Data and grid
+- button "03 Model configuration":
+  - generic: "03"
+  - text: Model configuration
+- button "04 Compute":
+  - generic: "04"
+  - text: Compute
+- button "05 Results and calibration":
+  - generic: "05"
+  - text: Results and calibration
+- generic: Model dashboard
+- generic: Key state variables and model run status
+- generic: Wet cells
+- generic: "-"
+- generic: Vertical layers
+- generic: "-"
+- generic: Ecological modules
+- generic: "-"
+- generic: Output time step
+- generic: "-"
+- generic: 🌡️ Key state variables (surface mean, latest time step)
+- generic: 📊
+- text: Available after loading a case and running the model
+- generic: 🗺️ Spatial distribution of state variables (mini heatmap)
+- generic: 🗺️
+- text: Available after loading a case and running the model
+- generic: 📋 Quick actions
+- button "🛠️ New model (preprocessing)"
+- button "📁 Select / load case"
+- button "⚙️ Edit model parameters"
+- button "⏱️ Set run time"
+- button "▶️ Run model"
+- button "🗺️ View 2D results"
+- button "📈 Extract time series"
+- status:
+  - generic: Project
+  - strong: No case loaded
+  - generic: Grid
+  - strong: Waiting to load
+  - generic: Run
+  - strong: Idle
+  - generic: View
+  - strong: 100%
+  - generic: Coordinate reference system
+  - strong: —
+- dialog "Langue de l’interface":
+  - heading "Langue de l’interface" [level=2]
+  - generic: Choisir la langue
+  - combobox "Choisir la langue" [active]:
+    - option "中文"
+    - option "English"
+    - option "Français (vérification)" [selected]
+  - text: Preview
+  - paragraph: Tableau de bord · Input data · Run model · Results and calibration
+  - generic: Import language pack (JSON)
+  - button "Choose language pack file"
+  - text: No file selected
+  - paragraph: Language packs must contain plain text JSON, up to 256 KiB.
+  - paragraph: Missing imported translations use English; otherwise the original text is retained.
+  - code: "{\"locale\":\"fr-FR\",\"name\":\"Français\",\"messages\":{\"取消\":\"Annuler\"}}"
+  - button "Download language pack template"
+  - alert
+  - button "Annuler"
+  - button "Appliquer"

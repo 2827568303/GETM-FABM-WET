@@ -1,0 +1,27 @@
+﻿[js] {"note": "missing GdipCreateBitmapFromStream"}
+[js] {"note": "missing GdipLoadImageFromStream"}
+[js] {"note": "missing GdipCreateHBITMAPFromBitmap"}
+pid=53984
+[js-raw] {'type': 'error', 'description': 'RangeError: invalid array index', 'stack': 'RangeError: invalid array index\n    at slice (native)\n    at call (native)\n    at onEnter (/script1.js:8:67)', 'fileName': '/script1.js', 'lineNumber': 8, 'columnNumber': 67} None
+[js] {"f": "GetObjectW", "hr": "0x18"}
+[js-raw] {'type': 'error', 'description': 'RangeError: invalid array index', 'stack': 'RangeError: invalid array index\n    at slice (native)\n    at call (native)\n    at onEnter (/script1.js:8:67)', 'fileName': '/script1.js', 'lineNumber': 8, 'columnNumber': 67} None
+[js] {"f": "GetObjectW", "hr": "0x18"}
+[js-raw] {'type': 'error', 'description': 'RangeError: invalid array index', 'stack': 'RangeError: invalid array index\n    at slice (native)\n    at call (native)\n    at onEnter (/script1.js:8:67)', 'fileName': '/script1.js', 'lineNumber': 8, 'columnNumber': 67} None
+[js] {"f": "CreateStreamOnHGlobal", "hr": "0x0"}
+[js-raw] {'type': 'error', 'description': 'RangeError: invalid array index', 'stack': 'RangeError: invalid array index\n    at slice (native)\n    at call (native)\n    at onEnter (/script1.js:8:67)', 'fileName': '/script1.js', 'lineNumber': 8, 'columnNumber': 67} None
+[js-raw] {'type': 'error', 'description': 'RangeError: invalid array index', 'stack': 'RangeError: invalid array index\n    at slice (native)\n    at call (native)\n    at onEnter (/script1.js:8:67)', 'fileName': '/script1.js', 'lineNumber': 8, 'columnNumber': 67} None
+[js] {"f": "GetObjectW", "hr": "0x18"}
+[js-raw] {'type': 'error', 'description': 'RangeError: invalid array index', 'stack': 'RangeError: invalid array index\n    at slice (native)\n    at call (native)\n    at onEnter (/script1.js:8:67)', 'fileName': '/script1.js', 'lineNumber': 8, 'columnNumber': 67} None
+[js] {"f": "GetObjectW", "hr": "0x18"}
+[js-raw] {'type': 'error', 'description': 'RangeError: invalid array index', 'stack': 'RangeError: invalid array index\n    at slice (native)\n    at call (native)\n    at onEnter (/script1.js:8:67)', 'fileName': '/script1.js', 'lineNumber': 8, 'columnNumber': 67} None
+[js] {"f": "GetObjectW", "hr": "0x18"}
+[js] {"f": "OleLoadPictureEx", "hr": "0x0"}
+[js-raw] {'type': 'error', 'description': 'RangeError: invalid array index', 'stack': 'RangeError: invalid array index\n    at slice (native)\n    at call (native)\n    at onEnter (/script1.js:8:67)', 'fileName': '/script1.js', 'lineNumber': 8, 'columnNumber': 67} None
+[js] {"f": "OleTranslateColor", "hr": "0x0"}
+[js-raw] {'type': 'error', 'description': 'RangeError: invalid array index', 'stack': 'RangeError: invalid array index\n    at slice (native)\n    at call (native)\n    at onEnter (/script1.js:8:67)', 'fileName': '/script1.js', 'lineNumber': 8, 'columnNumber': 67} None
+[js] {"f": "OleTranslateColor", "hr": "0x0"}
+[js-raw] {'type': 'error', 'description': 'RangeError: invalid array index', 'stack': 'RangeError: invalid array index\n    at slice (native)\n    at call (native)\n    at onEnter (/script1.js:8:67)', 'fileName': '/script1.js', 'lineNumber': 8, 'columnNumber': 67} None
+[js] {"f": "OleTranslateColor", "hr": "0x0"}
+[ 4.06] CHILD pid=47004 EFDC_Explorer8.4.exe
+[ 4.06] CHILD pid=25184 WerFault.exe
+done

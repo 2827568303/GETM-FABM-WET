@@ -1,0 +1,7 @@
+﻿[js]      0 hooked rtcMsgBox
+[js]      0 no rtcMsgBoxVar
+[js]      0 no __vbaMsgBox
+[js]      0 diag25 ready
+pid 24480
+[js]     74 rtcMsgBox caller=EFDC_Explorer8.4.exe+0x41e340 text="\b"
+done

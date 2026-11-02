@@ -1,0 +1,118 @@
+﻿[js]      0 diag2 ready
+pid 33824
+[js]     25 CoCreate d54dc2720ad78b438a4298424b88afb8 from AudioDevProps2.dll+0x21283
+[js]     28 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]     29 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]     29 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]     29 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]     29 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]     29 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]     29 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]     29 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]     29 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]     29 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]     87 CoCreate f8dd2b17eaced1118b0500600806d9b6 from AudioDevProps2.dll+0x21283
+[js]     87 CoCreate 11f890453a1dd011891f00aa004b2e24 from AudioDevProps2.dll+0x21283
+[js]     87 CoCreate 05c44ccfc5e2dd4db3ce5e7582d8c9fa from AudioDevProps2.dll+0x21283
+[js]     87 CoCreate 05c44ccfc5e2dd4db3ce5e7582d8c9fa from AudioDevProps2.dll+0x21283
+[js]     87 CoCreate 05c44ccfc5e2dd4db3ce5e7582d8c9fa from AudioDevProps2.dll+0x21283
+[js]     87 CoCreate 05c44ccfc5e2dd4db3ce5e7582d8c9fa from AudioDevProps2.dll+0x21283
+[js]     87 CoCreate 05c44ccfc5e2dd4db3ce5e7582d8c9fa from AudioDevProps2.dll+0x21283
+[js]     92 CoCreate 2a03000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]     92 CoCreate 3903000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]     94 CoCreate 98664b6792eed011ad7100c04fd8fdff from AudioDevProps2.dll+0x21283
+[js]    100 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]    104 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[  1.01] CPU  10.9%
+[js]   1243 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1243 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1245 CoCreate f8dd2b17eaced1118b0500600806d9b6 from AudioDevProps2.dll+0x21283
+[js]   1245 CoCreate 11f890453a1dd011891f00aa004b2e24 from AudioDevProps2.dll+0x21283
+[js]   1245 CoCreate 05c44ccfc5e2dd4db3ce5e7582d8c9fa from AudioDevProps2.dll+0x21283
+[js]   1245 CoCreate 05c44ccfc5e2dd4db3ce5e7582d8c9fa from AudioDevProps2.dll+0x21283
+[js]   1245 CoCreate 05c44ccfc5e2dd4db3ce5e7582d8c9fa from AudioDevProps2.dll+0x21283
+[js]   1245 CoCreate 05c44ccfc5e2dd4db3ce5e7582d8c9fa from AudioDevProps2.dll+0x21283
+[js]   1247 CoCreate 05c44ccfc5e2dd4db3ce5e7582d8c9fa from AudioDevProps2.dll+0x21283
+[js]   1247 CoCreate 3903000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1248 CoCreate 98664b6792eed011ad7100c04fd8fdff from AudioDevProps2.dll+0x21283
+[js]   1249 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1250 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1294 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1295 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1317 CoCreate d54dc2720ad78b438a4298424b88afb8 from AudioDevProps2.dll+0x21283
+[js]   1317 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1317 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]   1317 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1317 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]   1317 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1321 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]   1321 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1321 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]   1321 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1321 CoCreate d54dc2720ad78b438a4298424b88afb8 from AudioDevProps2.dll+0x21283
+[js]   1321 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]   1321 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1321 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]   1321 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1325 CoCreate b0cd0622c119d11189e000c04fd7a829 from AudioDevProps2.dll+0x21283
+[js]   1329 CoCreate c0b0abec197fd211978e0000f8757e2a from AudioDevProps2.dll+0x21283
+[js]   1333 CoCreate d122b5c8f35cce11ade500aa0044773d from AudioDevProps2.dll+0x21283
+[js]   1333 CoCreate c0b0abec197fd211978e0000f8757e2a from AudioDevProps2.dll+0x21283
+[js]   1337 CoCreate cf22b5c8f35cce11ade500aa0044773d from AudioDevProps2.dll+0x21283
+[js]   1337 CoCreate 7150e3de6b50cf11b1aa00aa00b8de95 from AudioDevProps2.dll+0x21283
+[js]   1337 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]   1337 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1337 CoCreate 2096701379c2ce11a49e444553540000 from AudioDevProps2.dll+0x21283
+[js]   1342 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1346 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1346 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1346 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]   1346 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1348 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]   1348 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   1363 CoCreate 426bbaaf9256ea488141dc517dcf0ef1 from AudioDevProps2.dll+0x21283
+[js]   1363 CoCreate f4c28720ef2c5349a8ab66779b670495 from AudioDevProps2.dll+0x21283
+[js]   1367 CoCreate e2235c274737d0119fea00aa003f8646 from AudioDevProps2.dll+0x21283
+[  2.02] CPU  13.8%
+[  3.04] CPU   6.2%
+[js]   3681 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]   3681 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[js]   3684 CoCreate 01fe430d93f0cf11894000a0c9054228 from AudioDevProps2.dll+0x21283
+[js]   3684 CoCreate 4603000000000000c000000000000046 from AudioDevProps2.dll+0x21283
+[  4.05] CPU   3.1%
+[  5.06] CPU   0.0%
+[  6.07] CPU   0.0%
+[  7.07] CPU   0.0%
+[  8.07] CPU   0.0%
+[  9.08] CPU   0.0%
+[ 10.08] CPU   0.0%
+[ 11.08] CPU   0.0%
+[ 12.08] CPU   0.0%
+[ 13.09] CPU   0.0%
+[ 14.10] CPU   0.0%
+[ 15.11] CPU   0.0%
+[ 16.11] CPU   0.0%
+[ 17.12] CPU   0.0%
+[ 18.12] CPU   0.0%
+[ 19.13] CPU   0.0%
+[ 20.14] CPU   0.0%
+[ 21.15] CPU   0.0%
+[ 22.15] CPU   0.0%
+[ 23.16] CPU   0.0%
+[ 24.16] CPU   0.0%
+[ 25.17] CPU   0.0%
+[ 26.17] CPU   0.0%
+[ 27.17] CPU   0.0%
+[ 28.17] CPU   0.0%
+[ 29.18] CPU   0.0%
+[ 30.19] CPU   0.0%
+[ 31.20] CPU   0.0%
+[ 32.20] CPU   0.0%
+[ 33.21] CPU   0.0%
+[ 34.22] CPU   0.0%
+[ 35.22] CPU   0.0%
+[ 36.23] CPU   0.0%
+[ 37.23] CPU   0.0%
+[ 38.24] CPU   0.0%
+[ 39.24] CPU   0.0%
+done; leaving process alive

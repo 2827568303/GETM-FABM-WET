@@ -123,3 +123,7 @@ desktop.ini
 *.bak~
 *.orig
 .bak/
+/release/
+/build/
+/scripts/installer/tools/
+**/.studio-runtime*/

@@ -1,0 +1,20 @@
+﻿[js]      0 ready
+pid 8216
+[js]   2939 OPEN C:\WINDOWS\Microsoft.Net\assembly\GAC_MSIL\System.resources\v4.0_4.0.0.0_zh-Hans_b77a5c561934e089\System.resources.dll
+[js]   2939 OPEN C:\WINDOWS\Microsoft.Net\assembly\GAC_MSIL\System.resources\v4.0_4.0.0.0_zh-Hans_b77a5c561934e089\System.resources.dll
+[js]   2946 OPEN C:\WINDOWS\Microsoft.Net\assembly\GAC_MSIL\mscorlib.resources\v4.0_4.0.0.0_zh-Hans_b77a5c561934e089\mscorlib.resources.dll
+[js]   2946 OPEN C:\WINDOWS\Microsoft.Net\assembly\GAC_MSIL\mscorlib.resources\v4.0_4.0.0.0_zh-Hans_b77a5c561934e089\mscorlib.resources.dll
+[js]   3650 OPEN C:\Users\Public\DSI\EEMS8.3\DSILIC1.log
+[js]   3650 OPEN C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+[js]   3650 OPEN C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+[js]   3650 OPEN C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+[js]   3650 OPEN C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+[js]   3650 OPEN C:\Windows\SysWOW64\scrrun.dll
+[js]   3654 OPEN C:\Users\Public\DSI\EEMS8.3\EEMS.ini
+[js]   3657 OPEN C:\Windows\SysWOW64\scrrun.dll
+[js]   3659 OPEN C:\Users\Public\DSI\EEMS8.3\EEMS.ini
+[js]   3661 OPEN C:\Users\23801\AppData\Local\Temp\\~DF56C66B0E13F79C8B.TMP
+[js]   3663 OPEN C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+[js]   3663 OPEN C:\Users\Public\DSI\EEMS8.4\ee_activation.log
+PROCESS EXITED code=0 at 4.1s
+elapsed=4.1

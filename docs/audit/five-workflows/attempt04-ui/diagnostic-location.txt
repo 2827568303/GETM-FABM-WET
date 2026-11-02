@@ -1,0 +1,4 @@
+{
+  "label": "domain.check_cfl",
+  "value": ".false."
+}

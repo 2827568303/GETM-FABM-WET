@@ -1,0 +1,16 @@
+﻿pid=47256 exe=C:\EFDC84_RUN\EFDC_Explorer8.4.exe
+[ 0.12] WIN hwnd=0x22100B4 cls=VBMsoStdCompMgr      title=''                           vis=0 rect=(0, 0, 0, 0)
+[ 0.12] WIN hwnd=0x30171120 cls=ThunderRT6Main       title='EFDC_Explorer8.4'           vis=1 rect=(853, 533, 853, 533)
+[ 0.12] WIN hwnd=0xA0478 cls=IME                  title='Default IME'                vis=0 rect=(0, 0, 0, 0)
+[ 2.75] WIN hwnd=0x18FC13B4 cls=ThunderRT6FormDC     title='Activation Wizard'          vis=1 rect=(532, 289, 1175, 778)
+[ 2.75] WIN hwnd=0x1913AC cls=CtlFrameWork_Parking title=''                           vis=0 rect=(0, 0, 0, 0)
+[ 2.88] WIN hwnd=0xB0484 cls=msvb_lib_tooltips    title=''                           vis=0 rect=(26, 26, 1306, 797)
+[ 4.02] shot ThunderRT6FormDC hwnd=0x18FC13B4 Activation Wizard (643, 489)
+[ 5.55] shot ThunderRT6FormDC hwnd=0x18FC13B4 Activation Wizard (643, 489)
+[ 7.06] shot ThunderRT6FormDC hwnd=0x18FC13B4 Activation Wizard (643, 489)
+[ 8.61] shot ThunderRT6FormDC hwnd=0x18FC13B4 Activation Wizard (643, 489)
+[10.01] shot ThunderRT6FormDC hwnd=0x18FC13B4 Activation Wizard (643, 489)
+[11.50] shot ThunderRT6FormDC hwnd=0x18FC13B4 Activation Wizard (643, 489)
+[13.02] shot ThunderRT6FormDC hwnd=0x18FC13B4 Activation Wizard (643, 489)
+[14.55] shot ThunderRT6FormDC hwnd=0x18FC13B4 Activation Wizard (643, 489)
+still running -> kill

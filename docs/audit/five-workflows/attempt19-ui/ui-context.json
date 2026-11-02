@@ -1,0 +1,8 @@
+{
+  "version": "b9ef466e4da4597069baa06ab6814cbdb139294721722b3a65e3858f6e931763",
+  "seed": 2026101601,
+  "intended_model_root": "C:\\Users\\23801\\Desktop\\GETM-FABM-WET-260928\\build\\full-workflow-20261016-attempt19\\external\\3DWET",
+  "intended_case": "UI_2026101601",
+  "description": "Fresh point bathymetry and drivers; UI evidence only counts when every required group is observed",
+  "ui_checks_completed": []
+}

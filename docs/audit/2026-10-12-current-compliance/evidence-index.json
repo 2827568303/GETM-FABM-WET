@@ -1,0 +1,121 @@
+{
+  "files": [
+    {
+      "path": ".trae/documents/3DWET_GUI_完成方案.md",
+      "bytes": 15113,
+      "sha256": "d69488b2a39831c666d153b812f3470dec5bc90fbbb68f046ea7d14ef1751319"
+    },
+    {
+      "path": ".trae/documents/preprocess_redesign.md",
+      "bytes": 10059,
+      "sha256": "8d192f6e799efc684b9409e4eed47047f7ce0852ea29ad15dd6984dcf6855599"
+    },
+    {
+      "path": "姚杨杰/GETM-FABM-WET_3DWET模型完整说明.docx",
+      "bytes": 201436,
+      "sha256": "5a47265639702ea494decf39a4c906a5f509c824fa28d617a362477a7eddc23f"
+    },
+    {
+      "path": "release/installer-manifest.json",
+      "bytes": 1579,
+      "sha256": "75716fe48757f10d69cc4dba6d4eb1fa662ffa62956f79f9ddf05b6fcd517ea2"
+    },
+    {
+      "path": "release/3DWETStudio-Setup.exe",
+      "bytes": 281324378,
+      "sha256": "66edf7de1681a9cfd64852c96bbf7836e7c29508f5ac3d294924fbb1b75c0952"
+    },
+    {
+      "path": "3DWET/bin/getm_cartesian.exe",
+      "bytes": 5317304,
+      "sha256": "f06a7219490a9d160f72c18788db463fe9cf1ec4881b0b0c52141d8762e65e8a"
+    },
+    {
+      "path": "build/native-restart-fix/getm_cartesian.exe",
+      "bytes": 5351077,
+      "sha256": "15884cc236ef8526cd28f51dde491e95d6bd87a0f340c291bcce10aa8bbdf9e4"
+    },
+    {
+      "path": "build/builtin-restart-candidate-20261012-01/3DWET/bin/getm_cartesian.exe",
+      "bytes": 5351077,
+      "sha256": "54ad5ac9e352aa678e420e93c138c3d7679cbe2f2284a2509a6b07b1dfb48bf6"
+    },
+    {
+      "path": "build/builtin-restart-candidate-20261012-01/verification.json",
+      "bytes": 8494645,
+      "sha256": "b519144e79aef0f5d4a62e360393fea09334df8cda13f8105fb1576e91b5c3a9"
+    },
+    {
+      "path": "build/external-candidate-20261012-01/verification.json",
+      "bytes": 1799028,
+      "sha256": "27244ba7ee2d66a0bedfb920d07127d4c88eaf7a7935fb5da013a165de1cedde"
+    },
+    {
+      "path": "build/external-polygon-20261012-01/verification.json",
+      "bytes": 1808128,
+      "sha256": "8cb1ff377470f7d5eaabd5e9e55ea7497d343b646c592834ed320f89581ea0bc"
+    },
+    {
+      "path": "build/external-drafts-20261012-01/verification.json",
+      "bytes": 1810580,
+      "sha256": "419927e2c66ddb816d697b37a970955b21df04f66926088fa58bc3dc38be665f"
+    },
+    {
+      "path": "3DWET/app/server.py",
+      "bytes": 327451,
+      "sha256": "ddfbac0f8dc36b2d8a2e96a8de4e04d17ed947d2b588fc852188ae1ee75ca057"
+    },
+    {
+      "path": "3DWET/app/static/js/app.js",
+      "bytes": 185902,
+      "sha256": "261c08672fa6bdd93e9fce3cae8c581241163b41c6c5656a741126e6baee867e"
+    },
+    {
+      "path": "3DWET/app/static/js/i18n.js",
+      "bytes": 18823,
+      "sha256": "34a440e74944a5b8887ff64380699825cde7004ce7b1ffcbd465cbb09f947511"
+    },
+    {
+      "path": "3DWET/app/static/js/view_controls.js",
+      "bytes": 15654,
+      "sha256": "5e121cc51b06c479cb0e88325b45972b3267c5155bf6ed31d1cd3d810bfb6704"
+    },
+    {
+      "path": "3DWET/app/templates/index.html",
+      "bytes": 103753,
+      "sha256": "8ee257e8f363abd3b4c15a45e7c4edc0df7219f212f5a9647f34891259adab99"
+    }
+  ],
+  "staged_comparison": [
+    {
+      "file": "app/server.py",
+      "staged_exists": false,
+      "matches_current": false
+    },
+    {
+      "file": "app/static/js/app.js",
+      "staged_exists": false,
+      "matches_current": false
+    },
+    {
+      "file": "app/static/js/view_controls.js",
+      "staged_exists": false,
+      "matches_current": false
+    },
+    {
+      "file": "app/static/js/i18n.js",
+      "staged_exists": false,
+      "matches_current": false
+    },
+    {
+      "file": "app/templates/index.html",
+      "staged_exists": false,
+      "matches_current": false
+    },
+    {
+      "file": "bin/getm_cartesian.exe",
+      "staged_exists": true,
+      "matches_current": true
+    }
+  ]
+}

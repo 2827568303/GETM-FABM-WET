@@ -1,0 +1,9 @@
+﻿[js]      0 raiser hook fail Error: unable to intercept function at 61C284A7; please file a bug
+[js]      0 SoftModalMessageBox replaced (�Զ��� OK)
+[js]      0 diag22 ready
+pid 42752
+[js]   6616 SoftModal caller=USER32.DLL+0xa9a82 text="There is an error when checking the license. Error 481 (Invalid picture)"
+[js]   6625   chain: USER32.DLL+0xa9a82 <- ntdll.dll+0x40c3e <- ntdll.dll+0x924e6 <- ntdll.dll+0x92677 <- ntdll.dll+0x66611 <- USER32.DLL+0xccf01 <- USER32.DLL+0xaa1d1 <- USER32.DLL+0xaa22b <- MSVBVM60.DLL+0xb7da4 <- MSVBVM60.DLL+0xb7c20 <- MSVBVM60.DLL+0xb7f1b <- MSVBVM60.DLL+0xb2b23 <- MSVBVM60.DLL+0xee7aa <- MSVBVM60.DLL+0xee366
+[js]   6625   [swallowed] SoftModalMessageBox
+alive True
+done

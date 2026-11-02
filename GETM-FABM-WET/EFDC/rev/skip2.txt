@@ -1,0 +1,4 @@
+﻿[js]      0 diag36 ready
+pid 53536
+[js]     31 skip CheckLicensing
+elapsed=16.2

@@ -1,0 +1,17 @@
+﻿powershell : Split-Path : Cannot bind argument to parameter 'Path' because it is null.
+所在位置 行:1 字符: 198
++ ... -WET\EFDC'; powershell -NoProfile -ExecutionPolicy Bypass -File .\rev ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Split-Path : Ca...use it is null.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+At C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\allwins.ps1:15 char:65
++ ... art-Process -FilePath $exe -WorkingDirectory (Split-Path $exe) -PassT ...
++                                                              ~~~~
+    + CategoryInfo          : InvalidData: (:) [Split-Path], ParameterBindingValidationException
+    + FullyQualifiedErrorId : ParameterArgumentValidationErrorNullNotAllowed,Microsoft.PowerShell.Commands.SplitPathCo 
+   mmand
+ 
+pid=
+total windows: 0
+alive=True

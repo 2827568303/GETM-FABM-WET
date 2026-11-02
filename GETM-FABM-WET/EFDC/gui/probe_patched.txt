@@ -1,0 +1,541 @@
+﻿pid=33816
+
+=== t3000 : 16 threads, 34 modules ===
+[ 3.19] CHILD pid=58680 EFDC_Explorer8.4.exe
+[ 3.19] CHILD pid=56976 WerFault.exe
+  tid=55032 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] KERNELBASE.dll+0x15f4d8
+      bt[2] KERNEL32.DLL+0x6cf56
+      bt[3] KERNEL32.DLL+0x6cb43
+      bt[4] KERNEL32.DLL+0x39799
+      bt[5] KERNELBASE.dll+0x259d5b
+      bt[6] ntdll.dll+0x4e1fe
+      bt[7] ntdll.dll+0x6dd4b
+      bt[8] ntdll.dll+0x6df00
+      bt[9] MSVBVM60.DLL+0x86515
+      bt[10] ntdll.dll+0xb61e2
+      bt[11] ntdll.dll+0xb61b4
+      bt[12] ntdll.dll+0x6dc53
+      bt[13] MSVBVM60.DLL+0x3d5e7
+      stack-scan(40): KERNELBASE.dll+0x15f67f, KERNELBASE.dll+0x172f70, KERNELBASE.dll+0x15f4d8, KERNEL32.DLL+0x6cf56, KERNEL32.DLL+0x1dff0, KERNEL32.DLL+0x6cb43, KERNEL32.DLL+0x39799, KERNELBASE.dll+0x259d5b, MSVBVM60.DLL+0x2b100, KERNEL32.DLL+0x0, ntdll.dll+0x4e1fe, MSVBVM60.DLL+0xf7c50, ntdll.dll+0x6dd4b, ntdll.dll+0x6df00, KERNELBASE.dll+0x172f70, MSVBVM60.DLL+0x86515, MSVBVM60.DLL+0xf7c9b, ntdll.dll+0xb61e2, ntdll.dll+0xb6200, ntdll.dll+0xb61b4, MSVBVM60.DLL+0xf7c50, ntdll.dll+0x6dc53, MSVBVM60.DLL+0xf7c50, MSVBVM60.DLL+0x3d5e7, ntdll.dll+0x7a62f, MSVBVM60.DLL+0x2d08, MSVBVM60.DLL+0x3d5e7, EFDC_Explorer8.4.exe+0xc0137f, ntdll.dll+0x924e6, MSVBVM60.DLL+0x2d08
+  tid=49100 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(13): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, ntdll.dll+0x7a6b0, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=49248 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(13): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, ntdll.dll+0x7a6b0, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=42192 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(15): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, ntdll.dll+0x7a6b0, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0x640003, EFDC_Explorer8.4.exe+0xf10011
+  tid=42108 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] 0x73f9c490
+      bt[2] ntdll.dll+0x40ee2
+      bt[3] ntdll.dll+0x40737
+      bt[4] ntdll.dll+0x924e6
+      bt[5] 0x73f9c64f
+      bt[6] ntdll.dll+0x95f9e
+      bt[7] 0x73f9c5a1
+      bt[8] 0x73f9c490
+      bt[9] 0x73f9c490
+      bt[10] 0x73f9c4dd
+      bt[11] 0x73f9c490
+      bt[12] 0x73f9c490
+      bt[13] 0x74480438
+      stack-scan(13): KERNELBASE.dll+0x15f67f, ntdll.dll+0x7a6b0, ntdll.dll+0x40ee2, ntdll.dll+0x40737, ntdll.dll+0x924e6, KERNELBASE.dll+0x172f70, ntdll.dll+0x95f9e, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341
+  tid=32232 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] ntdll.dll+0x7826c
+      bt[2] KERNELBASE.dll+0x15e808
+      bt[3] 0x73ebdfcd
+      bt[4] 0x73ebdfe7
+      bt[5] combase.dll+0xe1c75
+      bt[6] 0x744996c0
+      bt[7] 0x73ebdfe7
+      bt[8] 0x73ebe014
+      bt[9] 0x73ebdf99
+      bt[10] 0x73ebdf9e
+      bt[11] 0x73ecea69
+      bt[12] 0x73ed07cf
+      bt[13] 0x73ec3b84
+      stack-scan(15): KERNELBASE.dll+0x15f67f, EFDC_Explorer8.4.exe+0xa672, ntdll.dll+0x7826c, KERNELBASE.dll+0x15e808, KERNELBASE.dll+0x172f70, combase.dll+0xe1c75, EFDC_Explorer8.4.exe+0xa672, KERNELBASE.dll+0x172f70, ntdll.dll+0x61160, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341
+  tid=22468 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] ntdll.dll+0xb154b
+      bt[2] ntdll.dll+0x95f9e
+      bt[3] ntdll.dll+0x51719
+      bt[4] ntdll.dll+0x5117a
+      bt[5] ntdll.dll+0x515cc
+      bt[6] ntdll.dll+0x79e6c
+      bt[7] KERNELBASE.dll+0x16b996
+      bt[8] KERNELBASE.dll+0x16b9ac
+      bt[9] combase.dll+0xe7b77
+      bt[10] combase.dll+0x14029b
+      bt[11] combase.dll+0x13f895
+      bt[12] combase.dll+0x13f81a
+      bt[13] combase.dll+0x144d4f
+      stack-scan(40): KERNELBASE.dll+0x15f67f, EFDC_Explorer8.4.exe+0x62a6d6, ntdll.dll+0x0, ntdll.dll+0x0, ntdll.dll+0x80c30, ntdll.dll+0xb154b, ntdll.dll+0x95f9e, ntdll.dll+0x51719, ntdll.dll+0x5117a, ntdll.dll+0x515cc, ntdll.dll+0x79e6c, KERNELBASE.dll+0x16b996, KERNELBASE.dll+0x16b9ac, EFDC_Explorer8.4.exe+0x62a6d6, KERNELBASE.dll+0x172f70, combase.dll+0xe7b77, combase.dll+0x14029b, combase.dll+0x25b2a0, combase.dll+0x25b2a0, combase.dll+0x13f895, combase.dll+0x25b2a0, combase.dll+0x25b2a0, combase.dll+0x13f81a, combase.dll+0x144d4f, ntdll.dll+0x78efc, KERNELBASE.dll+0x16bf40, KERNELBASE.dll+0x16bf53, ntdll.dll+0x95f9e, combase.dll+0xeacb3, combase.dll+0xeac60
+  tid=26316 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(12): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=42852 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      bt[4] EFDC_Explorer8.4.exe+0x230261
+      bt[5] EFDC_Explorer8.4.exe+0x290321
+      bt[6] EFDC_Explorer8.4.exe+0x2d03a1
+      stack-scan(40): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0x81, EFDC_Explorer8.4.exe+0x10089, EFDC_Explorer8.4.exe+0x20091, EFDC_Explorer8.4.exe+0x30099, EFDC_Explorer8.4.exe+0x400a1, EFDC_Explorer8.4.exe+0x500a9, EFDC_Explorer8.4.exe+0x600b1, EFDC_Explorer8.4.exe+0x700b9, EFDC_Explorer8.4.exe+0x800c1, EFDC_Explorer8.4.exe+0x900c9, EFDC_Explorer8.4.exe+0xa00d1, EFDC_Explorer8.4.exe+0xb00d9, EFDC_Explorer8.4.exe+0xc00e1, EFDC_Explorer8.4.exe+0xd00e9, EFDC_Explorer8.4.exe+0xe00f1, EFDC_Explorer8.4.exe+0xf00f9, EFDC_Explorer8.4.exe+0x100101, EFDC_Explorer8.4.exe+0x110111
+  tid=55136 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] ntdll.dll+0xb154b
+      bt[2] ntdll.dll+0x323b9
+      bt[3] ntdll.dll+0x95f9e
+      bt[4] ntdll.dll+0x4e1fe
+      bt[5] ntdll.dll+0x95f9e
+      bt[6] ntdll.dll+0x41ccf
+      bt[7] ntdll.dll+0x78efc
+      bt[8] KERNELBASE.dll+0x16bf40
+      bt[9] ntdll.dll+0x79e6c
+      bt[10] KERNELBASE.dll+0x16b996
+      bt[11] KERNELBASE.dll+0x16b9ac
+      bt[12] 0x5fe34b11
+      bt[13] 0x5fe43a3b
+      stack-scan(21): KERNELBASE.dll+0x15f67f, ntdll.dll+0xb154b, EFDC_Explorer8.4.exe+0x22867c, ntdll.dll+0x323b9, ntdll.dll+0x0, ntdll.dll+0x95f9e, ntdll.dll+0x4e1fe, ntdll.dll+0x95f9e, ntdll.dll+0x41ccf, ntdll.dll+0x78efc, KERNELBASE.dll+0x16bf40, ntdll.dll+0x79e6c, KERNELBASE.dll+0x16b996, KERNELBASE.dll+0x16b9ac, KERNELBASE.dll+0x172f70, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341
+  tid=45240 running  eip=0x7762858c (ntdll.dll+0x7858c) 
+      bt[0] ntdll.dll+0x93dc9
+      bt[1] KERNELBASE.dll+0x16a1f0
+      bt[2] KERNELBASE.dll+0x16a18f
+      bt[3] 0x60ade067
+      bt[4] 0x60ade2fd
+      bt[5] ntdll.dll+0x57c47
+      bt[6] ntdll.dll+0x57cf9
+      bt[7] ntdll.dll+0x5530b
+      bt[8] KERNEL32.DLL+0x15d49
+      bt[9] ntdll.dll+0x6c75b
+      bt[10] ntdll.dll+0x6c6e1
+      stack-scan(19): ntdll.dll+0x93dc9, KERNELBASE.dll+0x16a1f0, KERNELBASE.dll+0x172f70, KERNELBASE.dll+0x16a18f, ntdll.dll+0x57c47, ntdll.dll+0x57cf9, ntdll.dll+0x5530b, ntdll.dll+0x54d70, ntdll.dll+0x54d70, ntdll.dll+0x57c80, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=51544 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(12): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=39148 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      bt[4] EFDC_Explorer8.4.exe+0xc1d922
+      stack-scan(13): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc1d922
+  tid=37760 running  eip=0x7762858c (ntdll.dll+0x7858c) 
+      bt[0] ntdll.dll+0x93dc9
+      bt[1] KERNELBASE.dll+0x16a1f0
+      bt[2] KERNELBASE.dll+0x16a236
+      bt[3] 0x73fe4c77
+      bt[4] 0x73f7d06f
+      bt[5] 0x73f56021
+      bt[6] ntdll.dll+0x7830c
+      bt[7] 0x73fe4b8a
+      bt[8] KERNEL32.DLL+0x15d49
+      bt[9] ntdll.dll+0x6c75b
+      bt[10] ntdll.dll+0x6c6e1
+      stack-scan(12): ntdll.dll+0x93dc9, KERNELBASE.dll+0x16a1f0, KERNELBASE.dll+0x16a236, KERNELBASE.dll+0x172f70, ntdll.dll+0x7830c, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, EFDC_Explorer8.4.exe+0xc06e62
+  tid=3504 running  eip=0x7762826c (ntdll.dll+0x7826c) 
+      bt[0] KERNELBASE.dll+0x15e808
+      bt[1] KERNELBASE.dll+0x15e844
+      bt[2] 0x6e0f76a1
+      bt[3] KERNEL32.DLL+0x15d49
+      bt[4] ntdll.dll+0x6c75b
+      bt[5] ntdll.dll+0x6c6e1
+      bt[6] EFDC_Explorer8.4.exe+0x34006f
+      stack-scan(17): KERNELBASE.dll+0x15e808, KERNELBASE.dll+0x15e844, KERNELBASE.dll+0x172f70, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, EFDC_Explorer8.4.exe+0x2f0052, EFDC_Explorer8.4.exe+0x34006f, EFDC_Explorer8.4.exe+0x50020, EFDC_Explorer8.4.exe+0x34006e, EFDC_Explorer8.4.exe+0x390072, EFDC_Explorer8.4.exe+0x4bc2eb, EFDC_Explorer8.4.exe+0x4bc2eb, EFDC_Explorer8.4.exe+0x7adbf3
+  tid=26808 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] KERNELBASE.dll+0x15f53e
+      bt[2] EFDC_Explorer8.4.exe+0xac3f57
+      bt[3] 0x73ec42c5
+      bt[4] 0x73ec4112
+      bt[5] 0x73ec4184
+      bt[6] ntdll.dll+0x95f9e
+      bt[7] 0x73ee4720
+      bt[8] 0x73ee471b
+      bt[9] 0x73f7bfa4
+      bt[10] 0x73f7bb9b
+      bt[11] ntdll.dll+0x51719
+      bt[12] 0x73eb3360
+      bt[13] 0x73f7bc75
+      stack-scan(24): KERNELBASE.dll+0x15f67f, KERNELBASE.dll+0x15f53e, EFDC_Explorer8.4.exe+0xac3f57, EFDC_Explorer8.4.exe+0x20117a, ntdll.dll+0x95f9e, KERNELBASE.dll+0x172f70, ntdll.dll+0x51719, ntdll.dll+0x392ec, ntdll.dll+0x95f9e, ntdll.dll+0x137354, ntdll.dll+0x95f9e, ntdll.dll+0x1381e0, ntdll.dll+0x51719, ntdll.dll+0x40ee2, ntdll.dll+0x92677, EFDC_Explorer8.4.exe+0xcee642, KERNELBASE.dll+0x14dc41, KERNEL32.DLL+0x1b330, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341
+
+=== t6000 : 16 threads, 34 modules ===
+  tid=55032 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] KERNELBASE.dll+0x15f4d8
+      bt[2] KERNEL32.DLL+0x6cf56
+      bt[3] KERNEL32.DLL+0x6cb43
+      bt[4] KERNEL32.DLL+0x39799
+      bt[5] KERNELBASE.dll+0x259d5b
+      bt[6] ntdll.dll+0x4e1fe
+      bt[7] ntdll.dll+0x6dd4b
+      bt[8] ntdll.dll+0x6df00
+      bt[9] MSVBVM60.DLL+0x86515
+      bt[10] ntdll.dll+0xb61e2
+      bt[11] ntdll.dll+0xb61b4
+      bt[12] ntdll.dll+0x6dc53
+      bt[13] MSVBVM60.DLL+0x3d5e7
+      stack-scan(40): KERNELBASE.dll+0x15f67f, KERNELBASE.dll+0x172f70, KERNELBASE.dll+0x15f4d8, KERNEL32.DLL+0x6cf56, KERNEL32.DLL+0x1dff0, KERNEL32.DLL+0x6cb43, KERNEL32.DLL+0x39799, KERNELBASE.dll+0x259d5b, MSVBVM60.DLL+0x2b100, KERNEL32.DLL+0x0, ntdll.dll+0x4e1fe, MSVBVM60.DLL+0xf7c50, ntdll.dll+0x6dd4b, ntdll.dll+0x6df00, KERNELBASE.dll+0x172f70, MSVBVM60.DLL+0x86515, MSVBVM60.DLL+0xf7c9b, ntdll.dll+0xb61e2, ntdll.dll+0xb6200, ntdll.dll+0xb61b4, MSVBVM60.DLL+0xf7c50, ntdll.dll+0x6dc53, MSVBVM60.DLL+0xf7c50, MSVBVM60.DLL+0x3d5e7, ntdll.dll+0x7a62f, MSVBVM60.DLL+0x2d08, MSVBVM60.DLL+0x3d5e7, EFDC_Explorer8.4.exe+0xc0137f, ntdll.dll+0x924e6, MSVBVM60.DLL+0x2d08
+  tid=49100 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(13): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, ntdll.dll+0x7a6b0, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=49248 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(13): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, ntdll.dll+0x7a6b0, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=42192 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(15): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, ntdll.dll+0x7a6b0, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0x640003, EFDC_Explorer8.4.exe+0xf10011
+  tid=42108 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] 0x73f9c490
+      bt[2] ntdll.dll+0x40ee2
+      bt[3] ntdll.dll+0x40737
+      bt[4] ntdll.dll+0x924e6
+      bt[5] 0x73f9c64f
+      bt[6] ntdll.dll+0x95f9e
+      bt[7] 0x73f9c5a1
+      bt[8] 0x73f9c490
+      bt[9] 0x73f9c490
+      bt[10] 0x73f9c4dd
+      bt[11] 0x73f9c490
+      bt[12] 0x73f9c490
+      bt[13] 0x74480438
+      stack-scan(13): KERNELBASE.dll+0x15f67f, ntdll.dll+0x7a6b0, ntdll.dll+0x40ee2, ntdll.dll+0x40737, ntdll.dll+0x924e6, KERNELBASE.dll+0x172f70, ntdll.dll+0x95f9e, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341
+  tid=32232 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] ntdll.dll+0x7826c
+      bt[2] KERNELBASE.dll+0x15e808
+      bt[3] 0x73ebdfcd
+      bt[4] 0x73ebdfe7
+      bt[5] combase.dll+0xe1c75
+      bt[6] 0x744996c0
+      bt[7] 0x73ebdfe7
+      bt[8] 0x73ebe014
+      bt[9] 0x73ebdf99
+      bt[10] 0x73ebdf9e
+      bt[11] 0x73ecea69
+      bt[12] 0x73ed07cf
+      bt[13] 0x73ec3b84
+      stack-scan(15): KERNELBASE.dll+0x15f67f, EFDC_Explorer8.4.exe+0xa672, ntdll.dll+0x7826c, KERNELBASE.dll+0x15e808, KERNELBASE.dll+0x172f70, combase.dll+0xe1c75, EFDC_Explorer8.4.exe+0xa672, KERNELBASE.dll+0x172f70, ntdll.dll+0x61160, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341
+  tid=22468 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] ntdll.dll+0xb154b
+      bt[2] ntdll.dll+0x95f9e
+      bt[3] ntdll.dll+0x51719
+      bt[4] ntdll.dll+0x5117a
+      bt[5] ntdll.dll+0x515cc
+      bt[6] ntdll.dll+0x79e6c
+      bt[7] KERNELBASE.dll+0x16b996
+      bt[8] KERNELBASE.dll+0x16b9ac
+      bt[9] combase.dll+0xe7b77
+      bt[10] combase.dll+0x14029b
+      bt[11] combase.dll+0x13f895
+      bt[12] combase.dll+0x13f81a
+      bt[13] combase.dll+0x144d4f
+      stack-scan(40): KERNELBASE.dll+0x15f67f, EFDC_Explorer8.4.exe+0x62a6d6, ntdll.dll+0x0, ntdll.dll+0x0, ntdll.dll+0x80c30, ntdll.dll+0xb154b, ntdll.dll+0x95f9e, ntdll.dll+0x51719, ntdll.dll+0x5117a, ntdll.dll+0x515cc, ntdll.dll+0x79e6c, KERNELBASE.dll+0x16b996, KERNELBASE.dll+0x16b9ac, EFDC_Explorer8.4.exe+0x62a6d6, KERNELBASE.dll+0x172f70, combase.dll+0xe7b77, combase.dll+0x14029b, combase.dll+0x25b2a0, combase.dll+0x25b2a0, combase.dll+0x13f895, combase.dll+0x25b2a0, combase.dll+0x25b2a0, combase.dll+0x13f81a, combase.dll+0x144d4f, ntdll.dll+0x78efc, KERNELBASE.dll+0x16bf40, KERNELBASE.dll+0x16bf53, ntdll.dll+0x95f9e, combase.dll+0xeacb3, combase.dll+0xeac60
+  tid=26316 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(12): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=42852 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      bt[4] EFDC_Explorer8.4.exe+0x230261
+      bt[5] EFDC_Explorer8.4.exe+0x290321
+      bt[6] EFDC_Explorer8.4.exe+0x2d03a1
+      stack-scan(40): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0x81, EFDC_Explorer8.4.exe+0x10089, EFDC_Explorer8.4.exe+0x20091, EFDC_Explorer8.4.exe+0x30099, EFDC_Explorer8.4.exe+0x400a1, EFDC_Explorer8.4.exe+0x500a9, EFDC_Explorer8.4.exe+0x600b1, EFDC_Explorer8.4.exe+0x700b9, EFDC_Explorer8.4.exe+0x800c1, EFDC_Explorer8.4.exe+0x900c9, EFDC_Explorer8.4.exe+0xa00d1, EFDC_Explorer8.4.exe+0xb00d9, EFDC_Explorer8.4.exe+0xc00e1, EFDC_Explorer8.4.exe+0xd00e9, EFDC_Explorer8.4.exe+0xe00f1, EFDC_Explorer8.4.exe+0xf00f9, EFDC_Explorer8.4.exe+0x100101, EFDC_Explorer8.4.exe+0x110111
+  tid=55136 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] ntdll.dll+0xb154b
+      bt[2] ntdll.dll+0x323b9
+      bt[3] ntdll.dll+0x95f9e
+      bt[4] ntdll.dll+0x4e1fe
+      bt[5] ntdll.dll+0x95f9e
+      bt[6] ntdll.dll+0x41ccf
+      bt[7] ntdll.dll+0x78efc
+      bt[8] KERNELBASE.dll+0x16bf40
+      bt[9] ntdll.dll+0x79e6c
+      bt[10] KERNELBASE.dll+0x16b996
+      bt[11] KERNELBASE.dll+0x16b9ac
+      bt[12] 0x5fe34b11
+      bt[13] 0x5fe43a3b
+      stack-scan(21): KERNELBASE.dll+0x15f67f, ntdll.dll+0xb154b, EFDC_Explorer8.4.exe+0x22867c, ntdll.dll+0x323b9, ntdll.dll+0x0, ntdll.dll+0x95f9e, ntdll.dll+0x4e1fe, ntdll.dll+0x95f9e, ntdll.dll+0x41ccf, ntdll.dll+0x78efc, KERNELBASE.dll+0x16bf40, ntdll.dll+0x79e6c, KERNELBASE.dll+0x16b996, KERNELBASE.dll+0x16b9ac, KERNELBASE.dll+0x172f70, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341
+  tid=45240 running  eip=0x7762858c (ntdll.dll+0x7858c) 
+      bt[0] ntdll.dll+0x93dc9
+      bt[1] KERNELBASE.dll+0x16a1f0
+      bt[2] KERNELBASE.dll+0x16a18f
+      bt[3] 0x60ade067
+      bt[4] 0x60ade2fd
+      bt[5] ntdll.dll+0x57c47
+      bt[6] ntdll.dll+0x57cf9
+      bt[7] ntdll.dll+0x5530b
+      bt[8] KERNEL32.DLL+0x15d49
+      bt[9] ntdll.dll+0x6c75b
+      bt[10] ntdll.dll+0x6c6e1
+      stack-scan(19): ntdll.dll+0x93dc9, KERNELBASE.dll+0x16a1f0, KERNELBASE.dll+0x172f70, KERNELBASE.dll+0x16a18f, ntdll.dll+0x57c47, ntdll.dll+0x57cf9, ntdll.dll+0x5530b, ntdll.dll+0x54d70, ntdll.dll+0x54d70, ntdll.dll+0x57c80, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=51544 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(12): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=39148 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      bt[4] EFDC_Explorer8.4.exe+0xc1d922
+      stack-scan(13): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc1d922
+  tid=37760 running  eip=0x7762858c (ntdll.dll+0x7858c) 
+      bt[0] ntdll.dll+0x93dc9
+      bt[1] KERNELBASE.dll+0x16a1f0
+      bt[2] KERNELBASE.dll+0x16a236
+      bt[3] 0x73fe4c77
+      bt[4] 0x73f7d06f
+      bt[5] 0x73f56021
+      bt[6] ntdll.dll+0x7830c
+      bt[7] 0x73fe4b8a
+      bt[8] KERNEL32.DLL+0x15d49
+      bt[9] ntdll.dll+0x6c75b
+      bt[10] ntdll.dll+0x6c6e1
+      stack-scan(12): ntdll.dll+0x93dc9, KERNELBASE.dll+0x16a1f0, KERNELBASE.dll+0x16a236, KERNELBASE.dll+0x172f70, ntdll.dll+0x7830c, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, EFDC_Explorer8.4.exe+0xc06e62
+  tid=3504 running  eip=0x7762826c (ntdll.dll+0x7826c) 
+      bt[0] KERNELBASE.dll+0x15e808
+      bt[1] KERNELBASE.dll+0x15e844
+      bt[2] 0x6e0f76a1
+      bt[3] KERNEL32.DLL+0x15d49
+      bt[4] ntdll.dll+0x6c75b
+      bt[5] ntdll.dll+0x6c6e1
+      bt[6] EFDC_Explorer8.4.exe+0x34006f
+      stack-scan(17): KERNELBASE.dll+0x15e808, KERNELBASE.dll+0x15e844, KERNELBASE.dll+0x172f70, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, EFDC_Explorer8.4.exe+0x2f0052, EFDC_Explorer8.4.exe+0x34006f, EFDC_Explorer8.4.exe+0x50020, EFDC_Explorer8.4.exe+0x34006e, EFDC_Explorer8.4.exe+0x390072, EFDC_Explorer8.4.exe+0x4bc2eb, EFDC_Explorer8.4.exe+0x4bc2eb, EFDC_Explorer8.4.exe+0x7adbf3
+  tid=26808 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] KERNELBASE.dll+0x15f53e
+      bt[2] EFDC_Explorer8.4.exe+0xac3f57
+      bt[3] 0x73ec42c5
+      bt[4] 0x73ec4112
+      bt[5] 0x73ec4184
+      bt[6] ntdll.dll+0x95f9e
+      bt[7] 0x73ee4720
+      bt[8] 0x73ee471b
+      bt[9] 0x73f7bfa4
+      bt[10] 0x73f7bb9b
+      bt[11] ntdll.dll+0x51719
+      bt[12] 0x73eb3360
+      bt[13] 0x73f7bc75
+      stack-scan(24): KERNELBASE.dll+0x15f67f, KERNELBASE.dll+0x15f53e, EFDC_Explorer8.4.exe+0xac3f57, EFDC_Explorer8.4.exe+0x20117a, ntdll.dll+0x95f9e, KERNELBASE.dll+0x172f70, ntdll.dll+0x51719, ntdll.dll+0x392ec, ntdll.dll+0x95f9e, ntdll.dll+0x137354, ntdll.dll+0x95f9e, ntdll.dll+0x1381e0, ntdll.dll+0x51719, ntdll.dll+0x40ee2, ntdll.dll+0x92677, EFDC_Explorer8.4.exe+0xcee642, KERNELBASE.dll+0x14dc41, KERNEL32.DLL+0x1b330, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341
+
+=== t8500 : 16 threads, 34 modules ===
+  tid=55032 running  eip=0x7762a08c (ntdll.dll+0x7a08c) 
+      bt[0] ntdll.dll+0x424c2
+      bt[1] ntdll.dll+0x95f9e
+      bt[2] 0x5d0767e7
+      bt[3] 0x5d0759ba
+      bt[4] KERNELBASE.dll+0x16a153
+      bt[5] 0x5d07113c
+      bt[6] 0x5d010043
+      bt[7] 0x5d00fe70
+      bt[8] 0x5cf67903
+      bt[9] 0x3b70056
+      bt[10] EFDC_Explorer8.4.exe+0xc0137f
+      bt[11] combase.dll+0x87e01
+      bt[12] ntdll.dll+0x3db49
+      bt[13] ntdll.dll+0x95fce
+      stack-scan(40): ntdll.dll+0x424c2, ntdll.dll+0x95f9e, KERNELBASE.dll+0x16a153, EFDC_Explorer8.4.exe+0xc0137f, combase.dll+0x87e01, ntdll.dll+0x3db49, ntdll.dll+0x95fce, ntdll.dll+0x95f9e, ntdll.dll+0x51719, MSVBVM60.DLL+0x1b12, MSVBVM60.DLL+0x24d6, MSVBVM60.DLL+0x38664, MSVBVM60.DLL+0x3013b, EFDC_Explorer8.4.exe+0x0, MSVBVM60.DLL+0x2e4c8, EFDC_Explorer8.4.exe+0x528c4, MSVBVM60.DLL+0x1140a8, MSVBVM60.DLL+0x20fa7, EFDC_Explorer8.4.exe+0x528c4, EFDC_Explorer8.4.exe+0x528c4, MSVBVM60.DLL+0x114080, KERNEL32.DLL+0x2b6e0, MSVBVM60.DLL+0x2b100, MSVBVM60.DLL+0x2ad05, EFDC_Explorer8.4.exe+0x51954, EFDC_Explorer8.4.exe+0x51954, MSVBVM60.DLL+0xf7c50, MSVBVM60.DLL+0x2b100, EFDC_Explorer8.4.exe+0x5195e, EFDC_Explorer8.4.exe+0x528c4
+  tid=49100 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(13): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, ntdll.dll+0x7a6b0, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=49248 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(13): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, ntdll.dll+0x7a6b0, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=42192 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(15): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, ntdll.dll+0x7a6b0, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0x640003, EFDC_Explorer8.4.exe+0xf10011
+  tid=42108 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] 0x73f9c490
+      bt[2] ntdll.dll+0x40ee2
+      bt[3] ntdll.dll+0x40737
+      bt[4] ntdll.dll+0x924e6
+      bt[5] 0x73f9c64f
+      bt[6] ntdll.dll+0x95f9e
+      bt[7] 0x73f9c5a1
+      bt[8] 0x73f9c490
+      bt[9] 0x73f9c490
+      bt[10] 0x73f9c4dd
+      bt[11] 0x73f9c490
+      bt[12] 0x73f9c490
+      bt[13] 0x74480438
+      stack-scan(13): KERNELBASE.dll+0x15f67f, ntdll.dll+0x7a6b0, ntdll.dll+0x40ee2, ntdll.dll+0x40737, ntdll.dll+0x924e6, KERNELBASE.dll+0x172f70, ntdll.dll+0x95f9e, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341
+  tid=32232 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] ntdll.dll+0x7826c
+      bt[2] KERNELBASE.dll+0x15e808
+      bt[3] 0x73ebdfcd
+      bt[4] 0x73ebdfe7
+      bt[5] combase.dll+0xe1c75
+      bt[6] 0x744996c0
+      bt[7] 0x73ebdfe7
+      bt[8] 0x73ebe014
+      bt[9] 0x73ebdf99
+      bt[10] 0x73ebdf9e
+      bt[11] 0x73ecea69
+      bt[12] 0x73ed07cf
+      bt[13] 0x73ec3b84
+      stack-scan(15): KERNELBASE.dll+0x15f67f, EFDC_Explorer8.4.exe+0xa672, ntdll.dll+0x7826c, KERNELBASE.dll+0x15e808, KERNELBASE.dll+0x172f70, combase.dll+0xe1c75, EFDC_Explorer8.4.exe+0xa672, KERNELBASE.dll+0x172f70, ntdll.dll+0x61160, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341
+  tid=22468 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] ntdll.dll+0xb154b
+      bt[2] ntdll.dll+0x95f9e
+      bt[3] ntdll.dll+0x51719
+      bt[4] ntdll.dll+0x5117a
+      bt[5] ntdll.dll+0x515cc
+      bt[6] ntdll.dll+0x79e6c
+      bt[7] KERNELBASE.dll+0x16b996
+      bt[8] KERNELBASE.dll+0x16b9ac
+      bt[9] combase.dll+0xe7b77
+      bt[10] combase.dll+0x14029b
+      bt[11] combase.dll+0x13f895
+      bt[12] combase.dll+0x13f81a
+      bt[13] combase.dll+0x144d4f
+      stack-scan(40): KERNELBASE.dll+0x15f67f, EFDC_Explorer8.4.exe+0x62a6d6, ntdll.dll+0x0, ntdll.dll+0x0, ntdll.dll+0x80c30, ntdll.dll+0xb154b, ntdll.dll+0x95f9e, ntdll.dll+0x51719, ntdll.dll+0x5117a, ntdll.dll+0x515cc, ntdll.dll+0x79e6c, KERNELBASE.dll+0x16b996, KERNELBASE.dll+0x16b9ac, EFDC_Explorer8.4.exe+0x62a6d6, KERNELBASE.dll+0x172f70, combase.dll+0xe7b77, combase.dll+0x14029b, combase.dll+0x25b2a0, combase.dll+0x25b2a0, combase.dll+0x13f895, combase.dll+0x25b2a0, combase.dll+0x25b2a0, combase.dll+0x13f81a, combase.dll+0x144d4f, ntdll.dll+0x78efc, KERNELBASE.dll+0x16bf40, KERNELBASE.dll+0x16bf53, ntdll.dll+0x95f9e, combase.dll+0xeacb3, combase.dll+0xeac60
+  tid=26316 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(12): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=42852 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      bt[4] EFDC_Explorer8.4.exe+0x230261
+      bt[5] EFDC_Explorer8.4.exe+0x290321
+      bt[6] EFDC_Explorer8.4.exe+0x2d03a1
+      stack-scan(40): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0x81, EFDC_Explorer8.4.exe+0x10089, EFDC_Explorer8.4.exe+0x20091, EFDC_Explorer8.4.exe+0x30099, EFDC_Explorer8.4.exe+0x400a1, EFDC_Explorer8.4.exe+0x500a9, EFDC_Explorer8.4.exe+0x600b1, EFDC_Explorer8.4.exe+0x700b9, EFDC_Explorer8.4.exe+0x800c1, EFDC_Explorer8.4.exe+0x900c9, EFDC_Explorer8.4.exe+0xa00d1, EFDC_Explorer8.4.exe+0xb00d9, EFDC_Explorer8.4.exe+0xc00e1, EFDC_Explorer8.4.exe+0xd00e9, EFDC_Explorer8.4.exe+0xe00f1, EFDC_Explorer8.4.exe+0xf00f9, EFDC_Explorer8.4.exe+0x100101, EFDC_Explorer8.4.exe+0x110111
+  tid=55136 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] ntdll.dll+0xb154b
+      bt[2] ntdll.dll+0x323b9
+      bt[3] ntdll.dll+0x95f9e
+      bt[4] ntdll.dll+0x4e1fe
+      bt[5] ntdll.dll+0x95f9e
+      bt[6] ntdll.dll+0x41ccf
+      bt[7] ntdll.dll+0x78efc
+      bt[8] KERNELBASE.dll+0x16bf40
+      bt[9] ntdll.dll+0x79e6c
+      bt[10] KERNELBASE.dll+0x16b996
+      bt[11] KERNELBASE.dll+0x16b9ac
+      bt[12] 0x5fe34b11
+      bt[13] 0x5fe43a3b
+      stack-scan(21): KERNELBASE.dll+0x15f67f, ntdll.dll+0xb154b, EFDC_Explorer8.4.exe+0x22867c, ntdll.dll+0x323b9, ntdll.dll+0x0, ntdll.dll+0x95f9e, ntdll.dll+0x4e1fe, ntdll.dll+0x95f9e, ntdll.dll+0x41ccf, ntdll.dll+0x78efc, KERNELBASE.dll+0x16bf40, ntdll.dll+0x79e6c, KERNELBASE.dll+0x16b996, KERNELBASE.dll+0x16b9ac, KERNELBASE.dll+0x172f70, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341
+  tid=45240 running  eip=0x7762858c (ntdll.dll+0x7858c) 
+      bt[0] ntdll.dll+0x93dc9
+      bt[1] KERNELBASE.dll+0x16a1f0
+      bt[2] KERNELBASE.dll+0x16a18f
+      bt[3] 0x60ade067
+      bt[4] 0x60ade2fd
+      bt[5] ntdll.dll+0x57c47
+      bt[6] ntdll.dll+0x57cf9
+      bt[7] ntdll.dll+0x5530b
+      bt[8] KERNEL32.DLL+0x15d49
+      bt[9] ntdll.dll+0x6c75b
+      bt[10] ntdll.dll+0x6c6e1
+      stack-scan(19): ntdll.dll+0x93dc9, KERNELBASE.dll+0x16a1f0, KERNELBASE.dll+0x172f70, KERNELBASE.dll+0x16a18f, ntdll.dll+0x57c47, ntdll.dll+0x57cf9, ntdll.dll+0x5530b, ntdll.dll+0x54d70, ntdll.dll+0x54d70, ntdll.dll+0x57c80, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=51544 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      stack-scan(12): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70
+  tid=39148 running  eip=0x7762a0bc (ntdll.dll+0x7a0bc) 
+      bt[0] ntdll.dll+0x550b7
+      bt[1] KERNEL32.DLL+0x15d49
+      bt[2] ntdll.dll+0x6c75b
+      bt[3] ntdll.dll+0x6c6e1
+      bt[4] EFDC_Explorer8.4.exe+0xc1d922
+      stack-scan(13): ntdll.dll+0x550b7, ntdll.dll+0x54d70, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc00000, ntdll.dll+0x80c30, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, ntdll.dll+0x54d70, EFDC_Explorer8.4.exe+0xc1d922
+  tid=37760 running  eip=0x7762858c (ntdll.dll+0x7858c) 
+      bt[0] ntdll.dll+0x93dc9
+      bt[1] KERNELBASE.dll+0x16a1f0
+      bt[2] KERNELBASE.dll+0x16a236
+      bt[3] 0x73fe4c77
+      bt[4] 0x73f7d06f
+      bt[5] 0x73f56021
+      bt[6] ntdll.dll+0x7830c
+      bt[7] 0x73fe4b8a
+      bt[8] KERNEL32.DLL+0x15d49
+      bt[9] ntdll.dll+0x6c75b
+      bt[10] ntdll.dll+0x6c6e1
+      stack-scan(12): ntdll.dll+0x93dc9, KERNELBASE.dll+0x16a1f0, KERNELBASE.dll+0x16a236, KERNELBASE.dll+0x172f70, ntdll.dll+0x7830c, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, EFDC_Explorer8.4.exe+0xc06e62
+  tid=3504 running  eip=0x7762826c (ntdll.dll+0x7826c) 
+      bt[0] KERNELBASE.dll+0x15e808
+      bt[1] KERNELBASE.dll+0x15e844
+      bt[2] 0x6e0f76a1
+      bt[3] KERNEL32.DLL+0x15d49
+      bt[4] ntdll.dll+0x6c75b
+      bt[5] ntdll.dll+0x6c6e1
+      bt[6] EFDC_Explorer8.4.exe+0x34006f
+      stack-scan(17): KERNELBASE.dll+0x15e808, KERNELBASE.dll+0x15e844, KERNELBASE.dll+0x172f70, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341, EFDC_Explorer8.4.exe+0x2f0052, EFDC_Explorer8.4.exe+0x34006f, EFDC_Explorer8.4.exe+0x50020, EFDC_Explorer8.4.exe+0x34006e, EFDC_Explorer8.4.exe+0x390072, EFDC_Explorer8.4.exe+0x4bc2eb, EFDC_Explorer8.4.exe+0x4bc2eb, EFDC_Explorer8.4.exe+0x7adbf3
+  tid=26808 running  eip=0x776287fc (ntdll.dll+0x787fc) 
+      bt[0] KERNELBASE.dll+0x15f67f
+      bt[1] KERNELBASE.dll+0x15f53e
+      bt[2] EFDC_Explorer8.4.exe+0xac3f57
+      bt[3] 0x73ec42c5
+      bt[4] 0x73ec4112
+      bt[5] 0x73ec4184
+      bt[6] ntdll.dll+0x95f9e
+      bt[7] 0x73ee4720
+      bt[8] 0x73ee471b
+      bt[9] 0x73f7bfa4
+      bt[10] 0x73f7bb9b
+      bt[11] ntdll.dll+0x51719
+      bt[12] 0x73eb3360
+      bt[13] 0x73f7bc75
+      stack-scan(24): KERNELBASE.dll+0x15f67f, KERNELBASE.dll+0x15f53e, EFDC_Explorer8.4.exe+0xac3f57, EFDC_Explorer8.4.exe+0x20117a, ntdll.dll+0x95f9e, KERNELBASE.dll+0x172f70, ntdll.dll+0x51719, ntdll.dll+0x392ec, ntdll.dll+0x95f9e, ntdll.dll+0x137354, ntdll.dll+0x95f9e, ntdll.dll+0x1381e0, ntdll.dll+0x51719, ntdll.dll+0x40ee2, ntdll.dll+0x92677, EFDC_Explorer8.4.exe+0xcee642, KERNELBASE.dll+0x14dc41, KERNEL32.DLL+0x1b330, KERNEL32.DLL+0x15d49, KERNEL32.DLL+0x15d30, ntdll.dll+0x6c75b, ntdll.dll+0x80c30, ntdll.dll+0x6c6e1, ntdll.dll+0xb6341
+done

@@ -1,0 +1,348 @@
+:root {
+  --wb-canvas: #f1f4f3;
+  --wb-surface: #ffffff;
+  --wb-surface-soft: #f7f9f8;
+  --wb-border: #d8e0df;
+  --wb-text: #263a3d;
+  --wb-muted: #657779;
+  --wb-teal: #167a78;
+  --wb-teal-dark: #105d61;
+  --wb-teal-soft: #e7f2f0;
+  --wb-amber: #a66e19;
+}
+
+html, body { background: var(--wb-canvas); color: var(--wb-text); }
+body { font-size: 13px; }
+.studio-icon-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.studio-icon { width: 20px; height: 20px; flex: 0 0 20px; display: inline-block; vertical-align: -0.22em; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: butt; stroke-linejoin: bevel; }
+.qgis-tool-btn .studio-icon { width: 22px; height: 22px; flex-basis: 22px; }
+.nav-item .studio-icon { width: 18px; height: 18px; flex-basis: 18px; }
+.card-title .studio-icon, .empty-state .studio-icon, .ctx-item .studio-icon { margin-right: 5px; }
+.icon-status-warning { color: var(--wb-amber); }
+.icon-status-error { color: var(--danger); }
+.icon-status-ok { color: var(--success); }
+.app-layout, .main-content, .content-area { background: var(--wb-canvas); }
+.sidebar {
+  width: 226px; background: #f8faf9; color: var(--wb-text);
+  border-right: 1px solid var(--wb-border); box-shadow: none;
+}
+.sidebar::after { display: none; }
+.sidebar-header { background: var(--wb-surface); border-color: var(--wb-border); }
+.sidebar-header h1 { color: #24484b; }
+.sidebar-header h1 span { color: var(--wb-teal); }
+.sidebar-header p { color: var(--wb-muted); }
+.studio-mark { background: var(--wb-teal); border-color: #5da4a0; }
+.nav-menu { padding: 9px 8px; }
+.nav-group { border-bottom: 1px solid #e7eceb; }
+.nav-group > summary {
+  padding: 9px 10px; color: #627476; font-size: 11px; font-weight: 700;
+  letter-spacing: .035em; cursor: pointer; list-style: none;
+}
+.nav-group > summary::-webkit-details-marker { display: none; }
+.nav-group > summary::after {
+  content: ''; float: right; width: 6px; height: 6px; margin: 1px 3px 0 0;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg); color: #839392;
+}
+.nav-group:not([open]) > summary::after { transform: rotate(-45deg); }
+.sidebar .nav-item {
+  min-height: 35px; padding: 7px 9px 7px 13px; color: #526669;
+  border-left: 3px solid transparent; border-radius: 5px; font-size: 12px;
+}
+.sidebar .nav-item:hover { background: #edf3f2; color: #22484a; }
+.sidebar .nav-item.active {
+  background: var(--wb-teal-soft); color: var(--wb-teal-dark);
+  border-left-color: var(--wb-teal); font-weight: 650;
+}
+.sidebar .nav-item .studio-icon { color: currentColor; }
+.qgis-tool-btn .studio-icon { color: currentColor; }
+.caret .studio-icon { width: 12px; height: 12px; flex-basis: 12px; }
+.sidebar .nav-item:focus-visible, .nav-group > summary:focus-visible {
+  outline: 2px solid #b47b2b; outline-offset: -2px;
+}
+.sidebar-footer { background: #f4f7f6; border-color: var(--wb-border); color: var(--wb-muted); }
+.qgis-menu-bar { background: #f8faf9; border-color: var(--wb-border); }
+.qgis-tool-bar { background: #f3f6f5; border-color: var(--wb-border); }
+.qgis-tool-btn:hover, .qgis-tool-btn:focus-visible { background: var(--wb-teal-soft); border-color: #b6d4d0; }
+.topbar { background: var(--wb-surface); border-color: var(--wb-border); }
+.topbar-title { color: var(--wb-text); }
+.case-badge { background: #edf5f2; border-color: #c9dfd8; color: #2c6557; }
+#run-status-display { border-color: var(--wb-border); background: var(--wb-surface-soft); }
+#output-warning-banner {
+  background: #fff8eb !important; color: #73531b !important;
+  border: 1px solid #ecdcb9; border-left: 4px solid var(--wb-amber) !important;
+}
+.content-area { padding: 15px 18px 20px; }
+.page { max-width: 1880px; }
+.page-header { border-color: var(--wb-border); }
+.page-title { color: var(--wb-text); }
+.page-desc { color: var(--wb-muted); }
+.card, .stat-card {
+  background: var(--wb-surface); border: 1px solid var(--wb-border);
+  border-radius: 8px; box-shadow: 0 1px 3px rgba(34, 57, 58, .055);
+}
+.card { padding: 15px; }
+.card-title { color: #43595b; border-color: #e8eeec; }
+.btn-primary { background: var(--wb-teal); border-color: var(--wb-teal); }
+.btn-primary:hover { background: var(--wb-teal-dark); border-color: var(--wb-teal-dark); }
+.btn-success { background: #39785e; border-color: #39785e; }
+.btn-danger { background: #b94b45; border-color: #a53f3a; }
+input:focus, select:focus, textarea:focus,
+.form-input:focus, .form-select:focus { border-color: #5b9e98 !important; box-shadow: 0 0 0 2px #167a7827 !important; }
+
+.workbench-home { max-width: none; }
+.workbench-home-heading {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 16px; margin: 0 0 13px; padding: 0 1px 10px;
+  border-bottom: 1px solid var(--wb-border);
+}
+.workbench-home-heading .page-title { font-size: 18px; font-weight: 650; }
+.workbench-home-heading .page-desc { margin-top: 4px; }
+.workbench-primary-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.workbench-home-grid {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(275px, 315px);
+  align-items: start; gap: 13px;
+}
+.workbench-primary-canvas { min-width: 0; min-height: min(72vh, 760px); padding: 16px; }
+.workbench-canvas-heading {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 12px;
+}
+.workbench-canvas-heading h2, .workbench-inspector h2 {
+  margin: 0; color: #354d50; font-size: 13px; font-weight: 650;
+}
+.workbench-canvas-heading p { margin: 4px 0 0; color: var(--wb-muted); font-size: 11px; line-height: 1.5; }
+.workbench-canvas-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 7px; }
+.workbench-canvas-actions label { color: var(--wb-muted); font-size: 11px; font-weight: 600; }
+.workbench-canvas-actions select { width: min(250px, 34vw); min-width: 150px; margin: 0; }
+.workbench-result-canvas {
+  min-height: 510px; padding: 12px; background: #fafcfb;
+  border: 1px solid #e1e9e7; border-radius: 6px;
+}
+.workbench-result-canvas.empty-state { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; }
+.workbench-heatmap-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(245px, 1fr)); gap: 10px;
+}
+.workbench-heatmap-card {
+  min-width: 0; padding: 9px; background: var(--wb-surface);
+  border: 1px solid #e0e8e6; border-radius: 6px;
+}
+.workbench-heatmap-card[data-dashboard-primary="true"] {
+  grid-column: 1 / -1; border-color: #83b8b1; box-shadow: inset 3px 0 0 var(--wb-teal), 0 1px 3px rgba(34,57,58,.06);
+}
+.workbench-heatmap-title { margin: 0 0 7px; color: #465d5f; font-size: 11px; font-weight: 600; }
+.workbench-heatmap-card[data-dashboard-primary="true"] .workbench-heatmap-title { color: var(--wb-teal-dark); font-size: 13px; }
+.workbench-heatmap {
+  display: block; width: 100%; height: clamp(155px, 23vh, 230px);
+  background: #eef3f1; border: 1px solid #e1e8e6; border-radius: 3px;
+  image-rendering: auto;
+}
+.workbench-heatmap-card[data-dashboard-primary="true"] .workbench-heatmap { height: clamp(330px, 46vh, 600px); }
+.workbench-heatmap-range { margin-top: 6px; color: var(--wb-muted); font-size: 10px; }
+.workbench-inspector { min-width: 0; position: sticky; top: 8px; }
+.workbench-inspector > details, .map-workbench-inspector {
+  background: var(--wb-surface); border: 1px solid var(--wb-border); border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(34, 57, 58, .055);
+}
+.workbench-inspector summary, .map-workbench-inspector summary {
+  padding: 11px 12px; color: #3d5557; font-weight: 650; cursor: pointer;
+}
+.workbench-inspector-content { display: grid; gap: 15px; padding: 0 12px 13px; }
+.workbench-stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 7px; margin-top: 8px; }
+.workbench-stat-grid .stat-card { min-height: 64px; padding: 8px; border-radius: 5px; box-shadow: none; }
+.workbench-stat-grid .stat-label { font-size: 9px; }
+.workbench-stat-grid .stat-value { font-size: 19px; color: var(--wb-teal-dark); }
+.workbench-summary #dashboard-vars { min-height: 50px; padding: 8px; margin-top: 7px; background: var(--wb-surface-soft); border-color: #e2e9e7; border-radius: 5px; }
+.workbench-summary #dashboard-vars .grid-2 { grid-template-columns: 1fr !important; }
+.workbench-summary #dashboard-vars .grid-2 > div { padding: 7px !important; background: transparent !important; border-bottom: 1px solid #e5ecea; }
+.workbench-inspector-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.workbench-inspector-actions h2 { grid-column: 1 / -1; margin-bottom: 1px; }
+.workbench-inspector-actions .btn { width: 100%; padding-inline: 7px; font-size: 11px; }
+
+.scientific-workspace .sw-inspector-controls { display: grid; gap: 9px; margin-bottom: 13px; }
+.scientific-workspace .sw-inspector-controls > h3 { margin: 0; color: #3c5b5c; font-size: 12px; font-weight: 650; }
+.scientific-workspace .sw-inspector-controls .sw-field { width: 100%; max-width: none; }
+.scientific-workspace .sw-inspector-controls select { width: 100%; }
+.scientific-workspace.sw-inspector-closed .sw-rail { display: none; }
+.scientific-workspace.sw-inspector-closed .sw-main { grid-template-columns: minmax(0,1fr); }
+#page-viz3d .sw-rail .sw-camera { display: grid; gap: 8px; padding: 8px 0; }
+#page-viz3d .sw-rail .sw-camera .sw-field { display: grid; }
+#page-viz3d .sw-rail .sw-3d-display-controls {
+  display: grid; align-items: start; gap: 8px; padding: 8px 0;
+  border: 0; background: transparent;
+}
+#page-viz3d .sw-rail .sw-3d-display-controls .sw-field { max-width: none; }
+
+.map-workbench-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(220px,275px); gap: 12px; align-items: stretch; }
+.map-workbench-layout #map-container { min-height: 520px; }
+.map-workbench-inspector { padding: 0 11px 11px; }
+.map-workbench-inspector #map-status, .map-workbench-inspector #map-picked {
+  padding: 9px; margin: 8px 0 0; color: #4c6364; background: #f5f8f7;
+  border: 1px solid #e3eae8; border-radius: 5px; font-size: 11px; line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.map-workbench-inspector #map-picked:empty { display: none; }
+.qgis-status-bar { background: #e8edeb; border-color: var(--wb-border); color: #526567; }
+
+/* The scientific plotting workspace uses quiet, flat application chrome. */
+body:has(.scientific-workspace.active) {
+  background: #f3f2ed;
+  color: #3d4646;
+}
+body:has(.scientific-workspace.active) .main-content,
+body:has(.scientific-workspace.active) .content-area { background: #f3f2ed; }
+body:has(.scientific-workspace.active) .sidebar,
+body:has(.scientific-workspace.active) .topbar,
+body:has(.scientific-workspace.active) .qgis-menu-bar,
+body:has(.scientific-workspace.active) .qgis-tool-bar {
+  background: #f8f7f2;
+  border-color: #d5d4ce;
+  box-shadow: none;
+}
+body:has(.scientific-workspace.active) .sidebar .nav-item.active {
+  background: var(--wb-lake-soft);
+  color: var(--wb-lake-deep);
+  border-left-color: var(--wb-lake);
+}
+body:has(.scientific-workspace.active) .sidebar .nav-item:focus-visible,
+body:has(.scientific-workspace.active) .nav-group > summary:focus-visible,
+body:has(.scientific-workspace.active) :is(button,input,select,summary,a):focus-visible {
+  outline-color: #738789;
+}
+body:has(.scientific-workspace.active) .form-input:focus,
+body:has(.scientific-workspace.active) .form-select:focus {
+  border-color: #738789 !important;
+  box-shadow: 0 0 0 2px #68777924 !important;
+}
+body:has(.scientific-workspace.active) .card,
+body:has(.scientific-workspace.active) .stat-card,
+body:has(.scientific-workspace.active) .workbench-inspector > details {
+  border-radius: 2px;
+  box-shadow: none;
+}
+body:has(.scientific-workspace.active) .btn-primary {
+  background: #687779;
+  border-color: #5d6f71;
+}
+body:has(.scientific-workspace.active) .btn-primary:hover { background: #586b6d; }
+
+@media (max-width: 1120px) {
+  .workbench-home-grid { grid-template-columns: minmax(0,1fr) 275px; }
+  .map-workbench-layout { grid-template-columns: minmax(0,1fr) 225px; }
+}
+@media (max-width: 850px) {
+  .workbench-home-grid, .map-workbench-layout { grid-template-columns: minmax(0,1fr); }
+  .workbench-inspector { position: static; }
+  .map-workbench-layout #map-container { min-height: 400px; }
+  .map-workbench-inspector { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px; }
+  .map-workbench-inspector summary { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .content-area { padding: 10px; }
+  .workbench-home-heading, .workbench-canvas-heading { align-items: flex-start; flex-direction: column; }
+  .workbench-primary-actions { width: 100%; }
+  .workbench-canvas-actions { width: 100%; justify-content: flex-start; }
+  .workbench-canvas-actions select { flex: 1; width: auto; }
+  .workbench-primary-actions .btn { flex: 1; }
+  .workbench-result-canvas { min-height: 300px; padding: 8px; }
+  .workbench-heatmap-grid { grid-template-columns: 1fr; }
+  .map-workbench-inspector { display: block; }
+}
+
+/* Whole-app landform/laboratory palette. Strong color remains reserved for
+   quantitative fields and semantic warning/error states. */
+:root {
+  --wb-paper: #f4f1e8;
+  --wb-canvas: #f4f1e8;
+  --wb-surface: #fbfaf6;
+  --wb-surface-soft: #edf0e8;
+  --wb-border: #d6d0c2;
+  --wb-text: #39464a;
+  --wb-muted: #687376;
+  --wb-lake: #627986;
+  --wb-lake-deep: #485f69;
+  --wb-lake-soft: #e5edf0;
+  --wb-sage: #748579;
+  --wb-sage-soft: #e5ebe5;
+  --wb-ochre: #927846;
+  --wb-ochre-soft: #f1eadd;
+  --wb-teal: var(--wb-lake);
+  --wb-teal-dark: var(--wb-lake-deep);
+  --wb-teal-soft: var(--wb-lake-soft);
+}
+.app-layout, .main-content, .content-area { background: var(--wb-paper); color: var(--wb-text); }
+.sidebar, .sidebar-header, .topbar, .qgis-menu-bar, .qgis-tool-bar { background: var(--wb-surface); border-color: var(--wb-border); box-shadow: none; }
+.sidebar-footer { background: var(--wb-surface-soft); border-color: var(--wb-border); color: var(--wb-muted); }
+.studio-mark { background: #e5ebe5; border-color: #cbd7cb; color: #4b5d58; box-shadow: none; }
+.studio-mark img { filter: saturate(.3); }
+.sidebar-header h1 { color: #39494e; }
+.sidebar-header h1 span { color: var(--wb-lake); }
+.sidebar .nav-item.active {
+  background: var(--wb-lake-soft);
+  color: #3f5660;
+  border-left-color: var(--wb-lake);
+  box-shadow: none;
+}
+.sidebar .nav-item:hover,
+.qgis-tool-btn:hover,
+.qgis-tool-btn:focus-visible { background: var(--wb-sage-soft); color: #43564b; border-color: #c9d5c7; }
+.nav-group > summary { color: #647469; }
+.nav-icon { display: inline-flex; align-items: center; justify-content: center; color: currentColor; filter: none; }
+.qgis-tool-btn { color: #52666d; }
+.qgis-tool-separator { border-color: #d6d0c2; }
+.case-badge { background: var(--wb-sage-soft); border-color: #cbd7cb; color: #4f6256; }
+.workflow-strip { background: var(--wb-border); border-color: var(--wb-border); }
+.workflow-strip button { background: var(--wb-surface); color: #566368; }
+.workflow-strip button:hover { background: var(--wb-sage-soft); }
+.workflow-strip b { color: var(--wb-ochre); }
+.stat-card::before { display: none; }
+.stat-card,
+.card,
+.workbench-inspector > details,
+.map-workbench-inspector {
+  background: var(--wb-surface);
+  border-color: var(--wb-border);
+  border-radius: 2px;
+  box-shadow: none;
+}
+.workbench-stat-grid .stat-value { color: #536d77; }
+.workbench-primary-canvas { border-color: var(--wb-border); box-shadow: none; }
+.workbench-result-canvas { background: #f8f6ef; border-color: var(--wb-border); border-radius: 2px; }
+.workbench-heatmap-card { background: var(--wb-surface); border-color: #d8d3c7; border-radius: 2px; }
+.workbench-heatmap-card[data-dashboard-primary="true"] {
+  border-color: #c5d0ca;
+  box-shadow: inset 3px 0 0 var(--wb-sage);
+}
+.workbench-heatmap-card[data-dashboard-primary="true"] .workbench-heatmap-title { color: #50676f; }
+.btn-primary { background: var(--wb-lake); border-color: #536b76; color: #fff; }
+.btn-primary:hover { background: var(--wb-lake-deep); border-color: #40555d; }
+.btn-success { background: var(--wb-sage); border-color: #647567; color: #fff; }
+.btn-success:hover { background: #627467; border-color: #59695b; }
+input:focus, select:focus, textarea:focus,
+.form-input:focus, .form-select:focus { border-color: var(--wb-lake) !important; box-shadow: 0 0 0 2px #62798624 !important; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline-color: var(--wb-lake); }
+.qgis-status-bar { background: #e7ebe5; border-color: var(--wb-border); color: #53645f; }
+.page-header, .card-title { border-color: #e2ddd1; }
+.card-title, .workbench-inspector summary { color: #465b60; }
+table { background: var(--wb-surface); }
+table th { background: #eceee7; color: #556661; border-color: var(--wb-border); }
+table td { border-color: #e4dfd3; }
+input, select, textarea, .form-input, .form-select { background-color: #fffefa; border-color: #d2cec3; color: var(--wb-text); }
+.modal-overlay .modal { background: var(--wb-surface); border-color: var(--wb-border); border-radius: 3px; box-shadow: 0 8px 24px #3e49491a; }
+.modal-title { color: #43585e; border-color: #e2ddd1; }
+.scientific-workspace { --sw-blue: var(--wb-lake); --sw-ink: #39464a; --sw-line: var(--wb-border); --sw-soft: #f3f0e8; }
+.scientific-workspace .sw-shell, .scientific-workspace .sw-rail,
+.scientific-workspace .sw-analysis, .scientific-workspace .sw-timeline { border-color: var(--wb-border); background-color: var(--wb-surface); }
+.scientific-workspace .sw-command, .scientific-workspace .sw-camera { background: #f0eee6; border-color: var(--wb-border); }
+.scientific-workspace .btn-primary, .scientific-workspace .btn.active { background: var(--wb-lake); border-color: #536b76; }
+.scientific-workspace .btn-primary:hover, .scientific-workspace .btn.active:hover { background: var(--wb-lake-deep); }
+.scientific-workspace :is(button,input,select,summary,a):focus-visible { outline-color: var(--wb-lake); }
+#page-viz3d .sw-3d-display-controls { background: #f0eee6; border-color: var(--wb-border); }
+#page-viz3d .sw-3d-land-control { color: #586d5b; border-color: #cbd7cb; }
+#page-viz3d .sw-3d-land-control input { accent-color: var(--wb-sage); }
+#viz3d-plotly { background: var(--wb-surface) !important; border-color: #ccd5d1 !important; }
+#viz3d-plotly .modebar { border-color: #ccd5d1; }
+#viz3d-plotly .modebar-btn path { fill: var(--wb-lake) !important; }
+#viz3d-plotly .modebar-btn:hover { background: var(--wb-lake-soft); }
+.workbench-result-canvas, .workbench-heatmap, .map-workbench-layout #map-container { border-color: var(--wb-border); }
+.map-workbench-inspector #map-status, .map-workbench-inspector #map-picked { background: var(--wb-sage-soft); border-color: #cbd7cb; color: #506459; }

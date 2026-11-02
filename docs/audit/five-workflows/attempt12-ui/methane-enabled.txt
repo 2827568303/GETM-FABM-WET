@@ -1,0 +1,287 @@
+- img "3DWET"
+- heading "3DWET Studio" [level=1]
+- paragraph: 湖泊生态 · 三维建模工作台
+- generic: 总览
+- generic: 📊
+- text: 仪表盘
+- generic: 📁
+- text: 案例管理
+- generic: 前处理
+- generic: 🛠️
+- text: 前处理
+- generic: ▦
+- text: 交互网格编辑
+- generic: 📥
+- text: 输入数据
+- generic: 🧩
+- text: 模块配置
+- generic: ⚙️
+- text: 参数编辑
+- generic: 🧪
+- text: 初始条件
+- generic: ⏱️
+- text: 时间设置
+- generic: 运行
+- generic: ▶️
+- text: 运行控制
+- generic: 后处理
+- generic: 🌐
+- text: 地图视图
+- generic: 🗺️
+- text: 2D 可视化
+- generic: 🧊
+- text: 3D 可视化
+- generic: 🔥
+- text: 垂向热图
+- generic: 📈
+- text: 时间序列
+- generic: 率定
+- generic: 🎯
+- text: 率定分析
+- generic: 🔄
+- text: 自动率定
+- generic: 工作台
+- generic: ◉
+- text: 环境与启动诊断
+- generic: 📋
+- text: 项目导入与物理设置
+- generic: "案例: Round12 UI Lake 1402"
+- menubar "工作台菜单":
+  - button "项目"
+  - button "编辑"
+  - button "视图"
+  - button "图层"
+  - button "运行"
+  - button "设置"
+  - button "帮助"
+  - button "语言"
+  - generic: 3DWET Studio · GIS 工作台
+- toolbar "常用工具":
+  - button "▣ 案例":
+    - generic: ▣
+    - generic: 案例
+  - button "⚒ 前处理":
+    - generic: ⚒
+    - generic: 前处理
+  - button "▦ 网格":
+    - generic: ▦
+    - generic: 网格
+  - button "▶ 运行":
+    - generic: ▶
+    - generic: 运行
+  - button "⌖ 地图":
+    - generic: ⌖
+    - generic: 地图
+  - button "▤ 2D":
+    - generic: ▤
+    - generic: 2D
+  - button "◇ 3D":
+    - generic: ◇
+    - generic: 3D
+  - button "⚙ 诊断":
+    - generic: ⚙
+    - generic: 诊断
+- generic: 模块配置
+- generic: Round12 UI Lake 1402
+- button "100%"
+- generic: 空闲
+- generic: 模块配置
+- generic: 启用/禁用模型引擎与生态模块，查看模块分类和参数数量
+- generic: 🚀 功能模块（引擎）
+- text: 未加载案例也能选：此时设置会保存为「新建模型默认模块组合」，之后在前处理/输入数据里「一键构建」时自动应用。 已加载案例时，勾选会直接写入该案例的
+- code: getm.inp
+- text: 与
+- code: fabm.yaml
+- text: 。
+- generic: 当前案例
+- generic "点击切换关闭":
+  - generic: 🌊 水动力（GETM 三维流动）
+  - generic: 湖泊三维水动力内核：投影正交曲线网格、sigma 垂向坐标、外模/内模分离求解水位与三维流场。任何案例都必须启用，无法关闭。
+  - generic: 启用
+  - text: ● 必选内核
+- generic "点击切换关闭":
+  - generic: 🦠 水质生态（FABM-WET 食物网）
+  - generic: 浮游植物（蓝藻/硅藻/绿藻）、浮游动物、底栖动物、沉水植物、碎屑与营养盐循环。关闭后仅运行物理水动力，生态变量不再计算。
+  - generic: 启用
+- generic "点击切换关闭":
+  - generic: 🐟 鱼类（食物网顶层捕食者）
+  - generic: 三个湿重/干重状态量实例：JuFish 浮游食性幼鱼（捕食浮游动物）、AdFish 底栖食性成鱼（捕食底栖动物、扰动沉积物）、PiscFish 食鱼性鱼（捕食前两者）。缺了它食物网就只有「藻→浮游动物→底栖动物」而缺少顶层下行控制（top-down control），生物操纵/鱼类控藻情景无法模拟。模块已编译在程序中，只是历史配置被摘除，启用无需重新编译。
+  - generic: 启用
+- generic "点击切换关闭":
+  - generic: 🌫️ 温室气体（CO₂ / CH₄）
+  - generic: 无机碳（DIC/碱度/pH/pCO₂ 与空气-水 CO₂ 通量）+ 甲烷（产生/氧化/冒泡/排放）。启用后闭合碳循环，若当前执行程序未含该模块会自动编译。
+  - generic: 启用
+- generic: 🧩 FABM 生态模块清单
+- generic: 搜索模块
+- textbox "输入模块名，如 cyanobacteria / 温室气体"
+- generic: 显示
+- combobox:
+  - option "全部" [selected]
+  - option "仅已启用"
+  - option "仅已禁用"
+- text: "显示:"
+- strong: "20"
+- text: / 20
+- text: ·
+- text: "启用:"
+- strong: "20"
+- text: ·
+- text: "禁用:"
+- strong: "0"
+- text: ·
+- text: "总参数:"
+- strong: "566"
+- text: 埋藏
+- generic: 1 个模块
+- generic "点击禁用":
+  - generic: burial
+  - generic: burial
+  - generic: 13 参数 • 有耦合
+  - generic: "依赖: POM, abiotic_sediment, bot_pel_interface, cyanobacteria, diatoms, greens, humus, macrophytes, sediment_exchange, zoobenthos"
+  - generic: ● 已启用
+- text: 底栖动物
+- generic: 1 个模块
+- generic "点击禁用":
+  - generic: zoobenthos
+  - generic: zoobenthos
+  - generic: 36 参数 • 有耦合
+  - generic: "依赖: DOM, POM, abiotic_sediment, abiotic_water, bot_pel_interface"
+  - generic: ● 已启用
+- text: 有机质
+- generic: 3 个模块
+- generic "点击禁用":
+  - generic: pom
+  - generic: POM
+  - generic: 21 参数 • 有耦合
+  - generic: "依赖: DOM, abiotic_water, bot_pel_interface, humus"
+  - generic: ● 已启用
+- generic "点击禁用":
+  - generic: dom
+  - generic: DOM
+  - generic: 22 参数 • 有耦合
+  - generic: "依赖: abiotic_sediment, abiotic_water, bot_pel_interface"
+  - generic: ● 已启用
+- generic "点击禁用":
+  - generic: humus
+  - generic: humus
+  - generic: 21 参数 • 有耦合
+  - generic: "依赖: DOM, abiotic_sediment, abiotic_water, bot_pel_interface"
+  - generic: ● 已启用
+- text: 水生植物
+- generic: 1 个模块
+- generic "点击禁用":
+  - generic: macrophytes
+  - generic: macrophytes
+  - generic: 50 参数 • 有耦合
+  - generic: "依赖: DOM, POM, abiotic_sediment, abiotic_water, bot_pel_interface"
+  - generic: ● 已启用
+- text: 沉积物交换
+- generic: 1 个模块
+- generic "点击禁用":
+  - generic: sediment_exchange
+  - generic: sediment_exchange
+  - generic: 31 参数 • 有耦合
+  - generic: "依赖: abiotic_sediment, abiotic_water, bot_pel_interface"
+  - generic: ● 已启用
+- text: 浮游动物
+- generic: 2 个模块
+- generic "点击禁用":
+  - generic: cladocerans
+  - generic: cladocerans
+  - generic: 38 参数 • 有耦合
+  - generic: "依赖: DOM, POM, abiotic_water"
+  - generic: ● 已启用
+- generic "点击禁用":
+  - generic: copepods
+  - generic: copepods
+  - generic: 38 参数 • 有耦合
+  - generic: "依赖: DOM, POM, abiotic_water"
+  - generic: ● 已启用
+- text: 浮游植物
+- generic: 3 个模块
+- generic "点击禁用":
+  - generic: cyanobacteria
+  - generic: cyanobacteria
+  - generic: 43 参数 • 有耦合
+  - generic: "依赖: DOM, POM, abiotic_sediment, abiotic_water, bot_pel_interface, sediment_exchange"
+  - generic: ● 已启用
+- generic "点击禁用":
+  - generic: diatom phytoplankton
+  - generic: diatoms
+  - generic: 43 参数 • 有耦合
+  - generic: "依赖: DOM, POM, abiotic_sediment, abiotic_water, bot_pel_interface, sediment_exchange"
+  - generic: ● 已启用
+- generic "点击禁用":
+  - generic: green phytoplankton
+  - generic: greens
+  - generic: 43 参数 • 有耦合
+  - generic: "依赖: DOM, POM, abiotic_sediment, abiotic_water, bot_pel_interface, sediment_exchange"
+  - generic: ● 已启用
+- text: 温室气体
+- generic: 2 个模块
+- generic "点击禁用":
+  - generic: inorganic carbon, pH and CO2 air-water exchange (GHG)
+  - generic: inorganic_carbon
+  - generic: 9 参数 • 有耦合
+  - generic: "依赖: DOM, bot_pel_interface, cladocerans, copepods, cyanobacteria, diatoms, greens, macrophytes, zoobenthos"
+  - generic: ● 已启用
+- generic "点击禁用":
+  - generic: methane production, oxidation and emission (GHG)
+  - generic: methane
+  - generic: 7 参数 • 有耦合
+  - generic: "依赖: DOM, POM, abiotic_sediment, abiotic_water, bot_pel_interface, humus, inorganic_carbon"
+  - generic: ● 已启用
+- text: 界面过程
+- generic: 1 个模块
+- generic "点击禁用":
+  - generic: bot_pel_interface
+  - generic: bot_pel_interface
+  - generic: 1 参数
+  - generic: ● 已启用
+- text: 非生物-水体
+- generic: 1 个模块
+- generic "点击禁用":
+  - generic: abiotic_process_in_water
+  - generic: abiotic_water
+  - generic: 17 参数
+  - generic: ● 已启用
+- text: 非生物-沉积物
+- generic: 1 个模块
+- generic "点击禁用":
+  - generic: abiotic_process_in_sediment
+  - generic: abiotic_sediment
+  - generic: 26 参数 • 有耦合
+  - generic: "依赖: DOM, POM, abiotic_water"
+  - generic: ● 已启用
+- text: 鱼类
+- generic: 3 个模块
+- generic "点击禁用":
+  - generic: juvenile planktivorous fish
+  - generic: JuFish
+  - generic: 36 参数 • 有耦合
+  - generic: "依赖: DOM, POM, abiotic_water, bot_pel_interface"
+  - generic: ● 已启用
+- generic "点击禁用":
+  - generic: adult benthivorous fish
+  - generic: AdFish
+  - generic: 35 参数 • 有耦合
+  - generic: "依赖: DOM, POM, abiotic_water, bot_pel_interface"
+  - generic: ● 已启用
+- generic "点击禁用":
+  - generic: piscivorous fish
+  - generic: PiscFish
+  - generic: 36 参数 • 有耦合
+  - generic: "依赖: DOM, POM, abiotic_water, bot_pel_interface"
+  - generic: ● 已启用
+- status:
+  - generic: 项目
+  - strong: Round12 UI Lake 1402
+  - generic: 网格
+  - strong: 待加载
+  - generic: 运行
+  - strong: 空闲
+  - generic: 视图
+  - strong: 100%
+  - generic: 坐标系
+  - strong: —
+- generic: 已启用 "methane"

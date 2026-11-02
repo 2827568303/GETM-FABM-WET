@@ -1,0 +1,5 @@
+     1 diag51 ready
+     0 ready
+  2070 NtWaitForSingleObject 2005ms tid=35772 from KERNELBASE.dll+0x15e808
+  2527 SUBSTITUTE hr_orig=0x80004005 -> create=0x0 ppv=0x1af8f8
+ 10213 NtWaitForMultipleObjects 7528ms tid=6384 from KERNELBASE.dll+0x15f67f

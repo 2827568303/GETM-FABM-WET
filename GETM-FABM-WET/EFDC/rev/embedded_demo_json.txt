@@ -1,0 +1,131 @@
+ "orderId": "",
+              "orderLineNumber": "",
+              "numberOfCopies": 1,
+              "startDate": null,
+              "startDateOption": "DEFINE_AT_FIRST_ACTIVATION",
+              "isPermanent": false,
+              "term": {
+                "numDuration": 10,
+                "durationUnit": "DAYS"
+              },
+              "expirationDate": null,
+              "versionDate": null,
+              "versionDateAttributes": null,
+              "lineItemType": null,
+              "entitledProducts": [
+                {
+                  "product": {
+                    "uniqueId": "HID-20118",
+                    "primaryKeys": {
+                      "name": "CVL Grid Trial 1.0",
+                      "version": "1.0"
+                    }
+                  },
+                  "quantity": 1
+                }
+              ],
+              "numberOfRemainingCopies": 1,
+              "availableExtraActivations": 0,
+              "isTrustedType": false,
+              "state": "DEPLOYED",
+              "licenseTechnology": {
+                "uniqueId": "HID-100",
+                "primaryKeys": {
+                  "name": "FLEXnet Licensing"
+                }
+              },
+              "activatableItemData": null,
+              "createdOnDateTime": null,
+              "lastModifiedDateTime": null
+            },
+            "channelPartner": [
+              {
+                "tierName": "bo.constants.partnertiernames.endcustomer",
+                "organizationUnit": {
+                  "uniqueId": "HID-20274",
+                  "primaryKeys": {
+                    "name": "Univesitas Tadulako"
+                  }
+                },
+                "contact": {
+                  "uniqueId": "HID-20267",
+                  "userName": null,
+                  "primaryKeys": {
+                    "firstName": "Yassir",
+                    "lastName": "Arafat",
+                    "emailAddress": "yassir@untad.ac.id",
+                    "phoneNumber": " "
+                  }
+                },
+                "currentOwner": true
+              }
+            ]
+          },
+          {
+            "activatableItemType": "LINEITEM",
+            "parentBulkEntitlementId": null,
+            "entitlementId": "34cd-63ce-1492-6049-d927-ff5",
+            "soldTo": "beijing_training",
+            "shipToEmail": "",
+            "shipToAddress": "",
+            "entitlementState": "DEPLOYED",
+            "activatableItemData": {
+              "activationId": {
+                "id": "4ada-b707-14c5-e8d9-1ce7-ff5",
+                "autogenerate": null
+              },
+              "product": {
+                "uniqueId": "HID-20119",
+                "primaryKeys": {
+                  "name": "CVL Grid Train 1.0",
+                  "version": "1.0"
+                }
+              },
+              "partNumber": null,
+              "licenseModel": {
+                "uniqueId": "HID-21006",
+                "primaryKeys": {
+                  "name": "EFDC_DSI_TRIAL_30"
+                }
+              },
+              "licenseModelAttributes": null,
+              "alternateLicenseModel1": null,
+              "alternateLicenseModel2": null,
+              "fNPTimeZoneValue": null,
+              "policyAttributes": {
+                "rehostsPolicy": {
+                  "allowedCount": 2,
+                  "policyTerm": {
+                    "duration": 1,
+                    "durationUnit": "YEARS"
+                  }
+                },
+                "returnsPolicy": {
+                  "allowedCount": 2,
+                  "policyTerm": {
+                    "duration": 1,
+                    "durationUnit": "YEARS"
+                  }
+                },
+                "repairsPolicy": null,
+                "extraActivationsPolicy": null,
+                "cancelLicensePolicy": {
+                  "isCancelLicense": false
+                },
+                "virtualLicensePolicy": {
+                  "isVirtualLicense": true
+                },
+                "reinstallPolicy": null
+              },
+              "orderId": "",
+              "orderLineNumber": "",
+              "numberOfCopies": 35,
+              "startDate": "2015-04-03",
+              "startDateOption": "DEFINE_AT_FIRST_ACTIVATION",
+              "isPermanent": false,
+              "term": {
+                "numDuration": 10,
+                "durationUnit": "DAYS"
+              },
+              "expirationDate": "2015-04-13",
+              "versionDate": n

@@ -1,0 +1,4 @@
+﻿targets: ['0x45020cae']
+rect 815 639
+PrintWindow -> 1
+saved C:\Users\23801\Desktop\GETM-FABM-WET-260928\GETM-FABM-WET\EFDC\rev\pw_shot.png (815, 639)

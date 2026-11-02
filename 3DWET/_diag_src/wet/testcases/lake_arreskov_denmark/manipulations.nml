@@ -1,0 +1,384 @@
+&manipulation
+   start = '1990-04-01 00:00:00',
+   name = 'AdFish_sD',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-06-01 00:00:00',
+   name = 'AdFish_sD',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-08-01 00:00:00',
+   name = 'AdFish_sD',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-04-01 00:00:00',
+   name = 'AdFish_sD',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-06-01 00:00:00',
+   name = 'AdFish_sD',
+   action_type = 1,
+   action = 0.7
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-08-01 00:00:00',
+   name = 'AdFish_sD',
+   action_type = 1,
+   action = 0.7
+   verbose = .true.
+/
+
+&manipulation
+   start = '1995-04-20 00:00:00',
+   name = 'AdFish_sD',
+   action_type = 1,
+   action = 0.4
+   verbose = .true.
+/
+
+&manipulation
+   start = '1996-04-20 00:00:00',
+   name = 'AdFish_sD',
+   action_type = 1,
+   action = 0.4
+   verbose = .true.
+/
+
+&manipulation
+   start = '1997-04-20 00:00:00',
+   name = 'AdFish_sD',
+   action_type = 1,
+   action = 0.4
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-04-01 00:00:00',
+   name = 'AdFish_sN',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-06-01 00:00:00',
+   name = 'AdFish_sN',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-08-01 00:00:00',
+   name = 'AdFish_sN',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-04-01 00:00:00',
+   name = 'AdFish_sN',
+   action_type = 1,
+   action = 0.7
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-06-01 00:00:00',
+   name = 'AdFish_sN',
+   action_type = 1,
+   action = 0.7
+   verbose = .true.
+/
+
+
+&manipulation
+   start = '1991-08-01 00:00:00',
+   name = 'AdFish_sN',
+   action_type = 1,
+   action = 0.7
+   verbose = .true.
+/
+
+&manipulation
+   start = '1995-04-20 00:00:00',
+   name = 'AdFish_sN',
+   action_type = 1,
+   action = 0.4
+   verbose = .true.
+/
+
+&manipulation
+   start = '1996-04-20 00:00:00',
+   name = 'AdFish_sN',
+   action_type = 1,
+   action = 0.4
+   verbose = .true.
+/
+
+&manipulation
+   start = '1997-04-20 00:00:00',
+   name = 'AdFish_sN',
+   action_type = 1,
+   action = 0.4
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-04-01 00:00:00',
+   name = 'AdFish_sP',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-06-01 00:00:00',
+   name = 'AdFish_sP',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-08-01 00:00:00',
+   name = 'AdFish_sP',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-04-01 00:00:00',
+   name = 'AdFish_sP',
+   action_type = 1,
+   action = 0.7
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-06-01 00:00:00',
+   name = 'AdFish_sP',
+   action_type = 1,
+   action = 0.7
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-08-01 00:00:00',
+   name = 'AdFish_sP',
+   action_type = 1,
+   action = 0.7
+   verbose = .true.
+/
+
+&manipulation
+   start = '1995-04-20 00:00:00',
+   name = 'AdFish_sP',
+   action_type = 1,
+   action = 0.4
+   verbose = .true.
+/
+
+&manipulation
+   start = '1996-04-20 00:00:00',
+   name = 'AdFish_sP',
+   action_type = 1,
+   action = 0.4
+   verbose = .true.
+/
+
+&manipulation
+   start = '1997-04-20 00:00:00',
+   name = 'AdFish_sP',
+   action_type = 1,
+   action = 0.4
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-04-20 00:00:00',
+   name = 'JuFish_sD',
+   action_type = 1,
+   action = 0.95
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-06-01 00:00:00',
+   name = 'JuFish_sD',
+   action_type = 1,
+   action = 0.95
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-08-01 00:00:00',
+   name = 'JuFish_sD',
+   action_type = 1,
+   action = 0.95
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-04-01 00:00:00',
+   name = 'JuFish_sD',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-06-01 00:00:00',
+   name = 'JuFish_sD',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-08-01 00:00:00',
+   name = 'JuFish_sD',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1992-02-01 00:00:00',
+   name = 'JuFish_sD',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-04-01 00:00:00',
+   name = 'JuFish_sP',
+   action_type = 1,
+   action = 0.95
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-06-01 00:00:00',
+   name = 'JuFish_sP',
+   action_type = 1,
+   action = 0.95
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-08-01 00:00:00',
+   name = 'JuFish_sP',
+   action_type = 1,
+   action = 0.95
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-04-01 00:00:00',
+   name = 'JuFish_sP',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-06-01 00:00:00',
+   name = 'JuFish_sP',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-08-01 00:00:00',
+   name = 'JuFish_sP',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1992-02-01 00:00:00',
+   name = 'JuFish_sP',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-04-01 00:00:00',
+   name = 'JuFish_sN',
+   action_type = 1,
+   action = 0.95
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-06-01 00:00:00',
+   name = 'JuFish_sN',
+   action_type = 1,
+   action = 0.95
+   verbose = .true.
+/
+
+&manipulation
+   start = '1990-08-01 00:00:00',
+   name = 'JuFish_sN',
+   action_type = 1,
+   action = 0.95
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-04-01 00:00:00',
+   name = 'JuFish_sN',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-06-01 00:00:00',
+   name = 'JuFish_sN',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1991-08-01 00:00:00',
+   name = 'JuFish_sN',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/
+
+&manipulation
+   start = '1992-02-01 00:00:00',
+   name = 'JuFish_sN',
+   action_type = 1,
+   action = 0.85
+   verbose = .true.
+/

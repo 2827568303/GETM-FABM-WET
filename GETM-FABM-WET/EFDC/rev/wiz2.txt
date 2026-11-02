@@ -1,0 +1,12 @@
+﻿[js]      1 diag51 ready
+[js]      0 raiser hook fail Error: unable to intercept function at 61C284A7; please file a bug
+[js]      0 SoftModalMessageBox replaced (�Զ��� OK)
+[js]      0 diag22 ready
+pid 8200
+t=2.5s ['ThunderRT6Main|EFDC_Explorer8.4|vis=1']
+t=5.0s ['ThunderRT6FormDC|Activation Wizard|vis=0', 'ThunderRT6Main|EFDC_Explorer8.4|vis=1']
+t=7.5s ['ThunderRT6FormDC|Activation Wizard|vis=0', 'ThunderRT6Main|EFDC_Explorer8.4|vis=1']
+t=10.0s ['ThunderRT6FormDC|Activation Wizard|vis=0', 'ThunderRT6Main|EFDC_Explorer8.4|vis=1']
+t=12.5s []
+t=15.0s []
+t=17.5s []

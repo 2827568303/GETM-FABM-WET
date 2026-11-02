@@ -1,0 +1,157 @@
+- img "3DWET"
+- heading "3DWET Studio" [level=1]
+- paragraph: 湖泊生态 · 三维建模工作台
+- generic: 总览
+- generic: 📊
+- text: 仪表盘
+- generic: 📁
+- text: 案例管理
+- generic: 前处理
+- generic: 🛠️
+- text: 前处理
+- generic: ▦
+- text: 交互网格编辑
+- generic: 📥
+- text: 输入数据
+- generic: 🧩
+- text: 模块配置
+- generic: ⚙️
+- text: 参数编辑
+- generic: 🧪
+- text: 初始条件
+- generic: ⏱️
+- text: 时间设置
+- generic: 运行
+- generic: ▶️
+- text: 运行控制
+- generic: 后处理
+- generic: 🌐
+- text: 地图视图
+- generic: 🗺️
+- text: 2D 可视化
+- generic: 🧊
+- text: 3D 可视化
+- generic: 🔥
+- text: 垂向热图
+- generic: 📈
+- text: 时间序列
+- generic: 率定
+- generic: 🎯
+- text: 率定分析
+- generic: 🔄
+- text: 自动率定
+- generic: 工作台
+- generic: ◉
+- text: 环境与启动诊断
+- generic: 📋
+- text: 项目导入与物理设置
+- generic: "状态: 就绪"
+- menubar "工作台菜单":
+  - button "项目"
+  - button "编辑"
+  - button "视图"
+  - button "图层"
+  - button "运行"
+  - button "设置"
+  - button "帮助"
+  - button "语言"
+- toolbar "常用工具":
+  - button "▣ 案例":
+    - generic: ▣
+    - generic: 案例
+  - button "⚒ 前处理":
+    - generic: ⚒
+    - generic: 前处理
+  - button "▦ 网格":
+    - generic: ▦
+    - generic: 网格
+  - button "▶ 运行":
+    - generic: ▶
+    - generic: 运行
+  - button "⌖ 地图":
+    - generic: ⌖
+    - generic: 地图
+  - button "▤ 2D":
+    - generic: ▤
+    - generic: 2D
+  - button "◇ 3D":
+    - generic: ◇
+    - generic: 3D
+  - button "⚙ 诊断":
+    - generic: ⚙
+    - generic: 诊断
+- generic: 案例管理
+- button "100%"
+- generic: 空闲
+- generic: 案例管理
+- generic: 选择要配置和运行的模型案例
+- button "➕ 新建模型"
+- generic: 从湖泊边界 + 底部高程 shapefile 生成新案例
+- generic: 📂 按路径打开案例（任意位置）
+- textbox "输入案例目录绝对路径，如 D:\\\\mycases\\\\LakeX（须含 getm.inp 或 bathymetry.nc）"
+- button "📁 选择文件夹…"
+- button "📂 浏览目录"
+- button "打开"
+- generic: 点击「选择文件夹」会弹出本机文件夹选择窗口，选好后自动填入并打开；也可直接粘贴路径后点「打开」。 打开后自动加入下方案例列表，下次可直接点击「加载」。在下方案例列表上单击右键可快速打开所在文件夹或重新选择目录。
+- text: 可用案例
+- generic: （右键行可打开所在文件夹 / 重新选择目录）
+- table:
+  - rowgroup:
+    - row "案例名称 地形 FABM 气象 河流 2D结果 3D结果 操作":
+      - columnheader "案例名称"
+      - columnheader "地形"
+      - columnheader "FABM"
+      - columnheader "气象"
+      - columnheader "河流"
+      - columnheader "2D结果"
+      - columnheader "3D结果"
+      - columnheader "操作"
+  - rowgroup:
+    - row "External Seed Lake ✅ ✅ ✅ ✅ ❌ ❌ 加载 另存为 删除":
+      - cell "External Seed Lake":
+        - strong: External Seed Lake
+      - cell "✅"
+      - cell "✅"
+      - cell "✅"
+      - cell "✅"
+      - cell "❌"
+      - cell "❌"
+      - cell "加载 另存为 删除":
+        - button "加载"
+        - button "另存为"
+        - button "删除"
+    - row "Imported Random Lake ✅ ✅ ✅ ✅ ✅ ✅ 加载 另存为 删除":
+      - cell "Imported Random Lake":
+        - strong: Imported Random Lake
+      - cell "✅"
+      - cell "✅"
+      - cell "✅"
+      - cell "✅"
+      - cell "✅"
+      - cell "✅"
+      - cell "加载 另存为 删除":
+        - button "加载"
+        - button "另存为"
+        - button "删除"
+    - row "Lake Luoma ✅ ✅ ✅ ✅ ❌ ❌ 加载 另存为 删除":
+      - cell "Lake Luoma":
+        - strong: Lake Luoma
+      - cell "✅"
+      - cell "✅"
+      - cell "✅"
+      - cell "✅"
+      - cell "❌"
+      - cell "❌"
+      - cell "加载 另存为 删除":
+        - button "加载"
+        - button "另存为"
+        - button "删除"
+- status:
+  - generic: 项目
+  - strong: 未加载案例
+  - generic: 运行
+  - strong: 空闲
+  - generic: 视图
+  - strong: 100%
+  - generic: 坐标系
+  - strong: —

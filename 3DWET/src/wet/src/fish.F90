@@ -15,7 +15,7 @@ module wet_fish
    !PUBLIC DERIVED TYPES:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
    type, extends(type_particle_model),public :: type_wet_fish
       ! local state variable identifiers---------------------------------------------------------------------------------------------------------------------------------------------------------------
-      type (type_state_variable_id)                                   :: id_sDFi, id_sPFi, id_sNFi, id_sCFi, id_sFRes, id_sDSiz, id_fVul
+      type (type_state_variable_id)                                   :: id_sDFi, id_sPFi, id_sNFi, id_sCFi, id_sFRes, id_sDSiz, id_fVul, id_Day_last_state
       ! diagnostic variables for modular fluxes--------------------------------------------------------------------------------------------------------------------------------------------------------
       type (type_diagnostic_variable_id)                              :: id_BioTurb, id_PStar, id_predD, id_recrD, id_Day_last_save
       ! state dependencies identifiers-----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ module wet_fish
       type (type_diagnostic_variable_id),   allocatable, dimension(:) :: id_tDConsFiPlan, id_tNConsFiPlan, id_tPConsFiPlan, id_tCConsFiPlan, id_tDConsFiPisc, id_tNConsFiPisc, id_tPConsFiPisc, id_tCConsFiPisc
       ! environmental dependencies---------------------------------------------------------------------------------------------------------------------------------------------------------------------
       type (type_horizontal_dependency_id)                            :: id_bot_pel_conv
-      type (type_dependency_id)                                       :: id_uTm, id_oxygen, id_par, id_depth, id_pred_sms, id_recr_sms, id_Day_last
+      type (type_dependency_id)                                       :: id_uTm, id_oxygen, id_par, id_depth, id_pred_sms, id_recr_sms
       type (type_diagnostic_variable_id),   allocatable, dimension(:) :: id_tDConsFiBent_out
       type (type_dependency_id),            allocatable, dimension(:) :: id_tDConsFiBent
       type (type_diagnostic_variable_id),   allocatable, dimension(:) :: id_tNConsFiBent_out
@@ -201,6 +201,10 @@ subroutine initialize(self,configunit)
    call self%register_state_variable(self%id_sNFi,  'sN',      'gN/m3',   'N',                                       initial_value= 0.05_rk, minimum=self%cDFiMin * self%cNDRef,     no_river_dilution=.TRUE.,  no_precipitation_dilution=.TRUE.)
    call self%register_state_variable(self%id_sCFi,  'sC',      'gC/m3',   'C',                                       initial_value= 0.05_rk, minimum=self%cDFiMin * self%cCDRef,     no_river_dilution=.TRUE.,  no_precipitation_dilution=.TRUE.)
    call self%register_state_variable(self%id_fVul,  'fVul',    '-',       'biomass fraction vulnerable to predation',initial_value= 1.0_rk,  minimum=0.0_rk,                         no_river_dilution=.TRUE.,  no_precipitation_dilution=.TRUE.)
+   call self%register_state_variable(self%id_Day_last_state, 'Day_last_state', 'd', 'last time step day for reproduction', &
+                                     initial_value=0.0_rk, minimum=0.0_rk, &
+                                     no_river_dilution=.TRUE., no_precipitation_dilution=.TRUE.)
+   call self%set_variable_property(self%id_Day_last_state, 'disable_transport', .true.)
    if (self%qStage > 0) then
 	   call self%register_state_variable(self%id_sFRes, 'sFRes',   'gDW/m3',  'reserve fraction of biomass',         initial_value= 0.0_rk,  minimum=0.0_rk,                         no_river_dilution=.TRUE.,  no_precipitation_dilution=.TRUE.)
        call self%register_state_variable(self%id_sDSiz, 'sDSiz',   'gDW/ind', 'average individual fish size',        initial_value= 0.0_rk,  minimum=0.0_rk,                         no_river_dilution=.TRUE.,  no_precipitation_dilution=.TRUE.)
@@ -348,7 +352,7 @@ subroutine initialize(self,configunit)
           call self%register_state_dependency(self%id_fVulPisc(i_prey),'fVulPisc'//trim(index),'-','fraction of vulnerable prey '//trim(index)//' biomass')
           call self%request_coupling_to_model(self%id_fVulPisc(i_prey),self%id_PISC_prey(i_prey),'fVul')
           
-          call self%register_state_dependency(self%id_pred_dummy_Pisc(i_prey),'pred_dummy'//trim(index),'DW/m3','total predation on prey'//trim(index))
+          call self%register_state_dependency(self%id_pred_dummy_Pisc(i_prey),'pred_dummy'//trim(index),'-','total predation on prey'//trim(index))
           call self%request_coupling_to_model(self%id_pred_dummy_Pisc(i_prey),self%id_PISC_prey(i_prey),'pred_dummy')
           if (self%diagnostics) then
               call self%register_diagnostic_variable(self%id_tDConsFiPisc(i_prey), 'tDConsFiPisc_'//trim(index),	'g/m3/s','rate fish D consumed '//trim(index),  output=output_instantaneous)
@@ -449,7 +453,6 @@ subroutine initialize(self,configunit)
    endif
    !  register environmental dependencies--------------------------------------------------------------------------------------------------------------------------------------------------------------
    call self%register_diagnostic_variable(self%id_Day_last_save,  'Day_last',         'd', 'last time step day',   output=output_none)!, act_as_state_variable=.true.                 )
-   call self%register_dependency(self%id_Day_last,  'Day_last',         'd', 'last time step day')
    
    call self%register_dependency(self%id_uTm,    standard_variables%temperature)
    call self%register_dependency(self%id_Day,    standard_variables%number_of_days_since_start_of_the_year)
@@ -519,13 +522,19 @@ subroutine do(self,_ARGUMENTS_DO_)
            _GET_(self%id_sNFi,sNFi)                                                                                 ! get fish N mass
            _GET_(self%id_sCFi,sCFi)                                                                                 ! get fish N mass
            if (.NOT. self%lNutMeth) then                                                                            ! case dynamic stochiometry
-               rPDFi = sPFi /(sDFi+NearZero)                                                                        !   calculate P:DW ratio
-               rNDFi = sNFi /(sDFi+NearZero)                                                                        !   calculate N:DW ratio
-               rCDFi = sCFi /(sDFi+NearZero)                                                                        !   calculate N:DW ratio
+               if (sDFi > NearZero) then                                                                            !   calculate ratios only when fish biomass is present
+                   rPDFi = sPFi /(sDFi+NearZero)                                                                    !     calculate P:DW ratio
+                   rNDFi = sNFi /(sDFi+NearZero)                                                                    !     calculate N:DW ratio
+                   rCDFi = sCFi /(sDFi+NearZero)                                                                    !     calculate C:DW ratio
+               else                                                                                                 !   use reference ratios for absent fish biomass
+                   rPDFi = self%cPDRef                                                                              !     P ratio parameter
+                   rNDFi = self%cNDRef                                                                              !     N ratio parameter
+                   rCDFi = self%cCDRef                                                                              !     C ratio parameter
+               endif                                                                                                !
            else                                                                                                     ! case fixed stochiometry
                rPDFi = self%cPDRef                                                                                  !   P ratio parameter
                rNDFi = self%cNDRef                                                                                  !   N ratio parameter
-               rCDFi = self%cCDRef                                                                                  !   N ratio parameter
+               rCDFi = self%cCDRef                                                                                  !   C ratio parameter
            endif                                                                                                    !
            if (self%qStage > 0) then                                                                                ! case stage structure
                _GET_(self%id_sFRes,sFRes)                                                                           !   get current reserve biomass
@@ -1207,14 +1216,16 @@ subroutine check_state(self, _ARGUMENTS_CHECK_STATE_)
    !  1. calculate and apply reproductive flux once per year                                                        !
    !================================================================================================================!
    _GET_GLOBAL_(self%id_Day,Day)                                                                                    ! get the simulation day
-   _GET_(self%id_Day_last,Day_last)                                                                                 !
+   _GET_(self%id_Day_last_state,Day_last)                                                                            ! read this grid cell's previous simulation day
    _SET_DIAGNOSTIC_(self%id_Day_last_save,Day)                                                                      !
-   _GET_(self%id_sFRes,sFRes)                                                                                       !
+   if (self%qStage > 0) then
+      _GET_(self%id_sFRes,sFRes)                                                                                     ! reserve state exists only for stage-structured fish
+      if (sFRes > self%fResMax) sFRes = self%fResMax                                                                 !
+   endif
    tDReproPOM = 0.0_rk                                                                                              !
    tNReproPOM = 0.0_rk                                                                                              !
    tPReproPOM = 0.0_rk                                                                                              !
    tCReproPOM = 0.0_rk                                                                                              !
-   if (sFRes > self%fResMax) sFRes = self%fResMax                                                                   !
    if ((self%qStage == 1 .OR. self%qStage == 3) .AND. Day >= self%cDayReprFish .AND. Day_last < self%cDayReprFish) then ! case reproduction
       if (sFRes > self%fResMin) then                                                                                !
          _GET_(self%id_sDFi,sDFi)                                                                                   !
@@ -1263,9 +1274,10 @@ subroutine check_state(self, _ARGUMENTS_CHECK_STATE_)
          tPReproPOM = tPReprFish*(1.0_rk-self%fReproFish)                                                           !   diagnostic PPOMW from reproduction
          tCReproPOM = tCReprFish*(1.0_rk-self%fReproFish)                                                           !   diagnostic CPOMW from reproduction
       endif                                                                                                         !
-   elseif (self%qTrans > 1) then                                                                                    !
+   elseif (self%qStage > 0 .AND. self%qTrans > 1) then                                                               !
       _SET_(self%id_sFRes,sFRes)                                                                                    !
    endif                                                                                                            !
+   _SET_(self%id_Day_last_state,Day)                                                                                 ! persist the current day for the next state check
    _SET_DIAGNOSTIC_(self%id_tDReproPOM,     tDReproPOM)                                                             !
    _SET_DIAGNOSTIC_(self%id_tNReproPOM,     tNReproPOM)                                                             !
    _SET_DIAGNOSTIC_(self%id_tPReproPOM,     tPReproPOM)                                                             !

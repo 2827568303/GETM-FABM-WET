@@ -1,0 +1,14 @@
+started pid=50272
+CREATE_PROCESS base=0x400000
+BP-exc at 0xd56026c9 eip=0x7762a6b0 not ours
+BP-exc at 0x776c91a8 eip=0x776c91a9 not ours
+EXC code=0xc000008f addr=0x751cbae4 first=1
+EXC code=0xc000008f addr=0x751cbae4 first=1
+EXC code=0xc000008f addr=0x751cbae4 first=1
+EXC code=0xc000008f addr=0x751cbae4 first=1
+EXC code=0x04242420 addr=0x751cbae4 first=1
+BP-exc at 0x776a3fd5 eip=0x776a3fd6 not ours
+BP-exc at 0x77667374 eip=0x77667375 not ours
+EXC code=0xc0000005 addr=0x7414584c first=1
+EXIT_PROCESS code=0x80131506
+done hits=0 elapsed=1.3s

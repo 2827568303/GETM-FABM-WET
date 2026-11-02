@@ -1,0 +1,38 @@
+***********************************************************************************
+***  This EFDCPlus run is using:     1 MPI domain(s).  Preparing domain:     0  ***
+***********************************************************************************
+
+***********************************************************************************
+*                                                                                 *
+*                                                                                 *
+*              EEEEEEEEE    FFFFFFFFF    DDDDDDDD       CCCCCCCC                  *
+*             EEE          FFF          DDD     DD    CCC      CC   +             *
+*            EEE          FFF          DDD     DD    CCC            +             *
+*           EEEEEEEE     FFFFFFFF     DDD     DD    CCC         +++++++++         *
+*          EEE          FFF          DDD     DD    CCC              +             *
+*         EEE          FFF          DDD     DD    CCC      CC       +             *
+*        EEEEEEEEE    FFF          DDDDDDDDDD      CCCCCCCCC                      *
+*                                                                                 *
+*                     ENVIRONMENTAL FLUID DYNAMICS CODE (PLUS)                    *
+*                     ORIGINALLY DEVELOPED BY JOHN M. HAMRICK                     *
+*                                                                                 *
+*        EFDC+   BY DSI, LLC,  EDMONDS WA, USA                                    *
+*                INCLUDING:                                                       *
+*                   GENERAL OCEAN TURBULENCE MODEL (GOTM)                         *
+*                   VERTICAL LAYERING WITH SIGMA-STRETCHED OR SIGMA-ZED           *
+*                   PROPELLER WASH, LAGRANGIAN PARTICLE TRACKING,                 *
+*                   NEW EUTROPHICATION WITH ZOOPLANKTON AND RPEM SUB-MODELS       *
+*                   WITH SEDZLJ, HYDROKINETIC DEVICES (SNL)                       *
+*                   MULTI-THREADED VERSION USING OpenMP                           *
+*                   MULTI-PROCESSOR VERSION USING OpenMPI                         *
+*                                                                                 *
+*        EFDC+ HAS BEEN CUSTOMIZED TO WORK WITH DSI's EFDC+ EXPLORER 12.5         *
+*                                                                                 *
+*                         VERSION DATE: MPI 2026-08-06                            *
+*                                                                                 *
+***********************************************************************************
+***********************************************************************************
+***  This EFDC+ run will use:     1 MPI domain(s) and  1 thread(s) per domain   ***
+***********************************************************************************
+
+SCANNING INPUT FILE: DECOMP.JNP

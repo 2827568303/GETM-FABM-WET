@@ -26,18 +26,23 @@ JuFish/AdFish/PiscFish 全部删掉，之后所有案例（含 GUI 建案例用�
 from __future__ import annotations
 
 import copy
+import os
 from pathlib import Path
 
 import yaml
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+CODE_DIR = Path(__file__).resolve().parent.parent
+MODEL_ROOT = (Path(os.environ['WET_MODEL_ROOT']).expanduser().resolve()
+              if os.environ.get('WET_MODEL_ROOT') else CODE_DIR)
 
 FISH_INSTANCES = ("JuFish", "AdFish", "PiscFish")
 
 # 模板查找顺序：优先项目自带的精简模板，再退回 WET 上游参考配置
 FISH_TEMPLATE_FILES = (
-    BASE_DIR / "model_builder" / "templates" / "fish_instances.yaml",
-    BASE_DIR / "src" / "wet" / "testcases" / "fabm-wet.yaml",
+    CODE_DIR / "model_builder" / "templates" / "fish_instances.yaml",
+    CODE_DIR / "src" / "wet" / "testcases" / "fabm-wet.yaml",
+    MODEL_ROOT / "model_builder" / "templates" / "fish_instances.yaml",
+    MODEL_ROOT / "src" / "wet" / "testcases" / "fabm-wet.yaml",
 )
 
 # 默认（模板）猎物名 → 需要按案例实际实例名重映射

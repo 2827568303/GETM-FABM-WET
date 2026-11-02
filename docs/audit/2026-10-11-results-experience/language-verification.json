@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "date": "2026-10-11",
+  "builtins": [
+    "zh-CN",
+    "en-US"
+  ],
+  "english_catalog_entries": 797,
+  "browser_checks": [
+    "English single-language dashboard and independent modal",
+    "Chinese restoration",
+    "French JSON file imported through file chooser and applied",
+    "Invalid en-12 locale rejected without changing language",
+    "Language and French pack restored after service restart at new port",
+    "English temperature name, meaning and initial reference displayed",
+    "No browser console errors"
+  ],
+  "scope": "Core language flow and variable metadata; unknown messages and raw solver logs retain source text."
+}

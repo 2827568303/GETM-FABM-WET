@@ -173,6 +173,7 @@
    title='A descriptive title can be specified in the param namelist'
    open(NAMLST,status='unknown',file=trim(input_dir) // "/getm.inp")
    read(NAMLST,NML=param)
+   runtime_diag_hotstart = hotstart
 
 #ifdef NO_BAROCLINIC
    if(runtype .ge. 3) then

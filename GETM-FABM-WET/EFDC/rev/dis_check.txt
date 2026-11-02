@@ -1,0 +1,918 @@
+﻿0081C4C0: 55                   push     ebp
+0081C4C1: 8bec                 mov      ebp, esp
+0081C4C3: 83ec14               sub      esp, 0x14
+0081C4C6: 68760f4500           push     0x450f76
+0081C4CB: 64a100000000         mov      eax, dword ptr fs:[0]
+0081C4D1: 50                   push     eax
+0081C4D2: 64892500000000       mov      dword ptr fs:[0], esp
+0081C4D9: 81ecac010000         sub      esp, 0x1ac
+0081C4DF: 53                   push     ebx
+0081C4E0: 56                   push     esi
+0081C4E1: 57                   push     edi
+0081C4E2: 8965ec               mov      dword ptr [ebp - 0x14], esp
+0081C4E5: c745f008224000       mov      dword ptr [ebp - 0x10], 0x402208
+0081C4EC: 33db                 xor      ebx, ebx
+0081C4EE: 895df4               mov      dword ptr [ebp - 0xc], ebx
+0081C4F1: 895df8               mov      dword ptr [ebp - 8], ebx
+0081C4F4: 895de0               mov      dword ptr [ebp - 0x20], ebx
+0081C4F7: 895ddc               mov      dword ptr [ebp - 0x24], ebx
+0081C4FA: 895dd8               mov      dword ptr [ebp - 0x28], ebx
+0081C4FD: 895dd4               mov      dword ptr [ebp - 0x2c], ebx
+0081C500: 895dd0               mov      dword ptr [ebp - 0x30], ebx
+0081C503: 895dcc               mov      dword ptr [ebp - 0x34], ebx
+0081C506: 895dc8               mov      dword ptr [ebp - 0x38], ebx
+0081C509: 895dc4               mov      dword ptr [ebp - 0x3c], ebx
+0081C50C: 895dc0               mov      dword ptr [ebp - 0x40], ebx
+0081C50F: 895db0               mov      dword ptr [ebp - 0x50], ebx
+0081C512: 895da0               mov      dword ptr [ebp - 0x60], ebx
+0081C515: 895d90               mov      dword ptr [ebp - 0x70], ebx
+0081C518: 895d80               mov      dword ptr [ebp - 0x80], ebx
+0081C51B: 899d70ffffff         mov      dword ptr [ebp - 0x90], ebx
+0081C521: 899d60ffffff         mov      dword ptr [ebp - 0xa0], ebx
+0081C527: 899d50ffffff         mov      dword ptr [ebp - 0xb0], ebx
+0081C52D: 899d40ffffff         mov      dword ptr [ebp - 0xc0], ebx
+0081C533: 899d30ffffff         mov      dword ptr [ebp - 0xd0], ebx
+0081C539: 899d20ffffff         mov      dword ptr [ebp - 0xe0], ebx
+0081C53F: 899d10ffffff         mov      dword ptr [ebp - 0xf0], ebx
+0081C545: 899d00ffffff         mov      dword ptr [ebp - 0x100], ebx
+0081C54B: 899df0feffff         mov      dword ptr [ebp - 0x110], ebx
+0081C551: 899de0feffff         mov      dword ptr [ebp - 0x120], ebx
+0081C557: 899dd0feffff         mov      dword ptr [ebp - 0x130], ebx
+0081C55D: 899dc0feffff         mov      dword ptr [ebp - 0x140], ebx
+0081C563: 899da0feffff         mov      dword ptr [ebp - 0x160], ebx
+0081C569: 899d90feffff         mov      dword ptr [ebp - 0x170], ebx
+0081C56F: 899d5cfeffff         mov      dword ptr [ebp - 0x1a4], ebx
+0081C575: 899d58feffff         mov      dword ptr [ebp - 0x1a8], ebx
+0081C57B: 6a01                 push     1
+0081C57D: ff159c124000         call     dword ptr [0x40129c]   ; thunk 0040129C
+0081C583: e898e2d400           call     0x156a820
+0081C588: e8c3f9ffff           call     0x81bf50
+0081C58D: 66391d98026201       cmp      word ptr [0x1620298], bx
+0081C594: 7416                 je       0x81c5ac
+0081C596: e8e5e2d400           call     0x156a880
+0081C59B: ff1580124000         call     dword ptr [0x401280]   ; thunk 00401280
+0081C5A1: 9b                   wait     
+0081C5A2: 68ddd08100           push     0x81d0dd
+0081C5A7: e9270b0000           jmp      0x81d0d3
+0081C5AC: baa4544f00           mov      edx, 0x4f54a4   ; " ****** Check Licensing ******"
+0081C5B1: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C5B4: 8b3d34154000         mov      edi, dword ptr [0x401534]
+0081C5BA: ffd7                 call     edi
+0081C5BC: 8d45dc               lea      eax, [ebp - 0x24]
+0081C5BF: 50                   push     eax
+0081C5C0: e88bd00000           call     0x829650
+0081C5C5: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C5C8: 8b35a4164000         mov      esi, dword ptr [0x4016a4]
+0081C5CE: ffd6                 call     esi
+0081C5D0: 68e8544f00           push     0x4f54e8   ; " UserName="
+0081C5D5: 8b0db8026201         mov      ecx, dword ptr [0x16202b8]
+0081C5DB: 51                   push     ecx
+0081C5DC: ff15ec114000         call     dword ptr [0x4011ec]   ; thunk 004011EC
+0081C5E2: 8bd0                 mov      edx, eax
+0081C5E4: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C5E7: ff151c164000         call     dword ptr [0x40161c]   ; thunk 0040161C
+0081C5ED: 50                   push     eax
+0081C5EE: 6804554f00           push     0x4f5504   ; ", ComputerName="
+0081C5F3: ff15ec114000         call     dword ptr [0x4011ec]   ; thunk 004011EC
+0081C5F9: 8bd0                 mov      edx, eax
+0081C5FB: 8d4dd8               lea      ecx, [ebp - 0x28]
+0081C5FE: ff151c164000         call     dword ptr [0x40161c]   ; thunk 0040161C
+0081C604: 50                   push     eax
+0081C605: 8b15f0046201         mov      edx, dword ptr [0x16204f0]
+0081C60B: 52                   push     edx
+0081C60C: ff15ec114000         call     dword ptr [0x4011ec]   ; thunk 004011EC
+0081C612: 8bd0                 mov      edx, eax
+0081C614: 8d4dd4               lea      ecx, [ebp - 0x2c]
+0081C617: ff151c164000         call     dword ptr [0x40161c]   ; thunk 0040161C
+0081C61D: 8d45d4               lea      eax, [ebp - 0x2c]
+0081C620: 50                   push     eax
+0081C621: e82ad00000           call     0x829650
+0081C626: 8d4dd4               lea      ecx, [ebp - 0x2c]
+0081C629: 51                   push     ecx
+0081C62A: 8d55d8               lea      edx, [ebp - 0x28]
+0081C62D: 52                   push     edx
+0081C62E: 8d45dc               lea      eax, [ebp - 0x24]
+0081C631: 50                   push     eax
+0081C632: 6a03                 push     3
+0081C634: ff154c154000         call     dword ptr [0x40154c]   ; thunk 0040154C
+0081C63A: 83c410               add      esp, 0x10
+0081C63D: 68b4524f00           push     0x4f52b4   ; " VersionDate:"
+0081C642: 8b0dc8026201         mov      ecx, dword ptr [0x16202c8]
+0081C648: 51                   push     ecx
+0081C649: ff15ec114000         call     dword ptr [0x4011ec]   ; thunk 004011EC
+0081C64F: 8bd0                 mov      edx, eax
+0081C651: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C654: ff151c164000         call     dword ptr [0x40161c]   ; thunk 0040161C
+0081C65A: 8d55dc               lea      edx, [ebp - 0x24]
+0081C65D: 52                   push     edx
+0081C65E: e8edcf0000           call     0x829650
+0081C663: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C666: ffd6                 call     esi
+0081C668: bad4524f00           mov      edx, 0x4f52d4   ; " 1. Initialize Flexnet wrapper"
+0081C66D: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C670: ffd7                 call     edi
+0081C672: 8d45dc               lea      eax, [ebp - 0x24]
+0081C675: 50                   push     eax
+0081C676: e8d5cf0000           call     0x829650
+0081C67B: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C67E: ffd6                 call     esi
+0081C680: e80b180000           call     0x81de90
+0081C685: e816270000           call     0x81eda0
+0081C68A: e8c1d20000           call     0x829950
+0081C68F: ba18534f00           mov      edx, 0x4f5318   ; " 2. Read license information"
+0081C694: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C697: ffd7                 call     edi
+0081C699: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C69C: 51                   push     ecx
+0081C69D: e8aecf0000           call     0x829650
+0081C6A2: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C6A5: ffd6                 call     esi
+0081C6A7: e834e60000           call     0x82ace0
+0081C6AC: ba40554f00           mov      edx, 0x4f5540   ; " 4. Get the machine id"
+0081C6B1: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C6B4: ffd7                 call     edi
+0081C6B6: 8d55dc               lea      edx, [ebp - 0x24]
+0081C6B9: 52                   push     edx
+0081C6BA: e891cf0000           call     0x829650
+0081C6BF: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C6C2: ffd6                 call     esi
+0081C6C4: 66391df4036201       cmp      word ptr [0x16203f4], bx
+0081C6CB: 7476                 je       0x81c743
+0081C6CD: 66391df6036201       cmp      word ptr [0x16203f6], bx   ; "ProductName"
+0081C6D4: 746d                 je       0x81c743
+0081C6D6: 8d45b0               lea      eax, [ebp - 0x50]
+0081C6D9: 50                   push     eax
+0081C6DA: ff15b0134000         call     dword ptr [0x4013b0]   ; thunk 004013B0
+0081C6E0: 8d4db0               lea      ecx, [ebp - 0x50]
+0081C6E3: 51                   push     ecx
+0081C6E4: 8d55a0               lea      edx, [ebp - 0x60]
+0081C6E7: 52                   push     edx
+0081C6E8: ff1560134000         call     dword ptr [0x401360]   ; thunk 00401360
+0081C6EE: c785f8feffff6c434f00 mov      dword ptr [ebp - 0x108], 0x4f436c   ; "DEACTIVATE"
+0081C6F8: c785f0feffff08800000 mov      dword ptr [ebp - 0x110], 0x8008
+0081C702: 8d45a0               lea      eax, [ebp - 0x60]
+0081C705: 50                   push     eax
+0081C706: 8d8df0feffff         lea      ecx, [ebp - 0x110]
+0081C70C: 51                   push     ecx
+0081C70D: ff157c134000         call     dword ptr [0x40137c]   ; thunk 0040137C
+0081C713: 66898554feffff       mov      word ptr [ebp - 0x1ac], ax
+0081C71A: 8d55a0               lea      edx, [ebp - 0x60]
+0081C71D: 52                   push     edx
+0081C71E: 8d45b0               lea      eax, [ebp - 0x50]
+0081C721: 50                   push     eax
+0081C722: 6a02                 push     2
+0081C724: ff158c114000         call     dword ptr [0x40118c]   ; thunk 0040118C
+0081C72A: 83c40c               add      esp, 0xc
+0081C72D: 66399d54feffff       cmp      word ptr [ebp - 0x1ac], bx
+0081C734: 7406                 je       0x81c73c
+0081C736: ff1588114000         call     dword ptr [0x401188]   ; thunk 00401188
+0081C73C: e8ef490000           call     0x821130
+0081C741: eb05                 jmp      0x81c748
+0081C743: e8c8430000           call     0x820b10
+0081C748: 8bd0                 mov      edx, eax
+0081C74A: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C74D: ff151c164000         call     dword ptr [0x40161c]   ; thunk 0040161C
+0081C753: 8bd0                 mov      edx, eax
+0081C755: b944046201           mov      ecx, 0x1620444
+0081C75A: ffd7                 call     edi
+0081C75C: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C75F: ffd6                 call     esi
+0081C761: 6874554f00           push     0x4f5574   ; "  MachineID="
+0081C766: 8b0d44046201         mov      ecx, dword ptr [0x1620444]
+0081C76C: 51                   push     ecx
+0081C76D: ff15ec114000         call     dword ptr [0x4011ec]   ; thunk 004011EC
+0081C773: 8bd0                 mov      edx, eax
+0081C775: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C778: ff151c164000         call     dword ptr [0x40161c]   ; thunk 0040161C
+0081C77E: 8d55dc               lea      edx, [ebp - 0x24]
+0081C781: 52                   push     edx
+0081C782: e8c9ce0000           call     0x829650
+0081C787: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C78A: ffd6                 call     esi
+0081C78C: c785f8feffff44046201 mov      dword ptr [ebp - 0x108], 0x1620444
+0081C796: c785f0feffff08400000 mov      dword ptr [ebp - 0x110], 0x4008
+0081C7A0: 8d85f0feffff         lea      eax, [ebp - 0x110]
+0081C7A6: 50                   push     eax
+0081C7A7: 8d4db0               lea      ecx, [ebp - 0x50]
+0081C7AA: 51                   push     ecx
+0081C7AB: ff15dc124000         call     dword ptr [0x4012dc]   ; thunk 004012DC
+0081C7B1: c785e8feffff2c544e00 mov      dword ptr [ebp - 0x118], 0x4e542c
+0081C7BB: c785e0feffff08800000 mov      dword ptr [ebp - 0x120], 0x8008
+0081C7C5: 8d55b0               lea      edx, [ebp - 0x50]
+0081C7C8: 52                   push     edx
+0081C7C9: 8d85e0feffff         lea      eax, [ebp - 0x120]
+0081C7CF: 50                   push     eax
+0081C7D0: ff157c134000         call     dword ptr [0x40137c]   ; thunk 0040137C
+0081C7D6: 66898554feffff       mov      word ptr [ebp - 0x1ac], ax
+0081C7DD: 8d4db0               lea      ecx, [ebp - 0x50]
+0081C7E0: ff1560114000         call     dword ptr [0x401160]   ; thunk 00401160
+0081C7E6: 66399d54feffff       cmp      word ptr [ebp - 0x1ac], bx
+0081C7ED: 0f849f000000         je       0x81c892
+0081C7F3: 66391df4036201       cmp      word ptr [0x16203f4], bx
+0081C7FA: 740e                 je       0x81c80a
+0081C7FC: 66391df6036201       cmp      word ptr [0x16203f6], bx   ; "ProductName"
+0081C803: ba94554f00           mov      edx, 0x4f5594   ; "You are using the dongle version. Please plug in the dongle into any USB port."
+0081C808: 7505                 jne      0x81c80f
+0081C80A: ba38564f00           mov      edx, 0x4f5638   ; "Could not get the host id (machine id) on this computer, the application will stop now. Please contact DS-INTL"
+0081C80F: 8d4de0               lea      ecx, [ebp - 0x20]
+0081C812: ffd7                 call     edi
+0081C814: 8d4de0               lea      ecx, [ebp - 0x20]
+0081C817: 51                   push     ecx
+0081C818: e833ce0000           call     0x829650
+0081C81D: b904000280           mov      ecx, 0x80020004
+0081C822: 894d98               mov      dword ptr [ebp - 0x68], ecx
+0081C825: b80a000000           mov      eax, 0xa
+0081C82A: 894590               mov      dword ptr [ebp - 0x70], eax
+0081C82D: 894da8               mov      dword ptr [ebp - 0x58], ecx
+0081C830: 8945a0               mov      dword ptr [ebp - 0x60], eax
+0081C833: 894db8               mov      dword ptr [ebp - 0x48], ecx
+0081C836: 8945b0               mov      dword ptr [ebp - 0x50], eax
+0081C839: 8d55e0               lea      edx, [ebp - 0x20]
+0081C83C: 8995f8feffff         mov      dword ptr [ebp - 0x108], edx
+0081C842: c785f0feffff08400000 mov      dword ptr [ebp - 0x110], 0x4008
+0081C84C: 8d4590               lea      eax, [ebp - 0x70]
+0081C84F: 50                   push     eax
+0081C850: 8d4da0               lea      ecx, [ebp - 0x60]
+0081C853: 51                   push     ecx
+0081C854: 8d55b0               lea      edx, [ebp - 0x50]
+0081C857: 52                   push     edx
+0081C858: 6a10                 push     0x10
+0081C85A: 8d85f0feffff         lea      eax, [ebp - 0x110]
+0081C860: 50                   push     eax
+0081C861: ff15a0124000         call     dword ptr [0x4012a0]   ; thunk 004012A0
+0081C867: 8d4d90               lea      ecx, [ebp - 0x70]
+0081C86A: 51                   push     ecx
+0081C86B: 8d55a0               lea      edx, [ebp - 0x60]
+0081C86E: 52                   push     edx
+0081C86F: 8d45b0               lea      eax, [ebp - 0x50]
+0081C872: 50                   push     eax
+0081C873: 6a03                 push     3
+0081C875: ff158c114000         call     dword ptr [0x40118c]   ; thunk 0040118C
+0081C87B: 83c410               add      esp, 0x10
+0081C87E: 66391df4036201       cmp      word ptr [0x16203f4], bx
+0081C885: 7405                 je       0x81c88c
+0081C887: e894270000           call     0x81f020
+0081C88C: ff1588114000         call     dword ptr [0x401188]   ; thunk 00401188
+0081C892: ba2c574f00           mov      edx, 0x4f572c   ; " 5. Get date, location from DSI's website"
+0081C897: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C89A: ffd7                 call     edi
+0081C89C: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C89F: 51                   push     ecx
+0081C8A0: e8abcd0000           call     0x829650
+0081C8A5: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C8A8: ffd6                 call     esi
+0081C8AA: e8a1000100           call     0x82c950
+0081C8AF: 899d5cfeffff         mov      dword ptr [ebp - 0x1a4], ebx
+0081C8B5: 8d955cfeffff         lea      edx, [ebp - 0x1a4]
+0081C8BB: 52                   push     edx
+0081C8BC: e8bf9d0100           call     0x836680
+0081C8C1: e83adfffff           call     0x81a800
+0081C8C6: 66391d8c046201       cmp      word ptr [0x162048c], bx   ; "8.04.0122"
+0081C8CD: 0f856b070000         jne      0x81d03e
+0081C8D3: 8d45b0               lea      eax, [ebp - 0x50]
+0081C8D6: 50                   push     eax
+0081C8D7: e814080000           call     0x81d0f0
+0081C8DC: 8d4db0               lea      ecx, [ebp - 0x50]
+0081C8DF: 51                   push     ecx
+0081C8E0: ff1508134000         call     dword ptr [0x401308]   ; thunk 00401308
+0081C8E6: 66898554feffff       mov      word ptr [ebp - 0x1ac], ax
+0081C8ED: 8d4db0               lea      ecx, [ebp - 0x50]
+0081C8F0: ff1560114000         call     dword ptr [0x401160]   ; thunk 00401160
+0081C8F6: 66399d54feffff       cmp      word ptr [ebp - 0x1ac], bx
+0081C8FD: 0f853b070000         jne      0x81d03e
+0081C903: ba84574f00           mov      edx, 0x4f5784   ; " 6. Check if the computer is already activated or not. "
+0081C908: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C90B: ffd7                 call     edi
+0081C90D: 8d55dc               lea      edx, [ebp - 0x24]
+0081C910: 52                   push     edx
+0081C911: e83acd0000           call     0x829650
+0081C916: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C919: ffd6                 call     esi
+0081C91B: 66391df4036201       cmp      word ptr [0x16203f4], bx
+0081C922: 0f84ad040000         je       0x81cdd5
+0081C928: 68f8574f00           push     0x4f57f8   ; " 6.1 The license is activated. LicenseCode: "
+0081C92D: a108046201           mov      eax, dword ptr [0x1620408]
+0081C932: 50                   push     eax
+0081C933: ff15ec114000         call     dword ptr [0x4011ec]   ; thunk 004011EC
+0081C939: 8bd0                 mov      edx, eax
+0081C93B: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C93E: ff151c164000         call     dword ptr [0x40161c]   ; thunk 0040161C
+0081C944: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C947: 51                   push     ecx
+0081C948: e803cd0000           call     0x829650
+0081C94D: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C950: ffd6                 call     esi
+0081C952: 66891d8e256201       mov      word ptr [0x162258e], bx
+0081C959: 66391df6036201       cmp      word ptr [0x16203f6], bx   ; "ProductName"
+0081C960: 7539                 jne      0x81c99b
+0081C962: ba20964f00           mov      edx, 0x4f9620   ; " 6.1.1 Compare the client time with server time"
+0081C967: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C96A: ffd7                 call     edi
+0081C96C: 8d55dc               lea      edx, [ebp - 0x24]
+0081C96F: 52                   push     edx
+0081C970: e8dbcc0000           call     0x829650
+0081C975: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C978: ffd6                 call     esi
+0081C97A: c78558feffff01000000 mov      dword ptr [ebp - 0x1a8], 1
+0081C984: 8d8558feffff         lea      eax, [ebp - 0x1a8]
+0081C98A: 50                   push     eax
+0081C98B: e870380000           call     0x820200
+0081C990: 6685c0               test     ax, ax
+0081C993: 7506                 jne      0x81c99b
+0081C995: ff1588114000         call     dword ptr [0x401188]   ; thunk 00401188
+0081C99B: ba84964f00           mov      edx, 0x4f9684   ; " 6.1.2 Check valid Product Features"
+0081C9A0: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C9A3: ffd7                 call     edi
+0081C9A5: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C9A8: 51                   push     ecx
+0081C9A9: e8a2cc0000           call     0x829650
+0081C9AE: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081C9B1: ffd6                 call     esi
+0081C9B3: e8c8180100           call     0x82e280
+0081C9B8: 668bd8               mov      bx, ax
+0081C9BB: 66f7db               neg      bx
+0081C9BE: 1bdb                 sbb      ebx, ebx
+0081C9C0: 43                   inc      ebx
+0081C9C1: e87a180100           call     0x82e240
+0081C9C6: 66f7d8               neg      ax
+0081C9C9: 1bc0                 sbb      eax, eax
+0081C9CB: 40                   inc      eax
+0081C9CC: 23d8                 and      ebx, eax
+0081C9CE: f7db                 neg      ebx
+0081C9D0: 1bdb                 sbb      ebx, ebx
+0081C9D2: f7db                 neg      ebx
+0081C9D4: e8e7180100           call     0x82e2c0
+0081C9D9: 66f7d8               neg      ax
+0081C9DC: 1bc0                 sbb      eax, eax
+0081C9DE: 40                   inc      eax
+0081C9DF: 23d8                 and      ebx, eax
+0081C9E1: f7db                 neg      ebx
+0081C9E3: 1bdb                 sbb      ebx, ebx
+0081C9E5: f7db                 neg      ebx
+0081C9E7: 8b15fc036201         mov      edx, dword ptr [0x16203fc]
+0081C9ED: 52                   push     edx
+0081C9EE: 685c544e00           push     0x4e545c   ; "EE_DEMO_8_3"
+0081C9F3: ff1570134000         call     dword ptr [0x401370]   ; thunk 00401370
+0081C9F9: f7d8                 neg      eax
+0081C9FB: 1bc0                 sbb      eax, eax
+0081C9FD: f7d8                 neg      eax
+0081C9FF: 85d8                 test     eax, ebx
+0081CA01: 0f85b8030000         jne      0x81cdbf
+0081CA07: bad0964f00           mov      edx, 0x4f96d0   ; " 6.1.3 Check the license is valid or not by checking with FNO server"
+0081CA0C: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081CA0F: ffd7                 call     edi
+0081CA11: 8d45dc               lea      eax, [ebp - 0x24]
+0081CA14: 50                   push     eax
+0081CA15: e836cc0000           call     0x829650
+0081CA1A: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081CA1D: ffd6                 call     esi
+0081CA1F: e8bc090000           call     0x81d3e0
+0081CA24: ba60974f00           mov      edx, 0x4f9760   ; " 6.1.4 Check license file"
+0081CA29: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081CA2C: ffd7                 call     edi
+0081CA2E: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081CA31: 51                   push     ecx
+0081CA32: e819cc0000           call     0x829650
+0081CA37: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081CA3A: ffd6                 call     esi
+0081CA3C: 680c046201           push     0x162040c
+0081CA41: 6844046201           push     0x1620444
+0081CA46: 68ac036201           push     0x16203ac
+0081CA4B: 68fc036201           push     0x16203fc
+0081CA50: e8fb590000           call     0x822450
+0081CA55: 6685c0               test     ax, ax
+0081CA58: 0f8458030000         je       0x81cdb6
+0081CA5E: 8d55b0               lea      edx, [ebp - 0x50]
+0081CA61: 52                   push     edx
+0081CA62: e8f9160100           call     0x82e160
+0081CA67: 8d45b0               lea      eax, [ebp - 0x50]
+0081CA6A: 50                   push     eax
+0081CA6B: ff1508134000         call     dword ptr [0x401308]   ; thunk 00401308
+0081CA71: 668bf0               mov      si, ax
+0081CA74: 8d4db0               lea      ecx, [ebp - 0x50]
+0081CA77: ff1560114000         call     dword ptr [0x401160]   ; thunk 00401160
+0081CA7D: 6685f6               test     si, si
+0081CA80: 0f8415030000         je       0x81cd9b
+0081CA86: 6898974f00           push     0x4f9798   ; "     Act.VersionDate="
+0081CA8B: 8b0d34046201         mov      ecx, dword ptr [0x1620434]
+0081CA91: 51                   push     ecx
+0081CA92: 8b1530046201         mov      edx, dword ptr [0x1620430]
+0081CA98: 52                   push     edx
+0081CA99: ff15f0134000         call     dword ptr [0x4013f0]   ; thunk 004013F0
+0081CA9F: 8bd0                 mov      edx, eax
+0081CAA1: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081CAA4: 8b351c164000         mov      esi, dword ptr [0x40161c]
+0081CAAA: ffd6                 call     esi
+0081CAAC: 50                   push     eax
+0081CAAD: ff15ec114000         call     dword ptr [0x4011ec]   ; thunk 004011EC
+0081CAB3: 8bd0                 mov      edx, eax
+0081CAB5: 8d4dd8               lea      ecx, [ebp - 0x28]
+0081CAB8: ffd6                 call     esi
+0081CABA: 8d45d8               lea      eax, [ebp - 0x28]
+0081CABD: 50                   push     eax
+0081CABE: e88dcb0000           call     0x829650
+0081CAC3: 8d4dd8               lea      ecx, [ebp - 0x28]
+0081CAC6: 51                   push     ecx
+0081CAC7: 8d55dc               lea      edx, [ebp - 0x24]
+0081CACA: 52                   push     edx
+0081CACB: 6a02                 push     2
+0081CACD: ff154c154000         call     dword ptr [0x40154c]   ; thunk 0040154C
+0081CAD3: 83c40c               add      esp, 0xc
+0081CAD6: dd0530046201         fld      qword ptr [0x1620430]
+0081CADC: dc1d68174000         fcomp    qword ptr [0x401768]
+0081CAE2: dfe0                 fnstsw   ax
+0081CAE4: f6c440               test     ah, 0x40
+0081CAE7: 0f85ae020000         jne      0x81cd9b
+0081CAED: dd0530046201         fld      qword ptr [0x1620430]
+0081CAF3: dc1d78046201         fcomp    qword ptr [0x1620478]
+0081CAF9: dfe0                 fnstsw   ax
+0081CAFB: f6c401               test     ah, 1
+0081CAFE: 0f8497020000         je       0x81cd9b
+0081CB04: c785e8feffffb49c4e00 mov      dword ptr [ebp - 0x118], 0x4e9cb4   ; "yyyy-mm-dd"
+0081CB0E: be08000000           mov      esi, 8
+0081CB13: 89b5e0feffff         mov      dword ptr [ebp - 0x120], esi
+0081CB19: 8d95e0feffff         lea      edx, [ebp - 0x120]
+0081CB1F: 8d4db0               lea      ecx, [ebp - 0x50]
+0081CB22: 8b3db0154000         mov      edi, dword ptr [0x4015b0]
+0081CB28: ffd7                 call     edi
+0081CB2A: c785f8feffff78046201 mov      dword ptr [ebp - 0x108], 0x1620478
+0081CB34: c785f0feffff07400000 mov      dword ptr [ebp - 0x110], 0x4007
+0081CB3E: 6a01                 push     1
+0081CB40: 6a01                 push     1
+0081CB42: 8d45b0               lea      eax, [ebp - 0x50]
+0081CB45: 50                   push     eax
+0081CB46: 8d8df0feffff         lea      ecx, [ebp - 0x110]
+0081CB4C: 51                   push     ecx
+0081CB4D: 8d55a0               lea      edx, [ebp - 0x60]
+0081CB50: 52                   push     edx
+0081CB51: 8b1d00124000         mov      ebx, dword ptr [0x401200]
+0081CB57: ffd3                 call     ebx
+0081CB59: c785a8feffffb49c4e00 mov      dword ptr [ebp - 0x158], 0x4e9cb4   ; "yyyy-mm-dd"
+0081CB63: 89b5a0feffff         mov      dword ptr [ebp - 0x160], esi
+0081CB69: 8d95a0feffff         lea      edx, [ebp - 0x160]
+0081CB6F: 8d8d60ffffff         lea      ecx, [ebp - 0xa0]
+0081CB75: ffd7                 call     edi
+0081CB77: dd0530046201         fld      qword ptr [0x1620430]
+0081CB7D: ff1598114000         call     dword ptr [0x401198]   ; thunk 00401198
+0081CB83: 83ec08               sub      esp, 8
+0081CB86: dd1c24               fstp     qword ptr [esp]
+0081CB89: ff1590134000         call     dword ptr [0x401390]   ; thunk 00401390
+0081CB8F: dd9d78ffffff         fstp     qword ptr [ebp - 0x88]
+0081CB95: c78570ffffff07000000 mov      dword ptr [ebp - 0x90], 7
+0081CB9F: 6a01                 push     1
+0081CBA1: 6a01                 push     1
+0081CBA3: 8d8560ffffff         lea      eax, [ebp - 0xa0]
+0081CBA9: 50                   push     eax
+0081CBAA: 8d8d70ffffff         lea      ecx, [ebp - 0x90]
+0081CBB0: 51                   push     ecx
+0081CBB1: 8d9550ffffff         lea      edx, [ebp - 0xb0]
+0081CBB7: 52                   push     edx
+0081CBB8: ffd3                 call     ebx
+0081CBBA: bb04000280           mov      ebx, 0x80020004
+0081CBBF: 899d08ffffff         mov      dword ptr [ebp - 0xf8], ebx
+0081CBC5: bf0a000000           mov      edi, 0xa
+0081CBCA: 89bd00ffffff         mov      dword ptr [ebp - 0x100], edi
+0081CBD0: 899d18ffffff         mov      dword ptr [ebp - 0xe8], ebx
+0081CBD6: 89bd10ffffff         mov      dword ptr [ebp - 0xf0], edi
+0081CBDC: 899d28ffffff         mov      dword ptr [ebp - 0xd8], ebx
+0081CBE2: 89bd20ffffff         mov      dword ptr [ebp - 0xe0], edi
+0081CBE8: c785d8fefffffc974f00 mov      dword ptr [ebp - 0x128], 0x4f97fc   ; "Sorry, you cannot use this version ("
+0081CBF2: 89b5d0feffff         mov      dword ptr [ebp - 0x130], esi
+0081CBF8: c785c8feffff4c984f00 mov      dword ptr [ebp - 0x138], 0x4f984c   ; "). Your Maintenance Expiration Date is: "
+0081CC02: 89b5c0feffff         mov      dword ptr [ebp - 0x140], esi
+0081CC08: c78598feffff48964e00 mov      dword ptr [ebp - 0x168], 0x4e9648
+0081CC12: 89b590feffff         mov      dword ptr [ebp - 0x170], esi
+0081CC18: 8d8500ffffff         lea      eax, [ebp - 0x100]
+0081CC1E: 50                   push     eax
+0081CC1F: 8d8d10ffffff         lea      ecx, [ebp - 0xf0]
+0081CC25: 51                   push     ecx
+0081CC26: 8d9520ffffff         lea      edx, [ebp - 0xe0]
+0081CC2C: 52                   push     edx
+0081CC2D: 6a10                 push     0x10
+0081CC2F: 8d85d0feffff         lea      eax, [ebp - 0x130]
+0081CC35: 50                   push     eax
+0081CC36: 8d4da0               lea      ecx, [ebp - 0x60]
+0081CC39: 51                   push     ecx
+0081CC3A: 8d5590               lea      edx, [ebp - 0x70]
+0081CC3D: 52                   push     edx
+0081CC3E: 8b35c0144000         mov      esi, dword ptr [0x4014c0]
+0081CC44: ffd6                 call     esi
+0081CC46: 50                   push     eax
+0081CC47: 8d85c0feffff         lea      eax, [ebp - 0x140]
+0081CC4D: 50                   push     eax
+0081CC4E: 8d4d80               lea      ecx, [ebp - 0x80]
+0081CC51: 51                   push     ecx
+0081CC52: ffd6                 call     esi
+0081CC54: 50                   push     eax
+0081CC55: 8d9550ffffff         lea      edx, [ebp - 0xb0]
+0081CC5B: 52                   push     edx
+0081CC5C: 8d8540ffffff         lea      eax, [ebp - 0xc0]
+0081CC62: 50                   push     eax
+0081CC63: ffd6                 call     esi
+0081CC65: 50                   push     eax
+0081CC66: 8d8d90feffff         lea      ecx, [ebp - 0x170]
+0081CC6C: 51                   push     ecx
+0081CC6D: 8d9530ffffff         lea      edx, [ebp - 0xd0]
+0081CC73: 52                   push     edx
+0081CC74: ffd6                 call     esi
+0081CC76: 50                   push     eax
+0081CC77: ff15a0124000         call     dword ptr [0x4012a0]   ; thunk 004012A0
+0081CC7D: 8d8500ffffff         lea      eax, [ebp - 0x100]
+0081CC83: 50                   push     eax
+0081CC84: 8d8d10ffffff         lea      ecx, [ebp - 0xf0]
+0081CC8A: 51                   push     ecx
+0081CC8B: 8d9520ffffff         lea      edx, [ebp - 0xe0]
+0081CC91: 52                   push     edx
+0081CC92: 8d8530ffffff         lea      eax, [ebp - 0xd0]
+0081CC98: 50                   push     eax
+0081CC99: 8d8d40ffffff         lea      ecx, [ebp - 0xc0]
+0081CC9F: 51                   push     ecx
+0081CCA0: 8d9550ffffff         lea      edx, [ebp - 0xb0]
+0081CCA6: 52                   push     edx
+0081CCA7: 8d4580               lea      eax, [ebp - 0x80]
+0081CCAA: 50                   push     eax
+0081CCAB: 8d8d60ffffff         lea      ecx, [ebp - 0xa0]
+0081CCB1: 51                   push     ecx
+0081CCB2: 8d9570ffffff         lea      edx, [ebp - 0x90]
+0081CCB8: 52                   push     edx
+0081CCB9: 8d4590               lea      eax, [ebp - 0x70]
+0081CCBC: 50                   push     eax
+0081CCBD: 8d4da0               lea      ecx, [ebp - 0x60]
+0081CCC0: 51                   push     ecx
+0081CCC1: 8d55b0               lea      edx, [ebp - 0x50]
+0081CCC4: 52                   push     edx
+0081CCC5: 6a0c                 push     0xc
+0081CCC7: ff158c114000         call     dword ptr [0x40118c]   ; thunk 0040118C
+0081CCCD: 83c434               add      esp, 0x34
+0081CCD0: a1783b6201           mov      eax, dword ptr [0x1623b78]
+0081CCD5: 85c0                 test     eax, eax
+0081CCD7: 7510                 jne      0x81cce9
+0081CCD9: 68783b6201           push     0x1623b78
+0081CCDE: 68a07f4a00           push     0x4a7fa0
+0081CCE3: ff1514154000         call     dword ptr [0x401514]   ; thunk 00401514
+0081CCE9: 8b35783b6201         mov      esi, dword ptr [0x1623b78]
+0081CCEF: 8bc3                 mov      eax, ebx
+0081CCF1: 8985e8feffff         mov      dword ptr [ebp - 0x118], eax
+0081CCF7: 8bcf                 mov      ecx, edi
+0081CCF9: 898de0feffff         mov      dword ptr [ebp - 0x120], ecx
+0081CCFF: ba01000000           mov      edx, 1
+0081CD04: 8995f8feffff         mov      dword ptr [ebp - 0x108], edx
+0081CD0A: c785f0feffff02000000 mov      dword ptr [ebp - 0x110], 2
+0081CD14: 8b3e                 mov      edi, dword ptr [esi]
+0081CD16: 83ec10               sub      esp, 0x10
+0081CD19: 8bdc                 mov      ebx, esp
+0081CD1B: 890b                 mov      dword ptr [ebx], ecx
+0081CD1D: 8b8de4feffff         mov      ecx, dword ptr [ebp - 0x11c]
+0081CD23: 894b04               mov      dword ptr [ebx + 4], ecx
+0081CD26: 894308               mov      dword ptr [ebx + 8], eax
+0081CD29: 8b85ecfeffff         mov      eax, dword ptr [ebp - 0x114]
+0081CD2F: 89430c               mov      dword ptr [ebx + 0xc], eax
+0081CD32: 83ec10               sub      esp, 0x10
+0081CD35: 8bcc                 mov      ecx, esp
+0081CD37: 8b85f0feffff         mov      eax, dword ptr [ebp - 0x110]
+0081CD3D: 8901                 mov      dword ptr [ecx], eax
+0081CD3F: 8b85f4feffff         mov      eax, dword ptr [ebp - 0x10c]
+0081CD45: 894104               mov      dword ptr [ecx + 4], eax
+0081CD48: 895108               mov      dword ptr [ecx + 8], edx
+0081CD4B: 8b95fcfeffff         mov      edx, dword ptr [ebp - 0x104]
+0081CD51: 89510c               mov      dword ptr [ecx + 0xc], edx
+0081CD54: 56                   push     esi
+0081CD55: ff97b0020000         call     dword ptr [edi + 0x2b0]
+0081CD5B: dbe2                 fnclex   
+0081CD5D: 85c0                 test     eax, eax
+0081CD5F: 7d12                 jge      0x81cd73
+0081CD61: 68b0020000           push     0x2b0
+0081CD66: 68a0984f00           push     0x4f98a0
+0081CD6B: 56                   push     esi
+0081CD6C: 50                   push     eax
+0081CD6D: ff1520124000         call     dword ptr [0x401220]   ; thunk 00401220
+0081CD73: a1fc036201           mov      eax, dword ptr [0x16203fc]
+0081CD78: 50                   push     eax
+0081CD79: 685c544e00           push     0x4e545c   ; "EE_DEMO_8_3"
+0081CD7E: ff1570134000         call     dword ptr [0x401370]   ; thunk 00401370
+0081CD84: 85c0                 test     eax, eax
+0081CD86: 750d                 jne      0x81cd95
+0081CD88: 663905f4036201       cmp      word ptr [0x16203f4], ax
+0081CD8F: 0f85a9020000         jne      0x81d03e
+0081CD95: ff1588114000         call     dword ptr [0x401188]   ; thunk 00401188
+0081CD9B: e800eeffff           call     0x81bba0
+0081CDA0: e8abc10000           call     0x828f50
+0081CDA5: ff1580124000         call     dword ptr [0x401280]   ; thunk 00401280
+0081CDAB: 9b                   wait     
+0081CDAC: 68ddd08100           push     0x81d0dd
+0081CDB1: e91d030000           jmp      0x81d0d3
+0081CDB6: e865220000           call     0x81f020
+0081CDBB: 33db                 xor      ebx, ebx
+0081CDBD: eb3d                 jmp      0x81cdfc
+0081CDBF: e8acddd400           call     0x156ab70
+0081CDC4: ff1580124000         call     dword ptr [0x401280]   ; thunk 00401280
+0081CDCA: 9b                   wait     
+0081CDCB: 68ddd08100           push     0x81d0dd
+0081CDD0: e9fe020000           jmp      0x81d0d3
+0081CDD5: ba009a4f00           mov      edx, 0x4f9a00   ; " 6.2 Begin the activation process..."
+0081CDDA: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081CDDD: ffd7                 call     edi
+0081CDDF: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081CDE2: 51                   push     ecx
+0081CDE3: e868c80000           call     0x829650
+0081CDE8: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081CDEB: ffd6                 call     esi
+0081CDED: 6898046201           push     0x1620498
+0081CDF2: e839f40000           call     0x82c230
+0081CDF7: e874ddd400           call     0x156ab70
+0081CDFC: 53                   push     ebx
+0081CDFD: ff159c124000         call     dword ptr [0x40129c]   ; thunk 0040129C
+0081CE03: ff1580124000         call     dword ptr [0x401280]   ; thunk 00401280
+0081CE09: 9b                   wait     
+0081CE0A: 68ddd08100           push     0x81d0dd
+0081CE0F: e9bf020000           jmp      0x81d0d3
+0081CE14: b904000280           mov      ecx, 0x80020004
+0081CE19: 894d88               mov      dword ptr [ebp - 0x78], ecx
+0081CE1C: b80a000000           mov      eax, 0xa
+0081CE21: 894580               mov      dword ptr [ebp - 0x80], eax
+0081CE24: 894d98               mov      dword ptr [ebp - 0x68], ecx
+0081CE27: 894590               mov      dword ptr [ebp - 0x70], eax
+0081CE2A: 894da8               mov      dword ptr [ebp - 0x58], ecx
+0081CE2D: 8945a0               mov      dword ptr [ebp - 0x60], eax
+0081CE30: 8b1d6c154000         mov      ebx, dword ptr [0x40156c]
+0081CE36: ffd3                 call     ebx
+0081CE38: 50                   push     eax
+0081CE39: 8d55c4               lea      edx, [ebp - 0x3c]
+0081CE3C: 52                   push     edx
+0081CE3D: 8b3da4124000         mov      edi, dword ptr [0x4012a4]
+0081CE43: ffd7                 call     edi
+0081CE45: 8bf0                 mov      esi, eax
+0081CE47: 8b06                 mov      eax, dword ptr [esi]
+0081CE49: 8d8d58feffff         lea      ecx, [ebp - 0x1a8]
+0081CE4F: 51                   push     ecx
+0081CE50: 56                   push     esi
+0081CE51: ff501c               call     dword ptr [eax + 0x1c]
+0081CE54: dbe2                 fnclex   
+0081CE56: 85c0                 test     eax, eax
+0081CE58: 7d0f                 jge      0x81ce69
+0081CE5A: 6a1c                 push     0x1c
+0081CE5C: 68e8bb4e00           push     0x4ebbe8
+0081CE61: 56                   push     esi
+0081CE62: 50                   push     eax
+0081CE63: ff1520124000         call     dword ptr [0x401220]   ; thunk 00401220
+0081CE69: ffd3                 call     ebx
+0081CE6B: 50                   push     eax
+0081CE6C: 8d55c0               lea      edx, [ebp - 0x40]
+0081CE6F: 52                   push     edx
+0081CE70: ffd7                 call     edi
+0081CE72: 8bf0                 mov      esi, eax
+0081CE74: 8b06                 mov      eax, dword ptr [esi]
+0081CE76: 8d4dd4               lea      ecx, [ebp - 0x2c]
+0081CE79: 51                   push     ecx
+0081CE7A: 56                   push     esi
+0081CE7B: ff502c               call     dword ptr [eax + 0x2c]
+0081CE7E: dbe2                 fnclex   
+0081CE80: 85c0                 test     eax, eax
+0081CE82: 7d0f                 jge      0x81ce93
+0081CE84: 6a2c                 push     0x2c
+0081CE86: 68e8bb4e00           push     0x4ebbe8
+0081CE8B: 56                   push     esi
+0081CE8C: 50                   push     eax
+0081CE8D: ff1520124000         call     dword ptr [0x401220]   ; thunk 00401220
+0081CE93: 68509a4f00           push     0x4f9a50   ; "There is an error when checking the license. Error "
+0081CE98: 8b9558feffff         mov      edx, dword ptr [ebp - 0x1a8]
+0081CE9E: 52                   push     edx
+0081CE9F: ff1544114000         call     dword ptr [0x401144]   ; thunk 00401144
+0081CEA5: 8bd0                 mov      edx, eax
+0081CEA7: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081CEAA: 8b351c164000         mov      esi, dword ptr [0x40161c]
+0081CEB0: ffd6                 call     esi
+0081CEB2: 50                   push     eax
+0081CEB3: 8b3dec114000         mov      edi, dword ptr [0x4011ec]
+0081CEB9: ffd7                 call     edi
+0081CEBB: 8bd0                 mov      edx, eax
+0081CEBD: 8d4dd8               lea      ecx, [ebp - 0x28]
+0081CEC0: ffd6                 call     esi
+0081CEC2: 50                   push     eax
+0081CEC3: 68fcbb4e00           push     0x4ebbfc
+0081CEC8: ffd7                 call     edi
+0081CECA: 8bd0                 mov      edx, eax
+0081CECC: 8d4dd0               lea      ecx, [ebp - 0x30]
+0081CECF: ffd6                 call     esi
+0081CED1: 50                   push     eax
+0081CED2: 8b45d4               mov      eax, dword ptr [ebp - 0x2c]
+0081CED5: 50                   push     eax
+0081CED6: ffd7                 call     edi
+0081CED8: 8bd0                 mov      edx, eax
+0081CEDA: 8d4dcc               lea      ecx, [ebp - 0x34]
+0081CEDD: ffd6                 call     esi
+0081CEDF: 50                   push     eax
+0081CEE0: 68e4bd4e00           push     0x4ebde4
+0081CEE5: ffd7                 call     edi
+0081CEE7: 8945b8               mov      dword ptr [ebp - 0x48], eax
+0081CEEA: c745b008000000       mov      dword ptr [ebp - 0x50], 8
+0081CEF1: 8d4d80               lea      ecx, [ebp - 0x80]
+0081CEF4: 51                   push     ecx
+0081CEF5: 8d5590               lea      edx, [ebp - 0x70]
+0081CEF8: 52                   push     edx
+0081CEF9: 8d45a0               lea      eax, [ebp - 0x60]
+0081CEFC: 50                   push     eax
+0081CEFD: 6a00                 push     0
+0081CEFF: 8d4db0               lea      ecx, [ebp - 0x50]
+0081CF02: 51                   push     ecx
+0081CF03: ff15a0124000         call     dword ptr [0x4012a0]   ; thunk 004012A0
+0081CF09: 8d55cc               lea      edx, [ebp - 0x34]
+0081CF0C: 52                   push     edx
+0081CF0D: 8d45d4               lea      eax, [ebp - 0x2c]
+0081CF10: 50                   push     eax
+0081CF11: 8d4dd0               lea      ecx, [ebp - 0x30]
+0081CF14: 51                   push     ecx
+0081CF15: 8d55d8               lea      edx, [ebp - 0x28]
+0081CF18: 52                   push     edx
+0081CF19: 8d45dc               lea      eax, [ebp - 0x24]
+0081CF1C: 50                   push     eax
+0081CF1D: 6a05                 push     5
+0081CF1F: ff154c154000         call     dword ptr [0x40154c]   ; thunk 0040154C
+0081CF25: 8d4dc0               lea      ecx, [ebp - 0x40]
+0081CF28: 51                   push     ecx
+0081CF29: 8d55c4               lea      edx, [ebp - 0x3c]
+0081CF2C: 52                   push     edx
+0081CF2D: 6a02                 push     2
+0081CF2F: ff15ac114000         call     dword ptr [0x4011ac]   ; thunk 004011AC
+0081CF35: 8d4580               lea      eax, [ebp - 0x80]
+0081CF38: 50                   push     eax
+0081CF39: 8d4d90               lea      ecx, [ebp - 0x70]
+0081CF3C: 51                   push     ecx
+0081CF3D: 8d55a0               lea      edx, [ebp - 0x60]
+0081CF40: 52                   push     edx
+0081CF41: 8d45b0               lea      eax, [ebp - 0x50]
+0081CF44: 50                   push     eax
+0081CF45: 6a04                 push     4
+0081CF47: ff158c114000         call     dword ptr [0x40118c]   ; thunk 0040118C
+0081CF4D: 83c438               add      esp, 0x38
+0081CF50: ffd3                 call     ebx
+0081CF52: 50                   push     eax
+0081CF53: 8d4dc4               lea      ecx, [ebp - 0x3c]
+0081CF56: 51                   push     ecx
+0081CF57: ff15a4124000         call     dword ptr [0x4012a4]   ; thunk 004012A4
+0081CF5D: 8bd8                 mov      ebx, eax
+0081CF5F: 8b13                 mov      edx, dword ptr [ebx]
+0081CF61: 8d8558feffff         lea      eax, [ebp - 0x1a8]
+0081CF67: 50                   push     eax
+0081CF68: 53                   push     ebx
+0081CF69: ff521c               call     dword ptr [edx + 0x1c]
+0081CF6C: dbe2                 fnclex   
+0081CF6E: 85c0                 test     eax, eax
+0081CF70: 7d0f                 jge      0x81cf81
+0081CF72: 6a1c                 push     0x1c
+0081CF74: 68e8bb4e00           push     0x4ebbe8
+0081CF79: 53                   push     ebx
+0081CF7A: 50                   push     eax
+0081CF7B: ff1520124000         call     dword ptr [0x401220]   ; thunk 00401220
+0081CF81: ff156c154000         call     dword ptr [0x40156c]   ; thunk 0040156C
+0081CF87: 50                   push     eax
+0081CF88: 8d4dc0               lea      ecx, [ebp - 0x40]
+0081CF8B: 51                   push     ecx
+0081CF8C: ff15a4124000         call     dword ptr [0x4012a4]   ; thunk 004012A4
+0081CF92: 8bd8                 mov      ebx, eax
+0081CF94: 8b13                 mov      edx, dword ptr [ebx]
+0081CF96: 8d45d4               lea      eax, [ebp - 0x2c]
+0081CF99: 50                   push     eax
+0081CF9A: 53                   push     ebx
+0081CF9B: ff522c               call     dword ptr [edx + 0x2c]
+0081CF9E: dbe2                 fnclex   
+0081CFA0: 85c0                 test     eax, eax
+0081CFA2: 7d0f                 jge      0x81cfb3
+0081CFA4: 6a2c                 push     0x2c
+0081CFA6: 68e8bb4e00           push     0x4ebbe8
+0081CFAB: 53                   push     ebx
+0081CFAC: 50                   push     eax
+0081CFAD: ff1520124000         call     dword ptr [0x401220]   ; thunk 00401220
+0081CFB3: 6810ab4e00           push     0x4eab10   ; "Error "
+0081CFB8: 8b8d58feffff         mov      ecx, dword ptr [ebp - 0x1a8]
+0081CFBE: 51                   push     ecx
+0081CFBF: ff1544114000         call     dword ptr [0x401144]   ; thunk 00401144
+0081CFC5: 8bd0                 mov      edx, eax
+0081CFC7: 8d4ddc               lea      ecx, [ebp - 0x24]
+0081CFCA: ffd6                 call     esi
+0081CFCC: 50                   push     eax
+0081CFCD: ffd7                 call     edi
+0081CFCF: 8bd0                 mov      edx, eax
+0081CFD1: 8d4dd8               lea      ecx, [ebp - 0x28]
+0081CFD4: ffd6                 call     esi
+0081CFD6: 50                   push     eax
+0081CFD7: 68fcbb4e00           push     0x4ebbfc
+0081CFDC: ffd7                 call     edi
+0081CFDE: 8bd0                 mov      edx, eax
+0081CFE0: 8d4dd0               lea      ecx, [ebp - 0x30]
+0081CFE3: ffd6                 call     esi
+0081CFE5: 50                   push     eax
+0081CFE6: 8b55d4               mov      edx, dword ptr [ebp - 0x2c]
+0081CFE9: 52                   push     edx
+0081CFEA: ffd7                 call     edi
+0081CFEC: 8bd0                 mov      edx, eax
+0081CFEE: 8d4dcc               lea      ecx, [ebp - 0x34]
+0081CFF1: ffd6                 call     esi
+0081CFF3: 50                   push     eax
+0081CFF4: 68bc9a4f00           push     0x4f9abc   ; ") in procedure CheckLicensing of Module Act_License_Module"
+0081CFF9: ffd7                 call     edi
+0081CFFB: 8bd0                 mov      edx, eax
+0081CFFD: 8d4dc8               lea      ecx, [ebp - 0x38]
+0081D000: ffd6                 call     esi
+0081D002: 8d45c8               lea      eax, [ebp - 0x38]
+0081D005: 50                   push     eax
+0081D006: e845c60000           call     0x829650
+0081D00B: 8d4dc8               lea      ecx, [ebp - 0x38]
+0081D00E: 51                   push     ecx
+0081D00F: 8d55cc               lea      edx, [ebp - 0x34]
+0081D012: 52                   push     edx
+0081D013: 8d45d4               lea      eax, [ebp - 0x2c]
+0081D016: 50                   push     eax
+0081D017: 8d4dd0               lea      ecx, [ebp - 0x30]
+0081D01A: 51                   push     ecx
+0081D01B: 8d55d8               lea      edx, [ebp - 0x28]
+0081D01E: 52                   push     edx
+0081D01F: 8d45dc               lea      eax, [ebp - 0x24]
+0081D022: 50                   push     eax
+0081D023: 6a06                 push     6
+0081D025: ff154c154000         call     dword ptr [0x40154c]   ; thunk 0040154C
+0081D02B: 8d4dc0               lea      ecx, [ebp - 0x40]
+0081D02E: 51                   push     ecx
+0081D02F: 8d55c4               lea      edx, [ebp - 0x3c]
+0081D032: 52                   push     edx
+0081D033: 6a02                 push     2
+0081D035: ff15ac114000         call     dword ptr [0x4011ac]   ; thunk 004011AC
+0081D03B: 83c428               add      esp, 0x28
+0081D03E: ff1580124000         call     dword ptr [0x401280]   ; thunk 00401280
+0081D044: 9b                   wait     
+0081D045: 68ddd08100           push     0x81d0dd
+0081D04A: e984000000           jmp      0x81d0d3
+0081D04F: 8d45c8               lea      eax, [ebp - 0x38]
+0081D052: 50                   push     eax
+0081D053: 8d4dcc               lea      ecx, [ebp - 0x34]
+0081D056: 51                   push     ecx
+0081D057: 8d55d0               lea      edx, [ebp - 0x30]
+0081D05A: 52                   push     edx
+0081D05B: 8d45d4               lea      eax, [ebp - 0x2c]
+0081D05E: 50                   push     eax
+0081D05F: 8d4dd8               lea      ecx, [ebp - 0x28]
+0081D062: 51                   push     ecx
+0081D063: 8d55dc               lea      edx, [ebp - 0x24]
+0081D066: 52                   push     edx
+0081D067: 6a06                 push     6
+0081D069: ff154c154000         call     dword ptr [0x40154c]   ; thunk 0040154C
+0081D06F: 8d45c0               lea      eax, [ebp - 0x40]
+0081D072: 50                   push     eax
+0081D073: 8d4dc4               lea      ecx, [ebp - 0x3c]
+0081D076: 51                   push     ecx
+0081D077: 6a02                 push     2
+0081D079: ff15ac114000         call     dword ptr [0x4011ac]   ; thunk 004011AC
+0081D07F: 8d9500ffffff         lea      edx, [ebp - 0x100]
+0081D085: 52                   push     edx
+0081D086: 8d8510ffffff         lea      eax, [ebp - 0xf0]
+0081D08C: 50                   push     eax
+0081D08D: 8d8d20ffffff         lea      ecx, [ebp - 0xe0]
+0081D093: 51                   push     ecx
+0081D094: 8d9530ffffff         lea      edx, [ebp - 0xd0]
+0081D09A: 52                   push     edx
+0081D09B: 8d8540ffffff         lea      eax, [ebp - 0xc0]
+0081D0A1: 50                   push     eax
+0081D0A2: 8d8d50ffffff         lea      ecx, [ebp - 0xb0]
+0081D0A8: 51                   push     ecx
+0081D0A9: 8d9560ffffff         lea      edx, [ebp - 0xa0]
+0081D0AF: 52                   push     edx
+0081D0B0: 8d8570ffffff         lea      eax, [ebp - 0x90]
+0081D0B6: 50                   push     eax
+0081D0B7: 8d4d80               lea      ecx, [ebp - 0x80]
+0081D0BA: 51                   push     ecx
+0081D0BB: 8d5590               lea      edx, [ebp - 0x70]
+0081D0BE: 52                   push     edx
+0081D0BF: 8d45a0               lea      eax, [ebp - 0x60]
+0081D0C2: 50                   push     eax
+0081D0C3: 8d4db0               lea      ecx, [ebp - 0x50]
+0081D0C6: 51                   push     ecx
+0081D0C7: 6a0c                 push     0xc
+0081D0C9: ff158c114000         call     dword ptr [0x40118c]   ; thunk 0040118C
+0081D0CF: 83c45c               add      esp, 0x5c
+0081D0D2: c3                   ret      
+0081D0D3: 8d4de0               lea      ecx, [ebp - 0x20]
+0081D0D6: ff15a4164000         call     dword ptr [0x4016a4]   ; thunk 004016A4
+0081D0DC: c3                   ret      
+0081D0DD: 8b4de4               mov      ecx, dword ptr [ebp - 0x1c]
+0081D0E0: 64890d00000000       mov      dword ptr fs:[0], ecx
+0081D0E7: 5f                   pop      edi
+0081D0E8: 5e                   pop      esi
+0081D0E9: 5b                   pop      ebx
+0081D0EA: 8be5                 mov      esp, ebp
+0081D0EC: 5d                   pop      ebp
+0081D0ED: c3                   ret      
+0081D0EE: 90                   nop      
+0081D0EF: 90                   nop      
+0081D0F0: 55                   push     ebp
+0081D0F1: 8bec                 mov      ebp, esp
+0081D0F3: 83ec0c               sub      esp, 0xc
+0081D0F6: 68760f4500           push     0x450f76
+0081D0FB: 64a100000000         mov      eax, dword ptr fs:[0]
+0081D101: 50                   push     eax
+0081D102: 64892500000000       mov      dword ptr fs:[0], esp
+0081D109: 81eca8000000         sub      esp, 0xa8
+0081D10F: 53                   push     ebx
+0081D110: 56                   push     esi
+0081D111: 57                   push     edi
+0081D112: 8965f4               mov      dword ptr [ebp - 0xc], esp
+0081D115: c745f830224000       mov      dword ptr [ebp - 8], 0x402230

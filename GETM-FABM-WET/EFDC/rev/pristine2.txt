@@ -1,0 +1,6 @@
+﻿--- 8s alive True
+  cls='ThunderRT6FormDC'   title='EFDC_Explore8.0'            vis=0 rect=(0,5 815x639) parent=0x0
+  cls='VBMsoStdCompMgr'    title=''                           vis=0 rect=(0,0 0x0) parent=0x0
+  cls='ThunderRT6Main'     title='EFDC_Explorer8.4'           vis=1 rect=(853,533 0x0) parent=0x0
+  cls='IME'                title='Default IME'                vis=0 rect=(0,0 0x0) parent=0x920e32
+--- 18s alive False

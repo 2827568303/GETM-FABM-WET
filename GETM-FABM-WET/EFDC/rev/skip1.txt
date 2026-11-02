@@ -1,0 +1,5 @@
+﻿[js]      0 CheckLicensing replaced
+[js]      0 diag35 ready
+pid 29100
+[js]     25 CheckLicensing ��������ֱ�ӷ��أ�
+elapsed=18.2

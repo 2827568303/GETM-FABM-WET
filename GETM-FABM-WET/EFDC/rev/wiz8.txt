@@ -1,0 +1,8 @@
+﻿[js]      0 diag51 ready
+[js]      0 diag98 ready
+pid 13092
+[js]   3174 BEFORE hwnd=0xfea0e7a title="Activation Wizard" style=0x6c80000 vis=0
+[js]   3181 AFTER  vis=1 style=0x16c80000
+[js]   3181 children(5): ThunderRT6Frame,ThunderRT6CommandButton,ThunderRT6CheckBox,ThunderRT6Frame,ThunderRT6TextBox
+win 0xfea0e7a vis=1 rect=(0,3 643x489)
+saved (643, 489)

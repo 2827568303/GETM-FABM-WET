@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "case": "Imported Random Lake",
+      "frames": 20,
+      "minimum_depth_m": 2.3534882068634033,
+      "minimum_layer_m": 0.3922480344772339,
+      "depth_equals_bathymetry_plus_level_error_m": 0.00014617096317515177,
+      "summed_layer_depth_error_m": 0.0001468658447265625,
+      "tolerance_m": 0.001,
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const source=fs.readFileSync('3DWET/app/static/js/app.js','utf8');
+let english=false;
+const context=vm.createContext({window:{StudioI18n:{t:s=>s,variable:v=>({...v,comparison_name:english?'Water temperature':'水温'})}}});
+vm.runInContext(source.slice(0,source.indexOf('function localizedVariableLabel')),context);
+vm.runInContext("state.variables3d=[{name:'temp',zh_name:'水温',en_name:'Water temperature'}];this.config={data:{datasets:[{label:'水温 / Water temperature [C]',data:[0]}]}};translateChartLabels(config);",context);
+assert.equal(context.config.data.datasets[0].label,'水温 [C]');
+english=true;vm.runInContext('translateChartLabels(config)',context);
+assert.equal(context.config.data.datasets[0].label,'Water temperature [C]');
+console.log('scientific charts: replace old paired labels with one selected language PASS');

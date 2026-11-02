@@ -1,0 +1,6 @@
+﻿p='mkvbvm3.py'; s=open(p,encoding='utf-8').read()
+s=s.replace("struct.pack_into('<I', data, e_lfanew + 0x18 + 0x3C, new_va + 0x1000)   # SizeOfImage","struct.pack_into('<I', data, e_lfanew + 0x18 + 0x38, new_va + 0x1000)   # SizeOfImage")
+s=s.replace("size_of_code = struct.unpack_from('<I', data, e_lfanew + 0x18 + 0x1C)[0]","size_of_code = struct.unpack_from('<I', data, e_lfanew + 0x18 + 0x04)[0]")
+s=s.replace("struct.pack_into('<I', data, e_lfanew + 0x18 + 0x1C, size_of_code + 0x1000)","struct.pack_into('<I', data, e_lfanew + 0x18 + 0x04, size_of_code + 0x1000)")
+open(p,'w',encoding='utf-8').write(s)
+print('fixed')

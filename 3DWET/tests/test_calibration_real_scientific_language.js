@@ -1,0 +1,21 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const source=fs.readFileSync('3DWET/app/static/js/app.js','utf8');
+const context=vm.createContext({window:{},console,Intl,Map,Set,WeakMap,JSON,Promise,
+    localStorage:{getItem:()=>null,setItem:()=>{}},fetch:async()=>({ok:true,json:async()=>JSON.parse(fs.readFileSync('3DWET/app/static/i18n/en.json','utf8'))})});
+vm.runInContext(fs.readFileSync('3DWET/app/static/js/i18n.js','utf8'),context);
+vm.runInContext(source.slice(0,source.indexOf('function localizedVariableLabel')),context);
+vm.runInContext(source.slice(source.indexOf('function calibrationScientificText('),source.indexOf('function selectedCalibrationVariables(')),context);
+(async()=>{await context.window.StudioI18n.ready;
+    vm.runInContext("state.variables3d=[{name:'temp',zh_name:'水温',en_name:'Water temperature'}];this.config={data:{datasets:[{label:'水温 / Water temperature [C]',data:[0]}]}};translateChartLabels(config);",context);
+    await context.window.StudioI18n.setLocale('en-US');vm.runInContext('translateChartLabels(config)',context);
+    assert.equal(context.config.data.datasets[0].label,'Water temperature [C]');
+    vm.runInContext("this.builtIn={data:{datasets:[{label:calibrationScientificText('模拟','Simulated')+' temp',data:[0]}]}};translateChartLabels(builtIn)",context);
+    assert.equal(context.builtIn.data.datasets[0].label,'Simulated temp');
+    context.window.StudioI18n.importPack({locale:'fr-FR',name:'Français',messages:{'水温':'Température'}});
+    await context.window.StudioI18n.setLocale('fr-FR');
+    vm.runInContext("this.french={data:{datasets:[{label:'Température [C]',data:[0]}]}};translateChartLabels(french)",context);
+    assert.equal(context.french.data.datasets[0].label,'Température [C]');
+    await context.window.StudioI18n.setLocale('en-US');vm.runInContext('translateChartLabels(french)',context);
+    assert.equal(context.french.data.datasets[0].label,'Water temperature [C]');
+    console.log('real scientific language: charts follow selected language and switch existing imported labels PASS');
+})().catch(e=>{console.error(e);process.exitCode=1;});
