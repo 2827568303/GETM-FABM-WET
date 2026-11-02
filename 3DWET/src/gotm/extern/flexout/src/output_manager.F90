@@ -15,7 +15,7 @@ module output_manager
    private
 
    public output_manager_init, output_manager_start, output_manager_prepare_save, output_manager_save, output_manager_clean, &
-      output_manager_add_file, global_attributes
+      output_manager_add_file, output_manager_host_data_required, global_attributes
 
    class (type_file), pointer :: first_file
    logical                    :: files_initialized
@@ -435,6 +435,50 @@ contains
          file => file%next
       end do
    end subroutine output_manager_save2
+
+   ! True when a later save (or a time average) will read host fields for
+   ! this step index. Matches output_manager_save2 without advancing clocks.
+   logical function output_manager_host_data_required(julianday, secondsofday, microseconds, n)
+      integer, intent(in) :: julianday, secondsofday, microseconds, n
+
+      class (type_file), pointer :: file
+      logical :: required
+
+      output_manager_host_data_required = .true.
+      if (host_data_read_every_step) return
+      if (.not. files_initialized) return
+
+      output_manager_host_data_required = .false.
+      file => first_file
+      do while (associated(file))
+         required = .false.
+         if (in_window(file, julianday, secondsofday, microseconds, n)) then
+            select case (file%time_unit)
+            case (time_unit_none)
+               required = .false.
+            case (time_unit_dt)
+               if (file%first_index == -1 .or. file%time_step <= 0) then
+                  required = .true.
+               else
+                  required = mod(n - file%first_index, file%time_step) == 0
+               end if
+            case default
+               ! next_julian == -1 means this step will initialise and may save.
+               if (file%next_julian == -1) then
+                  required = .true.
+               else
+                  required = (julianday == file%next_julian .and. secondsofday >= file%next_seconds) &
+                     .or. julianday > file%next_julian
+               end if
+            end select
+         end if
+         if (required) then
+            output_manager_host_data_required = .true.
+            return
+         end if
+         file => file%next
+      end do
+   end function output_manager_host_data_required
 
    subroutine configure_from_yaml(field_manager, title, postfix, settings)
       type (type_field_manager), target      :: field_manager

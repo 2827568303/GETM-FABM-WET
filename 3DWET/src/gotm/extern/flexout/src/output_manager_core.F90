@@ -28,6 +28,11 @@ module output_manager_core
    integer,parameter,public :: time_unit_dt     = 6
    integer,parameter,public :: time_from_list   = 7
 
+   ! Set when an output operator reads the host array on every step
+   ! (time averaging). Hosts can otherwise refresh instantaneous fields
+   ! only on steps that actually write.
+   logical, public, save :: host_data_read_every_step = .false.
+
    integer,parameter,public :: rk = kind(_ONE_)
 
    type,abstract :: type_host

@@ -47,6 +47,8 @@ contains
          output_field => source
          return
       end if
+      ! new_data samples the host field on every step, not only at save.
+      host_data_read_every_step = .true.
 
       allocate(result)
       result%operator => self
