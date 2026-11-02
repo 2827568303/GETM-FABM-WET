@@ -2011,10 +2011,31 @@
 !
 ! !LOCAL VARIABLES:
    integer :: i
+   logical, save :: aggregate_known = .false.
+   logical, save :: has_aggregate = .false.
 !
 !EOP
 !-----------------------------------------------------------------------!
 !BOC
+   ! GETM rewrites every saved diagnostic to instantaneous, then only reads
+   ! the host array on output steps. Walking ~1000 diagnostics per column
+   ! on the other steps does not change the stored fields.
+   if (.not. aggregate_known) then
+      has_aggregate = .false.
+      do i=1,size(model%horizontal_diagnostic_variables)
+         if (model%horizontal_diagnostic_variables(i)%output/=output_none .and. &
+             model%horizontal_diagnostic_variables(i)%output/=output_instantaneous) &
+            has_aggregate = .true.
+      end do
+      do i=1,size(model%diagnostic_variables)
+         if (model%diagnostic_variables(i)%output/=output_none .and. &
+             model%diagnostic_variables(i)%output/=output_instantaneous) &
+            has_aggregate = .true.
+      end do
+      aggregate_known = .true.
+   end if
+   if (.not. save_instant_diagnostics .and. .not. has_aggregate) return
+
    ! Time-integrate diagnostic variables defined on horizontal slices, where needed.
    do i=1,size(model%horizontal_diagnostic_variables)
       if (model%horizontal_diagnostic_variables(i)%output==output_instantaneous) then

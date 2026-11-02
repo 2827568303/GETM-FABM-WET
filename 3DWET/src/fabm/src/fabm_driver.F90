@@ -24,6 +24,10 @@ module fabm_driver
 
    class (type_base_driver),pointer,save :: driver => null()
 
+   ! Host sets this false on steps where instantaneous diagnostics are not read.
+   ! Models may skip diagnostic-only work. Source terms must still be evaluated.
+   logical, public, save :: host_save_diagnostics = .true.
+
 contains
 
    subroutine base_driver_fatal_error(self,location,message)

@@ -264,6 +264,20 @@
       STDERR '            cfl=',real(cmax/itmax)
    end if
 
+   ! Zero face velocity and zero prescribed boundary flux: the reconstructed
+   ! face flux is zero, and it = 1. The update below is the conservative
+   ! one-step formula with cu = 0. The non-conservative form then adds zero.
+   if (cmax==_ZERO_ .and. ww(0)==_ZERO_ .and. ww(N)==_ZERO_ &
+       .and. Yup==_ZERO_ .and. Ydw==_ZERO_) then
+      if (mode/=0) then
+         do k=1,N
+            Y(k) = (Vco(k)*Y(k) - dt*((_ZERO_-_ZERO_)-Qsour(k))) &
+                   / (Vc(k) - dt*Lsour(k))
+         end do
+      end if
+      return
+   end if
+
    dti = dt / it
    dV  = (Vc - Vco) / it
 

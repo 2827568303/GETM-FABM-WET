@@ -49,6 +49,8 @@
 #endif
    use fabm_types,only: output_instantaneous, output_none, output_time_integrated, &
       output_time_step_averaged, output_time_step_integrated, type_bulk_standard_variable
+   use fabm_driver, only: host_save_diagnostics
+!$ use omp_lib
    use fabm, only: fabm_link_scalar_data, fabm_get_scalar_variable_id, type_scalar_variable_id
    use fabm_standard_variables, only: standard_variables
    use fabm, only: fabm_get_bulk_diagnostic_data
@@ -579,6 +581,7 @@ end interface
 ! !LOCAL VARIABLES:
    integer         :: n
    integer         :: i,j,k,kk
+   integer         :: nthreads
    logical         :: publish
    REALTYPE        :: bioshade(1:kmax)
    REALTYPE        :: wind_speed,I_0,taub_nonnorm,cloud
@@ -599,6 +602,9 @@ end interface
    ! field is only read by output, so scatter them on output steps.
    ! Time-integrated diagnostics stay in the 3D field every step.
    save_instant_diagnostics = publish
+   ! Pelagic carbonate equilibrium is diagnostic-only. Surface exchange
+   ! still solves it. See wet/inorganic_carbon.F90.
+   host_save_diagnostics = publish
 
 !  First update all input fields
    if (month .ne. old_month) then
@@ -758,8 +764,18 @@ end interface
    end do
 #endif
 
-!  Advect pelagic biogeochemical variables.
+!  Advect pelagic biogeochemical variables. Each tracer is independent.
+!  num_threads overrides OMP_NUM_THREADS so this stays parallel when the
+!  rest of the run is serial (hydro OpenMP is slower on this grid).
+!  Inner advection regions then run with one thread because nesting is off.
+!  Not used for MPI: halo exchange shares one tag.
    call tic(TIM_ADVECTFABM)
+   nthreads = 1
+!$ nthreads = omp_get_num_procs()
+   if (nthreads < 1) nthreads = 1
+#ifndef GETM_PARALLEL
+!$omp parallel do if(nthreads>1) num_threads(nthreads) default(shared) private(n) schedule(static)
+#endif
    do n=1,size(model%state_variables)
 
       call update_3d_halo(fabm_pel(:,:,:,n),fabm_pel(:,:,:,n),az, &
@@ -770,6 +786,9 @@ end interface
                                                 fabm_adv_split,fabm_adv_hor,fabm_adv_ver,fabm_AH,H_TAG)
 
    end do
+#ifndef GETM_PARALLEL
+!$omp end parallel do
+#endif
    call toc(TIM_ADVECTFABM)
 
    call toc(TIM_GETM_FABM)
