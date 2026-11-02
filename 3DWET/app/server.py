@@ -2243,7 +2243,7 @@ def _compress_completed_getm_outputs(case_path, logs):
     if isinstance(run_config, dict):
         run_config["phase"] = "compressing"
     paths = []
-    for pattern in ("*.2d.nc", "*.3d.nc", "output.nc"):
+    for pattern in ("*.2d.nc", "*.3d.nc", "output.nc", "ext_wq.nc"):
         paths.extend(Path(case_path).glob(pattern))
     paths = list(dict.fromkeys(path for path in paths if path.is_file()))
     if not paths:

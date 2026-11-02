@@ -1,8 +1,12 @@
 # 关键变量每天写入 output.nc；水质按周写入 ext_wq.nc。
 # 水位 elev、深度积分流速 u/v 由原生 *.2d.nc 写出，不能放进这里。
-# FABM 变量登记在类别 fabm/<实例名>。source 必须写成 fabm/abiotic_water/*，
-# 输出级别 8（output_level_default）。写成 abiotic_water/* 会选到空类别，
-# 日志提示没有匹配到该输出级别，ext_wq.nc 不会创建。
+# 周文件默认只写水质状态量（溶解氧、氨氮、硝氮、磷酸盐、有机碳氮磷、
+# 藻类、浮游动物、鱼、DIC、甲烷等），外加三个藻类的叶绿素 oChla
+# 和合计 wet_chla_calculator_result。
+# 诊断量（反应速率、限制因子）默认不写。需要时把某一实例改回：
+#   - source: fabm/<实例名>/*
+#     output_level: 8
+# 不能写 abiotic_water/*：FABM 登记在类别 fabm/<实例名>，那个写法是空的。
 # 不要再用 source: * —— 那会把每个诊断量都按天写出。
 allow_missing_fields: true
 output:
@@ -20,37 +24,125 @@ ext_wq:
    time_step: 7
    sync_interval: 1
    variables:
-      - source: fabm/abiotic_water/*
-        output_level: 8
-      - source: fabm/abiotic_sediment/*
-        output_level: 8
-      - source: fabm/POM/*
-        output_level: 8
-      - source: fabm/DOM/*
-        output_level: 8
-      - source: fabm/humus/*
-        output_level: 8
-      - source: fabm/cyanobacteria/*
-        output_level: 8
-      - source: fabm/diatoms/*
-        output_level: 8
-      - source: fabm/greens/*
-        output_level: 8
-      - source: fabm/macrophytes/*
-        output_level: 8
-      - source: fabm/cladocerans/*
-        output_level: 8
-      - source: fabm/copepods/*
-        output_level: 8
-      - source: fabm/zoobenthos/*
-        output_level: 8
-      - source: fabm/JuFish/*
-        output_level: 8
-      - source: fabm/AdFish/*
-        output_level: 8
-      - source: fabm/PiscFish/*
-        output_level: 8
-      - source: fabm/inorganic_carbon/*
-        output_level: 8
-      - source: fabm/methane/*
-        output_level: 8
+      - source: abiotic_water_sNH4W
+      - source: abiotic_water_sNO3W
+      - source: abiotic_water_sPO4W
+      - source: abiotic_water_sPAIMW
+      - source: abiotic_water_sSiO2W
+      - source: abiotic_water_sO2W
+      - source: abiotic_water_sDIMW
+      - source: abiotic_water_sSiPaW
+      - source: abiotic_sediment_sNH4S
+      - source: abiotic_sediment_sNO3S
+      - source: abiotic_sediment_sPO4S
+      - source: abiotic_sediment_sPAIMS
+      - source: abiotic_sediment_sDIMS
+      - source: abiotic_sediment_sSiO2S
+      - source: abiotic_sediment_sSiPaS
+      - source: POM_sDW
+      - source: POM_sNW
+      - source: POM_sPW
+      - source: POM_sCW
+      - source: POM_sDS
+      - source: POM_sNS
+      - source: POM_sPS
+      - source: POM_sCS
+      - source: POM_sDS_PV
+      - source: POM_sNS_PV
+      - source: POM_sPS_PV
+      - source: POM_sCS_PV
+      - source: DOM_sDW
+      - source: DOM_sNW
+      - source: DOM_sPW
+      - source: DOM_sCW
+      - source: DOM_sDS
+      - source: DOM_sNS
+      - source: DOM_sPS
+      - source: DOM_sCS
+      - source: humus_sDS
+      - source: humus_sNS
+      - source: humus_sPS
+      - source: humus_sCS
+      - source: humus_sDS_PV
+      - source: humus_sNS_PV
+      - source: humus_sPS_PV
+      - source: humus_sCS_PV
+      - source: cyanobacteria_sDW
+      - source: cyanobacteria_sNW
+      - source: cyanobacteria_sPW
+      - source: cyanobacteria_sCW
+      - source: cyanobacteria_sDS
+      - source: cyanobacteria_sNS
+      - source: cyanobacteria_sPS
+      - source: cyanobacteria_sCS
+      - source: cyanobacteria_sDS_PV
+      - source: cyanobacteria_sNS_PV
+      - source: cyanobacteria_sPS_PV
+      - source: cyanobacteria_sCS_PV
+      - source: diatoms_sDW
+      - source: diatoms_sNW
+      - source: diatoms_sPW
+      - source: diatoms_sCW
+      - source: diatoms_sDS
+      - source: diatoms_sNS
+      - source: diatoms_sPS
+      - source: diatoms_sCS
+      - source: diatoms_sDS_PV
+      - source: diatoms_sNS_PV
+      - source: diatoms_sPS_PV
+      - source: diatoms_sCS_PV
+      - source: greens_sDW
+      - source: greens_sNW
+      - source: greens_sPW
+      - source: greens_sCW
+      - source: greens_sDS
+      - source: greens_sNS
+      - source: greens_sPS
+      - source: greens_sCS
+      - source: greens_sDS_PV
+      - source: greens_sNS_PV
+      - source: greens_sPS_PV
+      - source: greens_sCS_PV
+      - source: macrophytes_sD
+      - source: macrophytes_sN
+      - source: macrophytes_sP
+      - source: macrophytes_sC
+      - source: macrophytes_sD_PV
+      - source: macrophytes_sN_PV
+      - source: macrophytes_sP_PV
+      - source: macrophytes_sC_PV
+      - source: cladocerans_sD
+      - source: cladocerans_sN
+      - source: cladocerans_sP
+      - source: cladocerans_sC
+      - source: copepods_sD
+      - source: copepods_sN
+      - source: copepods_sP
+      - source: copepods_sC
+      - source: zoobenthos_sD
+      - source: zoobenthos_sN
+      - source: zoobenthos_sP
+      - source: zoobenthos_sC
+      - source: zoobenthos_sD_PV
+      - source: zoobenthos_sN_PV
+      - source: zoobenthos_sP_PV
+      - source: zoobenthos_sC_PV
+      - source: JuFish_sD
+      - source: JuFish_sP
+      - source: JuFish_sN
+      - source: JuFish_sC
+      - source: AdFish_sD
+      - source: AdFish_sP
+      - source: AdFish_sN
+      - source: AdFish_sC
+      - source: PiscFish_sD
+      - source: PiscFish_sP
+      - source: PiscFish_sN
+      - source: PiscFish_sC
+      - source: inorganic_carbon_sDICW
+      - source: inorganic_carbon_sAlkW
+      - source: methane_sCH4W
+      - source: cyanobacteria_oChla
+      - source: diatoms_oChla
+      - source: greens_oChla
+      - source: wet_chla_calculator_result

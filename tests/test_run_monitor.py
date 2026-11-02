@@ -39,3 +39,26 @@ def test_cpu_percent_is_nonzero_after_the_baseline_poll():
     finally:
         proc.kill()
         proc.wait(timeout=5)
+
+
+def test_completed_run_keeps_last_cpu_and_openmp_threads(tmp_path):
+    proc = subprocess.Popen([sys.executable, '-c', 'while True: pass'])
+    try:
+        assert build_run_monitor('running', {}, {'omp_threads': 3, 'mpi_ranks': 1}, tmp_path,
+                                 pid=proc.pid)['cpu_percent'] is None
+        time.sleep(0.4)
+        running = build_run_monitor(
+            'running', {}, {'omp_threads': 3, 'mpi_ranks': 1, 'timestep': 15}, tmp_path, pid=proc.pid)
+        assert running['cpu_percent'] is not None and running['cpu_percent'] > 0
+        assert running['omp_threads'] == 3
+        last = running['cpu_percent']
+    finally:
+        proc.kill()
+        proc.wait(timeout=5)
+    finished = build_run_monitor('completed', {}, {}, tmp_path, pid=proc.pid)
+    assert finished['cpu_percent'] == last
+    assert finished['omp_threads'] == 3
+    # MPI clears the process handle after merge, so the status poll has no pid.
+    cleared = build_run_monitor('completed', {}, {}, tmp_path, pid=None)
+    assert cleared['cpu_percent'] == last
+    assert cleared['omp_threads'] == 3

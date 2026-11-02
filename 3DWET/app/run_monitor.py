@@ -16,6 +16,12 @@ _FATAL = re.compile(
 # for that object. Recreating the object on every poll therefore stays at 0.
 _cpu_root = None
 _cpu_samples = {}
+# The solver process is gone once the run completes, so a fresh sample is
+# impossible. Keep the last finite reading and the thread count that was
+# configured for that same run.
+_last_cpu = None
+_last_threads = None
+_last_pid = None
 
 
 def _tail_lines(path: Path, max_bytes: int = 12000, max_lines: int = 40) -> list[str]:
@@ -31,14 +37,23 @@ def _tail_lines(path: Path, max_bytes: int = 12000, max_lines: int = 40) -> list
     return lines[-max_lines:]
 
 
+def _note_pid(pid):
+    """Drop the previous run's CPU sample when a different process starts."""
+    global _last_cpu, _last_pid
+    if _last_pid is not None and pid != _last_pid:
+        _last_cpu = None
+    _last_pid = pid
+
+
 def _cpu_percent(pid):
     """CPU percent of the solver and its children since the previous poll.
 
     The first poll for a pid only stores a baseline and returns None.
     Later polls reuse the same process objects, so a busy solver reports
     a non-zero share (including more than 100 when several cores are in use).
+    After the process exits, the last finite sample for that pid is returned.
     """
-    global _cpu_root
+    global _cpu_root, _last_cpu
     if not pid:
         return None
     try:
@@ -50,9 +65,12 @@ def _cpu_percent(pid):
         if _cpu_root != pid:
             _cpu_samples.clear()
             _cpu_root = pid
+            _note_pid(pid)
         root = _cpu_samples.get(pid)
         if root is None:
             root = psutil.Process(pid)
+            if not root.is_running():
+                return _last_cpu if _last_pid == pid else None
             root.cpu_percent(interval=None)
             _cpu_samples[pid] = root
             for child in root.children(recursive=True):
@@ -60,9 +78,7 @@ def _cpu_percent(pid):
                 _cpu_samples[child.pid] = child
             return None
         if not root.is_running():
-            _cpu_samples.clear()
-            _cpu_root = None
-            return None
+            return _last_cpu if _last_pid == pid else None
         total = root.cpu_percent(interval=None)
         seen = {pid}
         for child in root.children(recursive=True):
@@ -78,11 +94,13 @@ def _cpu_percent(pid):
                 _cpu_samples.pop(stale, None)
         if total < 0:
             return None
-        return round(float(total), 1)
+        _last_cpu = round(float(total), 1)
+        _last_pid = pid
+        return _last_cpu
     except Exception:
         _cpu_samples.clear()
         _cpu_root = None
-        return None
+        return _last_cpu if _last_pid == pid else None
 
 
 def collect_consoles(case_path, *, include_serial_log=True) -> list[dict]:
@@ -122,6 +140,23 @@ def collect_consoles(case_path, *, include_serial_log=True) -> list[dict]:
     return consoles
 
 
+def _remember_threads(pid, threads):
+    global _last_cpu, _last_threads, _last_pid
+    _last_threads = threads
+    if pid is not None:
+        if _last_pid is not None and pid != _last_pid:
+            _last_cpu = None
+        _last_pid = pid
+
+
+def _recall_threads(pid):
+    if _last_threads is None:
+        return None
+    if pid is None or _last_pid is None or pid == _last_pid:
+        return _last_threads
+    return None
+
+
 def build_run_monitor(status, metrics, config, case_path, *, pid=None, stall_seconds=90):
     """Summarise one run for the monitor panel."""
     config = config or {}
@@ -131,11 +166,19 @@ def build_run_monitor(status, metrics, config, case_path, *, pid=None, stall_sec
         ranks = max(1, int(ranks))
     except (TypeError, ValueError):
         ranks = 1
+    try:
+        pid = int(pid) if pid else None
+    except (TypeError, ValueError):
+        pid = None
     threads = config.get('omp_threads')
     try:
         threads = int(threads) if threads is not None else None
     except (TypeError, ValueError):
         threads = None
+    if threads is not None:
+        _remember_threads(pid, threads)
+    else:
+        threads = _recall_threads(pid)
     timestep = config.get('timestep')
     try:
         timestep = float(timestep) if timestep is not None else None
@@ -187,7 +230,9 @@ def build_run_monitor(status, metrics, config, case_path, *, pid=None, stall_sec
         'progress': metrics.get('progress'),
         'current_step': metrics.get('current_step'),
         'total_steps': metrics.get('total_steps'),
-        'cpu_percent': _cpu_percent(pid) if status == 'running' else None,
+        'cpu_percent': _cpu_percent(pid) if status == 'running' else (
+            _last_cpu if pid is None or pid == _last_pid else _cpu_percent(pid)
+        ),
         'seconds_since_step': since,
         'stalled': stalled,
         'level': level,

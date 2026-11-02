@@ -8,9 +8,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '3DWET' / 'app'))
 from flexout_output import (
     OUTPUT_LEVEL_DEBUG,
     OUTPUT_LEVEL_DEFAULT,
+    WEEKLY_CHLOROPHYLL,
     WEEKLY_INSTANCES,
     case_output_yaml,
     fields_for_source,
+    weekly_variable_names,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,15 +33,18 @@ def _sources(text):
     return found
 
 
-def test_builder_uses_fabm_categories_at_the_default_level():
+def test_builder_lists_state_variables_and_not_diagnostic_wildcards():
     text = case_output_yaml(86400)
     sources = _sources(text)
     weekly = [item for item in sources if item[0] == 'ext_wq']
-    assert [name for _file, name, _level in weekly] == [f'fabm/{name}/*' for name in WEEKLY_INSTANCES]
-    assert {level for _file, _name, level in weekly} == {OUTPUT_LEVEL_DEFAULT}
+    assert [name for _file, name, _level in weekly] == list(weekly_variable_names())
+    assert all(not source.startswith('fabm/') for _file, source, _level in weekly)
+    assert '\nsource: *' not in text
     assert ('output', 'abiotic_water_sO2W', OUTPUT_LEVEL_DEFAULT) in sources
     assert 'source: abiotic_water/*' not in text
     assert 'abiotic_water/sO2W' not in text
+    assert 'cyanobacteria_oChla' in text
+    assert 'wet_chla_calculator_result' in text
 
 
 def test_registered_state_is_kept_and_the_old_category_is_empty():
@@ -58,23 +63,27 @@ def test_registered_state_is_kept_and_the_old_category_is_empty():
 def test_dianchi_cases_would_create_ext_wq():
     fabm = yaml.safe_load((ROOT / '3DWET/case/Lake Dianchi/fabm.yaml').read_text(encoding='utf-8'))
     instances = fabm['instances']
+    expected_states = []
+    for instance in WEEKLY_INSTANCES:
+        keys = tuple((instances[instance].get('initialization') or {}).keys())
+        expected_states.extend(f'{instance}_{key}' for key in keys)
+    assert expected_states == [name for name in weekly_variable_names() if name not in WEEKLY_CHLOROPHYLL]
     for path in DIANCHI_YAMLS:
         text = path.read_text(encoding='utf-8')
         sources = _sources(text)
         weekly = [item for item in sources if item[0] == 'ext_wq']
-        assert weekly, path
+        assert [name for _file, name, _level in weekly] == list(weekly_variable_names()), path
+        assert all(not source.startswith('fabm/') for _file, source, _level in weekly)
         selected = []
         for _file, source, level in weekly:
-            instance = source.removeprefix('fabm/').removesuffix('/*')
-            assert instance in instances, source
-            fields = [
-                (f'{instance}_{name}', f'fabm/{instance}', OUTPUT_LEVEL_DEFAULT)
-                for name in (instances[instance].get('initialization') or {})
-            ]
-            # output_none diagnostics stay at the debug level and are not required.
-            fields.append((f'{instance}_dummy', f'fabm/{instance}', OUTPUT_LEVEL_DEBUG))
+            fields = [(source, f'fabm/{source.split("_", 1)[0]}', OUTPUT_LEVEL_DEFAULT)]
+            fields.append((f'{source}_dummy', 'fabm/abiotic_water', OUTPUT_LEVEL_DEBUG))
             selected.extend(fields_for_source(fields, source, level))
         assert 'abiotic_water_sO2W' in selected
         assert 'abiotic_water_sNH4W' in selected
-        assert any(name.startswith('cyanobacteria_') for name in selected)
+        assert 'abiotic_water_sNO3W' in selected
+        assert 'abiotic_water_sPO4W' in selected
+        assert 'cyanobacteria_sDW' in selected
+        assert 'cyanobacteria_oChla' in selected
+        assert 'wet_chla_calculator_result' in selected
         assert not any(name.endswith('_dummy') for name in selected)
