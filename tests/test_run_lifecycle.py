@@ -11,7 +11,8 @@ from flask import Flask, jsonify
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '3DWET/app'))
 from run_metrics import IncrementalLogReader, RunMetrics, read_rank_zero_stderr
-from solver_runtime import log_has_solver_failure
+from run_monitor import build_run_monitor
+from solver_runtime import log_has_solver_failure, prepare_solver_log_chunk
 
 
 @pytest.fixture
@@ -27,6 +28,7 @@ def worker(tmp_path):
                  run_metrics=RunMetrics(),_NC_LOCK=threading.RLock(),
                  _capture_run_repair_summary=lambda *_args:None,
                  solver_environment=lambda _: {}, log_has_solver_failure=log_has_solver_failure,
+                 prepare_solver_log_chunk=prepare_solver_log_chunk,
                  explain_exit_code=lambda _: 'bad exit',nc_open=None,jsonify=jsonify,
                  _archive_run_outputs=lambda *_:None, subprocess=subprocess,
                  validate_current_run_outputs=lambda *_a,**_k: dict(ready=True,duration_seconds=0),
@@ -209,6 +211,7 @@ def test_run_status_reports_merge_phase_without_solver_eta(tmp_path):
         '_run_identity': 'test-run', '_run_log_case_path': tmp_path,
         'run_metrics': metrics, '_run_repair_summary_payload': lambda: None,
         'Path': Path, 'jsonify': jsonify, 'request': SimpleNamespace(args={}),
+        'build_run_monitor': build_run_monitor, 'run_process': None,
     }
     exec(compile(ast.Module(body=[function], type_ignores=[]), str(source), 'exec'), scope)
     with Flask(__name__).app_context():
@@ -239,6 +242,7 @@ def test_run_status_normalizes_terminal_serial_phase(tmp_path):
         '_run_identity': 'test-run', '_run_log_case_path': tmp_path,
         'run_metrics': metrics, '_run_repair_summary_payload': lambda: None,
         'Path': Path, 'jsonify': jsonify, 'request': SimpleNamespace(args={}),
+        'build_run_monitor': build_run_monitor, 'run_process': None,
     }
     exec(compile(ast.Module(body=[function], type_ignores=[]), str(source), 'exec'), scope)
     for status in ('completed', 'failed', 'stopped'):
@@ -262,6 +266,7 @@ def test_serial_compressing_phase_keeps_progress_below_complete_and_suppresses_s
         '_run_identity': 'test-compressing', '_run_log_case_path': tmp_path,
         'run_metrics': metrics, '_run_repair_summary_payload': lambda: None,
         'Path': Path, 'jsonify': jsonify, 'request': SimpleNamespace(args={}),
+        'build_run_monitor': build_run_monitor, 'run_process': None,
     }
     exec(compile(ast.Module(body=[function], type_ignores=[]), str(source), 'exec'), scope)
     with Flask(__name__).app_context():
@@ -286,6 +291,7 @@ def test_run_status_log_window_is_bounded_and_defaults_to_tail(tmp_path):
         '_run_identity': 'test-run', '_run_log_case_path': tmp_path,
         'run_metrics': metrics, '_run_repair_summary_payload': lambda: None,
         'Path': Path, 'jsonify': jsonify, 'request': request,
+        'build_run_monitor': build_run_monitor, 'run_process': None,
     }
     exec(compile(ast.Module(body=[function], type_ignores=[]), str(source), 'exec'), scope)
     with Flask(__name__).app_context():

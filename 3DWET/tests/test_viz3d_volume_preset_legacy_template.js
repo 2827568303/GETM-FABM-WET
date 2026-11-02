@@ -23,44 +23,38 @@ function control(id){
   appendChild(item){this.append(item);return item;},addEventListener(name,callback){listeners[name]=callback;}};
 }
 
-test('old rendered shell receives a reversible volume preset from the current app.js asset',()=>{
- const display=control('sw-3d-display-controls');
+test('compatibility removes a leftover volume preset and triangle option',()=>{
+ const mesh=control('viz3d-mesh-mode');
+ mesh.value='triangles';
+ const triangle=control('option');
+ triangle.value='triangles';
+ const continuous=control('option');
+ continuous.value='continuous';
+ mesh.options=[triangle,continuous];
+ triangle.remove=()=>{mesh.options=mesh.options.filter(item=>item!==triangle);};
+ let presetRemoved=false;
+ const preset=control('viz3d-volume-preset');
+ preset.remove=()=>{presetRemoved=true;};
  const controls=new Map([
-  ['viz3d-mesh-mode',control('viz3d-mesh-mode')],
-  ['viz3d-iso-stack',control('viz3d-iso-stack')],
-  ['viz3d-iso-layer',control('viz3d-iso-layer')],
-  ['viz3d-volume-preset',null],
+  ['viz3d-mesh-mode',mesh],
+  ['viz3d-volume-preset',preset],
  ]);
- // The deployed old template has the legacy control row but no preset button/script.
- const oldMarkup=template.replace(/<button[^>]*id="viz3d-volume-preset"[\s\S]*?<\/button>/,'')
-  .replace(/<script src="\/static\/js\/viz3d_volume_preset\.js\?v=1"><\/script>/,'');
- assert.doesNotMatch(oldMarkup,/id="viz3d-volume-preset"|viz3d_volume_preset\.js/);
- const scripts=[];
- const created=[];
  const document={
-  getElementById(id){return id==='sw-3d-display-controls'?display:controls.get(id)||created.find(item=>item.id===id)||null;},
-  createElement(tag){const item=control(tag);created.push(item);return item;},
-  querySelector(selector){
-   if(selector==='.sw-3d-display-controls')return display;
-   return selector==='script[data-viz3d-volume-preset-compat]'?scripts[0]||null:null;
-  },
-  head:{appendChild(script){scripts.push(script);script.onload?.();}},
+  getElementById(id){return controls.get(id)||null;},
+  querySelectorAll(selector){return selector==='#viz3d-mesh-mode option'?mesh.options:[];},
  };
  const ensure=loadCompatibility(document);
- assert.equal(ensure(),true);
- const button=document.getElementById('viz3d-volume-preset');
- assert.ok(button,'legacy page should receive the preset control');
- assert.equal(button.textContent,'体网格预设');
- assert.equal(button.attrs['aria-pressed'],'false');
- assert.equal(button.attrs['data-i18n'],'体网格预设');
- assert.equal(display.children.includes(button),true,'button should appear beside the 3D display controls');
- assert.equal(scripts.length,1);
- assert.equal(scripts[0].src,'/static/js/viz3d_volume_preset.js?v=1');
- assert.equal(ensure(),true);
- assert.equal(scripts.length,1,'repeated bootstrap should not insert duplicate modules');
+ assert.equal(ensure(),false);
+ assert.equal(presetRemoved,true);
+ assert.equal(mesh.value,'continuous');
+ assert.deepEqual(mesh.options.map(item=>item.value),['continuous']);
+ assert.equal(ensure(),false);
 });
 
-test('current shell keeps its native preset markup and script path',()=>{
- assert.match(template,/id="viz3d-volume-preset"/);
- assert.match(template,/viz3d_volume_preset\.js\?v=1/);
+test('current shell has no triangle mesh product entry',()=>{
+ assert.doesNotMatch(template,/id="viz3d-volume-preset"/);
+ assert.doesNotMatch(template,/viz3d_volume_preset\.js/);
+ assert.doesNotMatch(template,/value="triangles"/);
+ assert.match(template,/id="run-monitor"/);
+ assert.match(template,/不提供三角网或非结构网格/);
 });

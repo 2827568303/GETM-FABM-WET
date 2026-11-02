@@ -2,10 +2,10 @@
 (function (root) {
     'use strict';
     const storageKey = '3dwet.viz3d.mesh-mode.v2';
-    const modes = new Set(['continuous', 'orthogonal', 'triangles', 'hidden']);
+    const modes = new Set(['continuous', 'orthogonal', 'hexa', 'curvilinear', 'hidden']);
 
-    function read(fallback = 'triangles') {
-        const defaultMode = modes.has(fallback) ? fallback : 'triangles';
+    function read(fallback = 'continuous') {
+        const defaultMode = modes.has(fallback) && fallback !== 'triangles' ? fallback : 'continuous';
         try {
             const value = root.localStorage?.getItem(storageKey);
             return modes.has(value) ? value : defaultMode;

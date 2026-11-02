@@ -1,6 +1,37 @@
+# 关键变量每天写入 output.nc；其余水质按周写入 ext_wq.nc。
+# 水位 elev、深度积分流速 u/v 由 GETM 原生 *.2d.nc 写出，不能放进这里。
+# 不要再用 source: * —— 那会把每个诊断量都按天写出，滇池一年可达数十 GB，
+# 写盘时进度会停在某一百分比并且日志被刷满。
+allow_missing_fields: true
 output:
    time_unit: second
    time_step: 86400
    sync_interval: 1
    variables:
-      - source: *
+      - source: temp
+      - source: D
+      - source: hn
+      - source: z
+      - source: abiotic_water/sO2W
+ext_wq:
+   time_unit: day
+   time_step: 7
+   sync_interval: 1
+   variables:
+      - source: abiotic_water/*
+      - source: abiotic_sediment/*
+      - source: POM/*
+      - source: DOM/*
+      - source: humus/*
+      - source: cyanobacteria/*
+      - source: diatoms/*
+      - source: greens/*
+      - source: macrophytes/*
+      - source: cladocerans/*
+      - source: copepods/*
+      - source: zoobenthos/*
+      - source: JuFish/*
+      - source: AdFish/*
+      - source: PiscFish/*
+      - source: inorganic_carbon/*
+      - source: methane/*

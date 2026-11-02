@@ -30,8 +30,12 @@ import shapefile  # pyshp
 import crs_utils
 import fish_support
 from model_dates import parse_ordinal_date, parse_calendar_date, format_model_time
-from solver_runtime import solver_environment, inspect_runtime, explain_exit_code, log_has_solver_failure
+from solver_runtime import (
+    solver_environment, inspect_runtime, explain_exit_code, log_has_solver_failure,
+    prepare_solver_log_chunk,
+)
 from run_metrics import IncrementalLogReader, RunMetrics, read_rank_zero_stderr
+from run_monitor import build_run_monitor
 from run_diagnostics import inspect_forcing_coverage, register_run_diagnostic_routes
 from run_output_health import validate_current_run_outputs
 from gotm_working_copy import (KIND as _GOTM_WORKING_KIND, create_working_copy as _create_gotm_working_copy,
@@ -1513,6 +1517,7 @@ def _get_2d_field_from_dataset(ds, var_name, timestep=0, level=0,
 
     aggregation = 'not_applicable' if depth_average else 'layer'
     weight_source = None
+    layer_contrast = None
     if var.ndim == 3 and time_idx == 0:  # time, y, x
         nt = var.shape[0]
         if nt == 0:
@@ -1527,10 +1532,16 @@ def _get_2d_field_from_dataset(ds, var_name, timestep=0, level=0,
         if depth_average:
             field, weight_source = depth_weighted_field(ds, var, t)
             aggregation = 'depth_weighted_mean'
+            layer_contrast = None
         else:
             start, _ = physical_vertical_grid(ds, var)
             _, lev = physical_layer_index(level, start, var.shape[1])
             field = _fill(var[t, lev, :, :])
+            from result_layers import surface_bottom_contrast
+            bottom = _fill(var[t, start, :, :])
+            surface = _fill(var[t, var.shape[1] - 1, :, :])
+            layer_contrast = surface_bottom_contrast(bottom, surface, bottom_index=start,
+                                                     surface_index=var.shape[1] - 1)
     elif var.ndim == 2 and not time_axes:
         # Static 2D fields (for example bathymetry) are valid map inputs.
         # Never use an unqualified fallback for other shapes: an unrelated
@@ -1556,6 +1567,7 @@ def _get_2d_field_from_dataset(ds, var_name, timestep=0, level=0,
         "max": float(np.nanmax(field)) if not np.all(np.isnan(field)) else 0,
         "mean": float(np.nanmean(field)) if not np.all(np.isnan(field)) else 0,
         "bathymetry": bathy.tolist() if bathy is not None else None,
+        "layer_contrast": layer_contrast,
     }
 
 
@@ -2269,8 +2281,20 @@ def run_model_thread(case_path, exe_path):
                     env=env,
                     creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
                 )
+            elif os.name != "nt":
+                # Native Linux/macOS binary. Do not route this through wsl.exe.
+                env = solver_environment(exe_path)
+                threads = env.get("OMP_NUM_THREADS", "1")
+                run_logs.append(f"[INFO] OpenMP 线程数 OMP_NUM_THREADS={threads}")
+                run_process = subprocess.Popen(
+                    [str(exe_path)],
+                    cwd=str(case_path),
+                    stdout=log_fh,
+                    stderr=subprocess.STDOUT,
+                    env=env,
+                )
             else:
-                # WSL/Linux binary: launch through wsl.exe with shell redirection.
+                # Windows host, Linux binary: launch through wsl.exe.
                 case_wsl = wsl_path(case_path)
                 exe_wsl = wsl_path(exe_path)
                 log_wsl = wsl_path(model_log)
@@ -2296,6 +2320,13 @@ def run_model_thread(case_path, exe_path):
                     f.seek(log_read_pos)
                     new_lines = f.read()
                     log_read_pos = f.tell()
+                if len(new_lines) > 2_000_000:
+                    run_logs.append(
+                        "[ERROR] 日志在 1 秒内增加超过 2MB，判定为 Patankar 警告刷屏"
+                        "（滇池约 29% 卡死的原因）。已停止模型，避免磁盘被日志写满。")
+                    solver_failed = True
+                    new_lines = new_lines[-4000:]
+                new_lines, _dropped = prepare_solver_log_chunk(new_lines)
                 run_metrics.observe(new_lines)
                 solver_failed |= log_has_solver_failure(new_lines)
                 for line in new_lines.splitlines():
@@ -2338,6 +2369,11 @@ def run_model_thread(case_path, exe_path):
             with open(model_log, "r", encoding="utf-8", errors="replace") as f:
                 f.seek(log_read_pos)
                 remaining = f.read()
+                if len(remaining) > 2_000_000:
+                    run_logs.append("[ERROR] 结束时日志增量超过 2MB，已截断 Patankar 刷屏。")
+                    solver_failed = True
+                    remaining = remaining[-4000:]
+                remaining, _dropped = prepare_solver_log_chunk(remaining)
                 run_metrics.observe(remaining)
                 solver_failed |= log_has_solver_failure(remaining)
                 for line in remaining.splitlines():
@@ -3414,7 +3450,9 @@ def _parse_output_yaml(out_path):
     ts = re.search(r"time_step\s*:\s*([0-9.]+)", text)
     si = re.search(r"sync_interval\s*:\s*(-?[0-9.]+)", text)
     # Extract the `variables:` block as raw text (everything after the variables: line)
-    var_match = re.search(r"\n\s*variables\s*:\s*\n(.*)$", text, re.DOTALL)
+    # Stop at the next top-level key so a second file (ext_wq:) is not
+    # swallowed into the first file's variable list.
+    var_match = re.search(r"\n\s*variables\s*:\s*\n(.*?)(?=\n\S|\Z)", text, re.DOTALL)
     variables_raw = var_match.group(1).strip() if var_match else ""
     return {
         "time_unit": tu.group(1) if tu else "day",
@@ -4242,10 +4280,17 @@ def run_start():
     if mpi_options:
         launcher, solver, n, runtime_dirs = mpi_options
         run_config["solver_mode"] = f"MPI ({n} ranks)"
+        run_config["mpi_ranks"] = n
+        run_config["omp_threads"] = 1
         run_config["phase"] = "preparing"
         run_thread = threading.Thread(target=run_mpi_model_thread,
                                       args=(active_case_path, launcher, solver, n, runtime_dirs), daemon=True)
     else:
+        run_config["mpi_ranks"] = 1
+        try:
+            run_config["omp_threads"] = int(solver_environment(EXE_PATH).get("OMP_NUM_THREADS", "1"))
+        except (TypeError, ValueError):
+            run_config["omp_threads"] = 1
         run_thread = threading.Thread(target=run_model_thread, args=(active_case_path, EXE_PATH), daemon=True)
     run_metrics.start(run_config, now=run_start_time)
     run_thread.start()
@@ -4292,6 +4337,8 @@ def run_status_api():
         "performance": {"solver_mode": solver_mode, "step_cost_seconds":
                         1 / metrics['steps_per_second'] if metrics['steps_per_second'] and metrics['steps_per_second'] > 0 else None,
                         "estimate": run_config},
+        "monitor": build_run_monitor(run_status, metrics, run_config, result_case,
+                                     pid=getattr(run_process, "pid", None)),
     })
 
 
@@ -9408,12 +9455,28 @@ def case_build():
                            if float(output_seconds).is_integer()
                            else str(output_seconds))
     (case_path / "output.yaml").write_text(
+        "allow_missing_fields: true\n"
         "output:\n"
         "   time_unit: second\n"
         f"   time_step: {output_seconds_yaml}\n"
         "   sync_interval: 1\n"
         "   variables:\n"
-        "      - source: *\n", encoding="utf-8")
+        "      - source: temp\n"
+        "      - source: D\n"
+        "      - source: hn\n"
+        "      - source: z\n"
+        "      - source: abiotic_water/sO2W\n"
+        "ext_wq:\n"
+        "   time_unit: day\n"
+        "   time_step: 7\n"
+        "   sync_interval: 1\n"
+        "   variables:\n"
+        "      - source: abiotic_water/*\n"
+        "      - source: POM/*\n"
+        "      - source: DOM/*\n"
+        "      - source: cyanobacteria/*\n"
+        "      - source: diatoms/*\n"
+        "      - source: greens/*\n", encoding="utf-8")
     if not (case_path / "meteo_input.txt").exists():
         (case_path / "meteo_input.txt").write_text("meteo.nc\n", encoding="utf-8")
     # Refresh caches so the case list / config pages see the new files

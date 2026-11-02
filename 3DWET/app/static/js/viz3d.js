@@ -293,8 +293,8 @@ function viz3dError(msg,request) {
     // When the new request fails, the graph is intentionally retained. Keep
     // its network selector truthful too; otherwise the control says triangles
     // while the visible Plotly legend still describes the orthogonal network.
-    if(viz3dCurrent(request) && ['triangles','orthogonal'].includes(last?.meshMode)
-            && ['triangles','orthogonal'].includes(requestedMode) && requestedMode!==last.meshMode) {
+    if(viz3dCurrent(request) && ['triangles','orthogonal','hexa','curvilinear'].includes(last?.meshMode)
+            && ['triangles','orthogonal','hexa','curvilinear'].includes(requestedMode) && requestedMode!==last.meshMode) {
         const control=document.getElementById('viz3d-mesh-mode');
         if(control?.value===requestedMode)control.value=last.meshMode;
     }
@@ -2753,7 +2753,7 @@ async function render3DWaterBody(varName, timestep, opts = {}) {
             }
             if(traces.length===baseTraceCount) { viz3dError('该层没有有效变量数据，请切换层或选择湖盆预览。',request);return; }
             const networkMeshStartedAt=viz3dNow();
-            const networkMeshes=['triangles','orthogonal'].includes(opts.meshMode)
+            const networkMeshes=['triangles','orthogonal','hexa','curvilinear'].includes(opts.meshMode)
                 ? lakePhysicalVolumeNetwork(d,geometry,ve,stack?undefined:[lv]):[];
             window.PlaybackPerformance?.stage(request.playbackPerf,'networkMesh',viz3dNow()-networkMeshStartedAt);
             if(stack&&opts.meshMode==='triangles') {

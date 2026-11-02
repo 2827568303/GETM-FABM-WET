@@ -510,10 +510,14 @@ test('static bathymetry omits the square dry-cell land mesh and retains a shorel
 });
 
 test('page template cache-busts the updated 3D shoreline renderer', () => {
-  assert.match(template, /<script src="\/static\/js\/viz3d\.js\?v=173"><\/script>/,
+  assert.match(template, /<script src="\/static\/js\/viz3d\.js\?v=174"><\/script>/,
     'the browser must request the changed shoreline renderer instead of a cached version');
-  assert.match(template, /<option value="continuous" selected>连续曲面<\/option>/,
+  assert.match(template, /<option value="continuous" selected>结构网格连续曲面<\/option>/,
     'the default 3D view should show the selected water field without a triangular wire overlay');
+  assert.match(template, /<option value="hexa">结构网格六面体（求解网格原样）<\/option>/);
+  assert.doesNotMatch(template, /value="triangles"/,
+    'triangle and unstructured mesh choices are not product entries');
+  assert.match(template, /不提供三角网或非结构网格/);
   assert.match(template, /<option value="0" selected>自动适配湖盆<\/option>/,
     'the default scale should make the basin visible at ordinary horizontal-to-depth ratios');
   assert.match(template, /<option value="1">1× \(真实比例\)<\/option>/,

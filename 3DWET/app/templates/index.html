@@ -8,7 +8,7 @@
     <link rel="alternate icon" href="{{ url_for('static', filename='brand/3dwet.ico') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='brand/3dwet-192.png') }}">
     <link rel="stylesheet" href="/static/css/style.css?v=11">
-    <link rel="stylesheet" href="/static/css/studio.css?v=11">
+    <link rel="stylesheet" href="/static/css/studio.css?v=12">
     <link rel="stylesheet" href="/static/css/view_controls.css?v=1">
     <link rel="stylesheet" href="/static/css/scientific_results.css?v=3">
     <link rel="stylesheet" href="/static/css/i18n.css?v=1">
@@ -42,7 +42,7 @@
     <script src="/static/js/scientific_workspace.js?v=19"></script>
     <script src="/static/js/scientific_colormap_editor.js?v=1"></script>
     <script src="/static/js/calibration_metrics.js?v=2"></script>
-    <script src="/static/js/viz3d.js?v=173"></script>
+    <script src="/static/js/viz3d.js?v=174"></script>
     <script src="/static/js/preprocess.js?v=12"></script>
 </head>
 <body>
@@ -1019,6 +1019,14 @@
                         <span id="mpi-run-capability" role="status" style="flex:1;min-width:260px;font-size:12px;color:var(--text-muted,#777);"></span>
                     </div>
                     <div id="run-repair-summary" role="status" aria-live="polite" style="margin:0 0 10px;color:var(--text-muted,#777);font-size:12px;">FABM 状态检查汇总：未提供。</div>
+                    <section id="run-monitor" class="run-monitor" aria-label="运行监控">
+                        <div class="run-monitor-head">
+                            <h3>运行监控</h3>
+                            <div id="run-monitor-alert" class="run-monitor-alert" hidden></div>
+                        </div>
+                        <div id="run-monitor-metrics" class="run-monitor-metrics">尚未开始。</div>
+                        <div id="run-monitor-ranks" class="run-monitor-ranks"></div>
+                    </section>
                     <div class="run-console-toolbar">
                         <div class="run-console-meta">
                             <div class="run-console-state-line" role="status" aria-live="polite">
@@ -1287,11 +1295,9 @@
                                     <div class="sw-field"><label for="viz3d-opacity">数据层</label><select id="viz3d-opacity"><option value="1" selected>不透明 · 定量读色</option><option value="0.55">半透明 · 结构探索</option></select></div>
                                 </div>
                                 <div class="sw-3d-display-controls" role="group" aria-label="三维水体与岸陆图层">
-                                    <div class="sw-field sw-3d-mesh-control"><label for="viz3d-mesh-mode">显示剖分</label><select class="form-select" id="viz3d-mesh-mode" onchange="updateViz3dIso()"><option value="continuous" selected>连续曲面</option><option value="orthogonal">正交网格线</option><option value="triangles">三角网格（显示剖分）</option><option value="hidden">隐藏网格线</option></select></div>
+                                    <div class="sw-field sw-3d-mesh-control"><label for="viz3d-mesh-mode">网格显示</label><select class="form-select" id="viz3d-mesh-mode" onchange="updateViz3dIso()"><option value="hexa">结构网格六面体（求解网格原样）</option><option value="continuous" selected>结构网格连续曲面</option><option value="curvilinear">曲线/正交网格线</option><option value="orthogonal">正交网格线</option><option value="hidden">隐藏网格线</option></select></div>
                                     <label class="sw-checkbox sw-3d-land-control" for="viz3d-show-land"><input type="checkbox" id="viz3d-show-land" onchange="updateViz3dIso()">显示岸陆示意</label>
-                                    <button type="button" class="btn btn-sm" id="viz3d-volume-preset" aria-pressed="false" title="体网格预设" data-i18n="体网格预设"><svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-layers"></use></svg> <span>体网格预设</span></button>
                                 </div>
-                                <div class="form-hint" data-i18n="此预设临时启用派生三角显示剖分与全部可用垂向层。再次点击后恢复预设前的剖分与叠层选择。">此预设临时启用派生三角显示剖分与全部可用垂向层。再次点击后恢复预设前的剖分与叠层选择。</div>
                             </section>
                             <section class="sw-legend" aria-labelledby="viz3d-legend-title">
                                 <h3 id="viz3d-legend-title">图例</h3>
@@ -1313,11 +1319,11 @@
                                     <legend>图层与质量</legend>
                                     <div class="sw-field"><label for="viz3d-iso-render">渲染方式</label><select class="form-select" id="viz3d-iso-render" onchange="updateViz3dIso()"><option value="waterbody" selected>立体水体（湖底+分层+剖面墙）</option><option value="isosurface">等值面 (isosurface)</option><option value="cloud">点云 (scatter3d)</option><option value="surface2d">变量高度表面（非真实水面）</option></select><div id="viz3d-iso-render-hint" class="form-hint" role="status" hidden></div></div>
                                     <div class="sw-field"><label for="viz3d-iso-quality">质量</label><select class="form-select" id="viz3d-iso-quality" onchange="updateViz3dIso()"><option value="32">低 (更快)</option><option value="64">中等</option><option value="96" selected>高 (更精细)</option></select></div>
-                                    <div class="form-hint">本案例为结构四边形网格；默认以稳定对角线将当前有效湿四边形显示为三角面。这是派生的显示剖分，不是求解器原生三角网；原始单元值、坐标和湿掩膜保持不变。图例随当前帧列出实际参与绘制的湿单元与显示边；缺少可信拓扑时拒绝绘制。连续曲面可作为大型网格或播放场景的轻量替代；单元中心悬停值保持不变。</div>
+                                    <div class="form-hint">求解只用笛卡尔、球面等距或正交曲线网格。三维图按该结构网格显示：六面体、连续曲面或网格线。不提供三角网或非结构网格。</div>
                                     <div class="sw-field"><label for="viz3d-line-density">网格线间距（单元）</label><input class="form-input" id="viz3d-line-density" type="number" min="1" max="20" step="1" value="1" onchange="updateViz3dIso()"></div>
                                     <div class="sw-field"><label for="viz3d-line-opacity">网格线透明度</label><input id="viz3d-line-opacity" type="range" min="0" max="1" step="0.05" value="0.9" oninput="updateViz3dIso()"></div>
                                     <label class="sw-checkbox" for="viz3d-mesh-nodes"><input type="checkbox" id="viz3d-mesh-nodes" onchange="updateViz3dIso()">显示网格节点（辅助）</label>
-                                    <p class="sw-range-status">拓扑说明：求解器的有效水体单元为四边形；三角模式按单元索引稳定选择对角线。单层 3D 播放默认每个湿四边形显示 2 个三角面；显式设置细分后才增加显示三角面。图例数值取自本帧实际参与绘制的网格。这是可审计的显示剖分，不是求解器原生三角拓扑；没有可信湿网格时拒绝绘制。此设置不改变求解器拓扑或变量原值。降采样时标为采样显示网格。陆地高程未提供时仅已知干单元绘制中性平面。</p>
+                                    <p class="sw-range-status">拓扑说明：水体单元是结构网格上的湿四边形。图例数值取自本帧实际绘制的单元。显示方式不改变求解网格。降采样时标为采样显示网格。陆地高程未提供时，仅已知干单元绘制中性平面。</p>
                                     <label class="sw-checkbox" for="viz3d-iso-stack"><input type="checkbox" id="viz3d-iso-stack" onchange="updateViz3dIso()" style="width:auto;">叠层看内部结构</label>
                                     <label class="sw-checkbox" for="viz3d-iso-overlay"><input type="checkbox" id="viz3d-iso-overlay" checked onchange="updateViz3dIso()">水面显示所选变量</label>
                                     <div class="sw-field"><label for="viz3d-iso-level">层（仅变量高度表面）</label><input class="form-input" id="viz3d-iso-level" type="number" value="0" min="0" onchange="updateViz3dIso()"></div>
@@ -1720,8 +1726,7 @@
 <script src="/static/js/playback_performance.js?v=7"></script>
 <script src="/static/js/viz3d_mesh_mode_preference.js?v=3"></script>
     <script src="/static/js/run_physics.js?v=6"></script>
-    <script src="/static/js/app.js?v=102"></script>
-<script src="/static/js/viz3d_volume_preset.js?v=1"></script>
+    <script src="/static/js/app.js?v=104"></script>
 <script src="/static/js/projects_studio.js?v=5"></script>
 <script src="/static/js/studio.js?v=1"></script>
 <script src="/static/js/gridstudio.js?v=3"></script>

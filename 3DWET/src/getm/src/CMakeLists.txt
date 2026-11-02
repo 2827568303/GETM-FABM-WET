@@ -5,6 +5,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 # Create main project.
 project(getm Fortran)
 
+# Keep GETM modules out of the build root. GOTM also provides an
+# eqstate module; a root-level eqstate.mod is found first and hides
+# eos_alpha/eos_beta from GOTM's util library.
+set(CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/getm_modules")
+
 # Set version information.
 set(getm_VERSION_MAJOR 2)
 set(getm_VERSION_MINOR 5)
@@ -237,6 +242,8 @@ add_library(3d OBJECT
             3d/ww_momentum_3d.F90
            )
 set_property(TARGET 3d APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/3d")
+# GETM's eqstate (do_eqstate) must win over GOTM's eqstate (eos_alpha).
+target_include_directories(3d BEFORE PRIVATE "${CMAKE_BINARY_DIR}/getm_modules")
 
 add_library(domain OBJECT
             domain/bdy_spec.F90
@@ -295,6 +302,7 @@ add_library(getm OBJECT
             getm/register_all_variables.F90
             getm/print_version.F90
            )
+target_include_directories(getm BEFORE PRIVATE "${CMAKE_BINARY_DIR}/getm_modules")
 
 add_library(input OBJECT
             input/get_2d_bdy.F90
@@ -410,7 +418,10 @@ if(GOTM_BASE)
   set(GOTM_LIBRARIES turbulence util output_manager)
 #KB  set(GOTM_LIBRARIES ${GOTM_LIBRARIES} output_manager)
   if(GETM_USE_FABM)
-    if(EXISTS ${GOTM_BASE}/src/gotm/deprecated_output.F90)
+    # Cases ship gotm_fabm.yaml. Defining _GOTM_FABM_NML_ makes GETM
+    # look for gotm_fabm.nml, skip the yaml file, and never call FABM
+    # (getm_fabm timer stays at 0). Keep the namelist path off.
+    if(EXISTS ${GOTM_BASE}/src/gotm/deprecated_output.F90 AND GETM_FABM_USE_NML)
       add_definitions(-D_GOTM_FABM_NML_)
     endif()
     if(FABM_BASE)

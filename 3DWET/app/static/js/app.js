@@ -2572,6 +2572,42 @@ function renderFabmRepairSummary(summary) {
         : `FABM 状态检查汇总：${counts}。计数表示检查事件，不是变量、网格单元或实际修改总数。`;
 }
 
+function renderRunMonitor(status) {
+    const box = $('run-monitor-metrics');
+    const alertBox = $('run-monitor-alert');
+    const ranks = $('run-monitor-ranks');
+    if (!box || !alertBox || !ranks) return;
+    const m = status?.monitor || {};
+    const rate = Number.isFinite(m.steps_per_second) ? m.steps_per_second.toFixed(1) : '—';
+    const days = Number.isFinite(m.sim_days_per_wall_hour) ? m.sim_days_per_wall_hour.toFixed(2) : '—';
+    const cpu = Number.isFinite(m.cpu_percent) ? `${m.cpu_percent.toFixed(0)}%` : '—';
+    const eta = runEtaText(status);
+    box.textContent = `MPI ${m.mpi_ranks || 1} 进程 · OpenMP ${m.omp_threads ?? '—'} 线程 · ${rate} 步/秒 · ${days} 模拟天/墙钟小时 · 剩余 ${eta} · CPU ${cpu}`;
+    if (m.level === 'error' || m.level === 'warn') {
+        alertBox.hidden = false;
+        alertBox.className = `run-monitor-alert ${m.level}`;
+        alertBox.textContent = m.message || (m.level === 'error' ? '求解器报错' : '步进停滞');
+    } else {
+        alertBox.hidden = true;
+        alertBox.textContent = '';
+    }
+    const consoles = Array.isArray(m.consoles) ? m.consoles : [];
+    const openId = ranks.querySelector('details[open]')?.dataset.id;
+    ranks.replaceChildren();
+    consoles.forEach((item, index) => {
+        const details = document.createElement('details');
+        details.dataset.id = item.id;
+        if (item.id === openId || (!openId && index === 0)) details.open = true;
+        if (item.error) details.className = 'error';
+        const summary = document.createElement('summary');
+        summary.textContent = `${item.label || item.id}${item.error ? ' · 有报错' : ''}`;
+        const pre = document.createElement('pre');
+        pre.textContent = (item.lines || []).join('\n') || '（暂无输出）';
+        details.append(summary, pre);
+        ranks.appendChild(details);
+    });
+}
+
 async function pollRunStatus() {
     if (state.runPollBusy) return;
     state.runPollBusy = true;
@@ -2614,6 +2650,7 @@ async function pollRunStatus() {
     $('run-console-state').textContent = runLabel;
     $('run-console-case').textContent = s.log_case_directory || s.case_directory || (state.activeCasePath || state.activeCase || window.StudioI18n?.t?.('尚未加载案例') || '尚未加载案例');
     updateRunPhysicsDisplay(s);
+    renderRunMonitor(s);
     const loadMoreButton = $('run-console-load-more');
     loadMoreButton.disabled = (s.total_logs || 0) <= (state.runLogLimit || 80) || (state.runLogLimit || 80) >= 5000;
     const logStatus = $('run-console-log-status');
@@ -3213,7 +3250,11 @@ async function updateViz2d() {
     const outline=validatedBoundary
         ? (window.StudioI18n?.scientificText(`边界：${validatedBoundary.source}与湿干掩膜一致（仅用于显示裁切；地理/科学真实性未验证）`,`Boundary: ${validatedBoundary.source} agrees with the wet/dry mask (display clipping only; geographic/scientific validity unverified)`)||`边界：${validatedBoundary.source}与湿干掩膜一致（仅用于显示裁切；地理/科学真实性未验证）`)
         : (window.StudioI18n?.scientificText('边界：湿格边缘代理（未验证）','Boundary: wet-cell edge proxy (unverified)')||'边界：湿格边缘代理（未验证）');
-    $('viz2d-info').textContent = `${window.StudioI18n?.scientificText('变量','Variable')||'变量'}: ${resultLabel(data,varName)} (${varName}) | ${outline} | ${window.StudioI18n?.scientificText('时步','Frame')||'时步'}: ${timestep}${dateLabel ? ' (' + dateLabel + ')' : ''} | ${window.StudioI18n?.scientificText('均值','Mean')||'均值'}: ${fmt(data.mean,4)} | ${window.StudioI18n?.scientificText('形状','Shape')||'形状'}: ${data.shape?.join('×')}`;
+    const contrast=data.layer_contrast;
+    const contrastText=contrast
+        ? ` | 底层k=${contrast.bottom_index}均值 ${fmt(contrast.bottom_mean,4)} · 表层k=${contrast.surface_index}均值 ${fmt(contrast.surface_mean,4)} · |表-底|均值 ${fmt(contrast.mean_abs_diff,4)}${contrast.well_mixed?'（垂向差异很小，浅水混合充分）':''}`
+        : '';
+    $('viz2d-info').textContent = `${window.StudioI18n?.scientificText('变量','Variable')||'变量'}: ${resultLabel(data,varName)} (${varName}) | ${outline} | ${window.StudioI18n?.scientificText('时步','Frame')||'时步'}: ${timestep}${dateLabel ? ' (' + dateLabel + ')' : ''} | ${window.StudioI18n?.scientificText('均值','Mean')||'均值'}: ${fmt(data.mean,4)} | ${window.StudioI18n?.scientificText('形状','Shape')||'形状'}: ${data.shape?.join('×')}${contrastText}`;
     drawColorbar('viz2d-colorbar', range.min, range.max, resultLabel(data,varName), data.units);
     perf?.stage(perfTicket,'draw',perfClock()-drawStartedAt);
     window.ScientificWorkspace?.publish('viz2d',{variable:varName,label:resultLabel(data,varName),units:data.units,min:data.min,max:data.max,range,field:data.data,date:dateLabel,time:timestep,level});
@@ -5077,37 +5118,15 @@ async function mapPickTimeseries(i, j) {
 
 // ── Init ──────────────────────────────────────────────────────────────
 function ensureViz3dVolumePresetCompatibility() {
+    // GETM cannot solve triangular meshes. Drop the old preset button and
+    // any leftover "triangles" option so a cached page cannot turn them back on.
+    document.getElementById('viz3d-volume-preset')?.remove();
+    document.querySelectorAll('#viz3d-mesh-mode option').forEach(opt => {
+        if (opt.value === 'triangles') opt.remove();
+    });
     const mesh = document.getElementById('viz3d-mesh-mode');
-    const stack = document.getElementById('viz3d-iso-stack');
-    const layer = document.getElementById('viz3d-iso-layer');
-    const controls = document.querySelector('.sw-3d-display-controls');
-    if (!mesh || !stack || !layer || !controls) return false;
-
-    let button = document.getElementById('viz3d-volume-preset');
-    if (!button) {
-        button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'btn btn-sm';
-        button.id = 'viz3d-volume-preset';
-        button.setAttribute('aria-pressed', 'false');
-        button.setAttribute('data-i18n', '体网格预设');
-        button.setAttribute('title', '此预设临时启用派生三角显示剖分与全部可用垂向层。再次点击后恢复预设前的剖分与叠层选择。');
-        button.textContent = '体网格预设';
-        controls.appendChild(button);
-    }
-
-    if (window.Viz3dVolumePreset) {
-        window.Viz3dVolumePreset.bind();
-        return true;
-    }
-    if (!document.querySelector('script[data-viz3d-volume-preset-compat]')) {
-        const script = document.createElement('script');
-        script.src = '/static/js/viz3d_volume_preset.js?v=1';
-        script.setAttribute('data-viz3d-volume-preset-compat', '');
-        script.onload = () => window.Viz3dVolumePreset?.bind?.();
-        (document.head || document.body).appendChild(script);
-    }
-    return true;
+    if (mesh && mesh.value === 'triangles') mesh.value = 'continuous';
+    return false;
 }
 
 window.addEventListener('load', () => {

@@ -243,6 +243,8 @@ class RunMetrics:
                 progress = 100
             rate = self.steps_per_second
             eta = max(0, (total - current) / rate) if status == 'running' and total and current is not None and rate and rate > 0 else None
+            since_step = (now - self.last_observed_at) if self.last_observed_at is not None else None
             return dict(elapsed=elapsed, current_step=current, total_steps=total, progress=progress,
                         steps_per_second=rate, eta_seconds=eta, eta_minutes=eta / 60 if eta is not None else None,
+                        seconds_since_step=since_step,
                         physics_diagnostic=dict(self.physics_diagnostic) if self.physics_diagnostic else None)
