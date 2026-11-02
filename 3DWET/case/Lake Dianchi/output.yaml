@@ -1,6 +1,56 @@
+# 关键变量每天写入 output.nc；水质按周写入 ext_wq.nc。
+# 水位 elev、深度积分流速 u/v 由原生 *.2d.nc 写出，不能放进这里。
+# FABM 变量登记在类别 fabm/<实例名>。source 必须写成 fabm/abiotic_water/*，
+# 输出级别 8（output_level_default）。写成 abiotic_water/* 会选到空类别，
+# 日志提示没有匹配到该输出级别，ext_wq.nc 不会创建。
+# 不要再用 source: * —— 那会把每个诊断量都按天写出。
+allow_missing_fields: true
 output:
-   time_unit: day
-   time_step: 1
+   time_unit: second
+   time_step: 86400
    sync_interval: 1
    variables:
-      - source: *
+      - source: temp
+      - source: D
+      - source: hn
+      - source: z
+      - source: abiotic_water_sO2W
+ext_wq:
+   time_unit: day
+   time_step: 7
+   sync_interval: 1
+   variables:
+      - source: fabm/abiotic_water/*
+        output_level: 8
+      - source: fabm/abiotic_sediment/*
+        output_level: 8
+      - source: fabm/POM/*
+        output_level: 8
+      - source: fabm/DOM/*
+        output_level: 8
+      - source: fabm/humus/*
+        output_level: 8
+      - source: fabm/cyanobacteria/*
+        output_level: 8
+      - source: fabm/diatoms/*
+        output_level: 8
+      - source: fabm/greens/*
+        output_level: 8
+      - source: fabm/macrophytes/*
+        output_level: 8
+      - source: fabm/cladocerans/*
+        output_level: 8
+      - source: fabm/copepods/*
+        output_level: 8
+      - source: fabm/zoobenthos/*
+        output_level: 8
+      - source: fabm/JuFish/*
+        output_level: 8
+      - source: fabm/AdFish/*
+        output_level: 8
+      - source: fabm/PiscFish/*
+        output_level: 8
+      - source: fabm/inorganic_carbon/*
+        output_level: 8
+      - source: fabm/methane/*
+        output_level: 8

@@ -12,6 +12,10 @@ from pathlib import Path
 _RANK = re.compile(r'(\d{4})\.(stderr|stdout)$', re.IGNORECASE)
 _FATAL = re.compile(
     r'(?i)(\[ERROR\]|\bSTOP\s+[1-9]\d*\b|\bfatal\b|out-of-bound|IEEE_|Floating invalid|forrtl:)')
+# psutil.Process.cpu_percent(interval=None) returns 0.0 on the first call
+# for that object. Recreating the object on every poll therefore stays at 0.
+_cpu_root = None
+_cpu_samples = {}
 
 
 def _tail_lines(path: Path, max_bytes: int = 12000, max_lines: int = 40) -> list[str]:
@@ -28,17 +32,56 @@ def _tail_lines(path: Path, max_bytes: int = 12000, max_lines: int = 40) -> list
 
 
 def _cpu_percent(pid):
+    """CPU percent of the solver and its children since the previous poll.
+
+    The first poll for a pid only stores a baseline and returns None.
+    Later polls reuse the same process objects, so a busy solver reports
+    a non-zero share (including more than 100 when several cores are in use).
+    """
+    global _cpu_root
     if not pid:
         return None
     try:
+        pid = int(pid)
+    except (TypeError, ValueError):
+        return None
+    try:
         import psutil
-        proc = psutil.Process(int(pid))
-        # First call establishes a baseline; a later poll returns a real share.
-        value = proc.cpu_percent(interval=None)
-        if value < 0:
+        if _cpu_root != pid:
+            _cpu_samples.clear()
+            _cpu_root = pid
+        root = _cpu_samples.get(pid)
+        if root is None:
+            root = psutil.Process(pid)
+            root.cpu_percent(interval=None)
+            _cpu_samples[pid] = root
+            for child in root.children(recursive=True):
+                child.cpu_percent(interval=None)
+                _cpu_samples[child.pid] = child
             return None
-        return round(float(value), 1)
+        if not root.is_running():
+            _cpu_samples.clear()
+            _cpu_root = None
+            return None
+        total = root.cpu_percent(interval=None)
+        seen = {pid}
+        for child in root.children(recursive=True):
+            seen.add(child.pid)
+            cached = _cpu_samples.get(child.pid)
+            if cached is None:
+                child.cpu_percent(interval=None)
+                _cpu_samples[child.pid] = child
+            else:
+                total += cached.cpu_percent(interval=None)
+        for stale in list(_cpu_samples):
+            if stale not in seen:
+                _cpu_samples.pop(stale, None)
+        if total < 0:
+            return None
+        return round(float(total), 1)
     except Exception:
+        _cpu_samples.clear()
+        _cpu_root = None
         return None
 
 

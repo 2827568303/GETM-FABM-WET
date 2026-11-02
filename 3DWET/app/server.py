@@ -3489,8 +3489,11 @@ def _parse_output_yaml(out_path):
 # ── Output subscription (P0) ─────────────────────────────────────────────
 # FABM's output manager (flexout) resolves each `source:` entry as:
 #   `*`        → root category = EVERY registered variable (the 17.9 GB trap)
-#   `NAME/*`   → category NAME (one FABM model instance, e.g. `abiotic_water/*`)
-#   `NAME`     → that single variable by exact name
+#   `fabm/NAME/*` → category fabm/NAME. GETM registers FABM fields there
+#                 (`getm_fabm.F90`); `NAME/*` is an empty category and
+#                 makes flexout skip ext_wq.nc.
+#   `NAME`     → that single variable by its registered name
+#                 (slashes become underscores, e.g. abiotic_water_sO2W)
 # See src/gotm/extern/flexout/src/output_manager.F90:683-704.
 # 注意：flexout 的 field manager 只注册了 temp/salt/hn/z/D 这几个水动力场
 # （实测 NativeTest 全量输出 output.nc 中仅有这 5 个）。elev/u/v 由 GETM 原生
@@ -9479,29 +9482,9 @@ def case_build():
     output_seconds_yaml = (str(int(output_seconds))
                            if float(output_seconds).is_integer()
                            else str(output_seconds))
+    from flexout_output import case_output_yaml
     (case_path / "output.yaml").write_text(
-        "allow_missing_fields: true\n"
-        "output:\n"
-        "   time_unit: second\n"
-        f"   time_step: {output_seconds_yaml}\n"
-        "   sync_interval: 1\n"
-        "   variables:\n"
-        "      - source: temp\n"
-        "      - source: D\n"
-        "      - source: hn\n"
-        "      - source: z\n"
-        "      - source: abiotic_water/sO2W\n"
-        "ext_wq:\n"
-        "   time_unit: day\n"
-        "   time_step: 7\n"
-        "   sync_interval: 1\n"
-        "   variables:\n"
-        "      - source: abiotic_water/*\n"
-        "      - source: POM/*\n"
-        "      - source: DOM/*\n"
-        "      - source: cyanobacteria/*\n"
-        "      - source: diatoms/*\n"
-        "      - source: greens/*\n", encoding="utf-8")
+        case_output_yaml(output_seconds_yaml), encoding="utf-8")
     if not (case_path / "meteo_input.txt").exists():
         (case_path / "meteo_input.txt").write_text("meteo.nc\n", encoding="utf-8")
     # Refresh caches so the case list / config pages see the new files

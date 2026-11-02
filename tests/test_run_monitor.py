@@ -1,8 +1,10 @@
+import subprocess
 import sys
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '3DWET' / 'app'))
-from run_monitor import build_run_monitor
+from run_monitor import _cpu_percent, build_run_monitor
 
 
 def test_monitor_reports_speed_and_stall(tmp_path):
@@ -25,3 +27,15 @@ def test_monitor_reports_speed_and_stall(tmp_path):
     assert abs(report['sim_days_per_wall_hour'] - (20 * 15 * 3600 / 86400)) < 1e-6
     labels = [item['label'] for item in report['consoles']]
     assert '求解器' in labels and 'MPI 0' in labels and 'MPI 1' in labels
+
+
+def test_cpu_percent_is_nonzero_after_the_baseline_poll():
+    proc = subprocess.Popen([sys.executable, '-c', 'while True: pass'])
+    try:
+        assert _cpu_percent(proc.pid) is None
+        time.sleep(0.4)
+        value = _cpu_percent(proc.pid)
+        assert value is not None and value > 0
+    finally:
+        proc.kill()
+        proc.wait(timeout=5)
