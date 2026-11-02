@@ -936,9 +936,10 @@
 !  Original author(s): Jorn Bruggeman
 !
 ! !LOCAL VARIABLES:
-   REALTYPE :: pileft, piright, fnow
+   REALTYPE :: pileft, piright, fnow, cc_safe
    REALTYPE :: relderivative(1:numc)
    integer  :: iter, i, potnegcount
+   integer, save :: nwarn = 0
 !EOP
 !-----------------------------------------------------------------------
 !BOC
@@ -949,10 +950,18 @@
 
       if (derivative(i).lt.0.) then
 !        State variable could become zero or less; include it in the
-!        J set of the EMP scheme.
-         if (cc(i).eq.0.) write (*,*) "Error: state variable ",i," is zero and has negative derivative!"
+!        J set of the EMP scheme. An exact zero used to divide by zero and
+!        print an "Error:" line on every wet cell. gotm_fabm includes this
+!        template, so the floor has to live here to reach the Windows exe.
+         cc_safe = cc(i)
+         if (cc_safe .le. _ZERO_) then
+            cc_safe = 1.d-12
+            nwarn = nwarn + 1
+            if (nwarn .le. 3) write(0,*) 'Warning: state variable ',i, &
+               ' is non-positive with a negative derivative; EMP uses a 1e-12 floor.'
+         end if
          potnegcount = potnegcount+1
-         relderivative(potnegcount) = dt*derivative(i)/cc(i)
+         relderivative(potnegcount) = dt*derivative(i)/cc_safe
 
 !        Derivative is negative, and therefore places an upper bound on pi.
          if (-_ONE_/relderivative(potnegcount).lt.piright) piright = -_ONE_/relderivative(potnegcount)
@@ -1002,10 +1011,11 @@
 !  for stiff systems (or very high delta_t), and for non-positive systems.
 !  Then EMP is not suitable (it will stall state variable values), so warn user.
    if (pi.lt.1.d-4) then
-     write (*,*) "Warning: small pi=",pi," in Extended Modified Patankar slows down system!"
-!    write (*,*) "relative derivatives: ",derivative(:)*dt/cc(:)
-!    write (*,*) "You system may be stiff or non-positive, or you time step is too large."
-!    stop "ode_solvers::findp_bisection"
+     nwarn = nwarn + 1
+     if (nwarn .le. 3) write(0,*) "Warning: small pi=",pi, &
+        " in Extended Modified Patankar slows down system!"
+     if (nwarn .eq. 4) write(0,*) &
+        "Warning: further EMP small-pi / zero-state warnings suppressed."
    end if
 
    end subroutine findp_bisection

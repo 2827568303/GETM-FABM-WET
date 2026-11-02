@@ -479,6 +479,16 @@ set_property(TARGET ncdf APPEND PROPERTY INCLUDE_DIRECTORIES "${GOTM_INCLUDE_DIR
 set_property(TARGET input APPEND PROPERTY INCLUDE_DIRECTORIES "${GOTM_INCLUDE_DIRS}")
 set_property(TARGET getm APPEND PROPERTY INCLUDE_DIRECTORIES "${GOTM_INCLUDE_DIRS}")
 
+# GETM modules (time, eqstate, ...) must be found before GOTM's copies.
+# A clean build has no leftover time.mod in the build root, so every
+# target needs this directory first. MinGW otherwise binds output.F90
+# to GOTM's write_time_string, which has no optional arguments.
+foreach(getm_mod_target futils domain ncdf input meteo output 2d 3d getm)
+  if(TARGET ${getm_mod_target})
+    target_include_directories(${getm_mod_target} BEFORE PRIVATE "${CMAKE_BINARY_DIR}/getm_modules")
+  endif()
+endforeach()
+
 # Build GETM executable.
 add_executable(getm_exe
                getm/main.F90
