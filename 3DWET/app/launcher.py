@@ -207,6 +207,56 @@ class UiSmoke:
                 logging.exception('Could not close the UI smoke window')
 
 
+def install_seed_cases(model_root, case_root):
+    """Copy packaged examples into an empty user case folder once.
+
+    The installer shortcut sets ``WET_USER_CASES``. Existing ``getm.inp`` files
+    are left untouched, and the copy is skipped when the user folder is the
+    packaged tree itself.
+    """
+    flag = os.environ.get('WET_USER_CASES', '').strip().lower()
+    if flag not in {'1', 'true', 'yes', 'on'}:
+        return
+    source_root = Path(model_root) / 'case'
+    destination_root = Path(case_root)
+    try:
+        if source_root.resolve() == destination_root.resolve():
+            return
+    except OSError:
+        return
+    if not source_root.is_dir():
+        return
+    for child in sorted(source_root.iterdir()):
+        if not child.is_dir() or child.name.startswith('.'):
+            continue
+        destination = destination_root / child.name
+        if (destination / 'getm.inp').is_file() or (destination / 'fabm.yaml').is_file():
+            continue
+        try:
+            _copy_seed_tree(child, destination)
+        except OSError:
+            logging.exception('Could not copy seed case %s', child.name)
+
+
+def _copy_seed_tree(source, destination):
+    """Copy a seed case without Win32 CopyFile2.
+
+    CPython's ``shutil.copytree`` uses ``CopyFile2``. Wine 9 aborts the
+    process on that call, so the installed shortcut would never reach the
+    server during the Wine smoke. A byte copy keeps the same files.
+    """
+    destination.mkdir(parents=True, exist_ok=False)
+    for child in source.iterdir():
+        name = child.name
+        if name in {'output', '__pycache__'} or name == 'output.nc' or name.endswith('.log'):
+            continue
+        target = destination / name
+        if child.is_dir() and not child.is_symlink():
+            _copy_seed_tree(child, target)
+        elif child.is_file():
+            target.write_bytes(child.read_bytes())
+
+
 def show_close_notice(window=None):
     if window is not None:
         window.create_confirmation_dialog('3DWET Studio', CLOSE_NOTICE)
@@ -274,6 +324,7 @@ def main(argv=None):
         root = resolve_model_root()
         os.environ['WET_MODEL_ROOT'] = str(root)
         case_root, case_source, case_warning = resolve_case_storage(root)
+        install_seed_cases(root, case_root)
         state_root, state_warning = resolve_state_storage(case_root)
         temp_root = case_root / '.temp'
         temp_root.mkdir(parents=True, exist_ok=True)

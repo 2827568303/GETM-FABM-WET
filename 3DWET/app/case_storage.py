@@ -43,9 +43,55 @@ def is_system_drive(path: str | Path) -> bool:
     return _drive_letter(path) == "C"
 
 
+def per_user_case_root(environ=None) -> Path | None:
+    """Return ``%LOCALAPPDATA%\\3DWET\\cases``, outside the program directory.
+
+    The installer shortcut sets ``WET_USER_CASES=1`` so a machine with only C:
+    still keeps user cases out of ``Programs\\3DWET``. A non-C: volume remains
+    preferred and this folder is not used then.
+    """
+    env = os.environ if environ is None else environ
+    local = str(env.get("LOCALAPPDATA", "")).strip()
+    if not local:
+        profile = str(env.get("USERPROFILE", "")).strip()
+        if profile and os.name == "nt":
+            local = str(Path(profile) / "AppData" / "Local")
+    if not local:
+        return None
+    return Path(local).expanduser() / "3DWET" / "cases"
+
+
+def _storage_key(path: str | Path) -> str:
+    text = os.fspath(path).replace("/", "\\").rstrip("\\")
+    if _drive_letter(text) and os.name != "nt":
+        return os.path.normcase(text)
+    try:
+        return os.path.normcase(os.path.abspath(text))
+    except (OSError, ValueError):
+        return os.path.normcase(text)
+
+
+def path_is_under(child: str | Path, parent: str | Path) -> bool:
+    left = _storage_key(child)
+    right = _storage_key(parent)
+    return left == right or left.startswith(right + "\\")
+
+
+def _user_cases_requested(env) -> bool:
+    return str(env.get("WET_USER_CASES", "")).strip().lower() in {"1", "true", "yes", "on"}
+
+
 def case_request_is_read_only_allowed(case_path: str | Path, method: str, route: str) -> bool:
-    """Gate API writes for cases on C: while preserving safe read/copy actions."""
+    """Gate API writes for cases on C: while preserving safe read/copy actions.
+
+    The installer's per-user folder may sit on C: when the machine has no
+    other volume. That folder is outside the install directory and is writable.
+    Other C: paths stay read-only.
+    """
     if not is_system_drive(case_path):
+        return True
+    per_user = per_user_case_root()
+    if per_user is not None and path_is_under(case_path, per_user):
         return True
     method = method.upper()
     if method in {"GET", "HEAD", "OPTIONS"}:
@@ -81,8 +127,11 @@ def _probe_writable(path: Path) -> None:
 
 
 def resolve_case_storage(base_dir: str | Path, environ=None):
-    """Return (case_root, source, warning), never selecting the C: volume.
+    """Return (case_root, source, warning).
 
+    Generated cases stay off C: whenever another volume can be written. The
+    installer sets ``WET_USER_CASES=1``; if every non-C: volume is missing,
+    cases then go to the per-user folder outside the install directory.
     A small write probe is used because a mounted path can exist while still
     being unwritable. The probe is removed immediately and never touches any
     existing case content.
@@ -135,6 +184,20 @@ def resolve_case_storage(base_dir: str | Path, environ=None):
         except (OSError, RuntimeError, ValueError) as error:
             warnings.append(f"Case root {candidate} unavailable: {error}.")
 
+    # Installer launches ask for a data directory outside Programs\3DWET.
+    # Source checkouts leave WET_USER_CASES unset and keep the tree below.
+    if _user_cases_requested(env):
+        per_user = per_user_case_root(env)
+        base = Path(base_dir)
+        if per_user is not None and not path_is_under(per_user, base):
+            try:
+                _probe_writable(per_user)
+                warnings.append(
+                    "No non-C: volume is available; user cases are outside the install directory.")
+                return per_user, "per-user", " ".join(warnings)
+            except (OSError, RuntimeError, ValueError) as error:
+                warnings.append(f"Per-user case root {per_user} unavailable: {error}.")
+
     # Linux and a Windows checkout without D: keep the restored cases in the
     # repository tree. Never resolve ``D:\`` as a relative directory: NetCDF
     # cannot create files in a path that still contains backslashes.
@@ -176,7 +239,9 @@ def resolve_state_storage(case_root: str | Path, environ=None):
             if key in checked:
                 continue
             checked.add(key)
-            if is_system_drive(path):
+            per_user = per_user_case_root(env)
+            on_system = is_system_drive(path)
+            if on_system and not (per_user is not None and path_is_under(path, per_user)):
                 warnings.append(f"Ignoring state root {path}: C: state storage is disabled.")
                 continue
             _probe_writable(path)
