@@ -9,9 +9,15 @@ INSTALL="$ROOT/install-linux"
 NJOB="${NJOB:-2}"
 STAGE="${1:-openmp}"
 FABM_INSTITUTES="au;bb;examples;gotm;jrc;pclake;pml;selma;ersem;su;niva;akvaplan;wet"
+if [[ -n "${NETCDF_INCLUDE:-}" ]]; then
+  NETCDF_INC="$NETCDF_INCLUDE"
+else
+  NETCDF_INC="$(nf-config --includedir)"
+fi
 
 echo "===== FABM configure ====="
 cmake -S "$ROOT/src/fabm/src" -B "$BUILD/fabm" \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX="$INSTALL/fabm" \
   -DFABM_HOST=gotm \
@@ -25,7 +31,8 @@ echo "===== GETM configure (Cartesian + OpenMP + FABM) ====="
 cmake -S "$ROOT/src/getm/src" -B "$BUILD/getm" \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX="$INSTALL" \
-  -DCMAKE_Fortran_FLAGS="-O2 -fopenmp -DGETM_OMP -ffree-line-length-none -I/usr/include" \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+  -DCMAKE_Fortran_FLAGS="-O2 -fopenmp -DGETM_OMP -ffree-line-length-none -I${NETCDF_INC}" \
   -DGOTM_BASE="$ROOT/src/gotm" \
   -DGETM_USE_FABM=ON \
   -DFABM_PREFIX="$INSTALL/fabm" \
@@ -41,7 +48,8 @@ if [[ "$STAGE" == "mpi" || "$STAGE" == "all" ]]; then
   echo "===== GETM configure (Cartesian + MPI + OpenMP + FABM/WET) ====="
   cmake -S "$ROOT/src/getm/src" -B "$BUILD/getm-parallel" \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_Fortran_FLAGS="-O2 -fopenmp -DGETM_OMP -ffree-line-length-none -I/usr/include" \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+    -DCMAKE_Fortran_FLAGS="-O2 -fopenmp -DGETM_OMP -ffree-line-length-none -I${NETCDF_INC}" \
     -DGOTM_BASE="$ROOT/src/gotm" \
     -DGETM_USE_FABM=ON \
     -DGETM_USE_PARALLEL=ON \

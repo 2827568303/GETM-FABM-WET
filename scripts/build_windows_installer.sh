@@ -311,7 +311,7 @@ if not isinstance(plan, dict) or "hardware" not in plan:
 print("core-plan keys", ",".join(sorted(plan)))
 PY
   cleanup_server
-  smoke_solver "$app" || die "1-hour serial or OpenMP case did not finish"
+  smoke_solver "$app" || die "1-day NativeTest did not finish"
   log "silent uninstall"
   local uninstaller
   uninstaller="$(find "$app" -maxdepth 1 -name 'unins*.exe' -print -quit)"
@@ -332,12 +332,10 @@ smoke_solver() {
   local serial="${app}/3DWET/bin/getm_cartesian_serial.exe"
   local openmp="${app}/3DWET/bin/getm_cartesian.exe"
   [[ -f "$serial" && -f "$openmp" ]] || die "installed solvers are missing"
-  # NativeTest stops on the first step with non-finite abiotic_water_sDIMW.
-  # That happens with the solvers from before 78c8f18 as well, so the smoke
-  # uses the repository Lake Dianchi case for one model hour instead.
+  # NativeTest is the bundled case. Its stop is two days; the smoke runs one day.
   local case_dir="${WORK}/solver-smoke"
-  local case_src="${ROOT}/3DWET/case/Lake Dianchi"
-  [[ -f "${case_src}/getm.inp" ]] || die "Lake Dianchi case is missing"
+  local case_src="${ROOT}/3DWET/case/NativeTest"
+  [[ -f "${case_src}/getm.inp" ]] || die "NativeTest case is missing"
   rm -rf "$case_dir"
   mkdir -p "$case_dir"
   cp -a "${case_src}/." "$case_dir/"
@@ -345,10 +343,10 @@ smoke_solver() {
 import pathlib, sys
 path = pathlib.Path(sys.argv[1])
 text = path.read_text(encoding="utf-8")
-old = "stop = '2020-12-29 00:00:00'"
-new = "stop = '2020-01-01 01:00:00'"
+old = "stop = '2020-01-03 00:00:00'"
+new = "stop = '2020-01-02 00:00:00'"
 if old not in text:
-    raise SystemExit("could not set Lake Dianchi to a 1-hour window")
+    raise SystemExit("could not set NativeTest to a 1-day window")
 path.write_text(text.replace(old, new, 1), encoding="utf-8")
 PY
   local runtime mpi
@@ -357,15 +355,15 @@ PY
   run_one() {
     local label="$1" exe="$2"
     local out="${WORK}/solver-${label}.log"
-    log "solver smoke ${label}: Lake Dianchi 2020-01-01 00:00 to 01:00"
+    log "solver smoke ${label}: NativeTest 2020-01-01 00:00 to 2020-01-02 00:00"
     set +e
     WINEPREFIX="$WINEPREFIX" WINEDEBUG="${WINEDEBUG:--all}" \
       WINEPATH="${runtime};${mpi}" OMP_NUM_THREADS=1 \
-      timeout 600 wine "$(to_win "$exe")" </dev/null >"$out" 2>&1
+      timeout 900 wine "$(to_win "$exe")" </dev/null >"$out" 2>&1
     local code=$?
     set -e
     if [[ "$code" -eq 0 ]] && grep -q 'getm: Completed on' "$out" && ! grep -q 'Non-finite' "$out"; then
-      log "${label} finished the 1-hour case"
+      log "${label} finished the 1-day NativeTest"
       return 0
     fi
     printf '%s log (exit %s):\n' "$label" "$code" >&2
@@ -375,7 +373,7 @@ PY
   if ( cd "$case_dir" && run_one serial "$serial" ); then
     return 0
   fi
-  log "serial 1-hour case did not finish; trying OpenMP"
+  log "serial 1-day NativeTest did not finish; trying OpenMP"
   ( cd "$case_dir" && run_one openmp "$openmp" )
 }
 
@@ -414,12 +412,10 @@ PY
   fi
   if [[ -d "$ARTIFACT_DIR" || "$ARTIFACT_DIR" == /opt/cursor/artifacts ]]; then
     mkdir -p "$ARTIFACT_DIR"
-    python3 - "$setup" "${ARTIFACT_DIR}/${SETUP_NAME}" <<'PY'
+    python3 - "$setup" "${ARTIFACT_DIR}/3DWET-Setup-${VERSION}-nativetest.exe" <<'PY'
 import hashlib, pathlib, sys
 src = pathlib.Path(sys.argv[1])
 dst = pathlib.Path(sys.argv[2])
-if dst.exists():
-    dst.unlink()
 digest = hashlib.sha256()
 with src.open("rb") as inp, dst.open("wb") as out:
     while True:

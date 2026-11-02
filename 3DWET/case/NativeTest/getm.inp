@@ -10,7 +10,7 @@
 /
 
 &time
-   timestep = 60
+   timestep = 20
    timefmt = 2
    start = '2020-01-01 00:00:00'
    stop = '2020-01-03 00:00:00'
