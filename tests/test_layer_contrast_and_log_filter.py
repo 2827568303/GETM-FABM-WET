@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '3DWET' / 'app'))
 from result_layers import surface_bottom_contrast
@@ -26,6 +27,16 @@ def test_well_mixed_shallow_column_is_reported_not_hidden():
     report = surface_bottom_contrast(bottom, surface, bottom_index=1, surface_index=10)
     assert report['mean_abs_diff'] < 0.01
     assert report['well_mixed'] is True
+
+
+def test_local_peak_is_not_called_well_mixed_when_the_mean_is_close():
+    bottom = np.full((2, 2), 14.22)
+    surface = np.full((2, 2), 13.97)
+    surface[0, 0] = bottom[0, 0] - 5.46
+    report = surface_bottom_contrast(bottom, surface, bottom_index=0, surface_index=9)
+    assert report['mean_abs_diff'] < 2
+    assert report['max_abs_diff'] == pytest.approx(5.46)
+    assert report['well_mixed'] is False
 
 
 def test_patankar_flood_keeps_progress_and_the_first_warnings():

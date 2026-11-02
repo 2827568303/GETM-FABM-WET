@@ -1522,6 +1522,8 @@ def _get_2d_field_from_dataset(ds, var_name, timestep=0, level=0,
     aggregation = 'not_applicable' if depth_average else 'layer'
     weight_source = None
     layer_contrast = None
+    logical_level = None
+    level_applies = False
     if var.ndim == 3 and time_idx == 0:  # time, y, x
         nt = var.shape[0]
         if nt == 0:
@@ -1539,7 +1541,8 @@ def _get_2d_field_from_dataset(ds, var_name, timestep=0, level=0,
             layer_contrast = None
         else:
             start, _ = physical_vertical_grid(ds, var)
-            _, lev = physical_layer_index(level, start, var.shape[1])
+            logical_level, lev = physical_layer_index(level, start, var.shape[1])
+            level_applies = True
             field = _fill(var[t, lev, :, :])
             from result_layers import surface_bottom_contrast
             bottom = _fill(var[t, start, :, :])
@@ -1572,6 +1575,8 @@ def _get_2d_field_from_dataset(ds, var_name, timestep=0, level=0,
         "mean": float(np.nanmean(field)) if not np.all(np.isnan(field)) else 0,
         "bathymetry": bathy.tolist() if bathy is not None else None,
         "layer_contrast": layer_contrast,
+        "level": logical_level,
+        "level_applies": level_applies,
     }
 
 

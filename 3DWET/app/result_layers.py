@@ -199,15 +199,20 @@ def surface_bottom_contrast(bottom, surface, bottom_index=0, surface_index=None)
         return None
     delta = top[both] - bed[both]
     mean_abs = float(np.mean(np.abs(delta)))
+    max_abs = float(np.max(np.abs(delta)))
     scale = max(float(np.mean(np.abs(top[both]))), float(np.mean(np.abs(bed[both]))), 1e-12)
+    # A lake can be close in the mean and still have a local surface-bottom
+    # contrast of several degrees. That local peak has to stay visible.
+    mean_close = mean_abs <= max(1e-4, 0.02 * scale)
+    peak_close = max_abs <= max(0.05, 0.05 * scale)
     return {
         'bottom_index': int(bottom_index),
         'surface_index': int(surface_index if surface_index is not None else 0),
         'bottom_mean': float(np.mean(bed[both])),
         'surface_mean': float(np.mean(top[both])),
         'mean_abs_diff': mean_abs,
-        'max_abs_diff': float(np.max(np.abs(delta))),
+        'max_abs_diff': max_abs,
         'n_wet': int(np.count_nonzero(both)),
-        'well_mixed': bool(mean_abs <= max(1e-4, 0.02 * scale)),
-        'note': '差值为表层减底层。k 从湖底数起。浅水充分混合时差值可以接近 0。',
+        'well_mixed': bool(mean_close and peak_close),
+        'note': '差值为表层减底层。k 从湖底数起。均值接近时，局部最大差仍可能有数度。',
     }

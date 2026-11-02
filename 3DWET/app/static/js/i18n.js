@@ -245,7 +245,7 @@
         select.focus();
     }
     const ready=(async()=>{
-        try {const response=await fetch('/static/i18n/en.json?v=20261027-static-bathymetry-preview');if(!response.ok)throw new Error('English catalog unavailable');const pack=validatePack(await response.json(),true);packs.set('en-US',pack);}
+        try {const response=await fetch('/static/i18n/en.json?v=20261102-structured-mesh');if(!response.ok)throw new Error('English catalog unavailable');const pack=validatePack(await response.json(),true);packs.set('en-US',pack);}
         catch(e){console.warn('Studio language catalog:',e.message);}
         if(typeof document!=='undefined') {
             try {

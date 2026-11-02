@@ -3256,8 +3256,8 @@ async function updateViz2d() {
         : (window.StudioI18n?.scientificText('边界：湿格边缘代理（未验证）','Boundary: wet-cell edge proxy (unverified)')||'边界：湿格边缘代理（未验证）');
     const contrast=data.layer_contrast;
     const contrastText=contrast
-        ? ` | 底层k=${contrast.bottom_index}均值 ${fmt(contrast.bottom_mean,4)} · 表层k=${contrast.surface_index}均值 ${fmt(contrast.surface_mean,4)} · |表-底|均值 ${fmt(contrast.mean_abs_diff,4)}${contrast.well_mixed?'（垂向差异很小，浅水混合充分）':''}`
-        : '';
+        ? ` | 底层k=${contrast.bottom_index}均值 ${fmt(contrast.bottom_mean,4)} · 表层k=${contrast.surface_index}均值 ${fmt(contrast.surface_mean,4)} · |表-底|均值 ${fmt(contrast.mean_abs_diff,4)} · 最大 ${fmt(contrast.max_abs_diff,4)}${contrast.well_mixed?'（垂向差异很小）':''}`
+        : (data.level_applies===false ? ' | 该变量没有垂向层，切换层不会改变数值和色标' : '');
     $('viz2d-info').textContent = `${window.StudioI18n?.scientificText('变量','Variable')||'变量'}: ${resultLabel(data,varName)} (${varName}) | ${outline} | ${window.StudioI18n?.scientificText('时步','Frame')||'时步'}: ${timestep}${dateLabel ? ' (' + dateLabel + ')' : ''} | ${window.StudioI18n?.scientificText('均值','Mean')||'均值'}: ${fmt(data.mean,4)} | ${window.StudioI18n?.scientificText('形状','Shape')||'形状'}: ${data.shape?.join('×')}${contrastText}`;
     drawColorbar('viz2d-colorbar', range.min, range.max, resultLabel(data,varName), data.units);
     perf?.stage(perfTicket,'draw',perfClock()-drawStartedAt);
@@ -3309,6 +3309,8 @@ async function onViz2dVarChange(preserveLayer=false) {
         levelSel.appendChild(opt);
     }
     if(preserveLayer && Array.from(levelSel.options).some(option=>String(option.value)===previous))levelSel.value=previous;
+    levelSel.disabled=!is3d;
+    levelSel.title=is3d?'':'这个变量没有垂向层，切换层不会改变数值或色标';
     await updateViz2d();
 }
 
