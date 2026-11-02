@@ -1010,13 +1010,17 @@
                             求解后压缩结果并逐值核验（减少磁盘占用；可能显著延长完成时间）
                         </label>
                     </div>
-                    <div id="mpi-run-control" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px;">
-                        <label><input id="mpi-run-enabled" type="checkbox" disabled> MPI</label>
-                        <label for="mpi-process-count">Processes</label>
-                        <select class="form-control" id="mpi-process-count" style="width:88px;" disabled></select>
-                        <button class="btn btn-sm" id="mpi-detect-recommendation" type="button" onclick="detectAndApplyMpiRecommendation()" disabled title="在隔离副本上测量多种进程数，包含求解与结果合并时间；仅在明确点击后运行">实测选择最快</button>
-                        <button class="btn btn-sm" id="mpi-tuning-cancel" type="button" onclick="cancelMpiTuning()" style="display:none;">取消测量</button>
-                        <span id="mpi-run-capability" role="status" style="flex:1;min-width:260px;font-size:12px;color:var(--text-muted,#777);"></span>
+                    <div id="core-run-control" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px;">
+                        <label for="core-count">使用核数</label>
+                        <input class="form-control" id="core-count" type="number" min="1" step="1" inputmode="numeric" value="1" style="width:96px;" title="没有上限。自动会按本机测定结果选择；改这个数字就改成手动指定。">
+                        <label for="parallel-mode">方式</label>
+                        <select class="form-control" id="parallel-mode" style="width:196px;" title="自动会在首次打开时短跑测定，并记住这台机器和这张网格。">
+                            <option value="auto">自动（测定最快）</option>
+                            <option value="threads">OpenMP 线程</option>
+                            <option value="mpi">MPI 进程</option>
+                            <option value="hybrid">MPI × OpenMP</option>
+                        </select>
+                        <span id="core-plan-note" role="status" style="flex:1;min-width:260px;font-size:12px;color:var(--text-muted,#777);">正在读取本机核数…</span>
                     </div>
                     <div id="run-repair-summary" role="status" aria-live="polite" style="margin:0 0 10px;color:var(--text-muted,#777);font-size:12px;">FABM 状态检查汇总：未提供。</div>
                     <section id="run-monitor" class="run-monitor" aria-label="运行监控">

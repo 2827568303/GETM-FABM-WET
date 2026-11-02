@@ -445,7 +445,8 @@ def stop_process_tree(process: subprocess.Popen, *, windows: bool | None = None,
 class MpiRun:
     """Own one launcher, rank log files, and a caller-provided merge hook."""
     def __init__(self, *, launcher, solver, n, case, cpu_count=None, runtime_dirs=None,
-                 merger=None, feature_enabled=None, popen=subprocess.Popen):
+                 merger=None, feature_enabled=None, popen=subprocess.Popen,
+                 omp_threads=None):
         enabled = MPI_RUN_ENABLED if feature_enabled is None else bool(feature_enabled)
         if not enabled:
             raise RuntimeError("MPI run feature is disabled")
@@ -455,6 +456,7 @@ class MpiRun:
             raise RuntimeError("MPI results merger is unavailable")
         self.launcher, self.solver = str(launcher), str(solver)
         self.n = validate_process_count(n, cpu_count=cpu_count)
+        self.omp_threads = omp_threads
         self.case = Path(case)
         self.merger = merger
         self.runtime_dirs = [Path(p).resolve() for p in (runtime_dirs or [])]
@@ -470,7 +472,7 @@ class MpiRun:
             self.case.mkdir(parents=True, exist_ok=True)
             self._log = (self.case / "model_run.log").open("w", encoding="utf-8", errors="replace")
             # Keep the model's packaged DLLs first and the MPI runtime next.
-            env = solver_environment(self.solver)
+            env = solver_environment(self.solver, threads=self.omp_threads)
             mpi_runtime = str(Path(self.launcher).resolve().parent)
             paths = [p for p in env.get("PATH", "").split(os.pathsep) if p]
             extras = [str(p) for p in self.runtime_dirs]

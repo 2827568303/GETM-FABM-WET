@@ -85,9 +85,11 @@ vm.runInContext(extractFunction('detectAndApplyMpiRecommendation'), context);
 
   await context.startRun();
   assertJsonObject(0, {
+    cores: 1,
+    parallel_mode: 'auto',
+    compress_results: false,
     mpi: false,
     processes: 1,
-    compress_results: false,
   }, 'run start');
 
   await context.fixSyncInterval();

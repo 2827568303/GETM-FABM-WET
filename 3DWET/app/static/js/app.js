@@ -2134,10 +2134,14 @@ document.addEventListener('DOMContentLoaded', () => {
 // ── Run Control ───────────────────────────────────────────────────────
 async function startRun() {
     if (!state.activeCase) { toast('请先加载案例', 'error'); return; }
-    const mpi = !!document.getElementById('mpi-run-enabled')?.checked;
-    const processCount = Number(document.getElementById('mpi-process-count')?.value || 1);
+    const coreInput = document.getElementById('core-count');
+    const modeInput = document.getElementById('parallel-mode');
+    const cores = Math.max(1, Math.floor(Number(coreInput && coreInput.value) || 1));
+    const parallelMode = (modeInput && modeInput.value) || 'auto';
     const compressResults = !!document.getElementById('compress-run-results')?.checked;
-    const res = await api('/api/run/start', {method:'POST', body:{mpi, processes:processCount, compress_results:compressResults}});
+    const mpi = parallelMode === 'mpi' || parallelMode === 'hybrid';
+    const res = await api('/api/run/start', {method:'POST', body:{
+        cores, parallel_mode: parallelMode, compress_results: compressResults, mpi, processes: cores}});
     if (!res.success) { toast(res.error || '启动失败', 'error'); return; }
     advanceOutputRevision();
     $('btn-start-run').disabled = true;
@@ -2247,84 +2251,143 @@ async function copyRunLogs() {
     }
 }
 
-async function loadMpiRunCapabilities() {
-    const panel = document.getElementById('mpi-run-control');
-    const toggle = document.getElementById('mpi-run-enabled');
-    const count = document.getElementById('mpi-process-count');
-    const note = document.getElementById('mpi-run-capability');
-    const detectButton = document.getElementById('mpi-detect-recommendation');
-    if (!panel || !toggle || !count || !note || !detectButton) return;
-    const request = state.mpiCapabilitiesRequest = (state.mpiCapabilitiesRequest || 0) + 1;
-    const caseRevision = state.caseRevision || 0;
-    const casePath = state.activeCasePath;
-    const caseType = state.caseType;
-    const isCurrent = () => request === state.mpiCapabilitiesRequest
-        && caseRevision === (state.caseRevision || 0)
-        && casePath === state.activeCasePath
-        && caseType === state.caseType;
-    // Lock the control while refreshing so a fast case switch cannot briefly
-    // leave MPI enabled for a read-only or single-column case.
-    toggle.checked = false;
-    toggle.disabled = true;
-    count.disabled = true;
-    detectButton.disabled = true;
+function coreStorageKey(casePath, kind) {
+    return `3dwet-${kind}:${casePath || ''}`;
+}
+
+function readCoreOverride(casePath) {
     try {
-        const capabilities = await api('/api/run/mpi-capabilities');
-        if (!isCurrent()) return;
-        const maxProcesses = Math.max(1, Number(capabilities.max_processes) || 1);
-        const targetProcesses = Math.max(1, Math.ceil(maxProcesses / 2));
-        const recommended = Math.max(1, Math.min(maxProcesses,
-            Number(capabilities.recommended_processes) || targetProcesses));
-        const allowedProcesses = Array.isArray(capabilities.allowed_processes)
-            ? [...new Set(capabilities.allowed_processes.map(Number)
-                .filter(value => Number.isInteger(value) && value >= 1 && value <= maxProcesses))]
-                .sort((a, b) => a - b)
-            : Array.from({length: maxProcesses}, (_, index) => index + 1);
-        const preference = state.mpiProcessCountByCase instanceof Map
-            ? state.mpiProcessCountByCase.get(casePath) : null;
-        const selectedCount = allowedProcesses.includes(preference) ? preference
-            : (allowedProcesses.includes(recommended) ? recommended
-                : ([...allowedProcesses].sort((a, b) =>
-                    Math.abs(a - targetProcesses) - Math.abs(b - targetProcesses) || a - b)[0] || 1));
-        count.replaceChildren(...allowedProcesses.map(value => {
-            const option = document.createElement('option');
-            option.value = String(value);
-            option.textContent = String(value);
-            return option;
-        }));
-        count.value = String(selectedCount);
-        const eligibleCase = !!casePath && caseType === 'getm' && !state.storageReadOnly;
-        const enabled = capabilities.enabled === true && eligibleCase && allowedProcesses.length > 0;
-        toggle.disabled = !enabled;
-        detectButton.disabled = !enabled;
-        if (enabled) {
-            const hasPreference = state.mpiSelectionByCase instanceof Map
-                && state.mpiSelectionByCase.has(casePath);
-            toggle.checked = hasPreference ? state.mpiSelectionByCase.get(casePath) : true;
-        } else {
-            toggle.checked = false;
+        const mode = localStorage.getItem(coreStorageKey(casePath, 'mode'))
+            || localStorage.getItem('3dwet-mode');
+        const cores = localStorage.getItem(coreStorageKey(casePath, 'cores'))
+            || localStorage.getItem('3dwet-cores');
+        if (!mode || mode === 'auto') return null;
+        const n = Math.floor(Number(cores));
+        if (!Number.isInteger(n) || n < 1) return null;
+        return {mode, cores: n};
+    } catch (_) {
+        return null;
+    }
+}
+
+function writeCoreOverride(casePath, mode, cores) {
+    try {
+        localStorage.setItem(coreStorageKey(casePath, 'mode'), mode);
+        localStorage.setItem(coreStorageKey(casePath, 'cores'), String(cores));
+        localStorage.setItem('3dwet-mode', mode);
+        localStorage.setItem('3dwet-cores', String(cores));
+    } catch (_) {}
+}
+
+function clearCoreOverrides() {
+    try {
+        const drop = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.startsWith('3dwet-mode') || key.startsWith('3dwet-cores'))) drop.push(key);
         }
-        count.disabled = !enabled || !toggle.checked;
-        note.textContent = !eligibleCase
-            ? (casePath ? 'MPI 仅适用于可写的 GETM 网格案例' : '请先加载可写的 GETM 网格案例')
-            : (capabilities.reason || `当前进程可用逻辑处理器：${maxProcesses}；建议 ${recommended} 个进程。建议值不保证最快。`);
-        toggle.onchange = () => {
-            if (!isCurrent() || !enabled) return;
-            count.disabled = !toggle.checked;
-            state.mpiSelectionByCase.set(casePath, toggle.checked);
-        };
-        count.onchange = () => {
-            if (!isCurrent() || !enabled || !allowedProcesses.includes(Number(count.value))) return;
-            state.mpiProcessCountByCase.set(casePath, Number(count.value));
-        };
+        drop.forEach(key => localStorage.removeItem(key));
+    } catch (_) {}
+}
+
+function bindCoreControls() {
+    const count = document.getElementById('core-count');
+    const mode = document.getElementById('parallel-mode');
+    if (!count || !mode || count.dataset.bound === '1') return;
+    count.dataset.bound = '1';
+    count.addEventListener('input', () => {
+        state.corePlanTouched = true;
+        if (mode.value === 'auto') mode.value = 'threads';
+        const n = Math.max(1, Math.floor(Number(count.value) || 1));
+        writeCoreOverride(state.activeCasePath, mode.value, n);
+    });
+    mode.addEventListener('change', () => {
+        state.corePlanTouched = true;
+        const n = Math.max(1, Math.floor(Number(count.value) || 1));
+        if (mode.value === 'auto') {
+            try {
+                localStorage.removeItem(coreStorageKey(state.activeCasePath, 'mode'));
+                localStorage.removeItem(coreStorageKey(state.activeCasePath, 'cores'));
+                localStorage.setItem('3dwet-mode', 'auto');
+            } catch (_) {}
+            return;
+        }
+        writeCoreOverride(state.activeCasePath, mode.value, n);
+    });
+}
+
+function applyCoreRecommendation(plan) {
+    const count = document.getElementById('core-count');
+    const mode = document.getElementById('parallel-mode');
+    const note = document.getElementById('core-plan-note');
+    if (!count || !mode || !note || state.corePlanTouched) {
+        if (note && plan) note.textContent = plan.summary || note.textContent;
+        return;
+    }
+    const override = readCoreOverride(state.activeCasePath);
+    const rec = plan.recommendation || {};
+    if (override) {
+        mode.value = override.mode;
+        count.value = String(override.cores);
+    } else {
+        mode.value = 'auto';
+        count.value = String(Math.max(1, Number(rec.cores) || 1));
+    }
+    note.textContent = plan.summary || '';
+}
+
+async function loadCorePlan() {
+    const count = document.getElementById('core-count');
+    const mode = document.getElementById('parallel-mode');
+    const note = document.getElementById('core-plan-note');
+    if (!count || !mode || !note) return;
+    const request = state.corePlanRequest = (state.corePlanRequest || 0) + 1;
+    const casePath = state.activeCasePath;
+    const isCurrent = () => request === state.corePlanRequest && casePath === state.activeCasePath;
+    state.corePlanTouched = false;
+    bindCoreControls();
+    try {
+        let plan = await api('/api/run/core-plan');
+        if (!isCurrent()) return;
+        if (plan.error && !plan.hardware) {
+            note.textContent = plan.error;
+            return;
+        }
+        const fingerprint = plan.fingerprint || '';
+        try {
+            const seen = localStorage.getItem('3dwet-hw');
+            if (seen && fingerprint && seen !== fingerprint) clearCoreOverrides();
+            if (fingerprint) localStorage.setItem('3dwet-hw', fingerprint);
+        } catch (_) {}
+        applyCoreRecommendation(plan);
+        const posted = state.coreCalibrationPosted || (state.coreCalibrationPosted = new Set());
+        const postKey = `${casePath || ''}|${fingerprint}`;
+        if (!plan.cached && plan.can_calibrate && !plan.calibrating && !posted.has(postKey)) {
+            posted.add(postKey);
+            const started = await api('/api/run/core-plan', {method:'POST', body:{}});
+            if (!isCurrent()) return;
+            if (started && started.hardware) plan = started;
+            else if (started && started.error) note.textContent = started.error;
+        }
+        while (isCurrent() && plan.calibrating) {
+            note.textContent = plan.summary || '正在测定核数…';
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            if (!isCurrent()) return;
+            plan = await api('/api/run/core-plan');
+        }
+        if (!isCurrent()) return;
+        if (plan.calibration_error) {
+            note.textContent = `测定没有完成（${plan.calibration_error}）。${plan.summary || ''}`;
+        }
+        applyCoreRecommendation(plan);
     } catch (error) {
         if (!isCurrent()) return;
-        toggle.checked = false;
-        toggle.disabled = true;
-        count.disabled = true;
-        detectButton.disabled = true;
-        note.textContent = '无法读取 MPI 运行能力';
+        note.textContent = '无法读取本机核数。可手动填写使用核数。';
     }
+}
+
+async function loadMpiRunCapabilities() {
+    return loadCorePlan();
 }
 
 async function detectAndApplyMpiRecommendation() {
@@ -2586,7 +2649,12 @@ function renderRunMonitor(status) {
     const days = Number.isFinite(m.sim_days_per_wall_hour) ? m.sim_days_per_wall_hour.toFixed(2) : '—';
     const cpu = Number.isFinite(m.cpu_percent) ? `${m.cpu_percent.toFixed(0)}%` : '—';
     const eta = runEtaText(status);
-    box.textContent = `MPI ${m.mpi_ranks || 1} 进程 · OpenMP ${m.omp_threads ?? '—'} 线程 · ${rate} 步/秒 · ${days} 模拟天/墙钟小时 · 剩余 ${eta} · CPU ${cpu}`;
+    const modeLabel = {serial:'串行', threads:'OpenMP', mpi:'MPI', hybrid:'MPI×OpenMP', auto:'自动'}[m.parallel_mode] || '';
+    const chosen = Number.isFinite(m.requested_cores)
+        ? `使用核数 ${m.requested_cores}${modeLabel ? `（${modeLabel}）` : ''}`
+        : '';
+    const fallback = m.fallback_serial ? ' · 已回退串行' : '';
+    box.textContent = `${chosen ? chosen + ' · ' : ''}实际 MPI ${m.mpi_ranks || 1} 进程 · OpenMP ${m.omp_threads ?? '—'} 线程 · ${rate} 步/秒 · ${days} 模拟天/墙钟小时 · 剩余 ${eta} · CPU ${cpu}${fallback}`;
     if (m.level === 'error' || m.level === 'warn') {
         alertBox.hidden = false;
         alertBox.className = `run-monitor-alert ${m.level}`;

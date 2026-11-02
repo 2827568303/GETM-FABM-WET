@@ -38,19 +38,36 @@ _PATANKAR_NOISE = re.compile(
     r'further EMP small-pi')
 
 
-def recommended_openmp_threads(logical=None):
-    """Threads for a serial GETM binary. Leave one core for the UI when possible.
+def recommended_openmp_threads(logical=None, wet_columns=None):
+    """A starting thread count. Not a limit: the selector accepts any positive integer.
 
-    MPI ranks should not also take every core; callers pass 1 for the parallel exe.
+    Unknown grids leave one core for the interface on machines with at least
+    four logical cores. A known wet-column count scales slowly, and lakes
+    smaller than 4000 wet columns stay at 4 or fewer until a timed trial
+    says otherwise. Dianchi (about 1150 wet columns) is in that range:
+    extra hydro threads made the small grid slower, while tracer advection
+    gained from only a few cores.
     """
     count = logical if logical is not None else os.cpu_count()
     try:
         count = int(count)
     except (TypeError, ValueError):
         count = 1
-    if count >= 4:
-        return count - 1
-    return max(1, count)
+    count = max(1, count)
+    if wet_columns is None:
+        if count >= 4:
+            return count - 1
+        return count
+    try:
+        wet = int(wet_columns)
+    except (TypeError, ValueError):
+        wet = 0
+    if wet <= 0:
+        return recommended_openmp_threads(count)
+    by_grid = max(1, (wet + 399) // 400)
+    if wet < 4000:
+        by_grid = min(by_grid, 4)
+    return max(1, min(count, by_grid))
 
 
 def prepare_solver_log_chunk(text, *, keep=3):
@@ -76,7 +93,7 @@ def prepare_solver_log_chunk(text, *, keep=3):
     return '\n'.join(kept), dropped
 
 
-def solver_environment(exe_path, parent_env=None):
+def solver_environment(exe_path, parent_env=None, threads=None):
     exe_path = Path(exe_path).resolve()
     env = dict(os.environ if parent_env is None else parent_env)
     dirs = [exe_path.parent / 'runtime', exe_path.parent]
@@ -86,13 +103,21 @@ def solver_environment(exe_path, parent_env=None):
     env['PATH'] = os.pathsep.join(str(p) for p in dirs if p.is_dir()) + os.pathsep + env.get('PATH', '')
     env['GFORTRAN_UNBUFFERED_PRECONNECTED'] = 'y'
     env['GFORTRAN_UNBUFFERED_ALL'] = 'y'
-    # A parallel executable already splits the grid. Extra OpenMP threads
-    # oversubscribe the machine and slow the run down.
-    if 'OMP_NUM_THREADS' not in env:
+    # An explicit core choice always wins, including on the MPI executable
+    # (hybrid MPI × OpenMP). Without one, a parallel executable stays at
+    # 1 OpenMP thread so ranks do not also take every core.
+    if threads is not None:
+        try:
+            chosen = int(threads)
+        except (TypeError, ValueError):
+            chosen = 1
+        env['OMP_NUM_THREADS'] = str(max(1, chosen))
+    elif 'OMP_NUM_THREADS' not in env:
         parallel = 'parallel' in exe_path.name.lower()
         env['OMP_NUM_THREADS'] = '1' if parallel else str(recommended_openmp_threads())
     env.setdefault('OMP_PROC_BIND', 'close')
     env.setdefault('OMP_SCHEDULE', 'static')
+    env.setdefault('OMP_WAIT_POLICY', 'PASSIVE')
     return env
 
 

@@ -765,13 +765,13 @@ end interface
 #endif
 
 !  Advect pelagic biogeochemical variables. Each tracer is independent.
-!  num_threads overrides OMP_NUM_THREADS so this stays parallel when the
-!  rest of the run is serial (hydro OpenMP is slower on this grid).
-!  Inner advection regions then run with one thread because nesting is off.
-!  Not used for MPI: halo exchange shares one tag.
+!  The team size is omp_get_max_threads(), which follows OMP_NUM_THREADS,
+!  so the run-control core count applies here. Nesting stays off, so the
+!  inner advection regions use one thread. Not used for MPI: halo exchange
+!  shares one tag.
    call tic(TIM_ADVECTFABM)
    nthreads = 1
-!$ nthreads = omp_get_num_procs()
+!$ nthreads = omp_get_max_threads()
    if (nthreads < 1) nthreads = 1
 #ifndef GETM_PARALLEL
 !$omp parallel do if(nthreads>1) num_threads(nthreads) default(shared) private(n) schedule(static)

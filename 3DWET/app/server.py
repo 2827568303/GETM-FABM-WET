@@ -106,6 +106,25 @@ BIN_DIR = BASE_DIR / "bin"
 _NATIVE_EXE = BIN_DIR / "getm_cartesian.exe"
 EXE_PATH = _NATIVE_EXE if _NATIVE_EXE.exists() else BIN_DIR / "getm_cartesian"
 
+
+def active_solver_path():
+    """Windows launches the packaged exe. Linux and a cluster launch a native ELF.
+
+    A checkout that still contains the Windows exe must not try to exec that
+    PE on Linux. The ELF is produced by scripts/build_linux_solver.sh and is
+    not committed.
+    """
+    if os.name == "nt":
+        return EXE_PATH
+    candidates = (
+        BIN_DIR / "getm_cartesian",
+        BASE_DIR / "build-linux" / "getm" / "getm_cartesian",
+    )
+    for candidate in candidates:
+        if candidate.is_file() and os.access(candidate, os.X_OK):
+            return candidate
+    return EXE_PATH
+
 # MinGW runtime DLL dir (libgfortran/libnetcdf/libhdf5...) needed by the exe.
 MSYS_UCRT_BIN = Path.home() / ".local" / "share" / "msys64" / "ucrt64" / "bin"
 
@@ -252,6 +271,8 @@ run_metrics = RunMetrics()
 _run_identity = None
 _run_log_case_path = None
 _mpi_tuning_lock = threading.Lock()
+_core_calibration_lock = threading.Lock()
+_core_calibration = {"status": "idle", "error": None}
 _mpi_tuning_state = {"status": "idle", "progress": None, "result": None,
                      "error": None, "cancel": None, "signature": None}
 _run_repair_summary_counts = None
@@ -2265,7 +2286,36 @@ def _compress_completed_getm_outputs(case_path, logs):
     return True
 
 
-def run_model_thread(case_path, exe_path):
+def _spawn_solver(exe_path, case_path, log_handle, threads, *, trusted_gotm_copy=False):
+    """Start the solver with an explicit OpenMP team size."""
+    exe_path = Path(exe_path)
+    env = solver_environment(exe_path, threads=threads)
+    is_native = str(exe_path).lower().endswith(".exe")
+    if is_native:
+        if trusted_gotm_copy:
+            extra_runtime = [BIN_DIR / "runtime", MSYS_UCRT_BIN]
+            env["PATH"] = os.pathsep.join(str(p) for p in extra_runtime if p.is_dir()) + os.pathsep + env.get("PATH", "")
+        env["GFORTRAN_UNBUFFERED_PRECONNECTED"] = "y"
+        env["GFORTRAN_UNBUFFERED_ALL"] = "y"
+        return subprocess.Popen(
+            [str(exe_path)], cwd=str(case_path), stdout=log_handle,
+            stderr=subprocess.STDOUT, env=env,
+            creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)
+    if os.name != "nt":
+        return subprocess.Popen(
+            [str(exe_path)], cwd=str(case_path), stdout=log_handle,
+            stderr=subprocess.STDOUT, env=env)
+    case_wsl = wsl_path(case_path)
+    exe_wsl = wsl_path(exe_path)
+    log_wsl = wsl_path(case_path / "model_run.log")
+    team = max(1, int(threads or 1))
+    return subprocess.Popen(
+        ["wsl.exe", "bash", "-c",
+         f"cd '{case_wsl}' && OMP_NUM_THREADS={team} '{exe_wsl}' > '{log_wsl}' 2>&1"],
+        creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)
+
+
+def run_model_thread(case_path, exe_path, threads=None):
     """Run model in background thread, output to log file for stability."""
     global run_process, run_status, run_logs, run_start_time, run_case_path
 
@@ -2287,48 +2337,53 @@ def run_model_thread(case_path, exe_path):
                 return
             log_fh = open(model_log, "w", encoding="utf-8", errors="replace")
             model_log_started = True
-            if is_native:
-                # Native Windows exe: run directly with MinGW runtime DLLs on PATH.
-                env = solver_environment(exe_path)
-                if trusted_gotm_copy:
-                    extra_runtime = [BIN_DIR / "runtime", MSYS_UCRT_BIN]
-                    env["PATH"] = os.pathsep.join(str(p) for p in extra_runtime if p.is_dir()) + os.pathsep + env.get("PATH", "")
-                # WET numerical errors use stdout while GETM progress uses
-                # stderr. Preserve both streams so exit code 0 cannot hide a
-                # numerical failure; stop at the first recognized error.
-                env["GFORTRAN_UNBUFFERED_PRECONNECTED"] = "y"
-                env["GFORTRAN_UNBUFFERED_ALL"] = "y"
-                run_process = subprocess.Popen(
-                    [str(exe_path)],
-                    cwd=str(case_path),
-                    stdout=log_fh,
-                    stderr=subprocess.STDOUT,
-                    env=env,
-                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
-                )
-            elif os.name != "nt":
-                # Native Linux/macOS binary. Do not route this through wsl.exe.
-                env = solver_environment(exe_path)
-                threads = env.get("OMP_NUM_THREADS", "1")
-                run_logs.append(f"[INFO] OpenMP 线程数 OMP_NUM_THREADS={threads}")
-                run_process = subprocess.Popen(
-                    [str(exe_path)],
-                    cwd=str(case_path),
-                    stdout=log_fh,
-                    stderr=subprocess.STDOUT,
-                    env=env,
-                )
-            else:
+            if not is_native and os.name == "nt":
                 # Windows host, Linux binary: launch through wsl.exe.
-                case_wsl = wsl_path(case_path)
-                exe_wsl = wsl_path(exe_path)
-                log_wsl = wsl_path(model_log)
                 log_fh.close()
-                run_process = subprocess.Popen(
-                    ["wsl.exe", "bash", "-c",
-                     f"cd '{case_wsl}' && '{exe_wsl}' > '{log_wsl}' 2>&1"],
-                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
-                )
+                log_fh = None
+            run_process = _spawn_solver(
+                exe_path, case_path, log_fh, threads, trusted_gotm_copy=trusted_gotm_copy)
+            shown = threads if threads is not None else solver_environment(exe_path).get("OMP_NUM_THREADS", "1")
+            run_logs.append(f"[INFO] OpenMP 线程数 OMP_NUM_THREADS={shown}")
+        progress_seen = False
+        silent_seconds = 0
+
+        def relaunch_serial(reason):
+            nonlocal threads, log_fh, progress_seen, silent_seconds
+            global run_process
+            serial_exe = Path(exe_path).with_name("getm_cartesian_serial.exe")
+            if not serial_exe.is_file():
+                serial_exe = Path(exe_path)
+            run_logs.append(f"[WARN] {reason}，改用 1 个线程。")
+            threads = 1
+            if isinstance(run_config, dict):
+                run_config["omp_threads"] = 1
+                run_config["mpi_ranks"] = 1
+                run_config["requested_cores"] = 1
+                run_config["parallel_mode"] = "serial"
+                run_config["fallback_serial"] = True
+                run_config["solver_mode"] = "串行 (1 核)"
+            try:
+                if run_process is not None and run_process.poll() is None:
+                    run_process.kill()
+                    run_process.wait(timeout=10)
+            except Exception:
+                pass
+            if log_fh is not None and not log_fh.closed:
+                log_fh.close()
+            log_fh = open(model_log, "a", encoding="utf-8", errors="replace")
+            run_process = _spawn_solver(
+                serial_exe, case_path, log_fh, 1, trusted_gotm_copy=trusted_gotm_copy)
+            progress_seen = False
+            silent_seconds = 0
+
+        if threads and int(threads) > 1 and run_process is not None:
+            try:
+                early = run_process.wait(timeout=8)
+            except subprocess.TimeoutExpired:
+                early = None
+            if early not in (None, 0):
+                relaunch_serial(f"{threads} 核启动失败（退出码 {early}）")
         # Poll log file for progress while model runs
         log_read_pos = 0
         # Exit-hang watchdog (native exe only): the MinGW build can freeze in
@@ -2352,6 +2407,18 @@ def run_model_thread(case_path, exe_path):
                     solver_failed = True
                     new_lines = new_lines[-4000:]
                 new_lines, _dropped = prepare_solver_log_chunk(new_lines)
+                if re.search(r"n=\s*\d+", new_lines):
+                    progress_seen = True
+                    silent_seconds = 0
+                elif new_lines.strip():
+                    silent_seconds = 0
+                else:
+                    silent_seconds += 1
+                if (threads and int(threads) > 1 and not progress_seen
+                        and silent_seconds >= 90 and (time.time() - run_start_time) > 90):
+                    relaunch_serial(f"{threads} 核启动后 90 秒没有步进，判定为卡住")
+                    log_read_pos = 0
+                    continue
                 run_metrics.observe(new_lines)
                 solver_failed |= log_has_solver_failure(new_lines)
                 for line in new_lines.splitlines():
@@ -2477,11 +2544,18 @@ def run_mpi_model_thread(case_path, launcher, solver, process_count, runtime_dir
     original_case = Path(case_path).resolve()
     case = None
     runner = None
+    handoff_serial = False
     try:
         case = prepare_mpi_case(original_case, msg_method=3, process_count=process_count)
         run_logs.append(f"[INFO] MPI isolated working copy: {case}")
+        ceiling = process_count
+        omp_threads = 1
+        if isinstance(run_config, dict):
+            ceiling = run_config.get("mpi_cpu_ceiling") or process_count
+            omp_threads = run_config.get("omp_threads") or 1
         runner = MpiRun(launcher=launcher, solver=solver, n=process_count, case=case,
-                        runtime_dirs=runtime_dirs,
+                        runtime_dirs=runtime_dirs, cpu_count=ceiling,
+                        omp_threads=omp_threads,
                         merger=merge_case_rank_outputs, feature_enabled=True)
         run_process = runner.start()
         if isinstance(run_config, dict):
@@ -2609,8 +2683,29 @@ def run_mpi_model_thread(case_path, launcher, solver, process_count, runtime_dir
             shutil.rmtree(stage, ignore_errors=True)
         run_logs.append(f"[INFO] MPI run merged and validated ({len(merged)} output families)")
     except Exception as error:
-        if run_status != "stopped": run_status = "failed"
-        run_logs.append(f"[ERROR] MPI run failed: {error}")
+        elapsed = time.time() - (run_start_time or time.time())
+        saw_step = any(re.search(r"n=\s*\d+", line or "") for line in run_logs)
+        if run_status != "stopped" and not saw_step and elapsed < 180:
+            run_logs.append(f"[WARN] MPI 没有开始步进（{error}），改用 1 个线程。")
+            if isinstance(run_config, dict):
+                run_config["omp_threads"] = 1
+                run_config["mpi_ranks"] = 1
+                run_config["requested_cores"] = 1
+                run_config["parallel_mode"] = "serial"
+                run_config["fallback_serial"] = True
+                run_config["solver_mode"] = "串行 (1 核)"
+                run_config["phase"] = "solving"
+            serial_exe = active_solver_path()
+            packaged_serial = Path(serial_exe).with_name("getm_cartesian_serial.exe")
+            if os.name == "nt" and packaged_serial.is_file():
+                serial_exe = packaged_serial
+            if run_status != "running":
+                run_status = "running"
+            handoff_serial = True
+            run_model_thread(original_case, serial_exe, 1)
+        elif run_status != "stopped":
+            run_status = "failed"
+            run_logs.append(f"[ERROR] MPI run failed: {error}")
     finally:
         if isinstance(run_config, dict) and run_config.get("solver_mode", "").startswith("MPI"):
             if run_status in {"completed", "failed", "stopped"}:
@@ -4147,6 +4242,9 @@ def run_start():
         return jsonify({"success": False, "error": "MPI 性能调优正在运行，请取消或等待其结束后再启动模型"}), 409
     if run_thread is not None and run_thread.is_alive():
         return jsonify({"success": False, "error": "上次运行仍在结束或检查结果，请稍后再启动"}), 409
+    with _core_calibration_lock:
+        if _core_calibration.get("status") == "running":
+            return jsonify(success=False, error="正在测定核数，请等测定结束后再开始运行。"), 409
     if not active_case_path:
         return jsonify({"success": False, "error": "请先加载案例"}), 400
     raw_request = request.get_data(cache=True)
@@ -4160,11 +4258,25 @@ def run_start():
         return jsonify(success=False, error="compress_results 必须是布尔值。"), 400
     compress_results = bool(run_request.get("compress_results", True))
     mpi_requested = bool(run_request.get("mpi", False))
+    from core_plan import detect_hardware, parse_core_count, read_case_grid, resolve_plan
+    try:
+        raw_cores = run_request.get("cores")
+        requested_cores = None if raw_cores in (None, "") else parse_core_count(raw_cores)
+        mode = run_request.get("parallel_mode") or ("mpi" if mpi_requested else "auto")
+        hardware = detect_hardware()
+        grid = read_case_grid(active_case_path) if (Path(active_case_path) / "getm.inp").is_file() else {}
+        solver_path = active_solver_path()
+        plan = resolve_plan(hardware, grid, solver_path, requested_cores=requested_cores, mode=mode)
+    except ValueError as exc:
+        return jsonify(success=False, error=str(exc)), 400
+    plan_note = plan.get("note")
+    mpi_requested = plan["mode"] in {"mpi", "hybrid"}
     mpi_options = None
+    mpi_cpu_ceiling = None
     if mpi_requested:
         from mpi_runner import (MPI_RUN_ENABLED, discover_mpi_installation,
                                 merge_case_rank_outputs, mpi_capabilities,
-                                mpi_hotstart_error, validate_process_count)
+                                mpi_hotstart_error)
         if not (active_case_path / "getm.inp").is_file():
             return jsonify(success=False, error="MPI 仅支持包含 getm.inp 的 GETM 网格案例。"), 400
         mpi_grid_shape = _mpi_grid_shape(active_case_path)
@@ -4176,14 +4288,26 @@ def run_start():
                                         merger=merge_case_rank_outputs,
                                         feature_enabled=MPI_RUN_ENABLED,
                                         grid_shape=mpi_grid_shape)
+        n = int(plan["ranks"])
         if not capabilities["enabled"]:
-            return jsonify(success=False, error=capabilities["reason"], mpi=capabilities), 400
-        try:
-            n = validate_process_count(run_request.get("processes", 1),
-                                       allowed_processes=capabilities["allowed_processes"])
-        except ValueError as exc:
-            return jsonify(success=False, error=str(exc)), 400
-        mpi_options = (launcher, solver, n, installation["runtime_dirs"])
+            launcher = hardware.get("srun") or hardware.get("mpi_launcher")
+            solver = hardware.get("parallel_solver")
+            if not launcher or not solver or not Path(launcher).is_file() or not Path(solver).is_file():
+                return jsonify(success=False, error=capabilities["reason"], mpi=capabilities), 400
+            mpi_cpu_ceiling = n
+            mpi_options = (launcher, solver, n, [])
+        else:
+            allowed = set(capabilities.get("allowed_processes") or [])
+            if n not in allowed and not hardware.get("srun"):
+                # Counts the packaged probe did not pre-check still launch.
+                # GETM rejects a decomposition that does not fit the halo.
+                plan_note = (plan_note or "") + (
+                    f" {n} 个 MPI 进程不在本机已探测的分解里；若网格容不下，求解器会在启动时停下。")
+            if n > int(capabilities.get("max_processes") or n) and not hardware.get("srun"):
+                plan_note = (plan_note or "") + (
+                    f" 进程数 {n} 超过本机逻辑核。单机可能过载；多节点请用 srun。")
+            mpi_cpu_ceiling = max(n, int(capabilities.get("max_processes") or n))
+            mpi_options = (launcher, solver, n, installation["runtime_dirs"])
     if run_status == "running":
         return jsonify({"success": False, "error": "模型正在运行中"}), 400
     active_is_native_gotm = (not (active_case_path / "getm.inp").is_file()
@@ -4229,10 +4353,10 @@ def run_start():
     namelist_path = Path(active_case_path) / 'getm.inp'
     if namelist_path.is_file() and quoted_logicals(namelist_path.read_bytes()):
         return jsonify(success=False,error='逻辑值不能带引号，请运行体检并修复逻辑值引号。'),400
-    if not EXE_PATH.exists():
-        return jsonify({"success": False, "error": f"可执行文件不存在: {EXE_PATH}"}), 400
-    if str(EXE_PATH).lower().endswith('.exe'):
-        runtime_check = inspect_runtime(EXE_PATH, probe=True)
+    if not solver_path.exists():
+        return jsonify({"success": False, "error": f"可执行文件不存在: {solver_path}"}), 400
+    if str(solver_path).lower().endswith('.exe'):
+        runtime_check = inspect_runtime(solver_path, probe=True)
         if not runtime_check['ready']:
             return jsonify(success=False, error=runtime_check['detail'], runtime=runtime_check), 400
 
@@ -4304,22 +4428,27 @@ def run_start():
     _run_identity = uuid.uuid4().hex
     run_config = estimate_run_time(active_case_path, config)
     run_config["compress_results"] = compress_results
+    run_config["requested_cores"] = plan["cores"]
+    run_config["parallel_mode"] = plan["mode"]
+    run_config["fallback_serial"] = False
+    run_config["mpi_cpu_ceiling"] = mpi_cpu_ceiling
+    if plan_note:
+        run_logs.append("[WARN] " + plan_note)
     run_start_time = time.time()
     if mpi_options:
         launcher, solver, n, runtime_dirs = mpi_options
-        run_config["solver_mode"] = f"MPI ({n} ranks)"
+        run_config["solver_mode"] = f"MPI ({n} ranks) × OpenMP {plan['threads']}"
         run_config["mpi_ranks"] = n
-        run_config["omp_threads"] = 1
+        run_config["omp_threads"] = plan["threads"]
         run_config["phase"] = "preparing"
         run_thread = threading.Thread(target=run_mpi_model_thread,
                                       args=(active_case_path, launcher, solver, n, runtime_dirs), daemon=True)
     else:
         run_config["mpi_ranks"] = 1
-        try:
-            run_config["omp_threads"] = int(solver_environment(EXE_PATH).get("OMP_NUM_THREADS", "1"))
-        except (TypeError, ValueError):
-            run_config["omp_threads"] = 1
-        run_thread = threading.Thread(target=run_model_thread, args=(active_case_path, EXE_PATH), daemon=True)
+        run_config["omp_threads"] = plan["threads"]
+        run_config["solver_mode"] = f"OpenMP ({plan['threads']} threads)" if plan["threads"] > 1 else "串行 (1 核)"
+        run_thread = threading.Thread(target=run_model_thread,
+                                      args=(active_case_path, solver_path, plan["threads"]), daemon=True)
     run_metrics.start(run_config, now=run_start_time)
     run_thread.start()
     return jsonify({"success": True})
@@ -4368,6 +4497,62 @@ def run_status_api():
         "monitor": build_run_monitor(run_status, metrics, run_config, result_case,
                                      pid=getattr(run_process, "pid", None)),
     })
+
+
+def _core_plan_payload():
+    from core_plan import (describe_plan, detect_hardware, hardware_fingerprint,
+                           heuristic_plan, lookup_choice, read_case_grid)
+    hardware = detect_hardware()
+    has_case = bool(active_case_path and (Path(active_case_path) / "getm.inp").is_file())
+    grid = read_case_grid(active_case_path) if has_case else {}
+    solver_path = active_solver_path()
+    choice = lookup_choice(hardware, grid, solver_path) if has_case else None
+    recommendation = choice or heuristic_plan(hardware, grid)
+    with _core_calibration_lock:
+        status = _core_calibration.get("status")
+        error = _core_calibration.get("error")
+    return {
+        "hardware": hardware,
+        "fingerprint": hardware_fingerprint(hardware),
+        "grid": grid,
+        "recommendation": recommendation,
+        "cached": bool(choice),
+        "calibrating": status == "running",
+        "calibration_error": error,
+        "can_calibrate": has_case and solver_path.is_file(),
+        "summary": describe_plan(hardware, grid, recommendation,
+                                 cached=bool(choice), calibrating=status == "running"),
+    }
+
+
+@app.route("/api/run/core-plan", methods=["GET", "POST"])
+def core_plan_api():
+    """Hardware, the recommended core count, and a short cached timing trial."""
+    if request.method == "GET":
+        return jsonify(_core_plan_payload())
+    if run_status == "running" or (run_thread is not None and run_thread.is_alive()):
+        return jsonify(success=False, error="模型正在运行，测定推迟。"), 409
+    with _core_calibration_lock:
+        if _core_calibration.get("status") == "running":
+            return jsonify(success=True, started=False, **_core_plan_payload())
+        if not active_case_path or not (Path(active_case_path) / "getm.inp").is_file():
+            return jsonify(success=False, error="请先加载 GETM 案例"), 400
+        _core_calibration.update(status="running", error=None)
+        case = Path(active_case_path)
+        exe = active_solver_path()
+
+    def work():
+        from core_plan import calibrate
+        try:
+            calibrate(case, exe, log=run_logs.append)
+            with _core_calibration_lock:
+                _core_calibration.update(status="completed", error=None)
+        except Exception as exc:
+            with _core_calibration_lock:
+                _core_calibration.update(status="failed", error=str(exc))
+
+    threading.Thread(target=work, daemon=True).start()
+    return jsonify(success=True, started=True, **_core_plan_payload())
 
 
 @app.route("/api/run/mpi-capabilities")

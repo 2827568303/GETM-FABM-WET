@@ -223,6 +223,9 @@ def build_run_monitor(status, metrics, config, case_path, *, pid=None, stall_sec
     return {
         'mpi_ranks': ranks,
         'omp_threads': threads,
+        'requested_cores': config.get('requested_cores'),
+        'parallel_mode': config.get('parallel_mode'),
+        'fallback_serial': bool(config.get('fallback_serial')),
         'steps_per_second': rate,
         'sim_days_per_wall_hour': sim_days_per_hour,
         'timestep_seconds': timestep,
