@@ -2654,7 +2654,8 @@ function renderRunMonitor(status) {
         ? `使用核数 ${m.requested_cores}${modeLabel ? `（${modeLabel}）` : ''}`
         : '';
     const fallback = m.fallback_serial ? ' · 已回退串行' : '';
-    box.textContent = `${chosen ? chosen + ' · ' : ''}实际 MPI ${m.mpi_ranks || 1} 进程 · OpenMP ${m.omp_threads ?? '—'} 线程 · ${rate} 步/秒 · ${days} 模拟天/墙钟小时 · 剩余 ${eta} · CPU ${cpu}${fallback}`;
+    const hotstart = m.hotstart_disabled ? ' · 已关闭热启动' : '';
+    box.textContent = `${chosen ? chosen + ' · ' : ''}实际 MPI ${m.mpi_ranks || 1} 进程 · OpenMP ${m.omp_threads ?? '—'} 线程 · ${rate} 步/秒 · ${days} 模拟天/墙钟小时 · 剩余 ${eta} · CPU ${cpu}${fallback}${hotstart}`;
     if (m.level === 'error' || m.level === 'warn') {
         alertBox.hidden = false;
         alertBox.className = `run-monitor-alert ${m.level}`;

@@ -353,7 +353,7 @@ def merge_case_rank_outputs(case, n, *, reference_name="bathymetry.nc"):
     return merged
 
 
-def prepare_mpi_case(source, *, msg_method=3, process_count=1):
+def prepare_mpi_case(source, *, msg_method=3, process_count=1, disable_hotstart=False):
     """Create a disposable run copy and configure GETM parallel namelists there."""
     source = Path(source).resolve()
     if msg_method not in (1, 3):
@@ -392,9 +392,11 @@ def prepare_mpi_case(source, *, msg_method=3, process_count=1):
             elif item.is_file():
                 shutil.copy2(item, dest)
         text = (work / "getm.inp").read_text(encoding="utf-8-sig")
-        hotstart_match = re.search(r"(?im)^\s*hotstart\s*=\s*\.true\.", text)
-        if hotstart_match:
+        hotstart_match = re.search(r"(?im)^(\s*hotstart\s*=\s*)\.true\.", text)
+        if hotstart_match and not disable_hotstart:
             raise ValueError(mpi_hotstart_error({"param": {"hotstart": True}}))
+        if hotstart_match and disable_hotstart:
+            text = text[:hotstart_match.start()] + hotstart_match.group(1) + ".false." + text[hotstart_match.end():]
         match = re.search(r"(?im)^(\s*parallel\s*=\s*)(?:\.true\.|\.false\.)", text)
         if not match:
             raise ValueError("getm.inp has no parallel logical in &getm_nml")

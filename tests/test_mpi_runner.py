@@ -314,6 +314,22 @@ def test_prepare_mpi_case_rejects_serial_fabm_hotstart(tmp_path):
     assert not list(tmp_path.glob(".case.mpi-*"))
 
 
+def test_prepare_mpi_case_can_disable_fabm_hotstart_without_editing_the_source(tmp_path):
+    source = tmp_path / "case"
+    source.mkdir()
+    (source / "getm.inp").write_text(
+        "&param\n parallel = .false.\n hotstart = .true.\n/\n", encoding="utf-8")
+    work = prepare_mpi_case(source, msg_method=3, process_count=2, disable_hotstart=True)
+    try:
+        copied = (work / "getm.inp").read_text(encoding="utf-8")
+        assert "hotstart = .false." in copied
+        assert "parallel = .true." in copied
+        assert "hotstart = .true." in (source / "getm.inp").read_text(encoding="utf-8")
+    finally:
+        import shutil
+        shutil.rmtree(work, ignore_errors=True)
+
+
 def test_mpi_hotstart_preflight_error_is_specific_and_cold_runs_are_allowed():
     assert mpi_hotstart_error({"param": {"hotstart": True}}) == (
         "MPI hotstart is currently unsupported: reading the serial checkpoint fails at the "

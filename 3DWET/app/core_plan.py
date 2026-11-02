@@ -100,19 +100,19 @@ def detect_hardware(logical=None):
         candidates.append(Path(os.environ["WET_MPI_SOLVER"]).expanduser())
     if packaged_solver:
         candidates.append(Path(packaged_solver))
-        no_suffix = Path(packaged_solver).with_suffix("")
-        if no_suffix != Path(packaged_solver):
-            candidates.append(no_suffix)
     app_root = Path(__file__).resolve().parents[1]
     candidates.extend((
         app_root / "bin" / "getm_cartesian_parallel",
         app_root / "bin" / "getm_cartesian_parallel.exe",
+        app_root / "build-linux-mpi" / "getm" / "getm_cartesian_parallel",
         app_root / "build-linux" / "getm" / "getm_cartesian_parallel",
     ))
     for candidate in candidates:
-        if candidate.is_file():
+        if _usable_parallel_solver(candidate):
             parallel_solver = str(candidate)
             break
+    if os.name == "nt" and packaged_launcher and Path(packaged_launcher).is_file():
+        mpiexec = str(Path(packaged_launcher))
     return {
         "logical": logical,
         "physical": int(physical),
@@ -123,8 +123,39 @@ def detect_hardware(logical=None):
         "mpi_launcher": mpiexec,
         "srun": srun,
         "parallel_solver": parallel_solver,
+        "parallel_solver_current": bool(parallel_solver and solver_has_current_revision(parallel_solver)),
         "mpi_available": bool((srun or mpiexec) and parallel_solver),
     }
+
+
+def _usable_parallel_solver(path):
+    """A parallel solver this operating system can execute."""
+    path = Path(path)
+    if not path.is_file():
+        return False
+    if os.name == "nt":
+        return path.suffix.lower() == ".exe"
+    if path.suffix.lower() == ".exe":
+        return False
+    return os.access(path, os.X_OK)
+
+
+def solver_has_current_revision(path):
+    """True when the binary was built from the sources that print this revision.
+
+    The packaged Windows parallel executable predates the current numerics.
+    Auto mode skips it until a rebuild contains this marker. An explicit MPI
+    choice can still launch it.
+    """
+    path = Path(path)
+    if not path.is_file():
+        return False
+    marker = b"3DWET solver revision 20261102"
+    try:
+        blob = path.read_bytes()
+    except OSError:
+        return False
+    return marker in blob
 
 
 def hardware_fingerprint(hardware):
@@ -171,6 +202,37 @@ def benchmark_thread_counts(logical):
     return sorted(value for value in values if 1 <= value <= logical)
 
 
+def benchmark_candidates(hardware):
+    """OpenMP counts, plus MPI and hybrid when a current parallel solver exists.
+
+    Counts stay sparse (1, powers of two, half, and the whole machine). Hybrid
+    keeps ranks times threads inside the logical cores detected on this host.
+    A packaged solver built from older sources is not an automatic candidate.
+    """
+    logical = max(1, int(hardware.get("logical") or 1))
+    counts = benchmark_thread_counts(logical)
+    candidates = [
+        {"mode": "serial" if count <= 1 else "threads", "threads": count, "ranks": 1}
+        for count in counts
+    ]
+    if not (hardware.get("mpi_available") and hardware.get("parallel_solver_current")):
+        return candidates
+    for count in counts:
+        candidates.append({"mode": "mpi", "threads": 1, "ranks": count})
+    seen = set()
+    for ranks in counts:
+        if ranks >= logical:
+            continue
+        threads = 1
+        while ranks * threads * 2 <= logical:
+            threads *= 2
+        if threads < 2 or (ranks, threads) in seen:
+            continue
+        seen.add((ranks, threads))
+        candidates.append({"mode": "hybrid", "threads": threads, "ranks": ranks})
+    return candidates
+
+
 def heuristic_plan(hardware, grid):
     threads = recommended_openmp_threads(
         hardware.get("logical"), grid.get("wet_columns") if grid else None)
@@ -186,15 +248,23 @@ def cache_path():
     return Path.home() / ".3dwet" / "core_calibration.json"
 
 
-def cache_key(hardware, grid, exe_path):
+def cache_key(hardware, grid, exe_path, hotstart=False):
     exe = Path(exe_path)
     try:
         size = exe.stat().st_size
     except OSError:
         size = 0
+    mpi_size = 0
+    solver = hardware.get("parallel_solver")
+    if solver:
+        try:
+            mpi_size = Path(solver).stat().st_size
+        except OSError:
+            mpi_size = 0
     wet = None if not grid else grid.get("wet_columns")
     shape = "x".join(str(grid.get(name) or 0) for name in ("nx", "ny", "layers")) if grid else "0x0x0"
-    return f"{hardware_fingerprint(hardware)}|{shape}|{wet}|{size}"
+    hot = "hot" if hotstart else "cold"
+    return f"{hardware_fingerprint(hardware)}|{shape}|{wet}|{size}|{mpi_size}|{hot}"
 
 
 def load_cache():
@@ -218,8 +288,8 @@ def save_cache(data):
     os.replace(temporary, path)
 
 
-def lookup_choice(hardware, grid, exe_path):
-    entry = load_cache()["entries"].get(cache_key(hardware, grid, exe_path))
+def lookup_choice(hardware, grid, exe_path, hotstart=False):
+    entry = load_cache()["entries"].get(cache_key(hardware, grid, exe_path, hotstart=hotstart))
     if not entry:
         return None
     choice = entry.get("choice")
@@ -323,17 +393,30 @@ def describe_plan(hardware, grid, plan, *, cached=False, calibrating=False):
                  "hybrid": "MPI × OpenMP"}.get(plan.get("mode"), plan.get("mode"))
         origin = "已测定" if cached or plan.get("source") == "measured" else "按网格估算"
         parts.append(f"{origin}：{plan.get('cores')} 核，{label}")
+        if plan.get("ranks", 1) > 1 and plan.get("threads", 1) > 1:
+            parts.append(f"{plan.get('ranks')} 个进程 × {plan.get('threads')} 个线程")
+        if plan.get("note"):
+            parts.append(plan["note"])
     return "。".join(parts) + "。"
 
 
-def resolve_plan(hardware, grid, exe_path, *, requested_cores=None, mode="auto"):
+def resolve_plan(hardware, grid, exe_path, *, requested_cores=None, mode="auto", hotstart=False):
     """Turn the selector into threads and ranks. Auto uses a cached trial."""
     mode = (mode or "auto").strip().lower()
     if mode not in _MODES:
         raise ValueError("并行方式必须是自动、串行、线程、MPI 或混合")
-    measured = lookup_choice(hardware, grid, exe_path)
+    measured = lookup_choice(hardware, grid, exe_path, hotstart=hotstart)
     if mode == "auto":
-        return dict(measured or heuristic_plan(hardware, grid))
+        plan = dict(measured or heuristic_plan(hardware, grid))
+        if hotstart and plan.get("mode") in {"mpi", "hybrid"}:
+            plan = heuristic_plan(hardware, grid)
+            plan["note"] = (
+                "测定里更快的是 MPI，但 FABM 热启动不能读进 MPI，自动改回 OpenMP。"
+                "要按冷启动使用 MPI，请先关掉热启动。")
+        elif hotstart and hardware.get("mpi_available") and not hardware.get("parallel_solver_current"):
+            plan["note"] = (plan.get("note") or "") + (
+                " 并行求解器不是当前源码编的，自动测定没有把 MPI 算进去。")
+        return plan
     if mode == "serial":
         return {"mode": "serial", "threads": 1, "ranks": 1, "cores": 1, "source": "user"}
     cores = requested_cores
@@ -349,14 +432,22 @@ def resolve_plan(hardware, grid, exe_path, *, requested_cores=None, mode="auto")
             raise ValueError(
                 "这台机器没有可用的 MPI 启动器和并行求解器。"
                 "集群上请先编 GETM_USE_PARALLEL，并用 srun 或 mpiexec 启动；说明见使用说明。")
-        return {"mode": "mpi", "threads": 1, "ranks": cores, "cores": cores, "source": "user"}
+        plan = {"mode": "mpi", "threads": 1, "ranks": cores, "cores": cores, "source": "user"}
+        if hotstart:
+            plan["note"] = "FABM 热启动已自动关掉，这次 MPI 从冷启动开始。案例文件没有改。"
+        elif hardware.get("parallel_solver") and not hardware.get("parallel_solver_current"):
+            plan["note"] = "这个并行求解器不是当前源码编的，结果可能和 OpenMP 程序不一致。"
+        return plan
     threads, ranks = _split_hybrid(cores, int(hardware.get("logical") or 1))
     if not hardware.get("mpi_available"):
         return {"mode": "serial" if cores == 1 else "threads", "threads": cores,
                 "ranks": 1, "cores": cores, "source": "user",
                 "note": "没有 MPI 求解器，混合模式已改成 OpenMP 线程"}
-    return {"mode": "hybrid", "threads": threads, "ranks": ranks,
+    plan = {"mode": "hybrid", "threads": threads, "ranks": ranks,
             "cores": threads * ranks, "source": "user"}
+    if hotstart:
+        plan["note"] = "FABM 热启动已自动关掉，这次 MPI 从冷启动开始。案例文件没有改。"
+    return plan
 
 
 def _split_hybrid(cores, logical):
@@ -400,17 +491,14 @@ def probe_threads(exe, case, threads, *, timeout=180):
     from solver_runtime import solver_environment
     log_path = Path(case) / "model_run.log"
     _clean_outputs(case)
+    _set_parallel(case, False)
     env = solver_environment(exe, threads=threads)
     started = time.perf_counter()
     with log_path.open("w", encoding="utf-8", errors="replace") as handle:
         process = subprocess.Popen(
-            [str(exe)], cwd=str(case), stdout=handle, stderr=subprocess.STDOUT, env=env)
-        try:
-            code = process.wait(timeout=timeout)
-        except subprocess.TimeoutExpired:
-            process.kill()
-            process.wait(timeout=10)
-            code = None
+            [str(exe)], cwd=str(case), stdout=handle, stderr=subprocess.STDOUT, env=env,
+            start_new_session=True)
+        code = _wait_or_kill(process, timeout)
     wall = time.perf_counter() - started
     text = log_path.read_text(encoding="utf-8", errors="replace") if log_path.is_file() else ""
     rate = integration_rate(text)
@@ -421,35 +509,216 @@ def probe_threads(exe, case, threads, *, timeout=180):
             "threads": int(threads), "ranks": 1}
 
 
+def launch_command(launcher, solver, ranks, threads):
+    """mpiexec -n N, or srun -n N --cpus-per-task=M for a hybrid job.
+
+    Open MPI on a shared node otherwise stacks every rank on one core, and
+    the halo wait then dominates. MS-MPI's mpiexec does not take these flags.
+    """
+    name = Path(launcher).name.lower()
+    if name.startswith("srun"):
+        command = [str(launcher), "-n", str(int(ranks))]
+        if int(threads) > 1:
+            command += ["--cpus-per-task", str(int(threads))]
+        command.append(str(solver))
+        return command
+    command = [str(launcher)]
+    if _launcher_is_openmpi(launcher):
+        if int(threads) > 1:
+            # A core cannot hold PE>1. Span the process across the socket.
+            command += ["--bind-to", "core", "--map-by", f"socket:PE={int(threads)}"]
+        else:
+            command += ["--bind-to", "core", "--map-by", "core"]
+    command += ["-n", str(int(ranks)), str(solver)]
+    return command
+
+
+def _launcher_is_openmpi(launcher):
+    key = str(launcher)
+    cached = getattr(_launcher_is_openmpi, "_cache", {})
+    if key in cached:
+        return cached[key]
+    try:
+        done = subprocess.run([key, "--version"], capture_output=True, text=True, timeout=5)
+        text = f"{done.stdout}\n{done.stderr}"
+        found = "Open MPI" in text or "OpenRTE" in text
+    except (OSError, subprocess.SubprocessError):
+        found = False
+    cached[key] = found
+    _launcher_is_openmpi._cache = cached
+    return found
+
+
+_launcher_is_openmpi._cache = {}
+
+
+def _wait_or_kill(process, timeout):
+    import signal
+    try:
+        return process.wait(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except (ProcessLookupError, PermissionError, OSError):
+            process.kill()
+        try:
+            process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            pass
+        return None
+
+
+def _set_parallel(case, enabled):
+    path = Path(case) / "getm.inp"
+    text = path.read_text(encoding="utf-8")
+    match = re.search(r"(?im)^(\s*parallel\s*=\s*)(?:\.true\.|\.false\.)", text)
+    if not match:
+        if not enabled:
+            return
+        raise ValueError("getm.inp 没有 parallel")
+    value = ".true." if enabled else ".false."
+    text = text[:match.start()] + match.group(1) + value + text[match.end():]
+    path.write_text(text, encoding="utf-8")
+    namelist = Path(case) / "parallel.inp"
+    if enabled:
+        namelist.write_text(
+            "&nampar\n MeshMethod=1, reorder=.false., MsgMethod=3\n/\n",
+            encoding="ascii")
+    elif namelist.is_file():
+        namelist.unlink()
+
+
+def case_requests_hotstart(case):
+    path = Path(case) / "getm.inp"
+    if not path.is_file():
+        return False
+    text = path.read_text(encoding="utf-8", errors="replace")
+    return bool(re.search(r"(?im)^\s*hotstart\s*=\s*\.true\.", text))
+
+
+def _hotstart_enabled(case):
+    return case_requests_hotstart(case)
+
+
+def _set_hotstart(case, enabled):
+    path = Path(case) / "getm.inp"
+    text = path.read_text(encoding="utf-8")
+    match = re.search(r"(?im)^(\s*hotstart\s*=\s*)(?:\.true\.|\.false\.)", text)
+    if not match:
+        return False
+    value = ".true." if enabled else ".false."
+    path.write_text(text[:match.start()] + match.group(1) + value + text[match.end():], encoding="utf-8")
+    return True
+
+
+def _progress_text(case):
+    """Progress from the launcher log and, for MPI, rank 0's stderr."""
+    case = Path(case)
+    chunks = []
+    log_path = case / "model_run.log"
+    if log_path.is_file():
+        chunks.append(log_path.read_text(encoding="utf-8", errors="replace"))
+    for path in sorted(case.glob("*.0000.stderr")):
+        chunks.append(path.read_text(encoding="utf-8", errors="replace"))
+    return "\n".join(chunks)
+
+
+def _clean_rank_outputs(case):
+    case = Path(case)
+    for path in case.glob("*"):
+        if not path.is_file():
+            continue
+        name = path.name
+        if re.fullmatch(r".+\.\d{4}\.nc", name) or name.endswith((".stdout", ".stderr")):
+            path.unlink(missing_ok=True)
+
+
+def probe_ranks(launcher, solver, case, ranks, threads, *, timeout=180):
+    """Time one MPI (or hybrid) window. A hang or a bad exit is not a winner."""
+    from solver_runtime import solver_environment
+    log_path = Path(case) / "model_run.log"
+    _clean_outputs(case)
+    _clean_rank_outputs(case)
+    _set_parallel(case, True)
+    _set_hotstart(case, False)
+    env = solver_environment(solver, threads=threads)
+    command = launch_command(launcher, solver, ranks, threads)
+    started = time.perf_counter()
+    with log_path.open("w", encoding="utf-8", errors="replace") as handle:
+        process = subprocess.Popen(
+            command, cwd=str(case), stdout=handle, stderr=subprocess.STDOUT, env=env,
+            start_new_session=True)
+        code = _wait_or_kill(process, timeout)
+    wall = time.perf_counter() - started
+    text = _progress_text(case)
+    rate = integration_rate(text)
+    hung = code is None
+    if int(ranks) > 1 and int(threads) > 1:
+        mode = "hybrid"
+    elif int(ranks) <= 1 and int(threads) > 1:
+        mode = "hybrid"
+    else:
+        mode = "mpi"
+    return {"ok": code == 0 and rate is not None and not hung,
+            "exit_code": code, "wall_seconds": wall, "steps_per_second": rate,
+            "hung": hung, "mode": mode, "threads": int(threads), "ranks": int(ranks)}
+
+
 def calibrate(case_path, exe_path, *, steps=300, timeout=180, thread_counts=None, log=None):
-    """Time a short window at several thread counts and cache the fastest."""
+    """Time a short window and cache the fastest of OpenMP, MPI, and hybrid."""
     case_path = Path(case_path)
     exe_path = Path(exe_path)
     hardware = detect_hardware()
     grid = read_case_grid(case_path)
-    counts = thread_counts or benchmark_thread_counts(hardware["logical"])
+    if thread_counts is None:
+        candidates = benchmark_candidates(hardware)
+    else:
+        candidates = [
+            {"mode": "serial" if count <= 1 else "threads", "threads": count, "ranks": 1}
+            for count in thread_counts
+        ]
     work_parent = Path(os.environ.get("TMPDIR", "/tmp"))
     work = work_parent / f"3dwet-core-{os.getpid()}"
     if work.exists():
         shutil.rmtree(work, ignore_errors=True)
     results = []
+    hotstart = False
     try:
         _copy_case(case_path, work)
         shorten_getm_inp(work / "getm.inp", steps=steps)
-        for threads in counts:
+        hotstart = _hotstart_enabled(work)
+        if hotstart:
+            candidates = [item for item in candidates if item["ranks"] == 1 and item["mode"] in {"serial", "threads"}]
             if log:
-                log(f"[INFO] 测定 {threads} 个 OpenMP 线程（约 {steps} 步）")
-            results.append(probe_threads(exe_path, work, threads, timeout=timeout))
+                log("[WARN] 案例开着热启动。FABM 检查点不能用于 MPI，这次测定只比较 OpenMP。")
+        if hardware.get("mpi_available") and not hardware.get("parallel_solver_current") and log:
+            log("[WARN] 找到的并行求解器不是当前源码编的，自动测定跳过 MPI。手动选择 MPI 仍会启动它。")
+        for candidate in candidates:
+            if log:
+                log("[INFO] 测定 {mode}：{ranks} 进程 × {threads} 线程（约 {steps} 步）".format(
+                    steps=steps, **candidate))
+            if candidate["mode"] in {"mpi", "hybrid"}:
+                results.append(probe_ranks(
+                    hardware.get("srun") or hardware.get("mpi_launcher"),
+                    hardware.get("parallel_solver"), work,
+                    candidate["ranks"], candidate["threads"], timeout=timeout))
+            else:
+                results.append(probe_threads(exe_path, work, candidate["threads"], timeout=timeout))
     finally:
         shutil.rmtree(work, ignore_errors=True)
     choice = choose_fastest(results) or heuristic_plan(hardware, grid)
+    if hotstart and choice.get("mode") in {"mpi", "hybrid"}:
+        choice = heuristic_plan(hardware, grid)
+        choice["note"] = "热启动下不采用 MPI 测定结果。"
     data = load_cache()
-    data["entries"][cache_key(hardware, grid, exe_path)] = {
+    data["entries"][cache_key(hardware, grid, exe_path, hotstart=hotstart)] = {
         "fingerprint": hardware_fingerprint(hardware),
         "grid": grid,
         "results": results,
         "choice": choice,
+        "hotstart": hotstart,
         "measured_at": datetime.now().isoformat(timespec="seconds"),
     }
     save_cache(data)
-    return {"hardware": hardware, "grid": grid, "results": results, "choice": choice}
+    return {"hardware": hardware, "grid": grid, "results": results, "choice": choice,
+            "hotstart": hotstart}

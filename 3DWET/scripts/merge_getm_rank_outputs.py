@@ -1,4 +1,8 @@
-"""Safely assemble GETM/FABM rank NetCDF files on a reference lonc/latc grid."""
+"""Safely assemble GETM/FABM rank NetCDF files on a reference grid.
+
+Geographic shards are placed with lonc/latc. Cartesian GETM writes only the
+1D xc/yc axes; those are placed on the reference xc/yc or bathymetry x/y.
+"""
 from __future__ import annotations
 import argparse, os, tempfile
 from pathlib import Path
@@ -17,6 +21,33 @@ def _shape_signature(dimensions, shape):
     """Keep time/vertical extents strict while allowing rank-local x/y sizes."""
     return tuple(None if dim in ('xc', 'yc') else size
                  for dim, size in zip(dimensions, shape))
+
+
+def _reference_axis(dataset, names):
+    """Return a 1D coordinate from the first matching variable name."""
+    for name in names:
+        variable = dataset.variables.get(name)
+        if variable is not None and variable.ndim == 1 and len(variable):
+            values = np.ma.asarray(variable[:])
+            if np.ma.getmaskarray(values).any():
+                return None
+            return np.asarray(np.ma.getdata(values), dtype=np.float64)
+    return None
+
+
+def _match_axis(axis, values, atol):
+    """Index where values sit inside axis, or None when they do not."""
+    values = np.ma.asarray(values, dtype=np.float64).reshape(-1)
+    if values.size == 0 or np.ma.getmaskarray(values).any() or values.size > axis.size:
+        return None
+    values = np.asarray(np.ma.getdata(values), dtype=np.float64)
+    index = int(np.argmin(np.abs(axis - values[0])))
+    end = index + values.size
+    if end > axis.size or abs(float(axis[index]) - float(values[0])) > atol:
+        return None
+    if not np.allclose(axis[index:end], values, atol=atol, rtol=0, equal_nan=True):
+        return None
+    return index
 
 
 def _chunk_plan(dimensions, shape, dtype, nx, ny, requested_records, budget_bytes):
@@ -76,18 +107,26 @@ def merge_rank_outputs(shards, reference, destination, *, atol=1e-5,
     sources = []
     try:
         with Dataset(reference) as ref:
-            if not {'lonc', 'latc'} <= set(ref.variables):
-                raise ValueError('Reference requires lonc and latc')
-            glon, glat = np.asarray(ref['lonc'][:]), np.asarray(ref['latc'][:])
-            if glon.ndim != 2 or glat.shape != glon.shape:
-                raise ValueError('Reference coordinates must be matching 2D arrays')
-            ny, nx = glon.shape
             sources = [Dataset(path) for path in shards]
             first = sources[0]
             schema = {n: (v.dimensions, str(v.dtype), tuple(v.shape), v.ncattrs())
                       for n, v in first.variables.items()}
-            if not {'lonc', 'latc'} <= set(schema):
-                raise ValueError('Shards require lonc and latc')
+            shard_lonlat = {'lonc', 'latc'} <= set(schema)
+            glon = glat = None
+            ref_x = ref_y = None
+            if shard_lonlat:
+                if not {'lonc', 'latc'} <= set(ref.variables):
+                    raise ValueError('Reference requires lonc and latc')
+                glon, glat = np.asarray(ref['lonc'][:]), np.asarray(ref['latc'][:])
+                if glon.ndim != 2 or glat.shape != glon.shape:
+                    raise ValueError('Reference coordinates must be matching 2D arrays')
+                ny, nx = glon.shape
+            else:
+                ref_x = _reference_axis(ref, ('xc', 'x'))
+                ref_y = _reference_axis(ref, ('yc', 'y'))
+                if ref_x is None or ref_y is None or 'xc' not in schema or 'yc' not in schema:
+                    raise ValueError('Shards require lonc and latc')
+                ny, nx = len(ref_y), len(ref_x)
             model = first.data_model
             globals_ = {n: first.getncattr(n) for n in first.ncattrs()}
             attrs = {n: {a: v.getncattr(a) for a in v.ncattrs() if a != '_FillValue'}
@@ -106,36 +145,43 @@ def merge_rank_outputs(shards, reference, destination, *, atol=1e-5,
                             or got[3] != schema[n][3]
                             or _shape_signature(got[0], got[2]) != _shape_signature(schema[n][0], schema[n][2])):
                         raise ValueError(f'Variable schema mismatch: {n} in {path}')
-                lonvar, latvar = src['lonc'][:], src['latc'][:]
-                lon, lat = np.asarray(lonvar), np.asarray(latvar)
-                lonmask, latmask = np.ma.getmaskarray(lonvar), np.ma.getmaskarray(latvar)
-                h, w = lon.shape
-                valid = np.isfinite(lon) & np.isfinite(lat) & ~lonmask & ~latmask & (np.abs(lon) < 360) & (np.abs(lat) < 90)
-                if not valid.any():
-                    raise ValueError(f'No valid coordinate pairs: {path}')
-                sy, sx = np.argwhere(valid)[0]
-                dist = np.hypot(glon - lon[sy, sx], glat - lat[sy, sx])
-                gy, gx = np.unravel_index(np.argmin(dist), dist.shape)
-                iy, ix = gy - sy, gx - sx
-                if iy < 0 or ix < 0:
-                    raise ValueError(f'Coordinate block starts outside reference grid: {path}')
-                # GETM may write a fixed-size rank-local buffer at the last
-                # decomposition edge. Cells beyond the global grid are padding
-                # and must be masked in both coordinate arrays.
-                h_in, w_in = min(h, ny - iy), min(w, nx - ix)
-                if h_in <= 0 or w_in <= 0:
-                    raise ValueError(f'Coordinate block outside reference grid: {path}')
-                outside = np.ones((h, w), dtype=bool)
-                outside[:h_in, :w_in] = False
-                if np.any(outside & (~lonmask | ~latmask)):
-                    raise ValueError(f'Unmasked coordinate padding outside reference grid: {path}')
-                rlon = np.ma.asarray(ref['lonc'][iy:iy+h_in, ix:ix+w_in])
-                rlat = np.ma.asarray(ref['latc'][iy:iy+h_in, ix:ix+w_in])
-                if (not np.array_equal(np.ma.getmaskarray(rlon), lonmask[:h_in, :w_in])
-                        or not np.array_equal(np.ma.getmaskarray(rlat), latmask[:h_in, :w_in])
-                        or not np.allclose(np.asarray(rlon), lon[:h_in, :w_in], atol=atol, rtol=0, equal_nan=True)
-                        or not np.allclose(np.asarray(rlat), lat[:h_in, :w_in], atol=atol, rtol=0, equal_nan=True)):
-                    raise ValueError(f'Coordinate block mismatch: {path}')
+                if shard_lonlat:
+                    lonvar, latvar = src['lonc'][:], src['latc'][:]
+                    lon, lat = np.asarray(lonvar), np.asarray(latvar)
+                    lonmask, latmask = np.ma.getmaskarray(lonvar), np.ma.getmaskarray(latvar)
+                    h, w = lon.shape
+                    valid = np.isfinite(lon) & np.isfinite(lat) & ~lonmask & ~latmask & (np.abs(lon) < 360) & (np.abs(lat) < 90)
+                    if not valid.any():
+                        raise ValueError(f'No valid coordinate pairs: {path}')
+                    sy, sx = np.argwhere(valid)[0]
+                    dist = np.hypot(glon - lon[sy, sx], glat - lat[sy, sx])
+                    gy, gx = np.unravel_index(np.argmin(dist), dist.shape)
+                    iy, ix = gy - sy, gx - sx
+                    if iy < 0 or ix < 0:
+                        raise ValueError(f'Coordinate block starts outside reference grid: {path}')
+                    # GETM may write a fixed-size rank-local buffer at the last
+                    # decomposition edge. Cells beyond the global grid are padding
+                    # and must be masked in both coordinate arrays.
+                    h_in, w_in = min(h, ny - iy), min(w, nx - ix)
+                    if h_in <= 0 or w_in <= 0:
+                        raise ValueError(f'Coordinate block outside reference grid: {path}')
+                    outside = np.ones((h, w), dtype=bool)
+                    outside[:h_in, :w_in] = False
+                    if np.any(outside & (~lonmask | ~latmask)):
+                        raise ValueError(f'Unmasked coordinate padding outside reference grid: {path}')
+                    rlon = np.ma.asarray(ref['lonc'][iy:iy+h_in, ix:ix+w_in])
+                    rlat = np.ma.asarray(ref['latc'][iy:iy+h_in, ix:ix+w_in])
+                    if (not np.array_equal(np.ma.getmaskarray(rlon), lonmask[:h_in, :w_in])
+                            or not np.array_equal(np.ma.getmaskarray(rlat), latmask[:h_in, :w_in])
+                            or not np.allclose(np.asarray(rlon), lon[:h_in, :w_in], atol=atol, rtol=0, equal_nan=True)
+                            or not np.allclose(np.asarray(rlat), lat[:h_in, :w_in], atol=atol, rtol=0, equal_nan=True)):
+                        raise ValueError(f'Coordinate block mismatch: {path}')
+                else:
+                    ix = _match_axis(ref_x, src['xc'][:], atol)
+                    iy = _match_axis(ref_y, src['yc'][:], atol)
+                    if ix is None or iy is None:
+                        raise ValueError(f'Coordinate block mismatch: {path}')
+                    h_in, w_in = len(src.dimensions['yc']), len(src.dimensions['xc'])
                 overlap = coverage[iy:iy+h_in, ix:ix+w_in].astype(bool)
                 coverage[iy:iy+h_in, ix:ix+w_in] = 1
                 tiles.append((iy, ix, h_in, w_in, overlap))

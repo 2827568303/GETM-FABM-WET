@@ -2546,7 +2546,9 @@ def run_mpi_model_thread(case_path, launcher, solver, process_count, runtime_dir
     runner = None
     handoff_serial = False
     try:
-        case = prepare_mpi_case(original_case, msg_method=3, process_count=process_count)
+        disable_hotstart = bool((run_config or {}).get("hotstart_disabled"))
+        case = prepare_mpi_case(original_case, msg_method=3, process_count=process_count,
+                                disable_hotstart=disable_hotstart)
         run_logs.append(f"[INFO] MPI isolated working copy: {case}")
         ceiling = process_count
         omp_threads = 1
@@ -4258,7 +4260,8 @@ def run_start():
         return jsonify(success=False, error="compress_results 必须是布尔值。"), 400
     compress_results = bool(run_request.get("compress_results", True))
     mpi_requested = bool(run_request.get("mpi", False))
-    from core_plan import detect_hardware, parse_core_count, read_case_grid, resolve_plan
+    from core_plan import (case_requests_hotstart, detect_hardware, parse_core_count,
+                            read_case_grid, resolve_plan)
     try:
         raw_cores = run_request.get("cores")
         requested_cores = None if raw_cores in (None, "") else parse_core_count(raw_cores)
@@ -4266,7 +4269,8 @@ def run_start():
         hardware = detect_hardware()
         grid = read_case_grid(active_case_path) if (Path(active_case_path) / "getm.inp").is_file() else {}
         solver_path = active_solver_path()
-        plan = resolve_plan(hardware, grid, solver_path, requested_cores=requested_cores, mode=mode)
+        hotstart = case_requests_hotstart(active_case_path) if (Path(active_case_path) / "getm.inp").is_file() else False
+        plan = resolve_plan(hardware, grid, solver_path, requested_cores=requested_cores, mode=mode, hotstart=hotstart)
     except ValueError as exc:
         return jsonify(success=False, error=str(exc)), 400
     plan_note = plan.get("note")
@@ -4289,9 +4293,18 @@ def run_start():
                                         feature_enabled=MPI_RUN_ENABLED,
                                         grid_shape=mpi_grid_shape)
         n = int(plan["ranks"])
-        if not capabilities["enabled"]:
+        # Windows uses the packaged MS-MPI runtime when its check passes.
+        # Linux and a cluster use srun or the system mpiexec plus the native solver.
+        if os.name == "nt" and capabilities["enabled"]:
+            pass
+        else:
             launcher = hardware.get("srun") or hardware.get("mpi_launcher")
             solver = hardware.get("parallel_solver")
+            capabilities = {"enabled": False, "reason": capabilities.get("reason")}
+        if not capabilities["enabled"]:
+            if launcher is installation["launcher"] and solver is installation["solver"]:
+                launcher = hardware.get("srun") or hardware.get("mpi_launcher")
+                solver = hardware.get("parallel_solver")
             if not launcher or not solver or not Path(launcher).is_file() or not Path(solver).is_file():
                 return jsonify(success=False, error=capabilities["reason"], mpi=capabilities), 400
             mpi_cpu_ceiling = n
@@ -4364,13 +4377,14 @@ def run_start():
     run_logs = []
     inp_path = active_case_path / "getm.inp"
     config = parse_getm_inp(inp_path) if inp_path.exists() else {}
+    hotstart_disabled = False
     if mpi_options:
         hotstart_error = mpi_hotstart_error(config)
         if hotstart_error:
-            return jsonify(success=False, error=(
-                "当前并行求解器不支持 FABM 热启动：读取串行检查点会在 FABM temporal checkpoint 处失败。"
-                "请关闭热启动后冷启动并行运行，或改用串行求解器。"
-            )), 400
+            hotstart_disabled = True
+            plan_note = (plan_note or "") + (
+                " FABM 热启动不能和 MPI 一起读串行检查点（会在 FABM 时间检查点处失败）。"
+                "这次已自动关掉热启动，按冷启动计算。案例目录里的 getm.inp 没有改。")
     meteo_enabled = bool((config.get("meteo", {}) or {}).get("metforcing", False))
     meteo_file_exists = (active_case_path / "meteo.nc").is_file()
     if meteo_file_exists and not meteo_enabled:
@@ -4431,6 +4445,7 @@ def run_start():
     run_config["requested_cores"] = plan["cores"]
     run_config["parallel_mode"] = plan["mode"]
     run_config["fallback_serial"] = False
+    run_config["hotstart_disabled"] = hotstart_disabled
     run_config["mpi_cpu_ceiling"] = mpi_cpu_ceiling
     if plan_note:
         run_logs.append("[WARN] " + plan_note)
@@ -4500,14 +4515,17 @@ def run_status_api():
 
 
 def _core_plan_payload():
-    from core_plan import (describe_plan, detect_hardware, hardware_fingerprint,
-                           heuristic_plan, lookup_choice, read_case_grid)
+    from core_plan import (case_requests_hotstart, describe_plan, detect_hardware,
+                           hardware_fingerprint, heuristic_plan, read_case_grid,
+                           resolve_plan)
     hardware = detect_hardware()
     has_case = bool(active_case_path and (Path(active_case_path) / "getm.inp").is_file())
     grid = read_case_grid(active_case_path) if has_case else {}
     solver_path = active_solver_path()
-    choice = lookup_choice(hardware, grid, solver_path) if has_case else None
-    recommendation = choice or heuristic_plan(hardware, grid)
+    hotstart = case_requests_hotstart(active_case_path) if has_case else False
+    recommendation = (resolve_plan(hardware, grid, solver_path, mode="auto", hotstart=hotstart)
+                      if has_case else heuristic_plan(hardware, grid))
+    choice = recommendation.get("source") == "measured"
     with _core_calibration_lock:
         status = _core_calibration.get("status")
         error = _core_calibration.get("error")

@@ -107,6 +107,49 @@ def test_auto_uses_the_cache_and_mpi_needs_a_launcher(tmp_path, monkeypatch):
     assert split["threads"] * split["ranks"] == 16
 
 
+def test_mpi_candidates_are_included_only_for_a_current_solver():
+    plain = {"logical": 4, "mpi_available": True, "parallel_solver_current": False}
+    assert all(item["ranks"] == 1 for item in core_plan.benchmark_candidates(plain))
+    current = {"logical": 4, "mpi_available": True, "parallel_solver_current": True}
+    modes = {(item["mode"], item["ranks"], item["threads"])
+             for item in core_plan.benchmark_candidates(current)}
+    assert ("mpi", 1, 1) in modes
+    assert ("mpi", 2, 1) in modes
+    assert ("mpi", 4, 1) in modes
+    assert ("hybrid", 2, 2) in modes
+    assert core_plan.launch_command("/usr/bin/mpiexec-not-installed", "/tmp/solver", 4, 1) == [
+        "/usr/bin/mpiexec-not-installed", "-n", "4", "/tmp/solver"]
+    assert core_plan.launch_command("/usr/bin/srun", "/tmp/solver", 4, 2) == [
+        "/usr/bin/srun", "-n", "4", "--cpus-per-task", "2", "/tmp/solver"]
+    core_plan._launcher_is_openmpi._cache["/opt/openmpi/bin/mpiexec"] = True
+    bound = core_plan.launch_command("/opt/openmpi/bin/mpiexec", "/tmp/solver", 4, 1)
+    assert bound == ["/opt/openmpi/bin/mpiexec", "--bind-to", "core", "--map-by", "core",
+                     "-n", "4", "/tmp/solver"]
+    hybrid = core_plan.launch_command("/opt/openmpi/bin/mpiexec", "/tmp/solver", 2, 2)
+    assert hybrid == ["/opt/openmpi/bin/mpiexec", "--bind-to", "core", "--map-by", "socket:PE=2",
+                      "-n", "2", "/tmp/solver"]
+
+
+def test_hotstart_keeps_auto_off_mpi(tmp_path, monkeypatch):
+    monkeypatch.setenv("WET_CORE_CACHE", str(tmp_path / "cache.json"))
+    hardware = {"logical": 4, "physical": 4, "sockets": 1, "numa_nodes": 1,
+                "system": "Linux", "machine": "vm", "mpi_launcher": "/usr/bin/mpiexec",
+                "srun": "", "parallel_solver": "/tmp/getm_cartesian_parallel",
+                "mpi_available": True, "parallel_solver_current": True}
+    grid = {"nx": 41, "ny": 67, "layers": 10, "wet_columns": 1150}
+    exe = tmp_path / "solver"
+    exe.write_bytes(b"x")
+    choice = {"mode": "mpi", "threads": 1, "ranks": 4, "cores": 4, "source": "measured"}
+    data = {"entries": {core_plan.cache_key(hardware, grid, exe, hotstart=True): {"choice": choice}}}
+    core_plan.save_cache(data)
+    plan = core_plan.resolve_plan(hardware, grid, exe, mode="auto", hotstart=True)
+    assert plan["mode"] == "threads"
+    assert "热启动" in plan["note"]
+    explicit = core_plan.resolve_plan(hardware, grid, exe, requested_cores=4, mode="mpi", hotstart=True)
+    assert explicit["mode"] == "mpi"
+    assert "冷启动" in explicit["note"]
+
+
 def test_explicit_thread_count_reaches_a_parallel_executable():
     env = solver_environment(
         Path("/tmp/getm_cartesian_parallel.exe"), {"PATH": "/usr/bin"}, threads=4)
