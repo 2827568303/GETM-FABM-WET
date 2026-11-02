@@ -28,7 +28,9 @@ for (const route of ['dashboard', 'cases', 'preprocess', 'input', 'gridstudio', 
 }
 assert.ok(/\.workbench-home-grid/.test(styles),
   'the shell should provide a responsive canvas and inspector layout');
-assert.ok(/<span class="case-name">\$\{escapeHtml\(base \+ nativePeriod\)\}<\/span>\$\{proxyCaseBadgeMarkup\(caseData\)\}/.test(app),
+assert.ok(/const proxyMarkup = proxyCaseBadgeMarkup\(caseData\)/.test(app)
+  && /<span class="case-name">\$\{label\}<\/span>\$\{proxyMarkup\}/.test(app)
+  && /badge\.innerHTML = proxyMarkup \?/.test(app),
   'the active case identity should be separate from its proxy status badge');
 const caseBadgeLayout = appStyles.slice(appStyles.lastIndexOf('.case-badge{'));
 assert.ok(/display:flex;[^}]*flex-wrap:wrap;[^}]*overflow:visible/s.test(caseBadgeLayout)

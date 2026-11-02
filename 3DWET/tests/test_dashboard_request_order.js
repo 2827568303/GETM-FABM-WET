@@ -7,6 +7,7 @@ const context=vm.createContext({state,$:id=>elements[id],api:url=>new Promise(re
   document:{createElement:tag=>({tagName:tag,value:'',textContent:''})},
   window:{StudioI18n:{scientificText:(_source,english)=>english}},drawHeatmap(){}});
 const start=source.indexOf('async function loadDashboardSummary(');
+vm.runInContext(source.slice(source.indexOf('function resultVariablePriority('), source.indexOf('function prioritizeResultVariables(')), context);
 vm.runInContext(source.slice(start,source.indexOf('// ── 2D Visualization',start)),context);
 function summary(name,mean){return {[name]:{mean,min:mean-1,max:mean+1,units:'C'}};}
 function heatmap(name,mean){return {[name]:{mean,min:mean-1,max:mean+1,units:'g/m3',data:[[mean]]}};}

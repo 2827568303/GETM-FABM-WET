@@ -4,8 +4,7 @@ import unittest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-HELPER_PATH = (REPO_ROOT / "build" / "real-use-validation-20261026"
-               / "erken-seasonal-attempt03" / "attempt03_report_paths.py")
+HELPER_PATH = REPO_ROOT / "scripts" / "attempt03_report_paths.py"
 SPEC = importlib.util.spec_from_file_location("attempt03_report_paths", HELPER_PATH)
 assert SPEC is not None and SPEC.loader is not None
 REPORT_PATHS = importlib.util.module_from_spec(SPEC)
@@ -30,7 +29,6 @@ class Attempt03ReportPathTests(unittest.TestCase):
         self.assertEqual(DEFAULT_NUMERICAL_REPORT, expected_dir / "numerical_health.json")
         self.assertEqual(parse_report(DEFAULT_RESULT_REPORT, []), DEFAULT_RESULT_REPORT)
         self.assertEqual(parse_report(DEFAULT_NUMERICAL_REPORT, []), DEFAULT_NUMERICAL_REPORT)
-
 
     def test_explicit_report_destination_overrides_default(self):
         destination = Path("custom") / "report.json"

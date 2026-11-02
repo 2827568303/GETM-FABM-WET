@@ -1,4 +1,5 @@
 import ast
+import re
 import subprocess
 import sys
 import threading
@@ -19,15 +20,16 @@ from solver_runtime import log_has_solver_failure, prepare_solver_log_chunk
 def worker(tmp_path):
     source = Path(__file__).resolve().parents[1] / '3DWET/app/server.py'
     tree = ast.parse(source.read_text(encoding='utf-8'))
-    functions = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in {'run_model_thread','run_stop'}]
+    functions = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in {'run_model_thread','run_stop','_spawn_solver'}]
     for function in functions:
         function.decorator_list = []
-    scope = dict(Path=Path, datetime=datetime, os=SimpleNamespace(name='posix'),
+    scope = dict(Path=Path, datetime=datetime, os=SimpleNamespace(name='posix'), re=re,
+                 solver_environment=lambda _exe, threads=None: {'OMP_NUM_THREADS': str(threads or 1), 'PATH': ''},
                  time=SimpleNamespace(time=lambda:100.,sleep=lambda _:None),
                  run_status='running',run_process=None,run_logs=[],run_start_time=100.,run_case_path=tmp_path,
                  run_metrics=RunMetrics(),_NC_LOCK=threading.RLock(),
                  _capture_run_repair_summary=lambda *_args:None,
-                 solver_environment=lambda _: {}, log_has_solver_failure=log_has_solver_failure,
+                 log_has_solver_failure=log_has_solver_failure,
                  prepare_solver_log_chunk=prepare_solver_log_chunk,
                  explain_exit_code=lambda _: 'bad exit',nc_open=None,jsonify=jsonify,
                  _archive_run_outputs=lambda *_:None, subprocess=subprocess,
@@ -172,7 +174,7 @@ def test_mpi_worker_observes_delayed_rank_zero_progress_and_final_partial_line(t
         return observe(text, now=observation_clock['value'], source=source)
     metrics.observe = observe_at_deterministic_time
     scope = {
-        'Path': Path, 'time': SimpleNamespace(time=lambda: 101., sleep=fake_sleep),
+        'Path': Path, 're': re, 'time': SimpleNamespace(time=lambda: 101., sleep=fake_sleep),
         'run_status': 'running', 'run_process': None, 'run_logs': [],
         'run_start_time': 100., 'run_case_path': original, 'run_metrics': metrics,
         'run_config': {'solver_mode': 'MPI (2 ranks)', 'phase': 'solving'},
@@ -346,7 +348,7 @@ def test_mpi_stop_during_launcher_spawn_stops_the_new_process_tree(tmp_path, mon
     monkeypatch.setitem(sys.modules, 'mpi_runner', fake_mpi)
     metrics = RunMetrics(); metrics.start({'nsteps': 10}, now=100)
     scope = {
-        'Path': Path, 'time': SimpleNamespace(time=lambda: 101., sleep=lambda _: None),
+        'Path': Path, 're': re, 'time': SimpleNamespace(time=lambda: 101., sleep=lambda _: None),
         'run_status': 'running', 'run_process': None, 'run_logs': [],
         'run_start_time': 100., 'run_case_path': original, 'run_metrics': metrics,
         'run_config': {'solver_mode': 'MPI (2 ranks)', 'phase': 'solving'},
@@ -400,7 +402,7 @@ def test_mpi_failed_merge_preserves_existing_user_outputs(tmp_path, monkeypatch)
     monkeypatch.setitem(sys.modules, 'mpi_runner', fake_mpi)
     metrics = RunMetrics(); metrics.start({'nsteps': 10}, now=100)
     scope = {
-        'Path': Path, 'time': SimpleNamespace(time=lambda: 101., sleep=lambda _: None),
+        'Path': Path, 're': re, 'time': SimpleNamespace(time=lambda: 101., sleep=lambda _: None),
         'run_status': 'running', 'run_process': None, 'run_logs': [],
         'run_start_time': 100., 'run_case_path': original, 'run_metrics': metrics,
         'run_config': {'solver_mode': 'MPI (2 ranks)', 'phase': 'solving'},
@@ -464,7 +466,7 @@ def test_mpi_publish_backup_failure_restores_already_moved_user_output(tmp_path,
 
     metrics = RunMetrics(); metrics.start({'nsteps': 10}, now=100)
     scope = {
-        'Path': Path, 'time': SimpleNamespace(time=lambda: 101., sleep=lambda _: None),
+        'Path': Path, 're': re, 'time': SimpleNamespace(time=lambda: 101., sleep=lambda _: None),
         'run_status': 'running', 'run_process': None, 'run_logs': [],
         'run_start_time': 100., 'run_case_path': original, 'run_metrics': metrics,
         'run_config': {'solver_mode': 'MPI (2 ranks)', 'phase': 'solving'},

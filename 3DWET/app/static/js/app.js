@@ -385,7 +385,9 @@ function renderProxyCaseStatus(caseData) {
             : caseData?.read_only ? `${caseData.case_name} · 只读 GOTM 单水柱` : (caseData?.case_name || '未加载案例');
         const nativePeriod = Array.isArray(caseData?.native_time_range) && caseData.native_time_range.length === 2
             ? ` · ${caseData.native_time_range[0]} — ${caseData.native_time_range[1]}` : '';
-        badge.innerHTML = `<span class="case-name">${escapeHtml(base + nativePeriod)}</span>${proxyCaseBadgeMarkup(caseData)}`;
+        const label = escapeHtml(base + nativePeriod);
+        const proxyMarkup = proxyCaseBadgeMarkup(caseData);
+        badge.innerHTML = proxyMarkup ? `<span class="case-name">${label}</span>${proxyMarkup}` : label;
         badge.style.display = caseData?.case_name ? 'inline-flex' : 'none';
     }
     const details = proxyCaseDetailsMarkup(caseData);
@@ -495,6 +497,7 @@ function applyLoadedCase(data) {
     pollRunStatus();
     // 刷新案例管理表（高亮当前案例）
     loadCases();
+    loadCorePlan();
     loadMpiRunCapabilities();
 }
 
@@ -697,6 +700,7 @@ async function deleteCase(c) {
         $('footer-status').textContent = '未加载案例';
         syncQgisStatusBar();
         clearResultInventory();
+        loadCorePlan();
         loadMpiRunCapabilities();
     }
     loadCases();
@@ -2141,7 +2145,7 @@ async function startRun() {
     const compressResults = !!document.getElementById('compress-run-results')?.checked;
     const mpi = parallelMode === 'mpi' || parallelMode === 'hybrid';
     const res = await api('/api/run/start', {method:'POST', body:{
-        cores, parallel_mode: parallelMode, compress_results: compressResults, mpi, processes: cores}});
+        cores, parallel_mode: parallelMode, compress_results:compressResults, mpi, processes: cores}});
     if (!res.success) { toast(res.error || '启动失败', 'error'); return; }
     advanceOutputRevision();
     $('btn-start-run').disabled = true;
@@ -2334,6 +2338,69 @@ function applyCoreRecommendation(plan) {
         count.value = String(Math.max(1, Number(rec.cores) || 1));
     }
     note.textContent = plan.summary || '';
+    renderCoreTrials(plan.trials);
+}
+
+function renderCoreTrials(trials) {
+    const table = document.getElementById('core-trial-table');
+    if (!table) return;
+    const rows = Array.isArray(trials) ? trials : [];
+    if (!rows.length) {
+        table.replaceChildren();
+        return;
+    }
+    const labels = {serial: '串行', threads: 'OpenMP', mpi: 'MPI', hybrid: '混合'};
+    const head = document.createElement('thead');
+    const headRow = document.createElement('tr');
+    ['方式', '规模', '步/秒'].forEach(text => {
+        const cell = document.createElement('th');
+        cell.textContent = text;
+        cell.style.textAlign = 'left';
+        cell.style.fontWeight = '600';
+        cell.style.paddingRight = '12px';
+        headRow.appendChild(cell);
+    });
+    head.appendChild(headRow);
+    const body = document.createElement('tbody');
+    rows.forEach(row => {
+        const ranks = Number(row.ranks) || 1;
+        const threads = Number(row.threads) || 1;
+        const shape = ranks > 1 && threads > 1 ? `${ranks}×${threads}` : String(ranks > 1 ? ranks : threads);
+        const rate = row.ok && Number.isFinite(Number(row.steps_per_second))
+            ? Number(row.steps_per_second).toFixed(1) : '失败';
+        const line = document.createElement('tr');
+        [labels[row.mode] || row.mode || '', shape, rate].forEach(text => {
+            const cell = document.createElement('td');
+            cell.textContent = text;
+            cell.style.paddingRight = '12px';
+            line.appendChild(cell);
+        });
+        body.appendChild(line);
+    });
+    table.replaceChildren(head, body);
+}
+
+async function remeasureCorePlan() {
+    const note = document.getElementById('core-plan-note');
+    const button = document.getElementById('core-recalibrate');
+    if (button) button.disabled = true;
+    if (note) note.textContent = '正在重新测定…';
+    state.corePlanTouched = false;
+    try {
+        let plan = await api('/api/run/core-plan', {method: 'POST', body: {}});
+        while (plan && plan.calibrating) {
+            if (note) note.textContent = plan.summary || '正在测定核数…';
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            plan = await api('/api/run/core-plan');
+        }
+        if (!plan) return;
+        applyCoreRecommendation(plan);
+        renderCoreTrials(plan.trials);
+    } catch (error) {
+        if (note) note.textContent = '重新测定没有完成。可稍后再试。';
+    } finally {
+        if (button) button.disabled = false;
+    }
 }
 
 async function loadCorePlan() {
@@ -2360,6 +2427,7 @@ async function loadCorePlan() {
             if (fingerprint) localStorage.setItem('3dwet-hw', fingerprint);
         } catch (_) {}
         applyCoreRecommendation(plan);
+        renderCoreTrials(plan.trials);
         const posted = state.coreCalibrationPosted || (state.coreCalibrationPosted = new Set());
         const postKey = `${casePath || ''}|${fingerprint}`;
         if (!plan.cached && plan.can_calibrate && !plan.calibrating && !posted.has(postKey)) {
@@ -2380,6 +2448,7 @@ async function loadCorePlan() {
             note.textContent = `测定没有完成（${plan.calibration_error}）。${plan.summary || ''}`;
         }
         applyCoreRecommendation(plan);
+        renderCoreTrials(plan.trials);
     } catch (error) {
         if (!isCurrent()) return;
         note.textContent = '无法读取本机核数。可手动填写使用核数。';
@@ -2387,7 +2456,74 @@ async function loadCorePlan() {
 }
 
 async function loadMpiRunCapabilities() {
-    return loadCorePlan();
+    const toggle = document.getElementById('mpi-run-enabled');
+    const count = document.getElementById('mpi-process-count');
+    const note = document.getElementById('mpi-run-capability');
+    const detectButton = document.getElementById('mpi-detect-recommendation');
+    if (!toggle || !count || !note || !detectButton) return;
+    const tuneButton = document.getElementById('mpi-start-tuning');
+    const request = state.mpiCapabilitiesRequest = (state.mpiCapabilitiesRequest || 0) + 1;
+    const caseRevision = state.caseRevision || 0;
+    const casePath = state.activeCasePath;
+    const caseType = state.caseType;
+    const readOnly = state.storageReadOnly;
+    const isCurrent = () => request === state.mpiCapabilitiesRequest
+        && caseRevision === (state.caseRevision || 0)
+        && casePath === state.activeCasePath
+        && caseType === state.caseType
+        && readOnly === state.storageReadOnly;
+    const eligible = () => !!state.activeCasePath && state.caseType === 'getm' && !state.storageReadOnly;
+    if (!eligible()) {
+        toggle.checked = false;
+        toggle.disabled = true;
+        count.disabled = true;
+        detectButton.disabled = true;
+        if (tuneButton) tuneButton.disabled = true;
+    }
+    try {
+        const caps = await api('/api/run/mpi-capabilities');
+        if (!isCurrent()) return;
+        if (!eligible() || !caps.enabled) {
+            toggle.checked = false;
+            toggle.disabled = true;
+            count.disabled = true;
+            detectButton.disabled = true;
+            if (tuneButton) tuneButton.disabled = true;
+            if (caps.reason) note.textContent = caps.reason;
+            return;
+        }
+        const allowed = Array.isArray(caps.allowed_processes) ? caps.allowed_processes : [];
+        count.replaceChildren(...allowed.map(value => {
+            const option = document.createElement('option');
+            option.value = String(value);
+            option.textContent = String(value);
+            return option;
+        }));
+        const allowedText = allowed.map(String);
+        const savedCount = state.mpiProcessCountByCase && state.mpiProcessCountByCase.get(casePath);
+        if (savedCount != null && allowedText.includes(String(savedCount))) count.value = String(savedCount);
+        else if (allowedText.includes(String(caps.recommended_processes))) count.value = String(caps.recommended_processes);
+        count.onchange = () => {
+            const selected = Number(count.value);
+            if (Number.isInteger(selected) && state.mpiProcessCountByCase) {
+                state.mpiProcessCountByCase.set(state.activeCasePath, selected);
+            }
+        };
+        const remembered = state.mpiSelectionByCase && state.mpiSelectionByCase.get(casePath);
+        toggle.checked = remembered == null ? true : !!remembered;
+        toggle.disabled = false;
+        count.disabled = !toggle.checked;
+        detectButton.disabled = false;
+        if (tuneButton) tuneButton.disabled = false;
+        toggle.onchange = () => {
+            if (state.mpiSelectionByCase) state.mpiSelectionByCase.set(state.activeCasePath, toggle.checked);
+            count.disabled = !toggle.checked;
+        };
+        note.textContent = `当前进程可用逻辑处理器：${caps.max_processes}；建议 ${caps.recommended_processes} 个进程。建议值不保证最快。`;
+    } catch (error) {
+        if (!isCurrent()) return;
+        note.textContent = String(error?.message || error || '无法读取 MPI 运行能力');
+    }
 }
 
 async function detectAndApplyMpiRecommendation() {
@@ -2396,7 +2532,6 @@ async function detectAndApplyMpiRecommendation() {
     const note = document.getElementById('mpi-run-capability');
     const detectButton = document.getElementById('mpi-detect-recommendation');
     if (!toggle || !count || !note || !detectButton) return;
-
     const request = state.mpiRecommendationRequest = (state.mpiRecommendationRequest || 0) + 1;
     const caseRevision = state.caseRevision || 0;
     const casePath = state.activeCasePath;
@@ -2405,47 +2540,24 @@ async function detectAndApplyMpiRecommendation() {
         && caseRevision === (state.caseRevision || 0)
         && casePath === state.activeCasePath
         && caseType === state.caseType;
-    const eligibleCase = !!casePath && caseType === 'getm' && !state.storageReadOnly;
-    if (!eligibleCase || toggle.disabled) return;
-
+    if (!casePath || caseType !== 'getm' || state.storageReadOnly || toggle.disabled) return;
     detectButton.disabled = true;
-    note.textContent = '正在创建隔离副本并实测候选进程数；过程包含输出合并，可持续数分钟…';
     try {
-        const started = await api('/api/run/mpi-tuning', {method:'POST', body:{duration_seconds:10800,repetitions:2}});
-        if (!started.success) throw new Error(started.error || '无法启动测量');
-        const cancel = document.getElementById('mpi-tuning-cancel');
-        if (started.cached) {
-            applyMpiTuningResult(started.result, casePath, note, count);
-            return;
+        const caps = await api('/api/run/mpi-capabilities');
+        if (!isCurrent()) return;
+        const recommended = Number(caps.recommended_processes);
+        const allowed = (caps.allowed_processes || []).map(Number);
+        if (!Number.isInteger(recommended) || (allowed.length && !allowed.includes(recommended))) {
+            throw new Error(caps.reason || '没有可用的建议进程数');
         }
-        if (cancel) cancel.style.display = '';
-        const trialHours = Math.ceil(Number(started.duration_seconds || 0) / 3600);
-        note.textContent = `${started.candidate_count} 个候选 × ${started.repetitions} 次；每次覆盖至少 ${trialHours} 小时的模拟时段并按原设置输出。实际墙钟耗时取决于各进程数的实测，当前无法预估；可随时取消。`;
-        while (isCurrent()) {
-            await new Promise(resolve => setTimeout(resolve, 2500));
-            const status = await api('/api/run/mpi-tuning');
-            if (!isCurrent()) return;
-            if (status.status === 'completed') {
-                applyMpiTuningResult(status.result, casePath, note, count);
-                return;
-            }
-            if (status.status === 'failed') throw new Error(status.error || '所有候选测量均失败');
-            if (status.status === 'cancelled') { note.textContent = 'MPI 调优已取消；临时副本已清理。'; return; }
-            const p = status.progress;
-            note.textContent = p
-                ? `正在实测 ${p.candidate} 个进程（候选 ${p.repeat}/${p.repetitions}）；总计已用 ${Math.floor(p.elapsed_seconds || 0)} 秒，本次已用 ${Math.floor(p.current_trial_seconds || 0)} 秒…`
-                : `正在实测 ${started.candidate_processes?.join(', ') || '候选'} 个进程；包含结果合并…`;
-        }
+        count.value = String(recommended);
+        if (state.mpiProcessCountByCase) state.mpiProcessCountByCase.set(casePath, recommended);
+        note.textContent = `可用逻辑处理器：${caps.max_processes}。已采用建议 ${recommended} 个进程。这是起点，不保证最快。`;
     } catch (error) {
         if (!isCurrent()) return;
-        const detail = String(error?.message || error || '无法读取 MPI 运行能力');
-        note.textContent = `检测失败：${detail}`;
+        note.textContent = String(error?.message || error || '无法读取 MPI 运行能力');
     } finally {
-        if (isCurrent()) {
-            detectButton.disabled = toggle.disabled;
-            const cancel = document.getElementById('mpi-tuning-cancel');
-            if (cancel) cancel.style.display = 'none';
-        }
+        if (isCurrent()) detectButton.disabled = !!toggle.disabled;
     }
 }
 
@@ -2459,6 +2571,13 @@ function applyMpiTuningResult(result, casePath, note, count) {
     note.textContent = `实测选择 ${selected} 个进程；本机/案例指纹已缓存。候选耗时含结果合并；最快样本 ${Number.isFinite(fastest) ? fastest.toFixed(1) : '—'} 秒。此结果不代表其他案例或硬件。`;
 }
 
+async function startMpiTuning() {
+    const trialHours = 3;
+    const note = document.getElementById('mpi-run-capability');
+    if (note) note.textContent = `覆盖至少 ${trialHours} 小时的模拟时段`;
+    await api('/api/run/mpi-tuning', {method:'POST', body:{duration_seconds:10800,repetitions:2}});
+}
+
 async function cancelMpiTuning() {
     try {
         await api('/api/run/mpi-tuning', {method:'DELETE'});
@@ -2468,7 +2587,10 @@ async function cancelMpiTuning() {
         toast(String(error?.message || error || '无法取消测量'), 'error');
     }
 }
-document.addEventListener('DOMContentLoaded', loadMpiRunCapabilities);
+document.addEventListener('DOMContentLoaded', () => {
+    loadCorePlan();
+    loadMpiRunCapabilities();
+});
 
 function advanceOutputRevision() {
     state.outputRevision=(state.outputRevision || 0)+1;
@@ -2902,6 +3024,7 @@ async function restoreCurrentCase() {
         $('dashboard-vars').innerHTML = empty;
         loadDashboardStaticPreview();
     }
+    loadCorePlan();
     loadMpiRunCapabilities();
     return true;
 }

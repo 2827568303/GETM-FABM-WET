@@ -1,6 +1,8 @@
 import os
 import sys
 from pathlib import Path
+
+import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '3DWET' / 'app'))
 from solver_runtime import solver_environment, inspect_runtime, explain_exit_code, log_has_solver_failure
 
@@ -24,6 +26,7 @@ def test_missing_runtime_has_specific_diagnostic(tmp_path):
     assert 'DLL' in explain_exit_code(3221225781)
 
 
+@pytest.mark.skipif(os.name != 'nt', reason='Windows PE loader probe needs the native DLL loader and getm_cartesian.exe')
 def test_loader_probe_enters_model_without_case_writes():
     exe = Path(__file__).resolve().parents[1] / '3DWET/bin/getm_cartesian.exe'
     r = inspect_runtime(exe, probe=True)

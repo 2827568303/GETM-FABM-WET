@@ -1,3 +1,4 @@
+import os
 import pytest
 from pathlib import Path
 import sys
@@ -71,6 +72,17 @@ def test_reads_are_allowed_and_non_c_case_writes_remain_available():
         r"D:\GETM-FABM-WET-outputs\cases\lake", "POST", "/api/run/start")
     assert case_storage.is_system_drive(r"C:\legacy\lake")
     assert not case_storage.is_system_drive(r"D:\GETM-FABM-WET-outputs\cases\lake")
+
+
+def test_non_windows_ignores_drive_letters_and_uses_the_repository_case_tree(tmp_path, monkeypatch):
+    if os.name == "nt":
+        pytest.skip("Windows selects a real non-C: volume when one is present")
+    monkeypatch.chdir(tmp_path)
+    root, source, warning = case_storage.resolve_case_storage(tmp_path / "model", {})
+    assert source == "repository"
+    assert root == (tmp_path / "model" / "case").resolve()
+    assert not (tmp_path / "D:\\GETM-FABM-WET-outputs\\cases").exists()
+    assert warning and "Windows drive paths are not used" in warning
 
 
 def test_save_as_destination_guard_distinguishes_c_and_d():

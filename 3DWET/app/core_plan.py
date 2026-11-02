@@ -287,8 +287,13 @@ def save_cache(data):
     os.replace(temporary, path)
 
 
-def lookup_choice(hardware, grid, exe_path, hotstart=False):
+def lookup_entry(hardware, grid, exe_path, hotstart=False):
     entry = load_cache()["entries"].get(cache_key(hardware, grid, exe_path, hotstart=hotstart))
+    return entry if isinstance(entry, dict) else None
+
+
+def lookup_choice(hardware, grid, exe_path, hotstart=False):
+    entry = lookup_entry(hardware, grid, exe_path, hotstart=hotstart)
     if not entry:
         return None
     choice = entry.get("choice")
@@ -297,6 +302,29 @@ def lookup_choice(hardware, grid, exe_path, hotstart=False):
     choice = dict(choice)
     choice["source"] = "measured"
     return choice
+
+
+def compact_trials(entry):
+    """Rows the run page can show without the rest of the calibration cache."""
+    if not entry:
+        return []
+    rows = []
+    for item in entry.get("results") or []:
+        if not isinstance(item, dict):
+            continue
+        rate = item.get("steps_per_second")
+        try:
+            rate = None if rate is None else float(rate)
+        except (TypeError, ValueError):
+            rate = None
+        rows.append({
+            "mode": item.get("mode"),
+            "threads": item.get("threads"),
+            "ranks": item.get("ranks"),
+            "steps_per_second": rate,
+            "ok": bool(item.get("ok")),
+        })
+    return rows
 
 
 def choose_fastest(results):
@@ -468,17 +496,17 @@ def _copy_case(source, destination):
             continue
         if item.is_dir():
             shutil.copytree(item, destination / item.name, ignore=shutil.ignore_patterns(
-                "*.2d.nc", "*.3d.nc", "output.nc", "ext_wq.nc", "model_run.log"))
+                "*.2d.nc", "*.3d.nc", "output.nc", "ext_wq*.nc", "model_run.log"))
         elif item.is_file() and item.suffix != ".nc" or item.name in {
                 "bathymetry.nc", "meteo.nc", "rivers.nc", "fabm_init.nc"}:
-            if item.name.endswith((".2d.nc", ".3d.nc")) or item.name in {"output.nc", "ext_wq.nc"}:
+            if item.name.endswith((".2d.nc", ".3d.nc")) or item.name == "output.nc" or item.name.startswith("ext_wq"):
                 continue
             shutil.copy2(item, destination / item.name)
 
 
 def _clean_outputs(case):
     case = Path(case)
-    for pattern in ("*.2d.nc", "*.3d.nc", "output.nc", "ext_wq.nc", "model_run.log", "run.log"):
+    for pattern in ("*.2d.nc", "*.3d.nc", "output.nc", "ext_wq*.nc", "model_run.log", "run.log"):
         for path in case.glob(pattern):
             if path.name == "bathymetry.nc":
                 continue

@@ -34,6 +34,18 @@ def output(path, variables, records=2, start=0):
                 variable[:] = 1
 
 
+def test_archived_and_root_weekly_files_both_stay_visible(tmp_path):
+    archived = tmp_path / 'output' / 'ext_wq.nc'
+    output(archived, ['abiotic_water_sNH4W'], records=1)
+    find = load_function()
+    assert archived in find(tmp_path)['3d_candidates']
+    root = tmp_path / 'ext_wq.nc'
+    output(root, ['abiotic_water_sNH4W'], records=1, start=10)
+    found = {path.resolve() for path in find(tmp_path)['3d_candidates']}
+    assert root.resolve() in found
+    assert archived.resolve() in found
+
+
 def test_weekly_ecology_file_is_a_3d_candidate(tmp_path):
     weekly = tmp_path / 'ext_wq.nc'
     output(weekly, ['abiotic_water_sNH4W'], records=1)

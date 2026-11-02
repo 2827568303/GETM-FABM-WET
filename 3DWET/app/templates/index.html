@@ -1020,7 +1020,19 @@
                             <option value="mpi">MPI 进程</option>
                             <option value="hybrid">MPI × OpenMP</option>
                         </select>
+                        <button type="button" class="btn btn-sm" id="core-recalibrate" onclick="remeasureCorePlan()">重新测定</button>
                         <span id="core-plan-note" role="status" style="flex:1;min-width:260px;font-size:12px;color:var(--text-muted,#777);">正在读取本机核数…</span>
+                    </div>
+                    <div id="core-trial-panel" style="margin:0 0 10px;">
+                        <table id="core-trial-table" style="border-collapse:collapse;font-size:12px;"></table>
+                    </div>
+                    <div id="mpi-run-control" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px;">
+                        <label><input id="mpi-run-enabled" type="checkbox" disabled> 使用 MPI</label>
+                        <label for="mpi-process-count">MPI 进程</label>
+                        <select class="form-control" id="mpi-process-count" disabled style="width:88px;"></select>
+                        <button type="button" class="btn btn-sm" id="mpi-detect-recommendation" onclick="detectAndApplyMpiRecommendation()" disabled>检测并采用建议</button>
+                        <button type="button" class="btn btn-sm" id="mpi-start-tuning" onclick="startMpiTuning()" disabled>实测进程数</button>
+                        <span id="mpi-run-capability" role="status" style="font-size:12px;color:var(--text-muted,#777);"></span>
                     </div>
                     <div id="run-repair-summary" role="status" aria-live="polite" style="margin:0 0 10px;color:var(--text-muted,#777);font-size:12px;">FABM 状态检查汇总：未提供。</div>
                     <section id="run-monitor" class="run-monitor" aria-label="运行监控">

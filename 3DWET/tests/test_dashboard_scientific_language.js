@@ -6,6 +6,7 @@ const ctx=vm.createContext({state:{variables2d:[],variables3d:[item]},window:{St
   $:id=>elements[id],api:async()=>({temp:item}),fmt:String,drawHeatmap:()=>{}});
 vm.runInContext(source.slice(source.indexOf('function localizedResult('),source.indexOf('const chartLanguageSources')),ctx);
 vm.runInContext(source.slice(source.indexOf('function escapeHtml('),source.indexOf('async function resetParam(')),ctx);
+vm.runInContext(source.slice(source.indexOf('function resultVariablePriority('), source.indexOf('function prioritizeResultVariables(')), ctx);
 vm.runInContext(source.slice(source.indexOf('async function loadDashboardSummary('),source.indexOf('// ── 2D Visualization')),ctx);
 (async()=>{await ctx.loadDashboardSummary();await ctx.loadDashboardMiniHeatmaps();
   for(const id of Object.keys(elements)) {

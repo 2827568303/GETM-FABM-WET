@@ -335,10 +335,8 @@ def main(argv=None):
             import webview
             window = webview.create_window('3DWET Studio', url, width=1440, height=960,
                                           min_size=(1024, 700))
-            notification_permission = None
-            if os.name == 'nt':
-                from desktop_notifications import install_notification_permission
-                notification_permission = install_notification_permission(window, url)
+            from desktop_notifications import install_notification_permission
+            notification_permission = install_notification_permission(window, url)
             if guard is not None:
                 def on_closing():
                     if not guard.begin_shutdown():

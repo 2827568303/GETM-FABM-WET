@@ -19,7 +19,55 @@ generator = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(generator)
 
 
-def test_generates_three_distinct_app_valid_proxy_cases_with_hashed_attribution(tmp_path):
+def install_geometry_sources(tmp_path, monkeypatch):
+    """Stand in for the gitignored HydroLAKES extract, OSM way, and Ravn zip."""
+    import zipfile
+
+    import shapefile
+
+    hydro = tmp_path / "HydroLAKES_Europe"
+    hydro.mkdir()
+    base = hydro / "HydroLAKES_Europe"
+    writer = shapefile.Writer(str(base), shapeType=shapefile.POLYGON)
+    writer.field("Hylak_id", "N", decimal=0)
+    writer.field("Depth_avg", "F", decimal=2)
+    # Irregular rings so the bounding grid keeps dry shoreline cells.
+    for hylak_id, depth, origin in ((160990, 8.0, (9.50, 56.00)), (162269, 6.5, (10.20, 55.20))):
+        lon, lat = origin
+        # Clockwise exterior ring. Shapefile treats the opposite winding as a hole.
+        ring = [
+            [lon, lat],
+            [lon + 0.004, lat + 0.016],
+            [lon + 0.028, lat + 0.018],
+            [lon + 0.03, lat + 0.002],
+            [lon, lat],
+        ]
+        writer.poly([ring])
+        writer.record(hylak_id, depth)
+    writer.close()
+    (hydro / "HydroLAKES_Europe.prj").write_text(
+        'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]]',
+        encoding="utf-8")
+    (hydro / "HydroLAKES_Europe.cpg").write_text("UTF-8", encoding="utf-8")
+    osm = tmp_path / "bryrup_langso_osm_way_69314701.xml"
+    nodes = [(1, 9.40, 56.10), (4, 9.404, 56.116), (3, 9.428, 56.118), (2, 9.43, 56.102)]
+    body = ["<osm>"]
+    for node_id, lon, lat in nodes:
+        body.append(f'<node id="{node_id}" lon="{lon}" lat="{lat}"/>')
+    body.append('<way id="69314701">')
+    body.extend(f'<nd ref="{node_id}"/>' for node_id in (1, 4, 3, 2, 1))
+    body.append("</way></osm>")
+    osm.write_text("\n".join(body), encoding="utf-8")
+    archive = tmp_path / "testcase_Lake_Ravn.zip"
+    with zipfile.ZipFile(archive, "w") as bundle:
+        bundle.writestr("readme.txt", "upstream ravn reference")
+    monkeypatch.setattr(generator, "HYDRO_DIR", hydro)
+    monkeypatch.setattr(generator, "OSM_XML", osm)
+    monkeypatch.setattr(generator, "RAVN_ARCHIVE", archive)
+
+
+def test_generates_three_distinct_app_valid_proxy_cases_with_hashed_attribution(tmp_path, monkeypatch):
+    install_geometry_sources(tmp_path, monkeypatch)
     cases = generator.generate_proxy_cases(REPO, tmp_path / "cases")
 
     assert set(cases) == {"Lake Ravn", "Bryrup", "Arreskov"}

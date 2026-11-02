@@ -176,6 +176,10 @@ app = Flask(__name__,
             static_folder=str(APP_DIR / "static"))
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable static file caching
+# Create the environment after the config assignment. Flask otherwise keeps
+# the default (reload only while debug is on), so an edited index.html stays
+# stale until the process restarts.
+app.jinja_env.auto_reload = True
 
 # ── NaN-safe JSON (CRITICAL) ──────────────────────────────────────────
 # 陆地格掩膜 → float('nan')。Python json 容忍 NaN 字面量，但浏览器
@@ -340,14 +344,17 @@ def _run_repair_summary_payload():
 _LAST_CASE_FILE = CASE_STATE_DIR / ".active_case.json"
 
 def _is_pytest_temporary_case_path(path):
-    """Reject pytest-managed temporary directories from persistent app state."""
+    """Reject pytest-managed temporary directories from persistent app state.
+
+    The marker is on the path itself. Comparing only against the current
+    temp directory misses a case recorded before this process pointed TMP at
+    the case scratch folder.
+    """
     try:
         resolved = Path(path).resolve()
-        temp_root = Path(tempfile.gettempdir()).resolve()
-        relative = resolved.relative_to(temp_root)
     except (OSError, ValueError):
         return False
-    parts = [part.casefold() for part in relative.parts]
+    parts = [part.casefold() for part in resolved.parts]
     return any(part.startswith("pytest-of-") or re.fullmatch(r"pytest-\d+", part)
                for part in parts)
 
@@ -1344,7 +1351,7 @@ def _nc_time_len(path):
 _CASE_SUBDIRS = {
     "Input": "用户提供的原始数据放这里（气象/河流 CSV、水深文本、hypsograph.dat、shapefile 等）。\n"
              "模型运行需要的 .nc 文件由 GUI 转换后放在案例根目录——GETM 以根目录为工作目录，这是模型侧要求。",
-    "output": "模型运行产物归档目录。每次运行成功结束后，*.2d.nc / *.3d.nc / output.nc / restart.nc\n"
+    "output": "模型运行产物归档目录。每次运行成功结束后，*.2d.nc / *.3d.nc / output.nc / restart.nc / ext_wq*.nc\n"
               "会自动从根目录移入这里（根目录只保留运行中的临时文件）。GUI 读取结果时两个位置都会找。",
     "analysis": "分析产物目录：图表、诊断报告、导出的时间序列等。",
     "calibration": "率定相关文件：观测数据、率定配置、率定结果与最优参数记录。",
@@ -1385,13 +1392,15 @@ def find_output_files(case_path, var_name=None):
     discovered = list(case.glob("*.2d.nc")) + list(case.glob("*.3d.nc")) + \
                  list((case / "output").glob("*.2d.nc")) + list((case / "output").glob("*.3d.nc"))
     for folder in (case, case / "output"):
-        extra = folder / "ext_wq.nc"
-        if extra.is_file():
-            discovered.append(extra)
+        if not folder.is_dir() and folder != case:
+            continue
+        for extra in folder.glob("ext_wq*.nc"):
+            if extra.is_file():
+                discovered.append(extra)
     for f in discovered:
         if ".2d.nc" in f.name:
             cands["2d"].append(f)
-        elif ".3d.nc" in f.name or f.name == "ext_wq.nc":
+        elif ".3d.nc" in f.name or (f.name.startswith("ext_wq") and f.name.endswith(".nc")):
             cands["3d"].append(f)
     primary = [case / 'output.nc', case / 'output' / 'output.nc']
     revision_paths = [*discovered, *primary]
@@ -2229,7 +2238,7 @@ def _archive_run_outputs(case_path, run_logs):
         out_dir.mkdir(exist_ok=True)
         moved = []
         with _NC_LOCK:  # 与结果读取端点互斥，避免移动到一半被打开
-            for pat in ("*.2d.nc", "*.3d.nc", "output.nc", "restart.nc"):
+            for pat in ("*.2d.nc", "*.3d.nc", "output.nc", "restart.nc", "ext_wq*.nc"):
                 for f in case.glob(pat):
                     if not f.is_file():
                         continue
@@ -2264,7 +2273,7 @@ def _compress_completed_getm_outputs(case_path, logs):
     if isinstance(run_config, dict):
         run_config["phase"] = "compressing"
     paths = []
-    for pattern in ("*.2d.nc", "*.3d.nc", "output.nc", "ext_wq.nc"):
+    for pattern in ("*.2d.nc", "*.3d.nc", "output.nc", "ext_wq*.nc"):
         paths.extend(Path(case_path).glob(pattern))
     paths = list(dict.fromkeys(path for path in paths if path.is_file()))
     if not paths:
@@ -2687,7 +2696,12 @@ def run_mpi_model_thread(case_path, launcher, solver, process_count, runtime_dir
     except Exception as error:
         elapsed = time.time() - (run_start_time or time.time())
         saw_step = any(re.search(r"n=\s*\d+", line or "") for line in run_logs)
-        if run_status != "stopped" and not saw_step and elapsed < 180:
+        # Merge and publish errors happen after the launcher has already
+        # exited 0. Retrying those as a serial run would replace the user's
+        # outputs. Only a launch that never started stepping falls back.
+        returncode = getattr(run_process, "returncode", None)
+        never_started = runner is None or run_process is None or returncode not in (0, None)
+        if run_status != "stopped" and never_started and not saw_step and elapsed < 180:
             run_logs.append(f"[WARN] MPI 没有开始步进（{error}），改用 1 个线程。")
             if isinstance(run_config, dict):
                 run_config["omp_threads"] = 1
@@ -2772,6 +2786,12 @@ def _is_case_dir(p):
     p = Path(p)
     return ((p / "getm.inp").is_file() or (p / "bathymetry.nc").is_file()
             or _is_gotm_result_dir(p) or _is_trusted_gotm_working_copy(p))
+
+
+def _is_app_case_shell(p):
+    """A new case created by the preprocessor, before inputs have been saved."""
+    p = Path(p)
+    return p.is_dir() and all((p / name / "README.txt").is_file() for name in _CASE_SUBDIRS)
 
 
 def _is_trusted_gotm_working_copy(path):
@@ -3063,7 +3083,8 @@ def list_cases():
             for d in case_root.iterdir():
                 has_proxy_manifest = (d / "proxy_engineering.json").is_file()
                 if d.is_dir() and ((d / "getm.inp").exists() or _is_gotm_result_dir(d)
-                                   or is_working_gotm(d) or has_proxy_manifest):
+                                   or is_working_gotm(d) or has_proxy_manifest
+                                   or _is_app_case_shell(d)):
                     key = str(d.resolve()).lower()
                     if key not in seen:
                         cases.append(_case_info(d, False))
@@ -3317,7 +3338,7 @@ def case_delete():
     protected = {BASE_DIR.resolve(), APP_DIR.resolve(), *_case_roots(), Path.home().resolve()}
     if p in protected or p.parent == p:
         return jsonify({"error": "非法目录"}), 400
-    if not p.is_dir() or not _is_case_dir(p):
+    if not p.is_dir() or not (_is_case_dir(p) or (_under_case_dir(p) and _is_app_case_shell(p))):
         return jsonify({"error": "目录不存在或不是有效案例"}), 400
     if not _under_case_dir(p):
         known = any(str(Path(x).resolve()).lower() == str(p).lower()
@@ -4258,6 +4279,8 @@ def run_start():
             return jsonify(success=False, error="请求体必须是 JSON 对象。"), 400
     if "compress_results" in run_request and type(run_request["compress_results"]) is not bool:
         return jsonify(success=False, error="compress_results 必须是布尔值。"), 400
+    if run_status == "running":
+        return jsonify({"success": False, "error": "模型正在运行中"}), 400
     compress_results = bool(run_request.get("compress_results", True))
     mpi_requested = bool(run_request.get("mpi", False))
     from core_plan import (case_requests_hotstart, detect_hardware, parse_core_count,
@@ -4321,8 +4344,6 @@ def run_start():
                     f" 进程数 {n} 超过本机逻辑核。单机可能过载；多节点请用 srun。")
             mpi_cpu_ceiling = max(n, int(capabilities.get("max_processes") or n))
             mpi_options = (launcher, solver, n, installation["runtime_dirs"])
-    if run_status == "running":
-        return jsonify({"success": False, "error": "模型正在运行中"}), 400
     active_is_native_gotm = (not (active_case_path / "getm.inp").is_file()
                              and (_is_gotm_result_dir(active_case_path)
                                   or _is_trusted_gotm_working_copy(active_case_path)))
@@ -4334,16 +4355,16 @@ def run_start():
         gotm_exe = active_case_path / "gotm_release.exe"
         if gotm_exe.is_symlink() or not gotm_exe.is_file() or gotm_exe.resolve().parent != active_case_path.resolve():
             return jsonify({"success": False, "error": "GOTM 工作副本缺少受校验的 gotm_release.exe；请从只读 reference 重新另存。"}), 400
-        if os.name != "nt":
-            return jsonify({"success": False, "error": "随附的 gotm_release.exe 需要 Windows 原生运行环境。"}), 400
-        if gotm_exe.read_bytes()[:2] != b"MZ":
-            return jsonify({"success": False, "error": "GOTM 工作副本的 gotm_release.exe 不是有效 Windows PE 文件；请从 reference 重新另存。"}), 400
         try:
             config = yaml.safe_load((active_case_path / "gotm.yaml").read_text(encoding="utf-8")) or {}
             times = config.get("time", {})
             start, stop, dt = _parse_gotm_time_interval(times)
         except Exception as exc:
             return jsonify({"success": False, "error": f"GOTM 时间配置无效: {exc}"}), 400
+        if os.name != "nt":
+            return jsonify({"success": False, "error": "随附的 gotm_release.exe 需要 Windows 原生运行环境。"}), 400
+        if gotm_exe.read_bytes()[:2] != b"MZ":
+            return jsonify({"success": False, "error": "GOTM 工作副本的 gotm_release.exe 不是有效 Windows PE 文件；请从 reference 重新另存。"}), 400
         try:
             (active_case_path / "output.nc").unlink(missing_ok=True)
         except OSError as exc:
@@ -4515,9 +4536,9 @@ def run_status_api():
 
 
 def _core_plan_payload():
-    from core_plan import (case_requests_hotstart, describe_plan, detect_hardware,
-                           hardware_fingerprint, heuristic_plan, read_case_grid,
-                           resolve_plan)
+    from core_plan import (case_requests_hotstart, compact_trials, describe_plan,
+                           detect_hardware, hardware_fingerprint, heuristic_plan,
+                           lookup_entry, read_case_grid, resolve_plan)
     from mpi_runner import windows_mpi_status
     hardware = detect_hardware()
     has_case = bool(active_case_path and (Path(active_case_path) / "getm.inp").is_file())
@@ -4535,11 +4556,13 @@ def _core_plan_payload():
                             cached=bool(choice), calibrating=status == "running")
     if windows_mpi.get("message"):
         summary = summary + windows_mpi["message"]
+    entry = lookup_entry(hardware, grid, solver_path, hotstart=hotstart) if has_case else None
     return {
         "hardware": hardware,
         "fingerprint": hardware_fingerprint(hardware),
         "grid": grid,
         "recommendation": recommendation,
+        "trials": compact_trials(entry),
         "cached": bool(choice),
         "calibrating": status == "running",
         "calibration_error": error,

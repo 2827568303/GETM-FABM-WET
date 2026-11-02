@@ -1,5 +1,6 @@
 """Shared, revision-checked bathymetry editor for browser and desktop clients."""
 import copy
+import hashlib
 import json
 import math
 import os
@@ -23,7 +24,22 @@ def register_grid_routes(app, context):
         return Path(context.active_case_path).resolve()
 
     def fingerprint(path):
-        return (path.stat().st_mtime_ns, path.stat().st_size) if path.exists() else None
+        # Size and mtime miss an in-place NetCDF rewrite that lands in the
+        # same timestamp (common on a 1-second clock). Hash the bytes too.
+        if not path.exists():
+            return None
+        stat = path.stat()
+        digest = hashlib.blake2s()
+        with path.open('rb') as handle:
+            if stat.st_size <= 8 * 1024 * 1024:
+                for block in iter(lambda: handle.read(1024 * 1024), b''):
+                    digest.update(block)
+            else:
+                digest.update(handle.read(256 * 1024))
+                tail = min(256 * 1024, stat.st_size)
+                handle.seek(max(0, stat.st_size - tail))
+                digest.update(handle.read(tail))
+        return (stat.st_mtime_ns, stat.st_size, digest.digest())
 
     def load(path):
         config = context.parse_getm_inp(path / 'getm.inp') if (path / 'getm.inp').exists() else {}

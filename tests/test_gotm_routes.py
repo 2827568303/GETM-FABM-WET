@@ -1,4 +1,5 @@
 import hashlib
+import os
 import sys
 import threading
 from pathlib import Path
@@ -77,8 +78,13 @@ def test_read_only_reference_cannot_start_and_working_copy_uses_local_release(tm
         def start(self): pass
     monkeypatch.setattr(threading,'Thread',Thread)
     result=client.post('/api/run/start',json={})
-    assert result.status_code==200,result.get_json()
-    assert spawned[0]['args']==(copy,copy/'gotm_release.exe')
+    if os.name != 'nt':
+        assert result.status_code==400, result.get_json()
+        assert 'Windows' in result.get_json()['error']
+        assert spawned == []
+    else:
+        assert result.status_code==200,result.get_json()
+        assert spawned[0]['args']==(copy,copy/'gotm_release.exe')
     server.run_status='idle'; server.run_thread=None; server.run_process=None; server.run_case_path=None
 
 

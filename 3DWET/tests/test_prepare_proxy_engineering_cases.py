@@ -15,7 +15,48 @@ prepare = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(prepare)
 
 
-def test_preparation_copies_only_traceable_sources_and_marks_blockers(tmp_path):
+def install_proxy_sources(tmp_path, monkeypatch):
+    """Point the preparer at a fixture Erken package and Ravn archive.
+
+    The historical packages live under gitignored ``build/`` and are not part
+    of the checkout. The fixture keeps the same file contract the preparer copies.
+    """
+    import json
+    import zipfile
+
+    import netCDF4 as nc
+
+    erken = tmp_path / "erken-source"
+    (erken / "Input").mkdir(parents=True)
+    for name, text in {
+        "fabm.yaml": "instances:\n  abiotic_water: {}\n  inorganic_carbon: {}\n  methane: {}\n",
+        "getm.inp": "&meteo\n metforcing = .false.\n/\n&domain\n river_method = 0\n/\n",
+        "getm_fabm.inp": "&fabm\n bio_model = 1\n/\n",
+        "gotm_fabm.yaml": "instances: {}\n",
+        "gotmturb.nml": "&turbulence\n /\n",
+        "meteo_input.txt": "meteo.nc\n",
+        "output.yaml": "output:\n  time_unit: hour\n  time_step: 1\n",
+        "initial_conditions.json": "{}\n",
+        "meteo_provenance.json": json.dumps({
+            "spatial": {"mode": "uniform_broadcast", "confirmed": False, "distance_km": 12}
+        }),
+        "rivers_setup.json": "{}\n",
+        "Input/Erken_TW_profile_2020-01-01_hourly.txt": "date temp\n",
+    }.items():
+        (erken / name).write_text(text, encoding="utf-8")
+    for name in ("bathymetry.nc", "fabm_init.nc", "meteo.nc"):
+        with nc.Dataset(erken / name, "w") as ds:
+            ds.createDimension("x", 1)
+            ds.createVariable("placeholder", "f4", ("x",))[:] = [1]
+    monkeypatch.setattr(prepare, "ERKEN_SOURCE", erken)
+    archive = tmp_path / "testcase_Lake_Ravn.zip"
+    with zipfile.ZipFile(archive, "w") as bundle:
+        bundle.writestr("readme.txt", "upstream ravn reference")
+    monkeypatch.setattr(prepare, "RAVN_ARCHIVE", archive)
+
+
+def test_preparation_copies_only_traceable_sources_and_marks_blockers(tmp_path, monkeypatch):
+    install_proxy_sources(tmp_path, monkeypatch)
     repo_root = Path(__file__).parents[2]
     output = tmp_path / "attempt"
     sources_before = {
@@ -62,7 +103,8 @@ def test_preparation_refuses_to_overwrite_existing_attempt(tmp_path):
     assert sorted(path.name for path in output.iterdir()) == ["keep.txt"]
 
 
-def test_erken_copy_is_independent_and_excludes_historical_outputs(tmp_path):
+def test_erken_copy_is_independent_and_excludes_historical_outputs(tmp_path, monkeypatch):
+    install_proxy_sources(tmp_path, monkeypatch)
     repo_root = Path(__file__).parents[2]
     output = tmp_path / "attempt"
     result = prepare.prepare_proxy_attempt(repo_root, output)
@@ -79,7 +121,8 @@ def test_erken_copy_is_independent_and_excludes_historical_outputs(tmp_path):
     assert all(item["role"] == "derived" for item in manifest["sources"])
 
 
-def test_active_erken_case_is_copied_to_new_storage_path(tmp_path):
+def test_active_erken_case_is_copied_to_new_storage_path(tmp_path, monkeypatch):
+    install_proxy_sources(tmp_path, monkeypatch)
     repo_root = Path(__file__).parents[2]
     output = tmp_path / "attempt"
     active = tmp_path / "cases" / "Engineering Proxy - Erken"
@@ -103,7 +146,8 @@ def test_active_erken_case_is_copied_to_new_storage_path(tmp_path):
         prepare.prepare_proxy_attempt(repo_root, tmp_path / "attempt2", active)
 
 
-def test_partial_ghg_off_case_removes_only_ghg_instances_and_keeps_provenance(tmp_path):
+def test_partial_ghg_off_case_removes_only_ghg_instances_and_keeps_provenance(tmp_path, monkeypatch):
+    install_proxy_sources(tmp_path, monkeypatch)
     repo_root = Path(__file__).parents[2]
     attempt = tmp_path / "attempt"
     active = tmp_path / "cases" / "Erken active"

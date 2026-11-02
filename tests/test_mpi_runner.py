@@ -228,7 +228,7 @@ def test_successful_run_calls_reserved_merge_hook(tmp_path):
     runtime = tmp_path / "app-runtime"
     ucrt = tmp_path / "ucrt64"
     runtime.mkdir(); ucrt.mkdir()
-    run = MpiRun(launcher=launcher, solver=solver, n=2, case=tmp_path,
+    run = MpiRun(launcher=launcher, solver=solver, n=2, case=tmp_path, cpu_count=4,
                  merger=lambda case, n: calls.append((case, n)) or "merged",
                  feature_enabled=True, runtime_dirs=[runtime, ucrt], popen=fake_popen)
     run.start()
@@ -263,7 +263,7 @@ def test_exit_zero_with_rank_fatal_never_calls_merger(tmp_path):
         def poll(self): return 0
         def wait(self, *args, **kwargs): return 0
 
-    run = MpiRun(launcher=launcher, solver=solver, n=2, case=tmp_path,
+    run = MpiRun(launcher=launcher, solver=solver, n=2, case=tmp_path, cpu_count=4,
                  merger=lambda *_: pytest.fail("merge must not run after rank fatal"),
                  feature_enabled=True, popen=lambda *a, **k: Process())
     run.start()
@@ -445,7 +445,7 @@ def test_exit_zero_with_rank_stdout_fatal_never_calls_merger(tmp_path):
         def poll(self): return 0
         def wait(self, *args, **kwargs): return 0
 
-    run = MpiRun(launcher=launcher, solver=solver, n=2, case=tmp_path,
+    run = MpiRun(launcher=launcher, solver=solver, n=2, case=tmp_path, cpu_count=4,
                  merger=lambda *_: pytest.fail("rank fatal must block merge"),
                  feature_enabled=True, popen=lambda *a, **k: Process())
     run.start()

@@ -9,7 +9,8 @@ const context=vm.createContext({state,document:{body:{classList:{toggle(){}}}},w
   $:id=>elements[id],api:async url=>{calls.push(url);return url==='/api/case/current'?data:{nwater:123};},
   syncQgisStatusBar(){},refreshCaseStatistics: value=>calls.push(['stats',value]),
   renderProxyCaseStatus: value=>calls.push(['proxy',value]),
-  loadDashboardSummary:()=>calls.push('dashboard'),loadVariables:()=>calls.push('variables')});
+  loadDashboardSummary:()=>calls.push('dashboard'),loadVariables:()=>calls.push('variables'),
+  loadCorePlan(){}, loadMpiRunCapabilities(){}, loadDashboardStaticPreview(){}, clearResultInventory(){}});
 const start=source.indexOf('async function restoreCurrentCase()');
 const end=source.indexOf('async function loadVariables()',start);
 vm.runInContext(source.slice(start,end),context);
