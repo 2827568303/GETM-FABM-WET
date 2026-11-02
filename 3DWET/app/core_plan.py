@@ -143,9 +143,8 @@ def _usable_parallel_solver(path):
 def solver_has_current_revision(path):
     """True when the binary was built from the sources that print this revision.
 
-    The packaged Windows parallel executable predates the current numerics.
-    Auto mode skips it until a rebuild contains this marker. An explicit MPI
-    choice can still launch it.
+    Auto mode skips a parallel solver until it contains this marker. An explicit
+    MPI choice can still launch an older executable.
     """
     path = Path(path)
     if not path.is_file():

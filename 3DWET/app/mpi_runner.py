@@ -194,6 +194,62 @@ def _packaged_model_root():
     return module_path.parents[1]
 
 
+SOLVER_REVISION = b"3DWET solver revision 20261102"
+
+
+def windows_mpi_status():
+    """Report the packaged Windows MPI solver, its revision, and the MS-MPI runtime.
+
+    Auto-selection uses the revision bytes. This host can launch that executable
+    only on Windows. A direct one-process start is allowed by MS-MPI; more than
+    one process needs the bundled mpiexec, which Wine cannot drive because smpd
+    fails to connect.
+    """
+    root = _packaged_model_root()
+    bin_dir = root / "bin"
+    mpi_dir = bin_dir / "mpi"
+    solver = bin_dir / "getm_cartesian_parallel.exe"
+    backups = sorted(path for path in bin_dir.glob("getm_cartesian_parallel_*.exe") if path.is_file())
+    size = solver.stat().st_size if solver.is_file() else None
+    current = False
+    if solver.is_file():
+        try:
+            current = SOLVER_REVISION in solver.read_bytes()
+        except OSError:
+            current = False
+    present = {
+        "msmpi_dll": (mpi_dir / "msmpi.dll").is_file(),
+        "mpiexec": (mpi_dir / "mpiexec.exe").is_file(),
+        "smpd": (mpi_dir / "smpd.exe").is_file(),
+    }
+    runtime_ready = all(present.values())
+    if current and runtime_ready and os.name == "nt":
+        message = (
+            f"Windows MPI 求解器是当前版本（{size} 字节），日志标记为 3DWET solver revision 20261102。"
+            "自动测定会把它算进去。单进程可以直接启动；多进程用 bin/mpi/mpiexec.exe，运行库 msmpi.dll 和 smpd.exe 已放在 bin/mpi，不必另装 MS-MPI。"
+        )
+    elif current and runtime_ready:
+        message = (
+            f"Windows MPI 求解器是当前版本（{size} 字节），日志标记为 3DWET solver revision 20261102。"
+            "在 Windows 上自动测定会把它算进去。单进程可以直接启动；多进程用 bin/mpi/mpiexec.exe。"
+            "这台机器不是 Windows。Wine 里 mpiexec 连不上 smpd（错误 1747），不能在这里做多进程。"
+        )
+    elif solver.is_file():
+        message = "找到的 Windows 并行程序不是当前源码，自动测定会跳过它。上一份程序仍留在旁边，没有删除。"
+    else:
+        message = "没有找到 Windows MPI 求解器 getm_cartesian_parallel.exe。"
+    return {
+        "solver": str(solver),
+        "size": size,
+        "revision_current": current,
+        "backup": str(backups[0]) if backups else None,
+        "host_can_launch": os.name == "nt",
+        "runtime_ready": runtime_ready,
+        **present,
+        "message": message,
+    }
+
+
 def discover_mpi_installation():
     """Resolve configured MPI binaries, preferring explicit paths then packaged files."""
     app_root = _packaged_model_root()

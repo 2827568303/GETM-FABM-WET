@@ -15,7 +15,7 @@ from mpi_runner import (MpiRun, discover_mpi_installation, merge_case_rank_outpu
                         mpi_dimensions_for_counts, mpi_process_counts_for_grid,
                         mpi_hotstart_error, prepare_mpi_case,
                         recommended_process_count, stop_process_tree,
-                        validate_process_count)
+                        validate_process_count, windows_mpi_status)
 
 
 def test_process_count_is_bounded_by_logical_cpu_count():
@@ -402,6 +402,36 @@ def test_mixed_empty_and_nonempty_rank_family_is_rejected(tmp_path, monkeypatch)
                 var[:] = [0.0]
     with pytest.raises(RuntimeError, match="inconsistent empty/non-empty"):
         merge_case_rank_outputs(tmp_path, 2)
+
+
+def test_windows_mpi_status_accepts_the_revision_marker_and_bundled_runtime(tmp_path, monkeypatch):
+    bin_dir = tmp_path / "bin"
+    mpi = bin_dir / "mpi"
+    mpi.mkdir(parents=True)
+    (bin_dir / "getm_cartesian_parallel.exe").write_bytes(b"xx3DWET solver revision 20261102yy")
+    (bin_dir / "getm_cartesian_parallel_prev.exe").write_bytes(b"old")
+    for name in ("msmpi.dll", "mpiexec.exe", "smpd.exe"):
+        (mpi / name).write_bytes(b"x")
+    monkeypatch.setattr("mpi_runner._packaged_model_root", lambda: tmp_path)
+    status = windows_mpi_status()
+    assert status["revision_current"] is True
+    assert status["runtime_ready"] is True
+    assert status["size"] == len(b"xx3DWET solver revision 20261102yy")
+    assert status["backup"].endswith("getm_cartesian_parallel_prev.exe")
+    assert "当前版本" in status["message"]
+    if os.name != "nt":
+        assert "Wine" in status["message"]
+        assert status["host_can_launch"] is False
+
+
+def test_windows_mpi_status_skips_a_solver_without_the_revision(tmp_path, monkeypatch):
+    bin_dir = tmp_path / "bin"
+    (bin_dir / "mpi").mkdir(parents=True)
+    (bin_dir / "getm_cartesian_parallel.exe").write_bytes(b"old solver")
+    monkeypatch.setattr("mpi_runner._packaged_model_root", lambda: tmp_path)
+    status = windows_mpi_status()
+    assert status["revision_current"] is False
+    assert "不是当前源码" in status["message"]
 
 
 def test_exit_zero_with_rank_stdout_fatal_never_calls_merger(tmp_path):

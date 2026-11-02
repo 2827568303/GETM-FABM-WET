@@ -4518,6 +4518,7 @@ def _core_plan_payload():
     from core_plan import (case_requests_hotstart, describe_plan, detect_hardware,
                            hardware_fingerprint, heuristic_plan, read_case_grid,
                            resolve_plan)
+    from mpi_runner import windows_mpi_status
     hardware = detect_hardware()
     has_case = bool(active_case_path and (Path(active_case_path) / "getm.inp").is_file())
     grid = read_case_grid(active_case_path) if has_case else {}
@@ -4529,6 +4530,11 @@ def _core_plan_payload():
     with _core_calibration_lock:
         status = _core_calibration.get("status")
         error = _core_calibration.get("error")
+    windows_mpi = windows_mpi_status()
+    summary = describe_plan(hardware, grid, recommendation,
+                            cached=bool(choice), calibrating=status == "running")
+    if windows_mpi.get("message"):
+        summary = summary + windows_mpi["message"]
     return {
         "hardware": hardware,
         "fingerprint": hardware_fingerprint(hardware),
@@ -4538,8 +4544,8 @@ def _core_plan_payload():
         "calibrating": status == "running",
         "calibration_error": error,
         "can_calibrate": has_case and solver_path.is_file(),
-        "summary": describe_plan(hardware, grid, recommendation,
-                                 cached=bool(choice), calibrating=status == "running"),
+        "windows_mpi": windows_mpi,
+        "summary": summary,
     }
 
 
