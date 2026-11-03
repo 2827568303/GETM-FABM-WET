@@ -155,6 +155,20 @@ function toast(msg, type='info') {
     $('toast-container').appendChild(t);
     setTimeout(() => t.remove(), 3000);
 }
+function serverOfflineMessage() {
+    return '无法连接本机 3DWET 服务。请查看 %LOCALAPPDATA%\\3DWET\\logs\\launcher.log，然后从开始菜单重新打开 3DWET。';
+}
+function showServerOffline(message) {
+    let banner = document.getElementById('server-offline-banner');
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'server-offline-banner';
+        banner.setAttribute('role', 'alert');
+        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:100000;background:#7f1d1d;color:#fff;padding:12px 16px;font-size:14px;line-height:1.45;';
+        document.body.appendChild(banner);
+    }
+    banner.textContent = message || serverOfflineMessage();
+}
 function closeModal(id) { $(id).classList.remove('active'); }
 function showModal(id) { $(id).classList.add('active'); }
 
@@ -190,7 +204,9 @@ async function api(url, opts={}) {
             }
         };
         xhr.onerror = function() {
-            finish({error: 'Network error (XHR) - cannot connect to server'});
+            const message = serverOfflineMessage();
+            showServerOffline(message);
+            finish({error: message, offline: true});
         };
         xhr.ontimeout = function() {
             finish({error: 'Request timeout'});
@@ -284,7 +300,12 @@ async function loadCases() {
     const cases = await api('/api/cases');
     const tbody = $('case-table').querySelector('tbody');
     tbody.innerHTML = '';
-    if (cases.error) { tbody.innerHTML = `<tr><td colspan="8">[XHR_DEBUG] ${cases.error}</td></tr>`; return; }
+    if (!cases || cases.error || !Array.isArray(cases)) {
+        const message = (cases && cases.error) || '案例列表不可用';
+        if (cases && cases.offline) showServerOffline(message);
+        tbody.innerHTML = `<tr><td colspan="8">${escapeHtml(message)}</td></tr>`;
+        return;
+    }
     state.cases = cases;
     const activePath = (state.activeCasePath || '').toLowerCase();
     cases.forEach((c, idx) => {
@@ -574,41 +595,111 @@ async function dirBrowserUse() {
     await openCaseByPath();
 }
 
+async function chooseDesktopFolder(start) {
+    const bridge = window.pywebview && window.pywebview.api && window.pywebview.api.pick_folder;
+    if (bridge) {
+        try {
+            const chosen = await window.pywebview.api.pick_folder(start || '');
+            if (chosen && typeof chosen === 'object') return chosen;
+            const path = typeof chosen === 'string' ? chosen : '';
+            return {path, error: '', cancelled: !path, done: true};
+        } catch (error) {
+            return {path: '', error: String(error && error.message || error), cancelled: false, done: true};
+        }
+    }
+    const launched = await api('/api/system/pick_folder', {method:'POST', body:{start_dir: start || ''}});
+    if (launched.error || launched.offline) {
+        return {path: '', error: launched.error || serverOfflineMessage(), cancelled: false, done: true};
+    }
+    const deadline = Date.now() + 120000;
+    while (Date.now() < deadline) {
+        await new Promise(resolve => setTimeout(resolve, 400));
+        const result = await api('/api/system/pick_folder_result');
+        if (result.offline) return {path: '', error: result.error, cancelled: false, done: true};
+        if (result.done) return result;
+    }
+    return {path: '', error: '等待文件夹窗口超时。可改用「浏览目录」。', cancelled: false, done: true};
+}
+window.chooseDesktopFolder = chooseDesktopFolder;
+
 async function pickCaseFolder(fixedPath) {
     const statusEl = $('pick-folder-status');
     const input = $('open-case-path');
     const start = fixedPath || input.value.trim() || state.activeCasePath || '';
-    if (statusEl) { statusEl.style.display = 'block'; statusEl.innerHTML = '<span>正在启动文件夹选择窗口…</span>'; }
-    const r = await api('/api/system/pick_folder', {method:'POST', body:{start_dir: start}});
-    if (r.error) { if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger)">${r.error}</span>`; return; }
-    if (statusEl) statusEl.innerHTML = '<span style="color:var(--info)">请在弹出的「浏览文件夹」窗口中选择案例目录，然后点【确定】…</span>';
+    if (statusEl) { statusEl.style.display = 'block'; statusEl.innerHTML = '<span>正在打开文件夹窗口…</span>'; }
     clearInterval(_pickTimer);
-    const deadline = Date.now() + 120000;
-    _pickTimer = setInterval(async () => {
-        const res = await api('/api/system/pick_folder_result');
-        if (res.error) {
-            clearInterval(_pickTimer);
-            if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger)">${res.error}</span>`;
-            return;
-        }
-        if (!res.done) {
-            if (Date.now() > deadline) {
-                clearInterval(_pickTimer);
-                if (statusEl) statusEl.innerHTML =
-                    '<span style="color:var(--warning)">没有检测到弹出的选择窗口（可能是浏览器环境限制）。' +
-                    '请改用右侧「<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg> 浏览目录」，在页面内逐级选择案例目录，功能完全一致。</span>';
-            }
-            return;
-        }
-        clearInterval(_pickTimer);
-        if (!res.path) {
-            if (statusEl) statusEl.innerHTML = '<span style="color:var(--text-muted)">已取消（未选择目录）</span>';
-            return;
-        }
-        if (statusEl) statusEl.innerHTML = `<span style="color:var(--success)">已选择：${res.path}</span>`;
-        input.value = res.path;
-        await openCaseByPath();
-    }, 600);
+    const result = await chooseDesktopFolder(start);
+    if (result.error && !result.path) {
+        if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger)">${escapeHtml(result.error)}</span>`;
+        return;
+    }
+    if (!result.path) {
+        if (statusEl) statusEl.innerHTML = '<span style="color:var(--text-muted)">已取消（未选择目录）</span>';
+        return;
+    }
+    if (statusEl) statusEl.innerHTML = `<span style="color:var(--success)">已选择：${escapeHtml(result.path)}</span>`;
+    input.value = result.path;
+    await openCaseByPath();
+}
+
+async function browseSaveAsDest() {
+    const input = $('save-as-dest');
+    const result = await chooseDesktopFolder(input && input.value.trim());
+    if (result && result.path && input) input.value = result.path;
+    else if (result && result.error) toast(result.error, 'error');
+}
+
+let _caseScanTimer = null;
+function renderCaseScan(state) {
+    const status = $('case-scan-status');
+    const host = $('case-scan-results');
+    const cancel = $('case-scan-cancel');
+    if (!status || !host) return;
+    if (cancel) cancel.hidden = !(state && state.running);
+    if (!state) { status.textContent = ''; return; }
+    const count = (state.found || []).length;
+    if (state.error) status.textContent = state.error;
+    else if (state.running) status.textContent = `正在扫描 ${state.current || ''}（已找到 ${count} 个，${state.progress || 0}%）`;
+    else status.textContent = state.cancelled
+        ? `已取消。找到 ${count} 个案例。扫描只在本机进行，不会上传路径。`
+        : `扫描完成，找到 ${count} 个案例。扫描只在本机进行，不会上传路径。`;
+    host.innerHTML = (state.found || []).map(item =>
+        `<div style="display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap;">
+            <span style="flex:1;min-width:220px;word-break:break-all;">${escapeHtml(item.path)}</span>
+            <button class="btn btn-sm" type="button" data-scan-add="${escapeAttr(item.path)}">加入列表</button>
+            <button class="btn btn-sm btn-primary" type="button" data-scan-load="${escapeAttr(item.path)}">加载</button>
+        </div>`).join('');
+    host.querySelectorAll('[data-scan-add]').forEach(button => button.addEventListener('click', () => registerScannedCase(button.dataset.scanAdd)));
+    host.querySelectorAll('[data-scan-load]').forEach(button => button.addEventListener('click', () => loadExternalCase(button.dataset.scanLoad)));
+}
+async function registerScannedCase(path) {
+    const result = await api('/api/cases/register', {method:'POST', body:{path}});
+    if (result.error) { toast(result.error, 'error'); return; }
+    toast('已加入案例列表', 'success');
+    loadCases();
+}
+async function pollCaseScan() {
+    const state = await api('/api/cases/scan');
+    if (state.offline) return;
+    renderCaseScan(state);
+    if (state.running) _caseScanTimer = setTimeout(pollCaseScan, 700);
+}
+async function startCaseScan() {
+    clearTimeout(_caseScanTimer);
+    const status = $('case-scan-status');
+    if (status) status.textContent = '开始扫描本机案例…';
+    const state = await api('/api/cases/scan', {method:'POST', body:{}});
+    if (state.error && state.offline) { showServerOffline(state.error); return; }
+    renderCaseScan(state);
+    if (!state.done) pollCaseScan();
+}
+async function cancelCaseScan() {
+    const state = await api('/api/cases/scan/cancel', {method:'POST', body:{}});
+    renderCaseScan(state);
+}
+async function maybeAutoScanCases() {
+    const boot = await api('/api/cases/scan/bootstrap');
+    if (boot && boot.auto && !boot.offline) startCaseScan();
 }
 
 async function exploreCasePath(path) {
@@ -5333,6 +5424,7 @@ window.addEventListener('load', () => {
     ensureViz3dVolumePresetCompatibility();
     refreshScientificTerms();
     loadCases();
+    maybeAutoScanCases();
     const pending=(async()=>{
         if(await restoreCurrentCase())await loadVariables();
         else $('stat-water').textContent='-';

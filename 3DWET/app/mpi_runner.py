@@ -359,7 +359,6 @@ def merge_case_rank_outputs(case, n, *, reference_name="bathymetry.nc"):
     coverage. A case is not publishable if any family fails to merge.
     """
     import sys
-    from netCDF4 import Dataset
     case = Path(case)
     reference = case / reference_name
     if not reference.is_file():
@@ -374,13 +373,22 @@ def merge_case_rank_outputs(case, n, *, reference_name="bathymetry.nc"):
     if str(scripts) not in sys.path:
         sys.path.insert(0, str(scripts))
     from merge_getm_rank_outputs import merge_rank_outputs
+    from netcdf_io import open_dataset
     families = {}
-    for path in case.glob("*.????.nc"):
+    names = []
+    try:
+        entries = list(case.iterdir())
+    except OSError as exc:
+        raise RuntimeError(f"MPI work directory cannot be listed: {case}: {exc}") from exc
+    for path in entries:
+        names.append(path.name)
         match = re.fullmatch(r"(.+)\.(\d{4})\.nc", path.name)
-        if match:
+        if match and path.is_file():
             families.setdefault(match.group(1), []).append(path)
     if not families:
-        raise RuntimeError("MPI run produced no rank output shards")
+        shown = ", ".join(sorted(names)[:40]) or "(empty)"
+        raise RuntimeError(
+            f"MPI run produced no rank output shards in {case}. Directory names: {shown}")
     merged = []
     for stem, shards in sorted(families.items()):
         ranks = {int(p.stem.rsplit(".", 1)[1]) for p in shards}
@@ -388,10 +396,16 @@ def merge_case_rank_outputs(case, n, *, reference_name="bathymetry.nc"):
             raise RuntimeError(f"Incomplete rank family {stem}: found {sorted(ranks)}, expected 0..{n-1}")
         lengths = []
         for shard in shards:
-            with Dataset(shard) as ds:
-                if "time" not in ds.dimensions:
-                    raise RuntimeError(f"Rank output has no time dimension: {shard.name}")
-                lengths.append(len(ds.dimensions["time"]))
+            try:
+                with open_dataset(shard) as ds:
+                    if "time" not in ds.dimensions:
+                        raise RuntimeError(f"Rank output has no time dimension: {shard.name}")
+                    lengths.append(len(ds.dimensions["time"]))
+            except OSError as exc:
+                if shard.is_file():
+                    raise RuntimeError(
+                        f"NetCDF 无法按系统代码页打开已存在的分片 {shard}: {exc}") from exc
+                raise
         if all(length == 0 for length in lengths):
             continue
         if any(length == 0 for length in lengths):
@@ -647,6 +661,7 @@ class MpiRun:
         self.popen = popen
         self.process = None
         self._log = None
+        self._solver_link = None
         self._lock = threading.Lock()
 
     def start(self):
@@ -654,6 +669,9 @@ class MpiRun:
             if self.process is not None and self.process.poll() is None:
                 raise RuntimeError("MPI run already active")
             self.case.mkdir(parents=True, exist_ok=True)
+            from netcdf_io import prepare_solver_cwd, release_solver_cwd
+            cwd, link = prepare_solver_cwd(self.case)
+            self._solver_link = link
             self._log = (self.case / "model_run.log").open("w", encoding="utf-8", errors="replace")
             # Keep the model's packaged DLLs first and the MPI runtime next.
             env = solver_environment(self.solver, threads=self.omp_threads)
@@ -676,23 +694,40 @@ class MpiRun:
             seen = {os.path.normcase(os.path.normpath(p)) for p in configured}
             ambient = [p for p in paths if os.path.normcase(os.path.normpath(p)) not in seen]
             env["PATH"] = os.pathsep.join(configured + ambient)
-            kwargs = {"cwd": str(self.case), "stdout": self._log,
+            kwargs = {"cwd": cwd, "stdout": self._log,
                       "stderr": subprocess.STDOUT, "env": env}
             if os.name == "nt":
                 kwargs["creationflags"] = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
             else:
                 kwargs["start_new_session"] = True
-            self.process = self.popen(mpi_command(self.launcher, self.solver, self.n), **kwargs)
+            try:
+                self.process = self.popen(mpi_command(self.launcher, self.solver, self.n), **kwargs)
+            except Exception:
+                release_solver_cwd(self._solver_link)
+                self._solver_link = None
+                raise
             return self.process
 
     def stop(self):
         if self.process is not None:
             stop_process_tree(self.process)
 
+    def release_workdir(self):
+        """Drop an ASCII junction created for a non-ACP working directory."""
+        from netcdf_io import release_solver_cwd
+        release_solver_cwd(getattr(self, "_solver_link", None))
+        self._solver_link = None
+
     def finish(self):
         """Report solver diagnostics before handling launcher exit status."""
         if self.process is None:
             raise RuntimeError("MPI run was not started")
+        try:
+            return self._finish_solver()
+        finally:
+            self.release_workdir()
+
+    def _finish_solver(self):
         code = self.process.wait()
         if self._log:
             self._log.flush()

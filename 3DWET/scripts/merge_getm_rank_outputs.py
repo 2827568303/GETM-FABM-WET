@@ -4,10 +4,9 @@ Geographic shards are placed with lonc/latc. Cartesian GETM writes only the
 1D xc/yc axes; those are placed on the reference xc/yc or bathymetry x/y.
 """
 from __future__ import annotations
-import argparse, os, tempfile
+import argparse, os, sys, tempfile
 from pathlib import Path
 import numpy as np
-from netCDF4 import Dataset
 
 DEFAULT_MERGE_MEMORY_BUDGET_BYTES = 128 * 1024 * 1024
 
@@ -86,10 +85,32 @@ def _spatial_tiles(nx, ny, max_cells):
             yield y0, min(ny, y0 + height), x0, min(nx, x0 + width)
 
 
+def _open_rank_dataset(path, mode='r', **kwargs):
+    """Open a rank file with the Windows ANSI code page NetCDF expects."""
+    app = Path(__file__).resolve().parents[1] / 'app'
+    if str(app) not in sys.path:
+        sys.path.insert(0, str(app))
+    from netcdf_io import open_dataset
+    return open_dataset(path, mode, **kwargs)
+
+
 def merge_rank_outputs(shards, reference, destination, *, atol=1e-5,
                        time_chunk_records=8,
                        max_chunk_bytes=DEFAULT_MERGE_MEMORY_BUDGET_BYTES):
     """Merge rank files with bounded temporal and spatial working arrays."""
+    app = Path(__file__).resolve().parents[1] / 'app'
+    if str(app) not in sys.path:
+        sys.path.insert(0, str(app))
+    from netcdf_io import NETCDF_LOCK
+    with NETCDF_LOCK:
+        return _merge_rank_outputs_body(
+            shards, reference, destination, atol=atol,
+            time_chunk_records=time_chunk_records, max_chunk_bytes=max_chunk_bytes)
+
+
+def _merge_rank_outputs_body(shards, reference, destination, *, atol=1e-5,
+                             time_chunk_records=8,
+                             max_chunk_bytes=DEFAULT_MERGE_MEMORY_BUDGET_BYTES):
     shards = sorted(map(Path, shards))
     reference, destination = Path(reference), Path(destination)
     if isinstance(time_chunk_records, bool) or int(time_chunk_records) < 1:
@@ -106,8 +127,8 @@ def merge_rank_outputs(shards, reference, destination, *, atol=1e-5,
     tmp = None
     sources = []
     try:
-        with Dataset(reference) as ref:
-            sources = [Dataset(path) for path in shards]
+        with _open_rank_dataset(reference) as ref:
+            sources = [_open_rank_dataset(path) for path in shards]
             first = sources[0]
             schema = {n: (v.dimensions, str(v.dtype), tuple(v.shape), v.ncattrs())
                       for n, v in first.variables.items()}
@@ -191,7 +212,7 @@ def merge_rank_outputs(shards, reference, destination, *, atol=1e-5,
             fd, tmpname = tempfile.mkstemp(prefix=f'.{destination.name}.', suffix='.tmp', dir=destination.parent)
             os.close(fd)
             tmp = Path(tmpname)
-            with Dataset(tmp, 'w', format=model) as result:
+            with _open_rank_dataset(tmp, 'w', format=model) as result:
                 for n, value in globals_.items():
                     result.setncattr(n, value)
                 for n, d in first.dimensions.items():

@@ -171,9 +171,9 @@ def read_case_grid(case_path):
     bathy = case / "bathymetry.nc"
     if bathy.is_file():
         try:
-            from netCDF4 import Dataset
+            from netcdf_io import locked_dataset
             import numpy as np
-            with Dataset(bathy) as ds:
+            with locked_dataset(bathy) as ds:
                 values = np.asarray(ds.variables["bathymetry"][:])
             grid["ny"], grid["nx"] = int(values.shape[-2]), int(values.shape[-1])
             grid["wet_columns"] = int((values > 0).sum())

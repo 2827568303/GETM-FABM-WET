@@ -13,6 +13,8 @@ PY_URL="https://www.python.org/ftp/python/${PY_VER}/python-${PY_VER}-embed-amd64
 PY_SHA256="0d57bb6cb078b74d23dbfe91f77d6780d45bed328911609f1f7ee2ba1606bf44"
 INNO_URL="https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe"
 INNO_SHA256="9c73c3bae7ed48d44112a0f48e66742c00090bdb5bef71d9d3c056c66e97b732"
+WEBVIEW2_URL="https://go.microsoft.com/fwlink/p/?LinkId=2124703"
+WEBVIEW2_SHA256="00c6e5a7413c37753bb92e176539dbf691a101846a622e00a9faec3f23e2816b"
 WORK="${WET_INSTALLER_WORK:-/tmp/3dwet-installer-build}"
 CACHE="${WET_INSTALLER_CACHE:-${WORK}/cache}"
 STAGE="${WORK}/stage"
@@ -102,20 +104,33 @@ stage_wheels() {
     --python-version 3.12 --platform win_amd64 --implementation cp \
     --only-binary=:all: \
     -r "$LOCK"
+  # proxy_tools publishes only an sdist. It is installed after the lock file
+  # so the lock itself can stay --only-binary.
+  python3 -m pip install --disable-pip-version-check --no-compile --no-deps \
+    --no-index --find-links "$wheelhouse" \
+    --target "$site" \
+    proxy_tools==0.1.0
 }
 
 download_wheels() {
   local wheelhouse="$1"
   mkdir -p "$wheelhouse"
-  if [[ -n "$(find "$wheelhouse" -name '*.whl' -print -quit)" ]]; then
+  local pywebview="$wheelhouse/pywebview-6.2.1-py3-none-any.whl"
+  local proxy="$wheelhouse/proxy_tools-0.1.0-py3-none-any.whl"
+  if [[ ! -f "$pywebview" ]]; then
+    log "download Windows wheels"
+    python3 -m pip download -d "$wheelhouse" --no-deps \
+      --python-version 3.12 --platform win_amd64 --implementation cp \
+      --only-binary=:all: \
+      -r "$LOCK"
+  else
     log "using cached wheels in ${wheelhouse}"
-    return
   fi
-  log "download Windows wheels"
-  python3 -m pip download -d "$wheelhouse" \
-    --python-version 3.12 --platform win_amd64 --implementation cp \
-    --only-binary=:all: \
-    -r "$LOCK"
+  if [[ ! -f "$proxy" ]]; then
+    log "build proxy_tools wheel (no upstream Windows wheel)"
+    python3 -m pip wheel -w "$wheelhouse" --no-deps proxy_tools==0.1.0
+  fi
+  [[ -f "$pywebview" && -f "$proxy" ]] || die "pywebview or proxy_tools wheel is missing"
 }
 
 copy_tree() {
@@ -166,7 +181,7 @@ shutil.copy2(app_src / "static" / "brand" / "3dwet.ico", stage / "3dwet.ico")
         "set \"PYTHONUNBUFFERED=1\"\r\n"
         "set \"PYTHONLEGACYWINDOWSSTDIO=1\"\r\n"
         "set \"PATH=%~dp03DWET\\bin\\mpi;%~dp03DWET\\bin\\runtime;%~dp03DWET\\bin;%~dp0python;%PATH%\"\r\n"
-        "\"%~dp0python\\python.exe\" \"%~dp03DWET\\app\\launcher.py\" --web %*\r\n"
+        "\"%~dp0python\\pythonw.exe\" \"%~dp03DWET\\app\\launcher.py\" %*\r\n"
         "endlocal\r\n"
     ).encode("ascii")
 )
@@ -177,9 +192,13 @@ notice.write_text(
         "",
         "Embedded CPython 3.12.7 (x64 embeddable package, PSF license: python\\LICENSE.txt).",
         "Python packages: scripts/installer/requirements-win.lock (NumPy pinned to 1.26.4).",
-        "pywebview is not bundled. The shortcut runs launcher.py --web and opens the browser.",
+        "pywebview is bundled. 3DWET.cmd runs pythonw.exe with no --web flag.",
+        "The shortcut opens a WebView2 window after /api/system/health responds.",
+        "MicrosoftEdgeWebview2Setup.exe is the Evergreen bootstrapper. The launcher",
+        "runs it /silent /install only when the WebView2 runtime is not registered.",
         "pyabc is not bundled. Calibration uses the SciPy fallback already in the app.",
-        "The folder dialog falls back to Windows PowerShell when tkinter is absent.",
+        "Folder dialogs use WebView2 or SHBrowseForFolder on an STA thread.",
+        "Logs: %LOCALAPPDATA%\\3DWET\\logs\\launcher.log",
         "",
         "Solvers, all under 3DWET\\bin:",
         "  getm_cartesian.exe           OpenMP",
@@ -243,6 +262,19 @@ smoke_install() {
   local app
   app="$(dirname "$(dirname "$python")")"
   log "installed at ${app}"
+  export DISPLAY="${DISPLAY:-:1}"
+  local cmd="${app}/3DWET.cmd"
+  grep -q 'pythonw.exe' "$cmd" || die "shortcut does not use pythonw.exe"
+  if grep -q -- '--web' "$cmd"; then
+    die "shortcut still passes --web"
+  fi
+  [[ -f "${app}/MicrosoftEdgeWebview2Setup.exe" ]] || die "WebView2 bootstrapper was not installed"
+  [[ -f "${app}/python/pythonw.exe" ]] || die "pythonw.exe is missing from the embeddable runtime"
+  [[ -f "${app}/python/Lib/site-packages/webview/__init__.py" ]] || die "pywebview was not installed"
+  [[ -f "${app}/3DWET/bin/mpi/mpiexec.exe" ]] || die "bundled MS-MPI runtime is missing"
+  if ! find "${app}/python/Lib/site-packages" -iname 'proxy_tools*' -print -quit | grep -q .; then
+    die "proxy_tools was not installed"
+  fi
   if find "$app" -iname '*efdc*' -print -quit | grep -q .; then
     die "the install contains an EFDC file"
   fi
@@ -254,6 +286,11 @@ smoke_install() {
     PYTHONLEGACYWINDOWSSTDIO=1 PYTHONUNBUFFERED=1 WINE_CONSOLE_TIMEOUT=180 \
     wine_console - wine "$win_py" -c "import flask,numpy,scipy,netCDF4,yaml,shapefile,pyproj,psutil,waitress,openpyxl; print('numpy', numpy.__version__)" \
     || die "embedded Python could not import the server dependencies"
+  if ! WINEPREFIX="$WINEPREFIX" WINEDEBUG="${WINEDEBUG:--all}" \
+      PYTHONLEGACYWINDOWSSTDIO=1 PYTHONUNBUFFERED=1 WINE_CONSOLE_TIMEOUT=90 \
+      wine_console - wine "$win_py" -c "import webview; print('webview ok')"; then
+    log "webview import did not finish under Wine; the package files are still installed"
+  fi
   unset WINE_CONSOLE_TIMEOUT
   local port="${WET_INSTALLER_PORT:-18766}"
   local log_file="${WORK}/smoke-server.log"
@@ -308,8 +345,48 @@ if 'value="triangles"' in html or "value='triangles'" in html:
 plan = json.load(urllib.request.urlopen(f"http://127.0.0.1:{port}/api/run/core-plan", timeout=60))
 if not isinstance(plan, dict) or "hardware" not in plan:
     raise SystemExit(f"core-plan payload missing hardware: {sorted(plan)[:12]}")
+health = json.load(urllib.request.urlopen(f"http://127.0.0.1:{port}/api/system/health", timeout=30))
+if not health.get("ready"):
+    raise SystemExit(f"health is not ready: {health}")
+cases = json.load(urllib.request.urlopen(f"http://127.0.0.1:{port}/api/cases", timeout=30))
+if isinstance(cases, dict) and cases.get("error"):
+    raise SystemExit(f"cases failed: {cases}")
+if not isinstance(cases, list):
+    raise SystemExit(f"cases payload is not a list: {type(cases).__name__}")
+scan = json.load(urllib.request.urlopen(
+    urllib.request.Request(f"http://127.0.0.1:{port}/api/cases/scan", data=b"{}",
+                           headers={"Content-Type": "application/json"}), timeout=30))
+if not isinstance(scan, dict) or "found" not in scan:
+    raise SystemExit(f"scan did not start: {scan}")
 print("core-plan keys", ",".join(sorted(plan)))
+print("cases", len(cases), "scan", scan.get("running"), scan.get("done"))
 PY
+  python3 - "$port" <<'PY' &
+import json, sys, urllib.request
+port = sys.argv[1]
+request = urllib.request.Request(
+    f"http://127.0.0.1:{port}/api/system/pick_folder",
+    data=json.dumps({"start_dir": "C:\\\\"}).encode("utf-8"),
+    headers={"Content-Type": "application/json"})
+with urllib.request.urlopen(request, timeout=30) as response:
+    print(response.read().decode("utf-8", "replace"))
+PY
+  local dialog_ok=0
+  if command -v xdotool >/dev/null; then
+    for _ in $(seq 1 30); do
+      if xdotool search --name "3DWET" >/dev/null 2>&1; then
+        dialog_ok=1
+        xdotool search --name "3DWET" windowkill >/dev/null 2>&1 || true
+        break
+      fi
+      sleep 0.5
+    done
+  fi
+  if [[ "$dialog_ok" != 1 ]]; then
+    cleanup_server
+    die "folder dialog did not appear (looked for a window titled 3DWET)"
+  fi
+  log "folder dialog window appeared"
   cleanup_server
   smoke_solver "$app" || die "1-day NativeTest did not finish"
   log "silent uninstall"
@@ -447,6 +524,8 @@ main() {
   stage_wheels "${STAGE}/python/Lib/site-packages" "${CACHE}/wheels"
   log "stage 3DWET"
   copy_tree
+  fetch "$WEBVIEW2_URL" "${CACHE}/MicrosoftEdgeWebview2Setup.exe" "$WEBVIEW2_SHA256"
+  cp "${CACHE}/MicrosoftEdgeWebview2Setup.exe" "${STAGE}/MicrosoftEdgeWebview2Setup.exe"
   local iscc
   iscc="$(ensure_inno)"
   compile_installer "$iscc"

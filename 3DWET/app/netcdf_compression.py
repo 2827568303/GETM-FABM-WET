@@ -12,6 +12,13 @@ import math
 import numpy as np
 from netCDF4 import Dataset
 
+from netcdf_io import filename_encoding, native_equivalent
+
+
+def _native_nc(path, mode, **kwargs):
+    kwargs.setdefault("encoding", filename_encoding())
+    return Dataset(os.fspath(native_equivalent(path)), mode, **kwargs)
+
 
 _CLASSIC_MODELS = {"NETCDF3_CLASSIC", "NETCDF3_64BIT_OFFSET", "NETCDF4_CLASSIC"}
 _TARGET_CHUNK_BYTES = 1024 * 1024
@@ -177,7 +184,7 @@ def _copy_dataset(source, destination, *, lock, cancelled):
     src = dst = None
     try:
         with _guard(lock):
-            src = Dataset(str(source), "r")
+            src = _native_nc(source, "r")
             if src.data_model not in _CLASSIC_MODELS:
                 return "unsupported", f"source format {src.data_model} is not classic"
             globals_ = {name: src.getncattr(name) for name in src.ncattrs()}
@@ -194,7 +201,7 @@ def _copy_dataset(source, destination, *, lock, cancelled):
                     "dtype": var.dtype,
                     "attributes": {attr: var.getncattr(attr) for attr in var.ncattrs()},
                 }
-            dst = Dataset(str(destination), "w", format="NETCDF4_CLASSIC")
+            dst = _native_nc(destination, "w", format="NETCDF4_CLASSIC")
             for name, value in globals_.items():
                 dst.setncattr(name, value)
             for name, length, unlimited in dimensions:
@@ -241,7 +248,8 @@ def _verify_dataset(source, destination, *, lock, cancelled):
     src = dst = None
     try:
         with _guard(lock):
-            src, dst = Dataset(str(source), "r"), Dataset(str(destination), "r")
+            src = _native_nc(source, "r")
+            dst = _native_nc(destination, "r")
             if dst.data_model != "NETCDF4_CLASSIC":
                 raise ValueError("compressed file is not NETCDF4_CLASSIC")
             if list(src.dimensions) != list(dst.dimensions):

@@ -250,6 +250,16 @@
 
   async function pickDirectory() {
     const start = ($('obs-source-dir') || {}).value || '';
+    if (window.chooseDesktopFolder) {
+      try {
+        status('请在系统文件夹窗口中选择观测数据目录…');
+        const result = await window.chooseDesktopFolder(start);
+        if (result && result.path) { $('obs-source-dir').value = result.path; await browseDirectory(result.path); }
+        else if (result && result.error) status(result.error, true);
+        else status('未选择目录。');
+      } catch (error) { status(error.message, true); }
+      return;
+    }
     try {
       await api('/api/system/pick_folder', { method: 'POST', body: JSON.stringify({ start_dir: start }) });
       status('请在系统文件夹窗口中选择观测数据目录…');

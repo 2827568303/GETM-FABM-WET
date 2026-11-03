@@ -1,7 +1,9 @@
 # Windows x64 wheels for the embedded CPython 3.12 runtime.
 # Resolved from requirements.txt with numpy==1.26.4.
-# pywebview is omitted: its proxy_tools dependency has no Windows wheel, and
-# the shortcut opens the browser (launcher.py --web).
+# pywebview 6.2.1 and its binary dependencies are included. proxy_tools has
+# no upstream wheel; scripts/build_windows_installer.sh builds that one wheel
+# and installs it with --no-deps. The shortcut runs pythonw.exe with no --web,
+# so the window is WebView2. --web remains a debug flag.
 # pyabc is omitted: it pulls pandas, matplotlib, scikit-learn, and Jupyter.
 # Calibration already falls back to SciPy when pyabc is not installed.
 # netCDF4 stays at 1.7.1.post2. 1.7.2 and later ship an HDF5 build that calls
@@ -9,9 +11,12 @@
 # requirements.txt (netCDF4>=1.6,<2) and imports on Windows and under Wine.
 # Rebuild with: bash scripts/build_windows_installer.sh
 blinker==1.9.0
+bottle==0.13.4
 certifi==2026.10.23
+cffi==2.1.1
 cftime==1.6.6.1
 click==8.5.0
+clr_loader==0.3.1
 et_xmlfile==2.0.0
 Flask==3.1.3
 itsdangerous==2.2.0
@@ -22,9 +27,13 @@ numpy==1.26.4
 openpyxl==3.1.5
 packaging==26.3
 psutil==7.2.2
+pycparser==3.12
 pyproj==3.8.0
 pyshp==3.1.6
+pythonnet==3.2.1
+pywebview==6.2.1
 PyYAML==6.0.3
 scipy==1.17.1
+typing_extensions==4.16.0
 waitress==3.0.2
 Werkzeug==3.1.9

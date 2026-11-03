@@ -302,6 +302,15 @@
                         </div>
                     </div>
                 </div>
+                <div class="card" id="case-scan-card" style="margin-bottom:16px;">
+                    <div class="card-title">本机案例</div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                        <button class="btn btn-primary" id="case-scan-start" type="button" onclick="startCaseScan()">扫描本机案例</button>
+                        <button class="btn" id="case-scan-cancel" type="button" onclick="cancelCaseScan()" hidden>取消扫描</button>
+                        <span id="case-scan-status" style="font-size:12px;color:var(--text-muted);">只在这台电脑上查找，不会上传路径。</span>
+                    </div>
+                    <div id="case-scan-results"></div>
+                </div>
                 <div class="card">
                     <div class="card-title">可用案例 <span style="font-size:11px;color:var(--text-muted);font-weight:400;">（右键行可打开所在文件夹 / 重新选择目录）</span></div>
                     <table class="data-table" id="case-table">
@@ -1677,7 +1686,11 @@
         <div class="modal-title">案例另存为</div>
         <div id="save-as-source" style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;word-break:break-all;"></div>
         <div class="form-group"><label class="form-label">目标目录（绝对路径，须不存在或为空目录）</label>
-            <input class="form-input" id="save-as-dest" placeholder="如 D:\mycases\LakeX_backup"></div>
+            <div style="display:flex;gap:8px;">
+                <input class="form-input" id="save-as-dest" placeholder="如 D:\mycases\LakeX_backup" style="flex:1;">
+                <button class="btn" type="button" onclick="browseSaveAsDest()">浏览…</button>
+            </div>
+        </div>
         <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;">
             <input type="checkbox" id="save-as-include-results"> <span id="save-as-include-label">包含模拟结果文件（*.3d.nc / output.nc 等，可能达数 GB、耗时数分钟）</span>
         </label>
@@ -1737,12 +1750,12 @@
 <script src="/static/js/confirm_dialog.js?v=1"></script>
 <script src="/static/js/variable_guide.js?v=2"></script>
     <script src="/static/js/result_files.js?v=3"></script>
-<script src="/static/js/observation_manager.js?v=6"></script>
+<script src="/static/js/observation_manager.js?v=7"></script>
 <script src="/static/js/viz2d_playback_prefetch.js?v=9"></script>
 <script src="/static/js/playback_performance.js?v=7"></script>
 <script src="/static/js/viz3d_mesh_mode_preference.js?v=3"></script>
     <script src="/static/js/run_physics.js?v=6"></script>
-    <script src="/static/js/app.js?v=106"></script>
+    <script src="/static/js/app.js?v=107"></script>
 <script src="/static/js/projects_studio.js?v=5"></script>
 <script src="/static/js/studio.js?v=1"></script>
 <script src="/static/js/gridstudio.js?v=3"></script>

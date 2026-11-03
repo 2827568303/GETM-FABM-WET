@@ -45,9 +45,9 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription:
 Source: "{#StageDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "__pycache__\*,*.pyc"
 
 [Icons]
-Name: "{group}\3DWET"; Filename: "{app}\3DWET.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\3dwet.ico"; Comment: "Start 3DWET and open the browser"
+Name: "{group}\3DWET"; Filename: "{app}\3DWET.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\3dwet.ico"; Comment: "打开 3DWET 桌面窗口"
 Name: "{group}\Uninstall 3DWET"; Filename: "{uninstallexe}"
-Name: "{userdesktop}\3DWET"; Filename: "{app}\3DWET.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\3dwet.ico"; Tasks: desktopicon; Comment: "Start 3DWET and open the browser"
+Name: "{userdesktop}\3DWET"; Filename: "{app}\3DWET.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\3dwet.ico"; Tasks: desktopicon; Comment: "打开 3DWET 桌面窗口"
 
 [Run]
 Filename: "{app}\3DWET.cmd"; Description: "Launch 3DWET"; Flags: nowait postinstall skipifsilent shellexec

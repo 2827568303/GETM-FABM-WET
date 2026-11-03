@@ -42,7 +42,7 @@ from gotm_working_copy import (KIND as _GOTM_WORKING_KIND, create_working_copy a
                                load_or_create_key as _load_gotm_manifest_key,
                                validate_gotm_output as _validate_gotm_output,
                                validate_working_copy as _validate_gotm_working_copy)
-from netcdf_io import open_dataset
+from netcdf_io import NETCDF_LOCK, open_dataset
 from output_subscriptions import resolve_sources as _resolve_output_sources, preset_sources as _output_preset_sources, model_sources as _output_model_sources
 from lake_points_api import effective_calibration_points, register_lake_points_routes
 from scipy.interpolate import griddata
@@ -212,7 +212,7 @@ app.json = SafeJSONProvider(app)
 #  exception=c0000005，python.exe。）
 # 因此所有 nc.Dataset 打开（读/写/追加）必须经 nc_open() 或 _with_nc_lock
 # 串行化。RLock 允许同线程重入，嵌套调用安全。
-_NC_LOCK = threading.RLock()
+_NC_LOCK = NETCDF_LOCK
 
 @contextmanager
 def nc_open(path, mode="r"):
@@ -2738,9 +2738,14 @@ def run_mpi_model_thread(case_path, launcher, solver, process_count, runtime_dir
         if isinstance(run_config, dict) and run_config.get("solver_mode", "").startswith("MPI"):
             if run_status in {"completed", "failed", "stopped"}:
                 run_config["phase"] = run_status
-        if runner is not None and runner._log:
-            try: runner._log.close()
-            except Exception: pass
+        if runner is not None:
+            try:
+                runner.release_workdir()
+            except Exception:
+                pass
+            if runner._log:
+                try: runner._log.close()
+                except Exception: pass
         run_metrics.finish()
         if case is not None:
             if run_status == "completed":
@@ -2809,7 +2814,8 @@ def _unregister_external_case(path):
 def _is_case_dir(p):
     """Recognize GETM projects and identifiable native, single-column GOTM results."""
     p = Path(p)
-    return ((p / "getm.inp").is_file() or (p / "bathymetry.nc").is_file()
+    return ((p / "getm.inp").is_file() or (p / "getm.dat").is_file()
+            or (p / "bathymetry.nc").is_file()
             or _is_gotm_result_dir(p) or _is_trusted_gotm_working_copy(p))
 
 
@@ -3107,7 +3113,8 @@ def list_cases():
         if case_root.exists():
             for d in case_root.iterdir():
                 has_proxy_manifest = (d / "proxy_engineering.json").is_file()
-                if d.is_dir() and ((d / "getm.inp").exists() or _is_gotm_result_dir(d)
+                if d.is_dir() and ((d / "getm.inp").exists() or (d / "getm.dat").is_file()
+                                   or (d / "bathymetry.nc").is_file() or _is_gotm_result_dir(d)
                                    or is_working_gotm(d) or has_proxy_manifest
                                    or _is_app_case_shell(d)):
                     key = str(d.resolve()).lower()
@@ -3124,6 +3131,73 @@ def list_cases():
         cases.append(_case_info(d, True))
         seen.add(key)
     return jsonify(cases)
+
+
+_CASE_SCAN = None
+_CASE_SCAN_LOCK = threading.Lock()
+_SCAN_FLAG = CASE_STATE_DIR / "local_case_scan_started"
+
+
+def _case_scan():
+    global _CASE_SCAN
+    with _CASE_SCAN_LOCK:
+        if _CASE_SCAN is None:
+            from case_scan import LocalCaseScan
+            _CASE_SCAN = LocalCaseScan()
+        return _CASE_SCAN
+
+
+def _scan_targets():
+    from case_scan import default_roots
+    extra = [str(CASE_DIR), str(LEGACY_CASE_DIR)]
+    extra.extend(_load_external_cases())
+    return default_roots(extra)
+
+
+@app.route("/api/cases/scan/bootstrap")
+def case_scan_bootstrap():
+    """Whether this profile has never started a local scan."""
+    return jsonify({"auto": not _SCAN_FLAG.exists()})
+
+
+@app.route("/api/cases/scan", methods=["GET", "POST"])
+def case_scan():
+    """Start or report a cancellable scan of local case folders. No upload."""
+    scanner = _case_scan()
+    if request.method == "POST":
+        try:
+            _SCAN_FLAG.parent.mkdir(parents=True, exist_ok=True)
+            _SCAN_FLAG.write_text("1", encoding="ascii")
+        except OSError:
+            pass
+        roots, drives = _scan_targets()
+        return jsonify(scanner.start(roots, drives))
+    return jsonify(scanner.status())
+
+
+@app.route("/api/cases/scan/cancel", methods=["POST"])
+def case_scan_cancel():
+    return jsonify(_case_scan().cancel())
+
+
+@app.route("/api/cases/register", methods=["POST"])
+def register_scanned_case():
+    """Remember a scanned case. The path stays on this computer."""
+    raw = str((request.json or {}).get("path") or "").strip().strip('"')
+    if not raw:
+        return jsonify({"error": "缺少案例路径"}), 400
+    path = Path(raw)
+    if not path.is_absolute():
+        return jsonify({"error": "请提供绝对路径"}), 400
+    try:
+        path = path.resolve()
+    except OSError:
+        return jsonify({"error": "路径不可用"}), 400
+    if not path.is_dir() or not _is_case_dir(path):
+        return jsonify({"error": "不是有效案例目录（需要 getm.inp、getm.dat 或 bathymetry.nc）"}), 400
+    _register_external_case(path)
+    return jsonify({"success": True, "path": str(path), "name": path.name})
+
 
 @app.route("/api/system/case-storage")
 def case_storage_status():
@@ -9790,15 +9864,12 @@ class _TkUnavailable(Exception):
 
 
 def _tk_pick_dir(start=""):
-    """Show the native Windows folder dialog from *this* process.
-
-    Runs tkinter directly (no child process), which is far more reliable than
-    launching a hidden ``powershell.exe``: a WinForms dialog owned by a hidden
-    window frequently never becomes visible.
-    Returns the chosen path, or "" when the user cancels.
-    """
-    import tkinter as tk
-    from tkinter import filedialog
+    """Tk folder dialog. Only used where tkinter is actually installed."""
+    try:
+        import tkinter as tk
+        from tkinter import filedialog
+    except Exception as e:
+        raise _TkUnavailable(str(e))
 
     global _PICK_TK_ROOT
     with _PICK_TK_LOCK:
@@ -9806,7 +9877,7 @@ def _tk_pick_dir(start=""):
             if _PICK_TK_ROOT is None or not _PICK_TK_ROOT.winfo_exists():
                 _PICK_TK_ROOT = tk.Tk()
             root = _PICK_TK_ROOT
-        except Exception as e:  # TclError / ImportError / no display
+        except Exception as e:  # TclError / no display
             raise _TkUnavailable(str(e))
     # 保持主窗口 withdrawn：只让系统文件夹对话框自己显示，避免闪出一个 Tk 空窗口
     try:
@@ -9830,9 +9901,11 @@ def _tk_pick_dir(start=""):
 
 
 def _ps_pick_dir(start=""):
-    """Fallback: folder dialog in a helper PowerShell process."""
+    """Last-resort folder dialog. The result file is the one Python polls."""
+    APP_TEMP_DIR.mkdir(parents=True, exist_ok=True)
     cmd = ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass",
-           "-Sta", "-File", str(PICKER_SCRIPT)]
+           "-Sta", "-File", str(PICKER_SCRIPT),
+           "-ResultFile", str(PICKER_RESULT)]
     if start:
         cmd += ["-StartDir", start]
     subprocess.Popen(cmd, cwd=str(APP_DIR),
@@ -9860,33 +9933,57 @@ def _pick_log(msg):
         pass
 
 
-def _run_folder_picker(start):
-    """Backend of the picker: write the result for the frontend to poll."""
-    path, err, engine = "", "", "tkinter"
-    _pick_log(f"picker start, start_dir={start!r}")
+def _write_picker_payload(payload):
     try:
-        path = _tk_pick_dir(start)
-    except _TkUnavailable as e:
-        _pick_log(f"tkinter unavailable: {e}")
-        err = f"本机无法弹出系统窗口（{e}），已改用备用方式"
-        engine = "powershell(回退)"
-        try:
-            path = _ps_pick_dir(start)
-        except Exception as e2:
-            _pick_log(f"powershell fallback failed: {e2}")
-            err = f"启动文件夹选择窗口失败: {e2}"
-    except Exception as e:  # noqa: BLE001
-        _pick_log(f"picker crashed: {e!r}")
-        err = f"文件夹选择窗口异常: {e}"
-        engine = "none"
-    _pick_log(f"picker done engine={engine} path={path!r} err={err!r}")
-    try:
-        PICKER_RESULT.write_text(
-            json.dumps({"path": path, "error": err, "engine": engine,
-                        "done": True}, ensure_ascii=False),
-            encoding="utf-8")
+        APP_TEMP_DIR.mkdir(parents=True, exist_ok=True)
+        PICKER_RESULT.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     except Exception:
         pass
+
+
+def _run_folder_picker(start):
+    """Show a folder dialog on an STA thread and write JSON for the poller.
+
+    Windows uses SHBrowseForFolder on its own STA thread. Tk is not the first
+    attempt: the embedded runtime has no tkinter, and a missing import must
+    not be reported as a chosen path. PowerShell is only the last fallback,
+    and it writes the same result file Python is polling.
+    """
+    from native_dialog import choose_directory, parse_picker_payload, result_payload
+    _pick_log(f"picker start, start_dir={start!r}")
+    payload = {"path": "", "paths": [], "error": "", "engine": "none",
+               "cancelled": True, "done": True}
+    if os.name == "nt":
+        try:
+            payload = result_payload(choose_directory(start, title="3DWET 选择文件夹"))
+        except Exception as exc:
+            _pick_log(f"native dialog crashed: {exc!r}")
+            payload["error"] = f"文件夹选择窗口异常: {exc}"
+            payload["cancelled"] = False
+        if not payload.get("path") and not payload.get("cancelled"):
+            _pick_log(f"native dialog failed ({payload.get('error')}); trying PowerShell")
+            try:
+                try:
+                    PICKER_RESULT.unlink(missing_ok=True)
+                except OSError:
+                    pass
+                text = _ps_pick_dir(start)
+                if text:
+                    payload = parse_picker_payload(text)
+                    payload["engine"] = payload.get("engine") or "powershell"
+            except Exception as exc:
+                _pick_log(f"powershell fallback failed: {exc!r}")
+                payload["error"] = f"启动文件夹选择窗口失败: {exc}"
+    else:
+        try:
+            path = _tk_pick_dir(start)
+            payload = {"path": path or "", "paths": [path] if path else [], "error": "",
+                       "engine": "tkinter", "cancelled": not path, "done": True}
+        except Exception as exc:
+            payload["error"] = f"当前环境没有文件夹对话框: {exc}"
+    _pick_log(f"picker done engine={payload.get('engine')} path={payload.get('path')!r} "
+              f"err={payload.get('error')!r}")
+    _write_picker_payload(payload)
 
 
 @app.route("/api/system/pick_folder", methods=["POST"])
@@ -9916,11 +10013,13 @@ def system_pick_folder_result():
         txt = PICKER_RESULT.read_text(encoding="utf-8", errors="replace").strip()
     except Exception:
         return jsonify({"path": None, "done": False})
+    from native_dialog import parse_picker_payload
+    payload = parse_picker_payload(txt)
     try:
         PICKER_RESULT.unlink(missing_ok=True)
     except OSError:
         pass
-    return jsonify({"path": txt or None, "done": True})
+    return jsonify(payload)
 
 
 @app.route("/api/system/list_dir")
