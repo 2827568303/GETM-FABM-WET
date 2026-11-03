@@ -464,11 +464,16 @@ def describe_mpi_solver_failure(case):
     step = None
     logged_date = None
     if rank is not None:
+        # Only the rank's text logs carry progress lines. The same glob also
+        # matches NetCDF shards (output.0006.nc, ext_wq.0006.nc), whose binary
+        # bytes can look like "n= 5" and once overwrote the real failure step.
         for path in sorted(case.glob(f"*.{rank:04d}.*")):
+            if _RANK_FILE_RE.search(path.name) is None:
+                continue
             text = _read_text(path)
-            steps = _STEP_RE.findall(text)
+            steps = [int(value) for value in _STEP_RE.findall(text)]
             if steps:
-                step = int(steps[-1])
+                step = max(steps) if step is None else max(step, max(steps))
             stamps = _MODEL_STAMP_RE.findall(text)
             if stamps:
                 logged_date = stamps[-1].replace("T", " ")

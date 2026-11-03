@@ -379,8 +379,13 @@ subroutine do(self,_ARGUMENTS_DO_)
         !===========================================================================================================!
         ! 2.2 Light functions for pelagic phytoplankton                                                             !
         !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!
-        uLPARSurf = meanpar / EXP( -extc * dz/2.0_rk )                                                              !  light at the top of the local layer
-        aLPARBot = meanpar * EXP( -extc * dz/2.0_rk )                                                               !  light at the bottom of the local layer
+        uLPARSurf = 0.0_rk
+        aLPARBot = 0.0_rk
+        if (meanpar > 0.0_rk) then
+           uLPARSurf = meanpar / EXP( -extc * dz/2.0_rk )                                                           !  light at the top of the local layer
+           aLPARBot = meanpar * EXP( -extc * dz/2.0_rk )                                                            !  light at the bottom of the local layer
+        end if
+        if (meanpar > 0.0_rk) then
         select case(self%qLightMethod)                                                                              !  select light limitation function
            case(1)                                                                                                  !    case 1, without photoinhibition, Chalker (1980) model
               uhL=self%hLRef*uFunTm                                                                                 !      half-saturation light intensity at current temperature
@@ -389,6 +394,9 @@ subroutine do(self,_ARGUMENTS_DO_)
               uOpt=uFunTm*self%cLOptRef                                                                             !      half-saturation light intensity at current temperature
               aLLim = exp(1.0_rk) /(extc * dz) *(exp(- aLPARBot /uOpt) - exp(- uLPARSurf /uOpt))                    !      light limitation function, no photo-inhibition
         end select                                                                                                  !
+        else
+           aLLim = 0.0_rk
+        end if
         !===========================================================================================================!
         ! 2.2 Day length and current max growth                                                                     !
         !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!

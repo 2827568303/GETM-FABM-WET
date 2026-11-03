@@ -231,3 +231,26 @@ def test_nonfinite_before_first_step_is_not_retried_as_serial(tmp_path, monkeypa
     assert "rank 6" in text
     assert "2023-08-01 00:00:00" in text
     assert (original_case / "output" / "LAKE.2d.0006.nc").read_bytes() == b"partial"
+
+
+def test_failure_step_ignores_rank_netcdf_shards(tmp_path):
+    # Regression: the year run failed at n=1274999 (2023-08-10) but the
+    # report said "2023-01-01 00:01:15, n=5" because output.0006.nc and
+    # ext_wq.0006.nc matched the rank glob and their bytes contained "n= 5".
+    case = tmp_path / ".Dianchi2023 1yr.mpi-x"
+    case.mkdir()
+    (case / "getm.inp").write_text(
+        "&time\n timestep = 15.0\n start = '2023-01-01 00:00:00'\n/\n", encoding="utf-8")
+    (case / "LAKE_DIANCHI_WET.0006.stdout").write_text(
+        " Non-finite value of FABM state variable abiotic_water_sPO4W\n", encoding="utf-8")
+    (case / "LAKE_DIANCHI_WET.0006.stderr").write_text(
+        "    11:19:54.405 n=     1274900\n    11:19:54.806 n=     1275000\n", encoding="utf-8")
+    (case / "model_run.log").write_text(
+        "STOP 1\nProcess name: [prterun-host-1,6]\nExit code:    1\n", encoding="utf-8")
+    for name in ("output.0006.nc", "ext_wq.0006.nc", "LAKE_DIANCHI_WET.2d.0006.nc"):
+        (case / name).write_bytes(b"CDF\x01\x00 n= 5 \x00 2023-01-01 00:00:00 \xff")
+    detail = mpi_runner.describe_mpi_solver_failure(case)
+    assert "rank 6" in detail
+    assert "n=1275000" in detail
+    assert "2023-08-10 08:30:00" in detail
+    assert "n=5" not in detail and "2023-01-01" not in detail

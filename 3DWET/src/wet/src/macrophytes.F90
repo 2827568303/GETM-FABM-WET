@@ -345,7 +345,7 @@ subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
         _GET_(self%id_uTm,uTm)                                                                                      !
         _GET_(self%id_dz,dz)                                                                                      !
         _GET_(self%id_meanpar,meanpar)                                                                              !
-       ! meanpar=max(0.0_rk,meanpar)     ! <==========================================================================================================<<<<<<<<<<<
+        meanpar=max(0.0_rk,meanpar)
         _GET_GLOBAL_(self%id_Day,Day)                                                                               !
         _GET_(self%id_extc,extc)                                                                                    !
         _GET_HORIZONTAL_(self%id_sDepthW,sDepthW)                                                                   !
@@ -415,13 +415,20 @@ subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
         ! 2.4 Light functions                                                                                       !
         !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!
         uhLVeg = self%hLRefVeg * uFunTmProdVeg                                                                      ! half-sat. light at current temp.
-        par_bott= meanpar                                                                                           !
-        aLPAR2Veg = par_bott*exp(- extc *dz/2.0_rk)                                                                 !
-        aLPAR1Veg = aLPAR2Veg / exp(- extc * min(self%cHeightVeg,sDepthW-dz/2.0_rk))
+        par_bott= meanpar
+        aLPAR1Veg = 0.0_rk
+        aLPAR2Veg = 0.0_rk
+        if (par_bott > 0.0_rk) then
+           aLPAR2Veg = par_bott*exp(-extc*dz/2.0_rk)
+           aLPAR1Veg = aLPAR2Veg/exp(-extc*min(self%cHeightVeg,sDepthW-dz/2.0_rk))
+        end if
         flush(0)                                !
-        aLLimShootVeg = self%fEmergVeg + self%fFloatVeg * (1.0 - afCovEmergVeg) &                                   !
-                 + bfSubVeg* (1.0 - afCovSurfVeg) * 1.0 / (extc * self%cHeightVeg) &                                !
-                 * log( (1.0 + aLPAR1Veg / uhLVeg) / (1.0 + aLPAR2Veg / uhLVeg))                                    !
+        aLLimShootVeg = self%fEmergVeg + self%fFloatVeg * (1.0 - afCovEmergVeg)
+        if (par_bott > 0.0_rk) then
+           aLLimShootVeg = aLLimShootVeg &
+              + bfSubVeg * (1.0 - afCovSurfVeg) / (extc * self%cHeightVeg) &
+              * log((1.0 + aLPAR1Veg / uhLVeg) / (1.0 + aLPAR2Veg / uhLVeg))
+        end if
         ufDay = DayLength(lat,int(Day))                                                                             !
         aMuTmLVeg =ufDay * bfShootVeg * aLLimShootVeg * uFunTmProdVeg * self%cMuMaxVeg                              ! max. growth rate at current temp. AND light
         !===========================================================================================================!
