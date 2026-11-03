@@ -323,7 +323,7 @@ subroutine do(self,_ARGUMENTS_DO_)
 
    !DECLARE LOCAL VARIABLES::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
    real(rk)   :: uTm, dz, extc, Day, meanpar, meanparout, lat, aCorO2BOD, afCovSurfVeg, sDW, sPW, sNW, sSiO2W, sPO4W, sNH4W, sNO3W, sO2W, rPDW, rNDW, uFunTm, wDW, wPW, wNW, aPLim, aNLim, aSiLim, aNutLim
-   real(rk)   :: aLPARBot, ufDay, uLPARSurf, uhL, uOpt, aLLim, aMuTmL, aMu, wDAss, wDRespW, ukDRespTm, wDMortW, wPMortW, wNMortW, wPUpt, aVPUpt, aVPUptMaxCr, aVNUptMaxCr, ahNUpt, aVNUpt, wNUpt
+   real(rk)   :: aLPARBot, ufDay, uLPARSurf, opticsHalf, uhL, uOpt, aLLim, aMuTmL, aMu, wDAss, wDRespW, ukDRespTm, wDMortW, wPMortW, wNMortW, wPUpt, aVPUpt, aVPUptMaxCr, aVNUptMaxCr, ahNUpt, aVNUpt, wNUpt
    real(rk)   :: sCW, rCDW, wCW, wCO2UptW, wCO2RespW, wCO2W, wCMortTOMW, wCPOMW, wCDOMW, wCMortW, wCAss, wCRespW, wCMortPOMW, wCMortDOMW
    real(rk)   :: wPExcrW, aNFixLim, aNFix, wNFix, wNExcrW, wNNH4W, wNNO3W, wPPO4W, wPPO4W_out, wSiSiO2W, wO2W, wDPOMW, wNPOMW, wPPOMW, wSiPaW, wDDOMW, wNDOMW, wPDOMW, wSiO2MortW, wNUptNH4, afNH4Upt, wNMortNH4W
    real(rk)   :: wNUptNO3, wPMortPO4W, wSiExcrW, wSiUpt, wO2Prod, wO2RespW, wO2UptNO3, wNMortTOMW, wPMortTOMW, wSiMortW, oSiW, rChD, oChla
@@ -382,24 +382,32 @@ subroutine do(self,_ARGUMENTS_DO_)
         uLPARSurf = 0.0_rk
         aLPARBot = 0.0_rk
         if (meanpar > 0.0_rk) then
-           uLPARSurf = meanpar / EXP( -extc * dz/2.0_rk )                                                           !  light at the top of the local layer
-           aLPARBot = meanpar * EXP( -extc * dz/2.0_rk )                                                            !  light at the bottom of the local layer
+           ! Cap optical depth so meanpar*exp(+/- eps*dz/2) cannot overflow when
+           ! extinction is extreme in thin layers (same class of bug as macrophytes).
+           opticsHalf = min(max(extc, 0.0_rk) * dz/2.0_rk, 8.0e1_rk)
+           uLPARSurf = meanpar * exp(opticsHalf)
+           aLPARBot = meanpar * exp(-opticsHalf)
         end if
-        if (meanpar > 0.0_rk) then
+        if (meanpar > 0.0_rk .and. extc * dz > NearZero) then
         select case(self%qLightMethod)                                                                              !  select light limitation function
            case(1)                                                                                                  !    case 1, without photoinhibition, Chalker (1980) model
               uhL=self%hLRef*uFunTm                                                                                 !      half-saturation light intensity at current temperature
-              aLLim= 1.0_rk /(extc * dz) * log((1.0_rk + uLPARSurf / uhL) / (1.0_rk + aLPARBot /uhL))               !      light limitation function, no photo-inhibition
+              if (uhL > 0.0_rk) then
+                 aLLim= 1.0_rk /(extc * dz) * log((1.0_rk + uLPARSurf / uhL) / (1.0_rk + aLPARBot /uhL))               !      light limitation function, no photo-inhibition
+              else
+                 aLLim = 0.0_rk
+              end if
            case(2)                                                                                                  !    case 2, Klepper et al. (1988) / Ebenhoh et al. (1997) model.
               uOpt=uFunTm*self%cLOptRef                                                                             !      half-saturation light intensity at current temperature
-              aLLim = exp(1.0_rk) /(extc * dz) *(exp(- aLPARBot /uOpt) - exp(- uLPARSurf /uOpt))                    !      light limitation function, no photo-inhibition
+              if (uOpt > 0.0_rk) then
+                 aLLim = exp(1.0_rk) /(extc * dz) *(exp(- aLPARBot /uOpt) - exp(- uLPARSurf /uOpt))                    !      light limitation function, no photo-inhibition
+              else
+                 aLLim = 0.0_rk
+              end if
         end select                                                                                                  !
         else
            aLLim = 0.0_rk
         end if
-        !===========================================================================================================!
-        ! 2.2 Day length and current max growth                                                                     !
-        !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!
         ufDay = DayLength(lat,int(Day))                                                                             ! calculate day length
         aMuTmL = ufDay *(1.0_rk - afCovSurfVeg)*aLLim * uFunTm*self%cMuMax                                          ! calculate max growth rate as dictated by current light and temp.
         !===========================================================================================================!

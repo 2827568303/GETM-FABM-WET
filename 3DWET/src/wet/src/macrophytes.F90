@@ -324,7 +324,7 @@ subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
    !DECLARE LOCAL VARIABLES::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
    real(rk)   :: uTm, extc, meanpar, dz, Day, sDepthW, lat, sDVeg, sNVeg, sPVeg, sDCompts, sNH4W, sNO3W, sPO4W, sNH4S, sNO3S, sPO4S, sO2W, CorO2BOD, bot_pel_conv !, Af_below, Af_last, Vc, Af
    real(rk)   :: oNH4S, oNO3S, oNDissS, oNDissW, oPO4S, afOxySed, bfRootVeg, bfShootVeg, aDRootVeg, aDShootVeg, aDEmergVeg, aDFloatVeg, bfSubVeg, aDSubVeg, bkMortVeg, aDayInitVeg, afCovEmergVeg
-   real(rk)   :: uFunTmProdVeg, uFunTmRespVeg, aCovVeg, afCovSurfVeg, aLLimShootVeg, uhLVeg, aMuTmLVeg, ufDay, par_bott, aLPAR1Veg, aLPAR2Veg, rPDVeg, rNDVeg, tDBedVeg, tDMigrVeg, tDProdVeg
+   real(rk)   :: uFunTmProdVeg, uFunTmRespVeg, aCovVeg, afCovSurfVeg, aLLimShootVeg, uhLVeg, aMuTmLVeg, ufDay, par_bott, aLPAR1Veg, aLPAR2Veg, tauVeg, rPDVeg, rNDVeg, tDBedVeg, tDMigrVeg, tDProdVeg
    real(rk)   :: aMuVeg, aNutLimVeg, aPLimVeg, aNLimVeg, tDRespVeg, tDEnvProdVeg, akDIncrVeg, tDEnvVeg, tDMortVeg, tDEnvMortVeg, tNBedVeg, tNMigrVeg, tNUptVeg, tNUptVegW, tNUptVegS, afNUptVegS
    real(rk)   :: aVNUptMaxCrVeg, ahNUptVeg, aVNUptVegW, aVNUptVegS, tNExcrVeg, tNMortVeg, tPBedVeg, tPMigrVeg, tPUptVeg, tPUptVegW, tPUptVegS, aVPUptMaxCrVeg, ahPUptVeg, aVPUptVegW, aVPUptVegS
    real(rk)   :: tPExcrVeg, tPMortVeg, afPUptVegS, wNBedNH4W, tNUptNH4VegW, afNH4UptVegW, tNMortVegNH4W, tNMortVegNH4, wNBedNO3W, tNUptNO3VegW, tNExcrVegS, tNExcrVegW, tNBedNH4S, tNUptNH4VegS
@@ -350,7 +350,6 @@ subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
         _GET_(self%id_extc,extc)                                                                                    !
         _GET_HORIZONTAL_(self%id_sDepthW,sDepthW)                                                                   !
         _GET_HORIZONTAL_(self%id_lat,lat)
-        flush(0)                                                                           !
         do i = 1,self%nCompts                                                                                       ! for each competitor
            _GET_HORIZONTAL_(self%id_Compts(i),sDCompts_all(i))                                                      !
         end do                                                                                                      !
@@ -418,16 +417,26 @@ subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
         par_bott= meanpar
         aLPAR1Veg = 0.0_rk
         aLPAR2Veg = 0.0_rk
-        if (par_bott > 0.0_rk) then
-           aLPAR2Veg = par_bott*exp(-extc*dz/2.0_rk)
-           aLPAR1Veg = aLPAR2Veg/exp(-extc*min(self%cHeightVeg,sDepthW-dz/2.0_rk))
-        end if
-        flush(0)                                !
         aLLimShootVeg = self%fEmergVeg + self%fFloatVeg * (1.0 - afCovEmergVeg)
-        if (par_bott > 0.0_rk) then
-           aLLimShootVeg = aLLimShootVeg &
-              + bfSubVeg * (1.0 - afCovSurfVeg) / (extc * self%cHeightVeg) &
-              * log((1.0 + aLPAR1Veg / uhLVeg) / (1.0 + aLPAR2Veg / uhLVeg))
+        ! Submerged canopy light integral (PCLake/WET).
+        ! Old form aLPAR1=aLPAR2/exp(-eps*H) overflows to Inf when eps*H is large enough
+        ! that exp(-eps*H) underflows to 0 while aLPAR2 is a tiny positive residue
+        ! (opaque shallow cells); Inf then enters log light-lim and poisons sPO4W.
+        ! Use multiply form with optical-depth cap (~80 ~= 1e-35) so upward reconstruction
+        ! cannot amplify underflow; beyond that the bottom layer is dark at resolved precision.
+        if (par_bott > 0.0_rk .and. bfSubVeg > 0.0_rk .and. uhLVeg > 0.0_rk) then
+           aLPAR2Veg = par_bott * exp(-min(extc*dz/2.0_rk, 8.0e1_rk))
+           if (self%cHeightVeg * max(extc, 0.0_rk) <= NearZero) then
+              aLPAR1Veg = max(aLPAR2Veg, 0.0_rk)
+              aLLimShootVeg = aLLimShootVeg + bfSubVeg * (1.0 - afCovSurfVeg) &
+                 * aLPAR1Veg / (aLPAR1Veg + uhLVeg)
+           else
+              tauVeg = extc * min(self%cHeightVeg, max(0.0_rk, sDepthW - dz/2.0_rk))
+              aLPAR1Veg = aLPAR2Veg * exp(min(max(tauVeg, 0.0_rk), 8.0e1_rk))
+              aLLimShootVeg = aLLimShootVeg + bfSubVeg * (1.0 - afCovSurfVeg) &
+                 / (extc * self%cHeightVeg) &
+                 * log((1.0_rk + aLPAR1Veg/uhLVeg) / (1.0_rk + aLPAR2Veg/uhLVeg))
+           end if
         end if
         ufDay = DayLength(lat,int(Day))                                                                             !
         aMuTmLVeg =ufDay * bfShootVeg * aLLimShootVeg * uFunTmProdVeg * self%cMuMaxVeg                              ! max. growth rate at current temp. AND light
