@@ -13,11 +13,15 @@
          在很多会话下根本不会显示（这正是最初「点了没反应」的原因）。
 #>
 param(
-    [string]$StartDir = ""
+    [string]$StartDir = "",
+    [string]$ResultFile = ""
 )
 
 $ErrorActionPreference = "Stop"
-$resultFile = Join-Path $PSScriptRoot '.picker_result.json'
+if (-not $ResultFile) {
+    $ResultFile = Join-Path $PSScriptRoot '.picker_result.json'
+}
+$resultFile = $ResultFile
 
 $chosen = ''
 try {

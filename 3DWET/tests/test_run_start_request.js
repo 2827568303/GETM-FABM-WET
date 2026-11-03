@@ -71,7 +71,7 @@ vm.runInContext(extractFunction('api'), context);
 vm.runInContext(extractFunction('startRun'), context);
 vm.runInContext(extractFunction('fixSyncInterval'), context);
 vm.runInContext(extractFunction('saveOutputConfig'), context);
-vm.runInContext(extractFunction('detectAndApplyMpiRecommendation'), context);
+vm.runInContext(extractFunction('startMpiTuning'), context);
 
 (async () => {
   const assertJsonObject = (index, expected, label) => {
@@ -85,9 +85,11 @@ vm.runInContext(extractFunction('detectAndApplyMpiRecommendation'), context);
 
   await context.startRun();
   assertJsonObject(0, {
+    cores: 1,
+    parallel_mode: 'auto',
+    compress_results: false,
     mpi: false,
     processes: 1,
-    compress_results: false,
   }, 'run start');
 
   await context.fixSyncInterval();
@@ -96,7 +98,7 @@ vm.runInContext(extractFunction('detectAndApplyMpiRecommendation'), context);
   await context.saveOutputConfig();
   assertJsonObject(2, {time_unit: 'hour', time_step: 3600, sync_interval: 1}, 'output configuration save');
 
-  await context.detectAndApplyMpiRecommendation();
+  await context.startMpiTuning();
   assertJsonObject(3, {duration_seconds: 10800, repetitions: 2}, 'MPI tuning start');
   console.log('run and output controls send single JSON objects through the shared API helper PASS');
 })().catch(error => { console.error(error); process.exitCode = 1; });

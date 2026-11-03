@@ -66,14 +66,10 @@ test('manual mesh or stack edits exit the preset without discarding the user cho
  assert.equal(controls['viz3d-iso-stack'].checked,true);
 });
 
-test('template exposes a bilingual volume preset and reversible display-only explanation',()=>{
+test('template no longer exposes the triangle volume preset',()=>{
  const html=fs.readFileSync('3DWET/app/templates/index.html','utf8');
- const pack=JSON.parse(fs.readFileSync('3DWET/app/static/i18n/en.json','utf8'));
- assert.match(html,/<button[^>]*id="viz3d-volume-preset"[^>]*aria-pressed="false"/);
- assert.match(html,/data-i18n="体网格预设"/);
- assert.match(html,/data-i18n="此预设临时启用派生三角显示剖分与全部可用垂向层。再次点击后恢复预设前的剖分与叠层选择。"/);
- assert.equal(pack.messages['体网格预设'],'3D volume preset');
- assert.equal(pack.messages['此预设临时启用派生三角显示剖分与全部可用垂向层。再次点击后恢复预设前的剖分与叠层选择。'],
-  'Temporarily enables the derived triangular display mesh and all available vertical layers. Click again to restore the mesh and layer selections from before the preset.');
- assert.match(html,/viz3d_volume_preset\.js\?v=1/);
+ assert.doesNotMatch(html,/id="viz3d-volume-preset"/);
+ assert.doesNotMatch(html,/viz3d_volume_preset\.js/);
+ assert.doesNotMatch(html,/value="triangles"/);
+ assert.match(html,/不提供三角网或非结构网格/);
 });

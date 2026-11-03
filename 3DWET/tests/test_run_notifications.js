@@ -7,7 +7,7 @@ const element=id=>{if(!elements.has(id))elements.set(id,{style:{},parentElement:
 const context=vm.createContext({state:{etaNotified:new Set(),lastRunStatus:'running'},api:async()=>response,
   $:element,window:{StudioI18n:{locale:()=>locale,t:(value,params)=>String(value).replace(/\{(\w+)\}/g,(_,key)=>params?.[key]??`{${key}}`)}},document:{querySelector:element,createElement:()=>({})},setInterval:()=>1,clearInterval(){},
   fmt:(v,d)=>Number(v).toFixed(d),syncQgisStatusBar(){},ModelDates:{formatText:t=>t},renderFabmRepairSummary(){},advanceOutputRevision(){},updateRunNotificationStatus(){},runFailureReason:s=>s.logs?.find(line=>line.includes('[ERROR]'))||'no reason',notifyUser:(title,body)=>notifications.push({title,body}),
-  loadVariables(){},loadDashboardSummary(){}});
+  renderRunMonitor(){},loadVariables(){},loadDashboardSummary(){}});
 vm.runInContext(source.slice(source.indexOf('function runStepSummary('),source.indexOf('function updateRunNotificationStatus(')),context);
 vm.runInContext(source.slice(source.indexOf('function appendRunLogLines('),source.indexOf('async function loadMpiRunCapabilities(')),context);
 vm.runInContext(source.slice(source.indexOf('async function pollRunStatus('),source.indexOf('// ── Variables')),context);

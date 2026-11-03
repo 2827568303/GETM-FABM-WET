@@ -100,7 +100,8 @@ def test_attach_exact_executable_and_cwd_and_restore_metrics(orphan):
     assert orphan.scope['run_process'] is orphan.process
     assert orphan.scope['run_case_path'] == orphan.case
     assert orphan.scope['run_start_time'] == orphan.started
-    assert orphan.scope['run_metrics'].current == 42
+    # integration.F90 prints n at the start of that step, so the completed step is n-1.
+    assert orphan.scope['run_metrics'].current == 41
     assert orphan.scope['run_config']['nsteps'] == 100
     run_watcher(orphan)
     assert orphan.scope['run_status'] == 'completed'
@@ -131,7 +132,7 @@ def test_registered_external_case_uses_real_cwd_not_newest_log(orphan, tmp_path)
     orphan.scope['_load_external_cases'] = lambda: [str(external)]
     orphan.scope['_reattach_orphan_model']()
     assert orphan.scope['run_case_path'] == external
-    assert orphan.scope['run_metrics'].current == 12
+    assert orphan.scope['run_metrics'].current == 11
 
 
 @pytest.mark.parametrize('failure', ['no_marker', 'fatal', 'nan_outputs', 'old_log'])
@@ -182,7 +183,7 @@ def test_ownership_change_does_not_finish_or_clear_new_run(orphan):
 def test_watcher_observes_appended_progress_before_exit(orphan):
     orphan.log.write_text('n = 2\n')
     orphan.scope['_reattach_orphan_model']()
-    assert orphan.scope['run_metrics'].current == 2
+    assert orphan.scope['run_metrics'].current == 1
     def append_and_exit(seconds):
         assert seconds == 1
         with orphan.log.open('a') as stream:
@@ -190,7 +191,7 @@ def test_watcher_observes_appended_progress_before_exit(orphan):
         orphan.process.running = False
     orphan.scope['time'].sleep = append_and_exit
     run_watcher(orphan)
-    assert orphan.scope['run_metrics'].current == 99
+    assert orphan.scope['run_metrics'].current == 98
     assert orphan.scope['run_status'] == 'completed'
 
 

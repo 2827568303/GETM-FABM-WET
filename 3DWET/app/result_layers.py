@@ -180,3 +180,39 @@ def depth_weighted_field(ds, var, timestep):
     field = np.full(values.shape[1:], np.nan)
     np.divide(numerator, denominator, out=field, where=denominator > 0)
     return field, source
+
+
+def surface_bottom_contrast(bottom, surface, bottom_index=0, surface_index=None):
+    """Compare the physical bottom and surface layers of one 3D field.
+
+    GETM stores k=0 at the bed and the last index at the free surface.
+    A shallow, well-mixed lake can have a near-zero difference; that is a
+    result, not a missing layer. Returns None when the two slices have no
+    overlapping finite wet values.
+    """
+    bed = np.asarray(bottom, dtype=float)
+    top = np.asarray(surface, dtype=float)
+    if bed.shape != top.shape:
+        raise ValueError('表层和底层切片形状不一致')
+    both = np.isfinite(bed) & np.isfinite(top)
+    if not np.any(both):
+        return None
+    delta = top[both] - bed[both]
+    mean_abs = float(np.mean(np.abs(delta)))
+    max_abs = float(np.max(np.abs(delta)))
+    scale = max(float(np.mean(np.abs(top[both]))), float(np.mean(np.abs(bed[both]))), 1e-12)
+    # A lake can be close in the mean and still have a local surface-bottom
+    # contrast of several degrees. That local peak has to stay visible.
+    mean_close = mean_abs <= max(1e-4, 0.02 * scale)
+    peak_close = max_abs <= max(0.05, 0.05 * scale)
+    return {
+        'bottom_index': int(bottom_index),
+        'surface_index': int(surface_index if surface_index is not None else 0),
+        'bottom_mean': float(np.mean(bed[both])),
+        'surface_mean': float(np.mean(top[both])),
+        'mean_abs_diff': mean_abs,
+        'max_abs_diff': max_abs,
+        'n_wet': int(np.count_nonzero(both)),
+        'well_mixed': bool(mean_close and peak_close),
+        'note': '差值为表层减底层。k 从湖底数起。均值接近时，局部最大差仍可能有数度。',
+    }

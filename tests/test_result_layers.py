@@ -113,7 +113,14 @@ def test_2d_field_rejects_unsupported_dimensions_before_read_and_preserves_suppo
         volume_result = get_field(view, 'timed_volume', timestep=1, level=2,
                                   include_bathymetry=False)
         assert volume_result['data'] == [[30.0, 31.0, 32.0], [33.0, 34.0, 35.0]]
-        assert tracked['timed_volume'].reads == [(1, 2, slice(None), slice(None))]
+        # The selected layer is read first. Surface/bottom contrast then reads
+        # the physical bottom and the free surface, even when one of them is
+        # the same slot as the selection.
+        assert tracked['timed_volume'].reads == [
+            (1, 2, slice(None), slice(None)),
+            (1, 0, slice(None), slice(None)),
+            (1, 2, slice(None), slice(None)),
+        ]
 
         for name in ('aux_field', 'late_time'):
             with pytest.raises(ValueError, match='不支持.*维度'):

@@ -1,5 +1,6 @@
 """Companion 3D outputs contribute variables to the result inventory."""
 from pathlib import Path
+import os
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '3DWET/app'))
@@ -52,7 +53,10 @@ def test_inventory_merges_companion_variables_and_invalidates_on_companion_revis
     assert first['time_axes'][str(companion.resolve())] == ['companion-t0', 'companion-t1']
 
     reads_before_revision = len(reads)
-    companion.touch()
+    # An in-place touch can land on the same timestamp. Advance the revision
+    # explicitly so the inventory must observe the companion change.
+    revised_ns = companion.stat().st_mtime_ns + 1_000_000_000
+    os.utime(companion, ns=(revised_ns, revised_ns))
     revised = client.get('/api/results/variables').get_json()
     assert 'greens_cohort2_sDW' in {item['name'] for item in revised['3d']}
     assert len(reads) > reads_before_revision, 'companion revision must invalidate inventory cache'

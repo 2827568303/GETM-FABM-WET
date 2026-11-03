@@ -1,6 +1,8 @@
 """Verify real server CFL and preflight bodies without starting background workers."""
 import ast
+import os
 import re
+import threading
 from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
@@ -30,6 +32,9 @@ def cfl_api(tmp_path, monkeypatch):
     scope = dict(Path=Path, np=np, nc_open=nc.Dataset, app=app, request=request,
                  jsonify=jsonify, datetime=datetime, active_case_path=tmp_path,
                  run_status='idle', run_thread=None, EXE_PATH=executable, run_logs=[],
+                 os=os, active_solver_path=lambda: executable,
+                 _core_calibration_lock=threading.Lock(),
+                 _core_calibration={'status': 'idle', 'error': None},
                  _mpi_tuning_state={'status': 'idle', 'progress': None, 'result': None,
                                     'error': None, 'cancel': None, 'signature': None},
                  _case_in_use=lambda _:False,

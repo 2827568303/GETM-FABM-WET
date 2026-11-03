@@ -24,6 +24,9 @@
    use output, only: clean_output
    use output_manager
    use kurt_parallel, only: clean_parallel
+#ifdef _OPENMP
+   use omp_lib, only: omp_pause_resource_all, omp_pause_hard
+#endif
    IMPLICIT NONE
 !
 ! !INPUT PARAMETERS:
@@ -32,6 +35,9 @@
 !
 ! !INPUT/OUTPUT PARAMETERS:
    integer, intent(inout)              :: loop
+#ifdef _OPENMP
+   integer                             :: pause_status
+#endif
 !
 ! !REVISION HISTORY:
 !  Original author(s): Karsten Bolding & Hans Burchard
@@ -68,6 +74,12 @@
    call clean_input()
 
    call clean_parallel()
+
+#ifdef _OPENMP
+   ! Release the OpenMP pool before the process exits. A static MinGW
+   ! libgomp otherwise can wait forever while the runtime is torn down.
+   pause_status = omp_pause_resource_all(omp_pause_hard)
+#endif
 
 #ifdef DEBUG
    write(debug,*) 'Leaving clean_up()'

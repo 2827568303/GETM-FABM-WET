@@ -112,6 +112,9 @@
    LONGINT            :: timertics(max_timers), sysclockcalls(max_timers)
    character(len=24)  :: timernames(max_timers)
    LONGINT, save      :: num_clock_calls=0
+   ! Tracer advection runs one OpenMP thread per core. Each thread keeps
+   ! its own start click; the shared totals are updated atomically.
+!$omp threadprivate(timertics)
 !EOP
 !-----------------------------------------------------------------------
 
@@ -295,7 +298,9 @@
 #endif
 !
    CALL SYSTEM_CLOCK(timertics(timerindex))
+!$omp atomic
    num_clock_calls = num_clock_calls+1
+!$omp atomic
    sysclockcalls(timerindex) = sysclockcalls(timerindex)+1
 #ifdef DEBUG
    write(debug,*) 'Leaving tic()'
@@ -337,9 +342,12 @@
 #endif
 
    CALL SYSTEM_CLOCK(timertoc)
+!$omp atomic
    num_clock_calls = num_clock_calls+1
+!$omp atomic
    sysclockcalls(timerindex) = sysclockcalls(timerindex)+1
    if (timertoc .ge. timertics(timerindex)) then
+!$omp atomic
       timercounts(timerindex) =  timercounts(timerindex) + (timertoc-timertics(timerindex))
    else
       LEVEL2 'Warning. System_clock clicks timing ',timernames(timerindex),' rolled past maximum'

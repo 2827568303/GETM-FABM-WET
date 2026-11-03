@@ -15,7 +15,7 @@ from mpi_runner import (MpiRun, discover_mpi_installation, merge_case_rank_outpu
                         mpi_dimensions_for_counts, mpi_process_counts_for_grid,
                         mpi_hotstart_error, prepare_mpi_case,
                         recommended_process_count, stop_process_tree,
-                        validate_process_count)
+                        validate_process_count, windows_mpi_status)
 
 
 def test_process_count_is_bounded_by_logical_cpu_count():
@@ -228,7 +228,7 @@ def test_successful_run_calls_reserved_merge_hook(tmp_path):
     runtime = tmp_path / "app-runtime"
     ucrt = tmp_path / "ucrt64"
     runtime.mkdir(); ucrt.mkdir()
-    run = MpiRun(launcher=launcher, solver=solver, n=2, case=tmp_path,
+    run = MpiRun(launcher=launcher, solver=solver, n=2, case=tmp_path, cpu_count=4,
                  merger=lambda case, n: calls.append((case, n)) or "merged",
                  feature_enabled=True, runtime_dirs=[runtime, ucrt], popen=fake_popen)
     run.start()
@@ -263,7 +263,7 @@ def test_exit_zero_with_rank_fatal_never_calls_merger(tmp_path):
         def poll(self): return 0
         def wait(self, *args, **kwargs): return 0
 
-    run = MpiRun(launcher=launcher, solver=solver, n=2, case=tmp_path,
+    run = MpiRun(launcher=launcher, solver=solver, n=2, case=tmp_path, cpu_count=4,
                  merger=lambda *_: pytest.fail("merge must not run after rank fatal"),
                  feature_enabled=True, popen=lambda *a, **k: Process())
     run.start()
@@ -312,6 +312,22 @@ def test_prepare_mpi_case_rejects_serial_fabm_hotstart(tmp_path):
         prepare_mpi_case(source, msg_method=3, process_count=2)
     assert (source / "restart.in").read_bytes() == b"global checkpoint"
     assert not list(tmp_path.glob(".case.mpi-*"))
+
+
+def test_prepare_mpi_case_can_disable_fabm_hotstart_without_editing_the_source(tmp_path):
+    source = tmp_path / "case"
+    source.mkdir()
+    (source / "getm.inp").write_text(
+        "&param\n parallel = .false.\n hotstart = .true.\n/\n", encoding="utf-8")
+    work = prepare_mpi_case(source, msg_method=3, process_count=2, disable_hotstart=True)
+    try:
+        copied = (work / "getm.inp").read_text(encoding="utf-8")
+        assert "hotstart = .false." in copied
+        assert "parallel = .true." in copied
+        assert "hotstart = .true." in (source / "getm.inp").read_text(encoding="utf-8")
+    finally:
+        import shutil
+        shutil.rmtree(work, ignore_errors=True)
 
 
 def test_mpi_hotstart_preflight_error_is_specific_and_cold_runs_are_allowed():
@@ -388,6 +404,36 @@ def test_mixed_empty_and_nonempty_rank_family_is_rejected(tmp_path, monkeypatch)
         merge_case_rank_outputs(tmp_path, 2)
 
 
+def test_windows_mpi_status_accepts_the_revision_marker_and_bundled_runtime(tmp_path, monkeypatch):
+    bin_dir = tmp_path / "bin"
+    mpi = bin_dir / "mpi"
+    mpi.mkdir(parents=True)
+    (bin_dir / "getm_cartesian_parallel.exe").write_bytes(b"xx3DWET solver revision 20261102yy")
+    (bin_dir / "getm_cartesian_parallel_prev.exe").write_bytes(b"old")
+    for name in ("msmpi.dll", "mpiexec.exe", "smpd.exe"):
+        (mpi / name).write_bytes(b"x")
+    monkeypatch.setattr("mpi_runner._packaged_model_root", lambda: tmp_path)
+    status = windows_mpi_status()
+    assert status["revision_current"] is True
+    assert status["runtime_ready"] is True
+    assert status["size"] == len(b"xx3DWET solver revision 20261102yy")
+    assert status["backup"].endswith("getm_cartesian_parallel_prev.exe")
+    assert "当前版本" in status["message"]
+    if os.name != "nt":
+        assert "Wine" in status["message"]
+        assert status["host_can_launch"] is False
+
+
+def test_windows_mpi_status_skips_a_solver_without_the_revision(tmp_path, monkeypatch):
+    bin_dir = tmp_path / "bin"
+    (bin_dir / "mpi").mkdir(parents=True)
+    (bin_dir / "getm_cartesian_parallel.exe").write_bytes(b"old solver")
+    monkeypatch.setattr("mpi_runner._packaged_model_root", lambda: tmp_path)
+    status = windows_mpi_status()
+    assert status["revision_current"] is False
+    assert "不是当前源码" in status["message"]
+
+
 def test_exit_zero_with_rank_stdout_fatal_never_calls_merger(tmp_path):
     launcher = tmp_path / "mpiexec.exe"
     solver = tmp_path / "getm.exe"
@@ -399,7 +445,7 @@ def test_exit_zero_with_rank_stdout_fatal_never_calls_merger(tmp_path):
         def poll(self): return 0
         def wait(self, *args, **kwargs): return 0
 
-    run = MpiRun(launcher=launcher, solver=solver, n=2, case=tmp_path,
+    run = MpiRun(launcher=launcher, solver=solver, n=2, case=tmp_path, cpu_count=4,
                  merger=lambda *_: pytest.fail("rank fatal must block merge"),
                  feature_enabled=True, popen=lambda *a, **k: Process())
     run.start()

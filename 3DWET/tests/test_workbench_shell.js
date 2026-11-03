@@ -28,19 +28,21 @@ for (const route of ['dashboard', 'cases', 'preprocess', 'input', 'gridstudio', 
 }
 assert.ok(/\.workbench-home-grid/.test(styles),
   'the shell should provide a responsive canvas and inspector layout');
-assert.ok(/<span class="case-name">\$\{escapeHtml\(base \+ nativePeriod\)\}<\/span>\$\{proxyCaseBadgeMarkup\(caseData\)\}/.test(app),
+assert.ok(/const proxyMarkup = proxyCaseBadgeMarkup\(caseData\)/.test(app)
+  && /<span class="case-name">\$\{label\}<\/span>\$\{proxyMarkup\}/.test(app)
+  && /badge\.innerHTML = proxyMarkup \?/.test(app),
   'the active case identity should be separate from its proxy status badge');
 const caseBadgeLayout = appStyles.slice(appStyles.lastIndexOf('.case-badge{'));
 assert.ok(/display:flex;[^}]*flex-wrap:wrap;[^}]*overflow:visible/s.test(caseBadgeLayout)
   && /\.case-name\s*\{[^}]*overflow:hidden;[^}]*text-overflow:ellipsis;[^}]*white-space:nowrap/s.test(appStyles)
   && /\.topbar\s*\{height:auto;min-height:var\(--topbar-height\)/s.test(appStyles),
   'case names should truncate independently while status remains readable and the top bar can grow');
-assert.ok(/workbench\.css\?v=9/.test(template) && /app\.js\?v=102/.test(template)
-  && /i18n\.js\?v=18/.test(template)
+assert.ok(/workbench\.css\?v=9/.test(template) && /app\.js\?v=106/.test(template)
+  && /i18n\.js\?v=19/.test(template)
   && /scientific_heatmap\.js\?v=6/.test(template)
   && /scientific_workspace\.css\?v=14/.test(template)
   && /scientific_workspace\.js\?v=19/.test(template)
-  && /studio_icons\.js\?v=5/.test(template) && /viz3d\.js\?v=173/.test(template),
+  && /studio_icons\.js\?v=5/.test(template) && /viz3d\.js\?v=174/.test(template),
   'workbench CSS and inspector behavior should use fresh asset cache keys');
 assert.ok(/class="workbench-heatmap" width="480" height="300" role="img"/.test(app),
   'dashboard heatmaps should retain readable intrinsic resolution and an accessible label');

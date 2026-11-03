@@ -156,9 +156,11 @@ def test_completed_getm_results_are_opt_in_and_restart_files_are_excluded(tmp_pa
     exec(compile(ast.Module(body=[function], type_ignores=[]), str(source), "exec"), scope)
     output = tmp_path / "output.nc"
     three_d = tmp_path / "run.3d.nc"
+    weekly = tmp_path / "ext_wq.nc"
     restart = tmp_path / "restart.nc"
     _fixture(output)
     _fixture(three_d)
+    _fixture(weekly)
     restart.write_bytes(b"keep restart byte-for-byte")
     original_output = _digest(output)
     logs = []
@@ -172,6 +174,8 @@ def test_completed_getm_results_are_opt_in_and_restart_files_are_excluded(tmp_pa
     with netCDF4.Dataset(output) as ds:
         assert ds.data_model == "NETCDF4_CLASSIC"
     with netCDF4.Dataset(three_d) as ds:
+        assert ds.data_model == "NETCDF4_CLASSIC"
+    with netCDF4.Dataset(weekly) as ds:
         assert ds.data_model == "NETCDF4_CLASSIC"
     assert restart.read_bytes() == b"keep restart byte-for-byte"
     assert any("核验通过" in line for line in logs)

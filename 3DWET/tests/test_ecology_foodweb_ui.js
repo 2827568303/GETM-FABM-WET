@@ -7,7 +7,7 @@ const indexTemplate = fs.readFileSync('3DWET/app/templates/index.html', 'utf8');
 const studioCss = fs.readFileSync('3DWET/app/static/css/studio.css', 'utf8');
 assert.match(indexTemplate, /\/static\/js\/ecology_network\.js\?v=34/, 'food-web script cache version matches the updated source');
 assert.match(indexTemplate, /\/static\/css\/scientific_workspace\.css\?v=14/, 'food-web stylesheet cache version matches the updated styles');
-assert.match(indexTemplate, /\/static\/css\/studio\.css\?v=11/, 'food-web editor card styles use a refreshed stylesheet URL');
+assert.match(indexTemplate, /\/static\/css\/studio\.css\?v=12/, 'food-web editor card styles use a refreshed stylesheet URL');
 assert.match(studioCss, /#en-foodweb-editor \.foodweb-row\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)[^}]*border:\s*1px solid/s,
   'each prey relationship is a bordered card with two readable field columns');
 assert.match(studioCss, /#en-foodweb-editor \.foodweb-field\s*\{[^}]*min-width:\s*0[^}]*background:/s,

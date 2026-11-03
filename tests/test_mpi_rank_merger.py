@@ -142,3 +142,53 @@ def test_merger_rejects_incomplete_global_coverage(tmp_path):
     reference, shards = _write_fixture(tmp_path, missing=True)
     with pytest.raises(ValueError, match="Incomplete coverage"):
         MERGER.merge_rank_outputs(shards, reference, tmp_path / "missing.nc")
+
+
+def test_merger_places_cartesian_shards_on_bathymetry_xy(tmp_path):
+    reference = tmp_path / "bathymetry.nc"
+    with Dataset(reference, "w") as ds:
+        ds.createDimension("x", 4)
+        ds.createDimension("y", 3)
+        ds.createVariable("x", "f8", ("x",))[:] = np.arange(4) * 10.0
+        ds.createVariable("y", "f8", ("y",))[:] = np.arange(3) * 5.0
+        # Present, but not the axes the Cartesian shards carry.
+        ds.createVariable("lonc", "f8", ("y", "x"))[:] = 100.0
+        ds.createVariable("latc", "f8", ("y", "x"))[:] = 20.0
+    shards = []
+    for rank, (x0, x1) in enumerate(((0, 2), (2, 4))):
+        path = tmp_path / f"output.{rank:04d}.nc"
+        shards.append(path)
+        with Dataset(path, "w") as ds:
+            ds.createDimension("time", None)
+            ds.createDimension("yc", 3)
+            ds.createDimension("xc", x1 - x0)
+            ds.createVariable("time", "f8", ("time",))[:] = [0.0]
+            ds.createVariable("yc", "f8", ("yc",))[:] = np.arange(3) * 5.0
+            ds.createVariable("xc", "f8", ("xc",))[:] = np.arange(x0, x1) * 10.0
+            temp = ds.createVariable("temp", "f4", ("time", "yc", "xc"), fill_value=-9999)
+            temp[:] = np.arange(x0, x1)[None, None, :] + np.arange(3)[None, :, None]
+    dest = tmp_path / "output.nc"
+    MERGER.merge_rank_outputs(shards, reference, dest)
+    with Dataset(dest) as ds:
+        assert ds.dimensions["xc"].size == 4
+        assert ds.dimensions["yc"].size == 3
+        expected = np.arange(4)[None, None, :] + np.arange(3)[None, :, None]
+        np.testing.assert_array_equal(ds["temp"][:], expected.astype("f4"))
+        np.testing.assert_array_equal(ds["xc"][:], np.arange(4) * 10.0)
+
+
+def test_merger_still_requires_lonlat_without_cartesian_axes(tmp_path):
+    reference = tmp_path / "reference.nc"
+    shard = tmp_path / "output.0000.nc"
+    with Dataset(reference, "w") as ds:
+        ds.createDimension("yc", 1)
+        ds.createDimension("xc", 1)
+        ds.createVariable("lonc", "f8", ("yc", "xc"))[:] = 1
+        ds.createVariable("latc", "f8", ("yc", "xc"))[:] = 2
+    with Dataset(shard, "w") as ds:
+        ds.createDimension("time", None)
+        ds.createDimension("yc", 1)
+        ds.createDimension("xc", 1)
+        ds.createVariable("temp", "f4", ("time", "yc", "xc"))[:] = 1
+    with pytest.raises(ValueError, match="Shards require lonc and latc"):
+        MERGER.merge_rank_outputs([shard], reference, tmp_path / "merged.nc")

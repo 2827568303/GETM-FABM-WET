@@ -207,6 +207,56 @@ class UiSmoke:
                 logging.exception('Could not close the UI smoke window')
 
 
+def install_seed_cases(model_root, case_root):
+    """Copy packaged examples into an empty user case folder once.
+
+    The installer shortcut sets ``WET_USER_CASES``. Existing ``getm.inp`` files
+    are left untouched, and the copy is skipped when the user folder is the
+    packaged tree itself.
+    """
+    flag = os.environ.get('WET_USER_CASES', '').strip().lower()
+    if flag not in {'1', 'true', 'yes', 'on'}:
+        return
+    source_root = Path(model_root) / 'case'
+    destination_root = Path(case_root)
+    try:
+        if source_root.resolve() == destination_root.resolve():
+            return
+    except OSError:
+        return
+    if not source_root.is_dir():
+        return
+    for child in sorted(source_root.iterdir()):
+        if not child.is_dir() or child.name.startswith('.'):
+            continue
+        destination = destination_root / child.name
+        if (destination / 'getm.inp').is_file() or (destination / 'fabm.yaml').is_file():
+            continue
+        try:
+            _copy_seed_tree(child, destination)
+        except OSError:
+            logging.exception('Could not copy seed case %s', child.name)
+
+
+def _copy_seed_tree(source, destination):
+    """Copy a seed case without Win32 CopyFile2.
+
+    CPython's ``shutil.copytree`` uses ``CopyFile2``. Wine 9 aborts the
+    process on that call, so the installed shortcut would never reach the
+    server during the Wine smoke. A byte copy keeps the same files.
+    """
+    destination.mkdir(parents=True, exist_ok=False)
+    for child in source.iterdir():
+        name = child.name
+        if name in {'output', '__pycache__'} or name == 'output.nc' or name.endswith('.log'):
+            continue
+        target = destination / name
+        if child.is_dir() and not child.is_symlink():
+            _copy_seed_tree(child, target)
+        elif child.is_file():
+            target.write_bytes(child.read_bytes())
+
+
 def show_close_notice(window=None):
     if window is not None:
         window.create_confirmation_dialog('3DWET Studio', CLOSE_NOTICE)
@@ -214,9 +264,19 @@ def show_close_notice(window=None):
         print(CLOSE_NOTICE, flush=True)
 
 
+def user_log_directory():
+    """Launcher log visible to the person who installed 3DWET."""
+    if os.name == 'nt':
+        base = os.environ.get('LOCALAPPDATA')
+        if not base:
+            home = os.environ.get('USERPROFILE') or os.environ.get('HOME') or str(Path.home())
+            base = str(Path(home) / 'AppData' / 'Local')
+        return Path(base) / '3DWET' / 'logs'
+    return Path.home() / '.local' / 'share' / '3DWET' / 'logs'
+
+
 def configure_logging(directory=None):
-    directory = Path(directory) if directory is not None else (
-        Path(os.environ.get('LOCALAPPDATA', str(Path.home()))) / '3DWET Studio' / 'logs')
+    directory = Path(directory) if directory is not None else user_log_directory()
     directory.mkdir(parents=True, exist_ok=True)
     for name in ('stdout', 'stderr'):
         if getattr(sys, name, None) is None:
@@ -224,6 +284,140 @@ def configure_logging(directory=None):
     logging.basicConfig(filename=str(directory / 'launcher.log'), level=logging.INFO,
                         format='%(asctime)s %(levelname)s %(message)s')
     return directory / 'launcher.log'
+
+
+_WEBVIEW2_CLIENT = '{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}'
+
+
+class DesktopApi:
+    """Folder and file dialogs inside the WebView2 window."""
+
+    def __init__(self):
+        self.window = None
+
+    def pick_folder(self, start=''):
+        return self._pick('folder', start or '')
+
+    def pick_files(self, start=''):
+        return self._pick('files', start or '')
+
+    def _pick(self, kind, start):
+        try:
+            import webview
+            dialog = webview.FileDialog.FOLDER if kind == 'folder' else webview.FileDialog.OPEN
+            if self.window is not None:
+                chosen = self.window.create_file_dialog(
+                    dialog, directory=start, allow_multiple=(kind == 'files'))
+                paths = []
+                if isinstance(chosen, (list, tuple)):
+                    paths = [str(item) for item in chosen if item]
+                elif isinstance(chosen, str) and chosen:
+                    paths = [chosen]
+                return {'path': paths[0] if paths else '', 'paths': paths, 'error': '',
+                        'engine': 'webview', 'cancelled': not paths}
+        except Exception:
+            logging.exception('WebView 对话框失败，改用系统对话框')
+        if os.name == 'nt':
+            from native_dialog import choose_directory, choose_files, result_payload
+            native = choose_directory(start) if kind == 'folder' else choose_files(start)
+            return result_payload(native)
+        return {'path': '', 'paths': [], 'error': '没有可用的文件夹对话框',
+                'engine': 'none', 'cancelled': True}
+
+
+def webview2_runtime_present():
+    """True when Edge WebView2 is installed, or when this is not Windows."""
+    if os.name != 'nt':
+        return True
+    try:
+        import winreg
+    except ImportError:
+        # Linux tests patch os.name without a Windows registry module.
+        return True
+    relative = (
+        rf'Software\Microsoft\EdgeUpdate\Clients\{_WEBVIEW2_CLIENT}',
+        rf'Software\WOW6432Node\Microsoft\EdgeUpdate\Clients\{_WEBVIEW2_CLIENT}',
+    )
+    views = [0]
+    for name in ('KEY_WOW64_32KEY', 'KEY_WOW64_64KEY'):
+        flag = getattr(winreg, name, 0)
+        if flag:
+            views.append(flag)
+    for hive in (winreg.HKEY_CURRENT_USER, winreg.HKEY_LOCAL_MACHINE):
+        for view in views:
+            for path in relative:
+                try:
+                    with winreg.OpenKey(hive, path, 0, winreg.KEY_READ | view) as key:
+                        version, _kind = winreg.QueryValueEx(key, 'pv')
+                except OSError:
+                    continue
+                if str(version).strip() not in ('', '0.0.0.0'):
+                    return True
+    return False
+
+
+def webview2_bootstrapper():
+    here = Path(__file__).resolve()
+    for candidate in (here.parents[2] / 'MicrosoftEdgeWebview2Setup.exe',
+                      here.parents[1] / 'bin' / 'MicrosoftEdgeWebview2Setup.exe'):
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def ensure_webview2():
+    """Install the Evergreen runtime only when the machine does not have it."""
+    if webview2_runtime_present():
+        return
+    import subprocess
+    bootstrap = webview2_bootstrapper()
+    if bootstrap is None:
+        raise RuntimeError(
+            '这台电脑没有 WebView2 运行库，安装目录里也没有 MicrosoftEdgeWebview2Setup.exe。'
+            '3DWET 需要它来打开自己的窗口。')
+    logging.info('安装 WebView2 运行库: %s', bootstrap)
+    subprocess.run([str(bootstrap), '/silent', '/install'], check=False)
+    if not webview2_runtime_present():
+        raise RuntimeError(
+            'WebView2 运行库仍未安装。请联网后重新打开 3DWET，'
+            f'或手动运行 {bootstrap}。')
+
+
+def _watch_local_service(service):
+    """Tell the user, in Chinese, if the local server dies under the window."""
+    if service is None or not hasattr(service, '_stopping'):
+        return
+
+    def watch():
+        try:
+            while not service._stopping.is_set():
+                time.sleep(1)
+                if service._stopping.is_set():
+                    return
+                if not service.thread.is_alive():
+                    message = ('3DWET 本机服务已停止，界面无法继续连接。\n'
+                               '请查看 %LOCALAPPDATA%\\3DWET\\logs\\launcher.log 后重新打开。')
+                    logging.error(message)
+                    if os.name == 'nt':
+                        import ctypes
+                        ctypes.windll.user32.MessageBoxW(None, message, '3DWET', 0x10)
+                    return
+        except Exception:
+            logging.exception('服务监视线程退出')
+
+    threading.Thread(target=watch, name='3dwet-server-watch', daemon=True).start()
+
+
+def launch_is_desktop(args, *, frozen=False, platform=None):
+    """A normal Windows launch opens the WebView2 window. --web is debug-only."""
+    platform = os.name if platform is None else platform
+    if args.ui_smoke:
+        return True
+    if frozen and not args.web and not args.check and not args.self_test:
+        return True
+    if platform == 'nt' and not args.web and not args.check and not args.self_test:
+        return True
+    return bool(args.desktop)
 
 
 def main(argv=None):
@@ -253,7 +447,7 @@ def main(argv=None):
     parser.add_argument('--no-open', action='store_true', help='Serve without opening a browser/window')
     parser.add_argument('--report', type=Path, help='Write diagnostic or smoke-test JSON to an absolute path')
     args = parser.parse_args(argv)
-    if getattr(sys, 'frozen', False) and not args.web and not args.check and not args.self_test:
+    if launch_is_desktop(args, frozen=getattr(sys, 'frozen', False)):
         args.desktop = True
     if args.ui_smoke:
         args.desktop = True
@@ -274,6 +468,7 @@ def main(argv=None):
         root = resolve_model_root()
         os.environ['WET_MODEL_ROOT'] = str(root)
         case_root, case_source, case_warning = resolve_case_storage(root)
+        install_seed_cases(root, case_root)
         state_root, state_warning = resolve_state_storage(case_root)
         temp_root = case_root / '.temp'
         temp_root.mkdir(parents=True, exist_ok=True)
@@ -284,7 +479,8 @@ def main(argv=None):
         os.environ['WET_CASE_STATE_DIR'] = str(state_root)
         os.environ['WET_CASE_STORAGE_SOURCE'] = case_source
         os.environ['WET_CASE_STORAGE_WARNING'] = ' '.join(filter(None, (case_warning, state_warning)))
-        log_path = configure_logging(case_root / '.logs')
+        log_path = configure_logging(user_log_directory())
+        logging.info('3DWET 日志目录: %s', log_path.parent)
         report = diagnostics(root)
         if args.check:
             emit_report(report, args.report)
@@ -332,13 +528,21 @@ def main(argv=None):
             emit_report(report, args.report)
             return result
         if args.desktop and not args.no_open:
-            import webview
-            window = webview.create_window('3DWET Studio', url, width=1440, height=960,
-                                          min_size=(1024, 700))
-            notification_permission = None
+            if service is not None:
+                wait_until_ready(url, instance_id, 15, root)
+            os.environ['WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS'] = (
+                '--proxy-bypass-list="<-loopback>" '
+                '--disable-features=BlockInsecurePrivateNetworkRequests,PrivateNetworkAccessSendPreflights')
             if os.name == 'nt':
-                from desktop_notifications import install_notification_permission
-                notification_permission = install_notification_permission(window, url)
+                ensure_webview2()
+            import webview
+            api = DesktopApi()
+            window = webview.create_window('3DWET Studio', url, width=1440, height=960,
+                                          min_size=(1024, 700), js_api=api)
+            api.window = window
+            _watch_local_service(service)
+            from desktop_notifications import install_notification_permission
+            notification_permission = install_notification_permission(window, url)
             if guard is not None:
                 def on_closing():
                     if not guard.begin_shutdown():
@@ -399,8 +603,12 @@ def main(argv=None):
                 failure.setdefault('ui_smoke', {})['passed'] = False
             emit_report(failure, args.report)
         if args.desktop and not args.no_open and not args.ui_smoke and os.name == 'nt':
-            import ctypes
-            ctypes.windll.user32.MessageBoxW(None, message, '3DWET Studio - Startup error', 0x10)
+            try:
+                import ctypes
+                ctypes.windll.user32.MessageBoxW(
+                    None, '3DWET 无法启动。\n' + message, '3DWET', 0x10)
+            except Exception:
+                logging.exception('无法显示启动错误对话框')
         return 1
     finally:
         if service is not None:

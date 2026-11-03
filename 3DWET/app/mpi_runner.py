@@ -194,6 +194,62 @@ def _packaged_model_root():
     return module_path.parents[1]
 
 
+SOLVER_REVISION = b"3DWET solver revision 20261102"
+
+
+def windows_mpi_status():
+    """Report the packaged Windows MPI solver, its revision, and the MS-MPI runtime.
+
+    Auto-selection uses the revision bytes. This host can launch that executable
+    only on Windows. A direct one-process start is allowed by MS-MPI; more than
+    one process needs the bundled mpiexec, which Wine cannot drive because smpd
+    fails to connect.
+    """
+    root = _packaged_model_root()
+    bin_dir = root / "bin"
+    mpi_dir = bin_dir / "mpi"
+    solver = bin_dir / "getm_cartesian_parallel.exe"
+    backups = sorted(path for path in bin_dir.glob("getm_cartesian_parallel_*.exe") if path.is_file())
+    size = solver.stat().st_size if solver.is_file() else None
+    current = False
+    if solver.is_file():
+        try:
+            current = SOLVER_REVISION in solver.read_bytes()
+        except OSError:
+            current = False
+    present = {
+        "msmpi_dll": (mpi_dir / "msmpi.dll").is_file(),
+        "mpiexec": (mpi_dir / "mpiexec.exe").is_file(),
+        "smpd": (mpi_dir / "smpd.exe").is_file(),
+    }
+    runtime_ready = all(present.values())
+    if current and runtime_ready and os.name == "nt":
+        message = (
+            f"Windows MPI 求解器是当前版本（{size} 字节），日志标记为 3DWET solver revision 20261102。"
+            "自动测定会把它算进去。单进程可以直接启动；多进程用 bin/mpi/mpiexec.exe，运行库 msmpi.dll 和 smpd.exe 已放在 bin/mpi，不必另装 MS-MPI。"
+        )
+    elif current and runtime_ready:
+        message = (
+            f"Windows MPI 求解器是当前版本（{size} 字节），日志标记为 3DWET solver revision 20261102。"
+            "在 Windows 上自动测定会把它算进去。单进程可以直接启动；多进程用 bin/mpi/mpiexec.exe。"
+            "这台机器不是 Windows。Wine 里 mpiexec 连不上 smpd（错误 1747），不能在这里做多进程。"
+        )
+    elif solver.is_file():
+        message = "找到的 Windows 并行程序不是当前源码，自动测定会跳过它。上一份程序仍留在旁边，没有删除。"
+    else:
+        message = "没有找到 Windows MPI 求解器 getm_cartesian_parallel.exe。"
+    return {
+        "solver": str(solver),
+        "size": size,
+        "revision_current": current,
+        "backup": str(backups[0]) if backups else None,
+        "host_can_launch": os.name == "nt",
+        "runtime_ready": runtime_ready,
+        **present,
+        "message": message,
+    }
+
+
 def discover_mpi_installation():
     """Resolve configured MPI binaries, preferring explicit paths then packaged files."""
     app_root = _packaged_model_root()
@@ -303,7 +359,6 @@ def merge_case_rank_outputs(case, n, *, reference_name="bathymetry.nc"):
     coverage. A case is not publishable if any family fails to merge.
     """
     import sys
-    from netCDF4 import Dataset
     case = Path(case)
     reference = case / reference_name
     if not reference.is_file():
@@ -318,13 +373,22 @@ def merge_case_rank_outputs(case, n, *, reference_name="bathymetry.nc"):
     if str(scripts) not in sys.path:
         sys.path.insert(0, str(scripts))
     from merge_getm_rank_outputs import merge_rank_outputs
+    from netcdf_io import open_dataset
     families = {}
-    for path in case.glob("*.????.nc"):
+    names = []
+    try:
+        entries = list(case.iterdir())
+    except OSError as exc:
+        raise RuntimeError(f"MPI work directory cannot be listed: {case}: {exc}") from exc
+    for path in entries:
+        names.append(path.name)
         match = re.fullmatch(r"(.+)\.(\d{4})\.nc", path.name)
-        if match:
+        if match and path.is_file():
             families.setdefault(match.group(1), []).append(path)
     if not families:
-        raise RuntimeError("MPI run produced no rank output shards")
+        shown = ", ".join(sorted(names)[:40]) or "(empty)"
+        raise RuntimeError(
+            f"MPI run produced no rank output shards in {case}. Directory names: {shown}")
     merged = []
     for stem, shards in sorted(families.items()):
         ranks = {int(p.stem.rsplit(".", 1)[1]) for p in shards}
@@ -332,10 +396,16 @@ def merge_case_rank_outputs(case, n, *, reference_name="bathymetry.nc"):
             raise RuntimeError(f"Incomplete rank family {stem}: found {sorted(ranks)}, expected 0..{n-1}")
         lengths = []
         for shard in shards:
-            with Dataset(shard) as ds:
-                if "time" not in ds.dimensions:
-                    raise RuntimeError(f"Rank output has no time dimension: {shard.name}")
-                lengths.append(len(ds.dimensions["time"]))
+            try:
+                with open_dataset(shard) as ds:
+                    if "time" not in ds.dimensions:
+                        raise RuntimeError(f"Rank output has no time dimension: {shard.name}")
+                    lengths.append(len(ds.dimensions["time"]))
+            except OSError as exc:
+                if shard.is_file():
+                    raise RuntimeError(
+                        f"NetCDF 无法按系统代码页打开已存在的分片 {shard}: {exc}") from exc
+                raise
         if all(length == 0 for length in lengths):
             continue
         if any(length == 0 for length in lengths):
@@ -353,7 +423,133 @@ def merge_case_rank_outputs(case, n, *, reference_name="bathymetry.nc"):
     return merged
 
 
-def prepare_mpi_case(source, *, msg_method=3, process_count=1):
+_NONFINITE_RE = re.compile(r"Non-finite value of FABM state variable\s+(\S+)")
+_RANK_FILE_RE = re.compile(r"\.(\d{4})\.(?:stdout|stderr)$", re.IGNORECASE)
+_PRTE_RANK_RE = re.compile(r"Process name:\s*\[[^,\]]+,\s*(\d+)\]")
+_STEP_RE = re.compile(r"\bn=\s*(\d+)")
+_MODEL_STAMP_RE = re.compile(r"(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2})")
+
+
+def _read_text(path):
+    try:
+        return Path(path).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+
+
+def _model_time_at_step(case, step):
+    """Map a printed GETM step count to the model clock in getm.inp."""
+    text = _read_text(Path(case) / "getm.inp")
+    timestep = re.search(r"(?im)^\s*timestep\s*=\s*([0-9]+(?:\.[0-9]*)?)", text)
+    start = re.search(r"(?im)^\s*start\s*=\s*'([^']+)'", text)
+    if timestep is None or start is None:
+        return None
+    from datetime import datetime, timedelta
+    raw = start.group(1).strip()
+    origin = None
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d"):
+        try:
+            origin = datetime.strptime(raw, fmt)
+            break
+        except ValueError:
+            continue
+    if origin is None:
+        return None
+    return origin + timedelta(seconds=float(timestep.group(1)) * int(step))
+
+
+def describe_mpi_solver_failure(case):
+    """Name the FABM variable, MPI rank and model date when a run stops."""
+    case = Path(case)
+    variable = None
+    rank = None
+    for path in sorted(case.glob("*")):
+        if not path.is_file() or _RANK_FILE_RE.search(path.name) is None:
+            continue
+        match = _NONFINITE_RE.search(_read_text(path))
+        if match is None:
+            continue
+        variable = match.group(1).rstrip(".,;")
+        rank = int(_RANK_FILE_RE.search(path.name).group(1))
+        break
+    log_rank = _PRTE_RANK_RE.search(_read_text(case / "model_run.log"))
+    if log_rank is not None:
+        rank = int(log_rank.group(1))
+    step = None
+    logged_date = None
+    if rank is not None:
+        # Only the rank's text logs carry progress lines. The same glob also
+        # matches NetCDF shards (output.0006.nc, ext_wq.0006.nc), whose binary
+        # bytes can look like "n= 5" and once overwrote the real failure step.
+        for path in sorted(case.glob(f"*.{rank:04d}.*")):
+            if _RANK_FILE_RE.search(path.name) is None:
+                continue
+            text = _read_text(path)
+            steps = [int(value) for value in _STEP_RE.findall(text)]
+            if steps:
+                step = max(steps) if step is None else max(step, max(steps))
+            stamps = _MODEL_STAMP_RE.findall(text)
+            if stamps:
+                logged_date = stamps[-1].replace("T", " ")
+    if variable is None and rank is None and step is None:
+        return None
+    model_time = _model_time_at_step(case, step) if step is not None else None
+    parts = []
+    if variable:
+        parts.append(f"FABM 状态变量 {variable} 变为非有限值")
+    else:
+        parts.append("求解器报告了数值失败")
+    if rank is not None:
+        parts.append(f"rank {rank}")
+    if model_time is not None:
+        parts.append(model_time.strftime("模型时间 %Y-%m-%d %H:%M:%S"))
+    elif logged_date:
+        parts.append(f"模型日期 {logged_date}")
+    if step is not None:
+        parts.append(f"n={step}")
+    return "，".join(parts)
+
+
+def salvage_mpi_outputs(case, n, destination, *, reference_name="bathymetry.nc"):
+    """Publish a failed or stopped MPI run into a visible case directory.
+
+    A complete rank family is merged onto the reference grid. If that cannot
+    be done, the per-rank NetCDF files are copied so they stay loadable.
+    """
+    case = Path(case)
+    destination = Path(destination)
+    destination.mkdir(parents=True, exist_ok=True)
+    warning = None
+    merged_paths = []
+    try:
+        merged_paths = list(merge_case_rank_outputs(case, n, reference_name=reference_name))
+    except Exception as error:
+        warning = str(error)
+        merged_paths = []
+    published = []
+    for path in merged_paths:
+        path = Path(path)
+        if not path.is_file():
+            continue
+        target = destination / path.name
+        if target.exists():
+            target.unlink()
+        shutil.copy2(path, target)
+        published.append(target)
+    shards = []
+    if not published:
+        for shard in sorted(case.glob("*.????.nc")):
+            if re.fullmatch(r".+\.\d{4}\.nc", shard.name) is None:
+                continue
+            target = destination / shard.name
+            if target.exists():
+                target.unlink()
+            shutil.copy2(shard, target)
+            shards.append(target)
+    return {"merged": published, "shards": shards, "warning": warning}
+
+
+def prepare_mpi_case(source, *, msg_method=3, process_count=1, disable_hotstart=False):
     """Create a disposable run copy and configure GETM parallel namelists there."""
     source = Path(source).resolve()
     if msg_method not in (1, 3):
@@ -392,9 +588,11 @@ def prepare_mpi_case(source, *, msg_method=3, process_count=1):
             elif item.is_file():
                 shutil.copy2(item, dest)
         text = (work / "getm.inp").read_text(encoding="utf-8-sig")
-        hotstart_match = re.search(r"(?im)^\s*hotstart\s*=\s*\.true\.", text)
-        if hotstart_match:
+        hotstart_match = re.search(r"(?im)^(\s*hotstart\s*=\s*)\.true\.", text)
+        if hotstart_match and not disable_hotstart:
             raise ValueError(mpi_hotstart_error({"param": {"hotstart": True}}))
+        if hotstart_match and disable_hotstart:
+            text = text[:hotstart_match.start()] + hotstart_match.group(1) + ".false." + text[hotstart_match.end():]
         match = re.search(r"(?im)^(\s*parallel\s*=\s*)(?:\.true\.|\.false\.)", text)
         if not match:
             raise ValueError("getm.inp has no parallel logical in &getm_nml")
@@ -445,7 +643,8 @@ def stop_process_tree(process: subprocess.Popen, *, windows: bool | None = None,
 class MpiRun:
     """Own one launcher, rank log files, and a caller-provided merge hook."""
     def __init__(self, *, launcher, solver, n, case, cpu_count=None, runtime_dirs=None,
-                 merger=None, feature_enabled=None, popen=subprocess.Popen):
+                 merger=None, feature_enabled=None, popen=subprocess.Popen,
+                 omp_threads=None):
         enabled = MPI_RUN_ENABLED if feature_enabled is None else bool(feature_enabled)
         if not enabled:
             raise RuntimeError("MPI run feature is disabled")
@@ -455,12 +654,14 @@ class MpiRun:
             raise RuntimeError("MPI results merger is unavailable")
         self.launcher, self.solver = str(launcher), str(solver)
         self.n = validate_process_count(n, cpu_count=cpu_count)
+        self.omp_threads = omp_threads
         self.case = Path(case)
         self.merger = merger
         self.runtime_dirs = [Path(p).resolve() for p in (runtime_dirs or [])]
         self.popen = popen
         self.process = None
         self._log = None
+        self._solver_link = None
         self._lock = threading.Lock()
 
     def start(self):
@@ -468,9 +669,12 @@ class MpiRun:
             if self.process is not None and self.process.poll() is None:
                 raise RuntimeError("MPI run already active")
             self.case.mkdir(parents=True, exist_ok=True)
+            from netcdf_io import prepare_solver_cwd, release_solver_cwd
+            cwd, link = prepare_solver_cwd(self.case)
+            self._solver_link = link
             self._log = (self.case / "model_run.log").open("w", encoding="utf-8", errors="replace")
             # Keep the model's packaged DLLs first and the MPI runtime next.
-            env = solver_environment(self.solver)
+            env = solver_environment(self.solver, threads=self.omp_threads)
             mpi_runtime = str(Path(self.launcher).resolve().parent)
             paths = [p for p in env.get("PATH", "").split(os.pathsep) if p]
             extras = [str(p) for p in self.runtime_dirs]
@@ -490,23 +694,40 @@ class MpiRun:
             seen = {os.path.normcase(os.path.normpath(p)) for p in configured}
             ambient = [p for p in paths if os.path.normcase(os.path.normpath(p)) not in seen]
             env["PATH"] = os.pathsep.join(configured + ambient)
-            kwargs = {"cwd": str(self.case), "stdout": self._log,
+            kwargs = {"cwd": cwd, "stdout": self._log,
                       "stderr": subprocess.STDOUT, "env": env}
             if os.name == "nt":
                 kwargs["creationflags"] = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
             else:
                 kwargs["start_new_session"] = True
-            self.process = self.popen(mpi_command(self.launcher, self.solver, self.n), **kwargs)
+            try:
+                self.process = self.popen(mpi_command(self.launcher, self.solver, self.n), **kwargs)
+            except Exception:
+                release_solver_cwd(self._solver_link)
+                self._solver_link = None
+                raise
             return self.process
 
     def stop(self):
         if self.process is not None:
             stop_process_tree(self.process)
 
+    def release_workdir(self):
+        """Drop an ASCII junction created for a non-ACP working directory."""
+        from netcdf_io import release_solver_cwd
+        release_solver_cwd(getattr(self, "_solver_link", None))
+        self._solver_link = None
+
     def finish(self):
         """Report solver diagnostics before handling launcher exit status."""
         if self.process is None:
             raise RuntimeError("MPI run was not started")
+        try:
+            return self._finish_solver()
+        finally:
+            self.release_workdir()
+
+    def _finish_solver(self):
         code = self.process.wait()
         if self._log:
             self._log.flush()

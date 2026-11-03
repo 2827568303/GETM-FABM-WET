@@ -1,0 +1,24 @@
+Theoretical Lake - design summary
+==================================================
+
+Shape              : heart (point south), irregular shoreline
+Grid               : 24 x 20 cells, 500 m x 500 m
+Wet cells          : 280
+Surface area       : 70.00 km²
+Average depth      : 5.30 m
+Maximum depth      : 10.20 m
+Minimum depth      : 1.00 m
+Volume             : 371.05 Mm³
+Sigma layers       : 10
+Deepest point (i,j): (9, 6)  [centre -> NW]
+Centroid    (i,j)  : (12.3, 8.8)
+
+Rivers:
+  INFL_NW  inflow   width~1.0km  cells=(3,7), (3,6)  meanQ=4.00 m³/s
+  INFL_NE  inflow   width~0.5km  cells=(21,3)  meanQ=1.50 m³/s
+  INFL_W   inflow   width~0.5km  cells=(3,11)  meanQ=1.50 m³/s
+  OUTFL_S  outflow  width~0.5km  cells=(13,19)  meanQ=-2.25 m³/s
+  OUTFL_E  outflow  width~1.0km  cells=(20,11), (20,12)  meanQ=-4.51 m³/s
+
+Total river cells  : 7
+Simulation period  : 2020-01-01 to 2020-12-31 (366 days)

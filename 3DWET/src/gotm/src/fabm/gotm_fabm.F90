@@ -39,6 +39,9 @@
 
    ! Variables below must be accessible for gotm_fabm_output
    public dt,h,save_inputs
+   ! When false, instantaneous diagnostics are not copied into the host
+   ! column. Time-integrated diagnostics are always updated.
+   logical, public :: save_instant_diagnostics = .true.
 
    ! Variables below must be accessible for getm_fabm
    public cc_transport
@@ -2008,15 +2011,38 @@
 !
 ! !LOCAL VARIABLES:
    integer :: i
+   logical, save :: aggregate_known = .false.
+   logical, save :: has_aggregate = .false.
 !
 !EOP
 !-----------------------------------------------------------------------!
 !BOC
+   ! GETM rewrites every saved diagnostic to instantaneous, then only reads
+   ! the host array on output steps. Walking ~1000 diagnostics per column
+   ! on the other steps does not change the stored fields.
+   if (.not. aggregate_known) then
+      has_aggregate = .false.
+      do i=1,size(model%horizontal_diagnostic_variables)
+         if (model%horizontal_diagnostic_variables(i)%output/=output_none .and. &
+             model%horizontal_diagnostic_variables(i)%output/=output_instantaneous) &
+            has_aggregate = .true.
+      end do
+      do i=1,size(model%diagnostic_variables)
+         if (model%diagnostic_variables(i)%output/=output_none .and. &
+             model%diagnostic_variables(i)%output/=output_instantaneous) &
+            has_aggregate = .true.
+      end do
+      aggregate_known = .true.
+   end if
+   if (.not. save_instant_diagnostics .and. .not. has_aggregate) return
+
    ! Time-integrate diagnostic variables defined on horizontal slices, where needed.
    do i=1,size(model%horizontal_diagnostic_variables)
       if (model%horizontal_diagnostic_variables(i)%output==output_instantaneous) then
-         ! Simply use last value
-         cc_diag_hz(i) = fabm_get_horizontal_diagnostic_data(model,i)
+         ! Simply use last value. Skip when the host will not read it:
+         ! the value is recomputed from the current state, so dropping
+         ! this copy does not change the next source term.
+         if (save_instant_diagnostics) cc_diag_hz(i) = fabm_get_horizontal_diagnostic_data(model,i)
       elseif (model%horizontal_diagnostic_variables(i)%output/=output_none) then
          ! Integration or averaging in time needed: for now do simple Forward Euler integration.
          ! If averaging is required, this will be done upon output by dividing by the elapsed period.
@@ -2027,8 +2053,8 @@
    ! Time-integrate diagnostic variables defined on the full domain, where needed.
    do i=1,size(model%diagnostic_variables)
       if (model%diagnostic_variables(i)%output==output_instantaneous) then
-         ! Simply use last value
-         cc_diag(:,i) = fabm_get_bulk_diagnostic_data(model,i)
+         ! Simply use last value. See the horizontal case above.
+         if (save_instant_diagnostics) cc_diag(:,i) = fabm_get_bulk_diagnostic_data(model,i)
       elseif (model%diagnostic_variables(i)%output/=output_none) then
          ! Integration or averaging in time needed: for now do simple Forward Euler integration.
          ! If averaging is required, this will be done upon output by dividing by the elapsed period.

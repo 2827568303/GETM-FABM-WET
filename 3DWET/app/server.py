@@ -30,15 +30,19 @@ import shapefile  # pyshp
 import crs_utils
 import fish_support
 from model_dates import parse_ordinal_date, parse_calendar_date, format_model_time
-from solver_runtime import solver_environment, inspect_runtime, explain_exit_code, log_has_solver_failure
+from solver_runtime import (
+    solver_environment, inspect_runtime, explain_exit_code, log_has_solver_failure,
+    prepare_solver_log_chunk,
+)
 from run_metrics import IncrementalLogReader, RunMetrics, read_rank_zero_stderr
+from run_monitor import build_run_monitor
 from run_diagnostics import inspect_forcing_coverage, register_run_diagnostic_routes
 from run_output_health import validate_current_run_outputs
 from gotm_working_copy import (KIND as _GOTM_WORKING_KIND, create_working_copy as _create_gotm_working_copy,
                                load_or_create_key as _load_gotm_manifest_key,
                                validate_gotm_output as _validate_gotm_output,
                                validate_working_copy as _validate_gotm_working_copy)
-from netcdf_io import open_dataset
+from netcdf_io import NETCDF_LOCK, open_dataset
 from output_subscriptions import resolve_sources as _resolve_output_sources, preset_sources as _output_preset_sources, model_sources as _output_model_sources
 from lake_points_api import effective_calibration_points, register_lake_points_routes
 from scipy.interpolate import griddata
@@ -102,6 +106,25 @@ BIN_DIR = BASE_DIR / "bin"
 _NATIVE_EXE = BIN_DIR / "getm_cartesian.exe"
 EXE_PATH = _NATIVE_EXE if _NATIVE_EXE.exists() else BIN_DIR / "getm_cartesian"
 
+
+def active_solver_path():
+    """Windows launches the packaged exe. Linux and a cluster launch a native ELF.
+
+    A checkout that still contains the Windows exe must not try to exec that
+    PE on Linux. The ELF is produced by scripts/build_linux_solver.sh and is
+    not committed.
+    """
+    if os.name == "nt":
+        return EXE_PATH
+    candidates = (
+        BIN_DIR / "getm_cartesian",
+        BASE_DIR / "build-linux" / "getm" / "getm_cartesian",
+    )
+    for candidate in candidates:
+        if candidate.is_file() and os.access(candidate, os.X_OK):
+            return candidate
+    return EXE_PATH
+
 # MinGW runtime DLL dir (libgfortran/libnetcdf/libhdf5...) needed by the exe.
 MSYS_UCRT_BIN = Path.home() / ".local" / "share" / "msys64" / "ucrt64" / "bin"
 
@@ -153,6 +176,10 @@ app = Flask(__name__,
             static_folder=str(APP_DIR / "static"))
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable static file caching
+# Create the environment after the config assignment. Flask otherwise keeps
+# the default (reload only while debug is on), so an edited index.html stays
+# stale until the process restarts.
+app.jinja_env.auto_reload = True
 
 # ── NaN-safe JSON (CRITICAL) ──────────────────────────────────────────
 # 陆地格掩膜 → float('nan')。Python json 容忍 NaN 字面量，但浏览器
@@ -185,7 +212,7 @@ app.json = SafeJSONProvider(app)
 #  exception=c0000005，python.exe。）
 # 因此所有 nc.Dataset 打开（读/写/追加）必须经 nc_open() 或 _with_nc_lock
 # 串行化。RLock 允许同线程重入，嵌套调用安全。
-_NC_LOCK = threading.RLock()
+_NC_LOCK = NETCDF_LOCK
 
 @contextmanager
 def nc_open(path, mode="r"):
@@ -248,6 +275,8 @@ run_metrics = RunMetrics()
 _run_identity = None
 _run_log_case_path = None
 _mpi_tuning_lock = threading.Lock()
+_core_calibration_lock = threading.Lock()
+_core_calibration = {"status": "idle", "error": None}
 _mpi_tuning_state = {"status": "idle", "progress": None, "result": None,
                      "error": None, "cancel": None, "signature": None}
 _run_repair_summary_counts = None
@@ -315,14 +344,17 @@ def _run_repair_summary_payload():
 _LAST_CASE_FILE = CASE_STATE_DIR / ".active_case.json"
 
 def _is_pytest_temporary_case_path(path):
-    """Reject pytest-managed temporary directories from persistent app state."""
+    """Reject pytest-managed temporary directories from persistent app state.
+
+    The marker is on the path itself. Comparing only against the current
+    temp directory misses a case recorded before this process pointed TMP at
+    the case scratch folder.
+    """
     try:
         resolved = Path(path).resolve()
-        temp_root = Path(tempfile.gettempdir()).resolve()
-        relative = resolved.relative_to(temp_root)
     except (OSError, ValueError):
         return False
-    parts = [part.casefold() for part in relative.parts]
+    parts = [part.casefold() for part in resolved.parts]
     return any(part.startswith("pytest-of-") or re.fullmatch(r"pytest-\d+", part)
                for part in parts)
 
@@ -1319,7 +1351,7 @@ def _nc_time_len(path):
 _CASE_SUBDIRS = {
     "Input": "用户提供的原始数据放这里（气象/河流 CSV、水深文本、hypsograph.dat、shapefile 等）。\n"
              "模型运行需要的 .nc 文件由 GUI 转换后放在案例根目录——GETM 以根目录为工作目录，这是模型侧要求。",
-    "output": "模型运行产物归档目录。每次运行成功结束后，*.2d.nc / *.3d.nc / output.nc / restart.nc\n"
+    "output": "模型运行产物归档目录。每次运行成功结束后，*.2d.nc / *.3d.nc / output.nc / restart.nc / ext_wq*.nc\n"
               "会自动从根目录移入这里（根目录只保留运行中的临时文件）。GUI 读取结果时两个位置都会找。",
     "analysis": "分析产物目录：图表、诊断报告、导出的时间序列等。",
     "calibration": "率定相关文件：观测数据、率定配置、率定结果与最优参数记录。",
@@ -1359,10 +1391,16 @@ def find_output_files(case_path, var_name=None):
     cands = {"2d": [], "3d": []}
     discovered = list(case.glob("*.2d.nc")) + list(case.glob("*.3d.nc")) + \
                  list((case / "output").glob("*.2d.nc")) + list((case / "output").glob("*.3d.nc"))
+    for folder in (case, case / "output"):
+        if not folder.is_dir() and folder != case:
+            continue
+        for extra in folder.glob("ext_wq*.nc"):
+            if extra.is_file():
+                discovered.append(extra)
     for f in discovered:
         if ".2d.nc" in f.name:
             cands["2d"].append(f)
-        elif ".3d.nc" in f.name:
+        elif ".3d.nc" in f.name or (f.name.startswith("ext_wq") and f.name.endswith(".nc")):
             cands["3d"].append(f)
     primary = [case / 'output.nc', case / 'output' / 'output.nc']
     revision_paths = [*discovered, *primary]
@@ -1513,6 +1551,9 @@ def _get_2d_field_from_dataset(ds, var_name, timestep=0, level=0,
 
     aggregation = 'not_applicable' if depth_average else 'layer'
     weight_source = None
+    layer_contrast = None
+    logical_level = None
+    level_applies = False
     if var.ndim == 3 and time_idx == 0:  # time, y, x
         nt = var.shape[0]
         if nt == 0:
@@ -1527,10 +1568,17 @@ def _get_2d_field_from_dataset(ds, var_name, timestep=0, level=0,
         if depth_average:
             field, weight_source = depth_weighted_field(ds, var, t)
             aggregation = 'depth_weighted_mean'
+            layer_contrast = None
         else:
             start, _ = physical_vertical_grid(ds, var)
-            _, lev = physical_layer_index(level, start, var.shape[1])
+            logical_level, lev = physical_layer_index(level, start, var.shape[1])
+            level_applies = True
             field = _fill(var[t, lev, :, :])
+            from result_layers import surface_bottom_contrast
+            bottom = _fill(var[t, start, :, :])
+            surface = _fill(var[t, var.shape[1] - 1, :, :])
+            layer_contrast = surface_bottom_contrast(bottom, surface, bottom_index=start,
+                                                     surface_index=var.shape[1] - 1)
     elif var.ndim == 2 and not time_axes:
         # Static 2D fields (for example bathymetry) are valid map inputs.
         # Never use an unqualified fallback for other shapes: an unrelated
@@ -1556,14 +1604,33 @@ def _get_2d_field_from_dataset(ds, var_name, timestep=0, level=0,
         "max": float(np.nanmax(field)) if not np.all(np.isnan(field)) else 0,
         "mean": float(np.nanmean(field)) if not np.all(np.isnan(field)) else 0,
         "bathymetry": bathy.tolist() if bathy is not None else None,
+        "layer_contrast": layer_contrast,
+        "level": logical_level,
+        "level_applies": level_applies,
     }
 
 
 def get_2d_field(nc_path, var_name, timestep=0, level=0, depth_average=False, include_bathymetry=True):
     """Extract one 2D field with a single hyperslab read from NetCDF."""
+    from result_slice_cache import lookup as _slice_lookup, store as _slice_store
+    cache_key = None
+    try:
+        stat = Path(nc_path).stat()
+        cache_key = (str(Path(nc_path).resolve()), int(stat.st_mtime_ns), int(stat.st_size),
+                     str(var_name), int(timestep), int(level), bool(depth_average),
+                     bool(include_bathymetry))
+    except (OSError, TypeError, ValueError):
+        cache_key = None
+    if cache_key is not None:
+        cached = _slice_lookup(cache_key)
+        if cached is not None:
+            return cached
     with nc_open(nc_path) as ds:
-        return _get_2d_field_from_dataset(ds, var_name, timestep, level,
-                                          depth_average, include_bathymetry)
+        result = _get_2d_field_from_dataset(ds, var_name, timestep, level,
+                                            depth_average, include_bathymetry)
+    if cache_key is not None and result is not None:
+        _slice_store(cache_key, result)
+    return result
 
 
 def get_2d_fields(nc_path, var_name, timesteps, level=0, depth_average=False,
@@ -2171,7 +2238,7 @@ def _archive_run_outputs(case_path, run_logs):
         out_dir.mkdir(exist_ok=True)
         moved = []
         with _NC_LOCK:  # 与结果读取端点互斥，避免移动到一半被打开
-            for pat in ("*.2d.nc", "*.3d.nc", "output.nc", "restart.nc"):
+            for pat in ("*.2d.nc", "*.3d.nc", "output.nc", "restart.nc", "ext_wq*.nc"):
                 for f in case.glob(pat):
                     if not f.is_file():
                         continue
@@ -2206,7 +2273,7 @@ def _compress_completed_getm_outputs(case_path, logs):
     if isinstance(run_config, dict):
         run_config["phase"] = "compressing"
     paths = []
-    for pattern in ("*.2d.nc", "*.3d.nc", "output.nc"):
+    for pattern in ("*.2d.nc", "*.3d.nc", "output.nc", "ext_wq*.nc"):
         paths.extend(Path(case_path).glob(pattern))
     paths = list(dict.fromkeys(path for path in paths if path.is_file()))
     if not paths:
@@ -2228,7 +2295,36 @@ def _compress_completed_getm_outputs(case_path, logs):
     return True
 
 
-def run_model_thread(case_path, exe_path):
+def _spawn_solver(exe_path, case_path, log_handle, threads, *, trusted_gotm_copy=False):
+    """Start the solver with an explicit OpenMP team size."""
+    exe_path = Path(exe_path)
+    env = solver_environment(exe_path, threads=threads)
+    is_native = str(exe_path).lower().endswith(".exe")
+    if is_native:
+        if trusted_gotm_copy:
+            extra_runtime = [BIN_DIR / "runtime", MSYS_UCRT_BIN]
+            env["PATH"] = os.pathsep.join(str(p) for p in extra_runtime if p.is_dir()) + os.pathsep + env.get("PATH", "")
+        env["GFORTRAN_UNBUFFERED_PRECONNECTED"] = "y"
+        env["GFORTRAN_UNBUFFERED_ALL"] = "y"
+        return subprocess.Popen(
+            [str(exe_path)], cwd=str(case_path), stdout=log_handle,
+            stderr=subprocess.STDOUT, env=env,
+            creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)
+    if os.name != "nt":
+        return subprocess.Popen(
+            [str(exe_path)], cwd=str(case_path), stdout=log_handle,
+            stderr=subprocess.STDOUT, env=env)
+    case_wsl = wsl_path(case_path)
+    exe_wsl = wsl_path(exe_path)
+    log_wsl = wsl_path(case_path / "model_run.log")
+    team = max(1, int(threads or 1))
+    return subprocess.Popen(
+        ["wsl.exe", "bash", "-c",
+         f"cd '{case_wsl}' && OMP_NUM_THREADS={team} '{exe_wsl}' > '{log_wsl}' 2>&1"],
+        creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)
+
+
+def run_model_thread(case_path, exe_path, threads=None):
     """Run model in background thread, output to log file for stability."""
     global run_process, run_status, run_logs, run_start_time, run_case_path
 
@@ -2250,36 +2346,53 @@ def run_model_thread(case_path, exe_path):
                 return
             log_fh = open(model_log, "w", encoding="utf-8", errors="replace")
             model_log_started = True
-            if is_native:
-                # Native Windows exe: run directly with MinGW runtime DLLs on PATH.
-                env = solver_environment(exe_path)
-                if trusted_gotm_copy:
-                    extra_runtime = [BIN_DIR / "runtime", MSYS_UCRT_BIN]
-                    env["PATH"] = os.pathsep.join(str(p) for p in extra_runtime if p.is_dir()) + os.pathsep + env.get("PATH", "")
-                # WET numerical errors use stdout while GETM progress uses
-                # stderr. Preserve both streams so exit code 0 cannot hide a
-                # numerical failure; stop at the first recognized error.
-                env["GFORTRAN_UNBUFFERED_PRECONNECTED"] = "y"
-                env["GFORTRAN_UNBUFFERED_ALL"] = "y"
-                run_process = subprocess.Popen(
-                    [str(exe_path)],
-                    cwd=str(case_path),
-                    stdout=log_fh,
-                    stderr=subprocess.STDOUT,
-                    env=env,
-                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
-                )
-            else:
-                # WSL/Linux binary: launch through wsl.exe with shell redirection.
-                case_wsl = wsl_path(case_path)
-                exe_wsl = wsl_path(exe_path)
-                log_wsl = wsl_path(model_log)
+            if not is_native and os.name == "nt":
+                # Windows host, Linux binary: launch through wsl.exe.
                 log_fh.close()
-                run_process = subprocess.Popen(
-                    ["wsl.exe", "bash", "-c",
-                     f"cd '{case_wsl}' && '{exe_wsl}' > '{log_wsl}' 2>&1"],
-                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
-                )
+                log_fh = None
+            run_process = _spawn_solver(
+                exe_path, case_path, log_fh, threads, trusted_gotm_copy=trusted_gotm_copy)
+            shown = threads if threads is not None else solver_environment(exe_path).get("OMP_NUM_THREADS", "1")
+            run_logs.append(f"[INFO] OpenMP 线程数 OMP_NUM_THREADS={shown}")
+        progress_seen = False
+        silent_seconds = 0
+
+        def relaunch_serial(reason):
+            nonlocal threads, log_fh, progress_seen, silent_seconds
+            global run_process
+            serial_exe = Path(exe_path).with_name("getm_cartesian_serial.exe")
+            if not serial_exe.is_file():
+                serial_exe = Path(exe_path)
+            run_logs.append(f"[WARN] {reason}，改用 1 个线程。")
+            threads = 1
+            if isinstance(run_config, dict):
+                run_config["omp_threads"] = 1
+                run_config["mpi_ranks"] = 1
+                run_config["requested_cores"] = 1
+                run_config["parallel_mode"] = "serial"
+                run_config["fallback_serial"] = True
+                run_config["solver_mode"] = "串行 (1 核)"
+            try:
+                if run_process is not None and run_process.poll() is None:
+                    run_process.kill()
+                    run_process.wait(timeout=10)
+            except Exception:
+                pass
+            if log_fh is not None and not log_fh.closed:
+                log_fh.close()
+            log_fh = open(model_log, "a", encoding="utf-8", errors="replace")
+            run_process = _spawn_solver(
+                serial_exe, case_path, log_fh, 1, trusted_gotm_copy=trusted_gotm_copy)
+            progress_seen = False
+            silent_seconds = 0
+
+        if threads and int(threads) > 1 and run_process is not None:
+            try:
+                early = run_process.wait(timeout=8)
+            except subprocess.TimeoutExpired:
+                early = None
+            if early not in (None, 0):
+                relaunch_serial(f"{threads} 核启动失败（退出码 {early}）")
         # Poll log file for progress while model runs
         log_read_pos = 0
         # Exit-hang watchdog (native exe only): the MinGW build can freeze in
@@ -2296,6 +2409,25 @@ def run_model_thread(case_path, exe_path):
                     f.seek(log_read_pos)
                     new_lines = f.read()
                     log_read_pos = f.tell()
+                if len(new_lines) > 2_000_000:
+                    run_logs.append(
+                        "[ERROR] 日志在 1 秒内增加超过 2MB，判定为 Patankar 警告刷屏"
+                        "（滇池约 29% 卡死的原因）。已停止模型，避免磁盘被日志写满。")
+                    solver_failed = True
+                    new_lines = new_lines[-4000:]
+                new_lines, _dropped = prepare_solver_log_chunk(new_lines)
+                if re.search(r"n=\s*\d+", new_lines):
+                    progress_seen = True
+                    silent_seconds = 0
+                elif new_lines.strip():
+                    silent_seconds = 0
+                else:
+                    silent_seconds += 1
+                if (threads and int(threads) > 1 and not progress_seen
+                        and silent_seconds >= 90 and (time.time() - run_start_time) > 90):
+                    relaunch_serial(f"{threads} 核启动后 90 秒没有步进，判定为卡住")
+                    log_read_pos = 0
+                    continue
                 run_metrics.observe(new_lines)
                 solver_failed |= log_has_solver_failure(new_lines)
                 for line in new_lines.splitlines():
@@ -2338,6 +2470,11 @@ def run_model_thread(case_path, exe_path):
             with open(model_log, "r", encoding="utf-8", errors="replace") as f:
                 f.seek(log_read_pos)
                 remaining = f.read()
+                if len(remaining) > 2_000_000:
+                    run_logs.append("[ERROR] 结束时日志增量超过 2MB，已截断 Patankar 刷屏。")
+                    solver_failed = True
+                    remaining = remaining[-4000:]
+                remaining, _dropped = prepare_solver_log_chunk(remaining)
                 run_metrics.observe(remaining)
                 solver_failed |= log_has_solver_failure(remaining)
                 for line in remaining.splitlines():
@@ -2412,15 +2549,26 @@ def run_model_thread(case_path, exe_path):
 def run_mpi_model_thread(case_path, launcher, solver, process_count, runtime_dirs=None):
     """Run an MPI executable group and publish results only after rank merge."""
     global run_process, run_status, run_logs, run_case_path, run_config
-    from mpi_runner import MpiRun, merge_case_rank_outputs, prepare_mpi_case
+    from mpi_runner import (MpiRun, describe_mpi_solver_failure,
+                            merge_case_rank_outputs, prepare_mpi_case,
+                            salvage_mpi_outputs)
     original_case = Path(case_path).resolve()
     case = None
     runner = None
+    handoff_serial = False
     try:
-        case = prepare_mpi_case(original_case, msg_method=3, process_count=process_count)
+        disable_hotstart = bool((run_config or {}).get("hotstart_disabled"))
+        case = prepare_mpi_case(original_case, msg_method=3, process_count=process_count,
+                                disable_hotstart=disable_hotstart)
         run_logs.append(f"[INFO] MPI isolated working copy: {case}")
+        ceiling = process_count
+        omp_threads = 1
+        if isinstance(run_config, dict):
+            ceiling = run_config.get("mpi_cpu_ceiling") or process_count
+            omp_threads = run_config.get("omp_threads") or 1
         runner = MpiRun(launcher=launcher, solver=solver, n=process_count, case=case,
-                        runtime_dirs=runtime_dirs,
+                        runtime_dirs=runtime_dirs, cpu_count=ceiling,
+                        omp_threads=omp_threads,
                         merger=merge_case_rank_outputs, feature_enabled=True)
         run_process = runner.start()
         if isinstance(run_config, dict):
@@ -2548,20 +2696,74 @@ def run_mpi_model_thread(case_path, launcher, solver, process_count, runtime_dir
             shutil.rmtree(stage, ignore_errors=True)
         run_logs.append(f"[INFO] MPI run merged and validated ({len(merged)} output families)")
     except Exception as error:
-        if run_status != "stopped": run_status = "failed"
-        run_logs.append(f"[ERROR] MPI run failed: {error}")
+        elapsed = time.time() - (run_start_time or time.time())
+        saw_step = any(re.search(r"n=\s*\d+", line or "") for line in run_logs)
+        # Merge and publish errors happen after the launcher has already
+        # exited 0. Retrying those as a serial run would replace the user's
+        # outputs. Only a launch that never started stepping falls back.
+        returncode = getattr(run_process, "returncode", None)
+        never_started = runner is None or run_process is None or returncode not in (0, None)
+        diagnosed = False
+        if case is not None:
+            chunks = []
+            for path in [case / "model_run.log", *case.glob("*.stdout"), *case.glob("*.stderr")]:
+                if path.is_file():
+                    chunks.append(path.read_text(encoding="utf-8", errors="replace")[-20000:])
+            diagnosed = log_has_solver_failure("\n".join(chunks))
+        if run_status != "stopped" and never_started and not saw_step and not diagnosed and elapsed < 180:
+            run_logs.append(f"[WARN] MPI 没有开始步进（{error}），改用 1 个线程。")
+            if isinstance(run_config, dict):
+                run_config["omp_threads"] = 1
+                run_config["mpi_ranks"] = 1
+                run_config["requested_cores"] = 1
+                run_config["parallel_mode"] = "serial"
+                run_config["fallback_serial"] = True
+                run_config["solver_mode"] = "串行 (1 核)"
+                run_config["phase"] = "solving"
+            serial_exe = active_solver_path()
+            packaged_serial = Path(serial_exe).with_name("getm_cartesian_serial.exe")
+            if os.name == "nt" and packaged_serial.is_file():
+                serial_exe = packaged_serial
+            if run_status != "running":
+                run_status = "running"
+            handoff_serial = True
+            run_model_thread(original_case, serial_exe, 1)
+        elif run_status != "stopped":
+            run_status = "failed"
+            detail = describe_mpi_solver_failure(case) if case is not None else None
+            if detail:
+                run_logs.append(f"[ERROR] {detail}")
+            run_logs.append(f"[ERROR] MPI run failed: {error}")
     finally:
         if isinstance(run_config, dict) and run_config.get("solver_mode", "").startswith("MPI"):
             if run_status in {"completed", "failed", "stopped"}:
                 run_config["phase"] = run_status
-        if runner is not None and runner._log:
-            try: runner._log.close()
-            except Exception: pass
+        if runner is not None:
+            try:
+                runner.release_workdir()
+            except Exception:
+                pass
+            if runner._log:
+                try: runner._log.close()
+                except Exception: pass
         run_metrics.finish()
         if case is not None:
             if run_status == "completed":
                 shutil.rmtree(case, ignore_errors=True)
             else:
+                try:
+                    saved = salvage_mpi_outputs(case, process_count, original_case / "output")
+                    names = [path.name for path in saved["merged"]] + [path.name for path in saved["shards"]]
+                    if names:
+                        run_logs.append("[INFO] 失败前的输出已保存到 output/：" + ", ".join(names))
+                    elif saved["warning"]:
+                        run_logs.append(f"[WARN] 无法保存失败前的 MPI 输出: {saved['warning']}")
+                    if run_status == "stopped":
+                        detail = describe_mpi_solver_failure(case)
+                        if detail:
+                            run_logs.append(f"[ERROR] {detail}")
+                except Exception as error:
+                    run_logs.append(f"[WARN] 无法保存失败前的 MPI 输出: {error}")
                 try:
                     shutil.copy2(case / "model_run.log", original_case / "model_run.mpi.log")
                     for pattern in ("*.stdout", "*.stderr"):
@@ -2612,8 +2814,15 @@ def _unregister_external_case(path):
 def _is_case_dir(p):
     """Recognize GETM projects and identifiable native, single-column GOTM results."""
     p = Path(p)
-    return ((p / "getm.inp").is_file() or (p / "bathymetry.nc").is_file()
+    return ((p / "getm.inp").is_file() or (p / "getm.dat").is_file()
+            or (p / "bathymetry.nc").is_file()
             or _is_gotm_result_dir(p) or _is_trusted_gotm_working_copy(p))
+
+
+def _is_app_case_shell(p):
+    """A new case created by the preprocessor, before inputs have been saved."""
+    p = Path(p)
+    return p.is_dir() and all((p / name / "README.txt").is_file() for name in _CASE_SUBDIRS)
 
 
 def _is_trusted_gotm_working_copy(path):
@@ -2904,8 +3113,10 @@ def list_cases():
         if case_root.exists():
             for d in case_root.iterdir():
                 has_proxy_manifest = (d / "proxy_engineering.json").is_file()
-                if d.is_dir() and ((d / "getm.inp").exists() or _is_gotm_result_dir(d)
-                                   or is_working_gotm(d) or has_proxy_manifest):
+                if d.is_dir() and ((d / "getm.inp").exists() or (d / "getm.dat").is_file()
+                                   or (d / "bathymetry.nc").is_file() or _is_gotm_result_dir(d)
+                                   or is_working_gotm(d) or has_proxy_manifest
+                                   or _is_app_case_shell(d)):
                     key = str(d.resolve()).lower()
                     if key not in seen:
                         cases.append(_case_info(d, False))
@@ -2920,6 +3131,73 @@ def list_cases():
         cases.append(_case_info(d, True))
         seen.add(key)
     return jsonify(cases)
+
+
+_CASE_SCAN = None
+_CASE_SCAN_LOCK = threading.Lock()
+_SCAN_FLAG = CASE_STATE_DIR / "local_case_scan_started"
+
+
+def _case_scan():
+    global _CASE_SCAN
+    with _CASE_SCAN_LOCK:
+        if _CASE_SCAN is None:
+            from case_scan import LocalCaseScan
+            _CASE_SCAN = LocalCaseScan()
+        return _CASE_SCAN
+
+
+def _scan_targets():
+    from case_scan import default_roots
+    extra = [str(CASE_DIR), str(LEGACY_CASE_DIR)]
+    extra.extend(_load_external_cases())
+    return default_roots(extra)
+
+
+@app.route("/api/cases/scan/bootstrap")
+def case_scan_bootstrap():
+    """Whether this profile has never started a local scan."""
+    return jsonify({"auto": not _SCAN_FLAG.exists()})
+
+
+@app.route("/api/cases/scan", methods=["GET", "POST"])
+def case_scan():
+    """Start or report a cancellable scan of local case folders. No upload."""
+    scanner = _case_scan()
+    if request.method == "POST":
+        try:
+            _SCAN_FLAG.parent.mkdir(parents=True, exist_ok=True)
+            _SCAN_FLAG.write_text("1", encoding="ascii")
+        except OSError:
+            pass
+        roots, drives = _scan_targets()
+        return jsonify(scanner.start(roots, drives))
+    return jsonify(scanner.status())
+
+
+@app.route("/api/cases/scan/cancel", methods=["POST"])
+def case_scan_cancel():
+    return jsonify(_case_scan().cancel())
+
+
+@app.route("/api/cases/register", methods=["POST"])
+def register_scanned_case():
+    """Remember a scanned case. The path stays on this computer."""
+    raw = str((request.json or {}).get("path") or "").strip().strip('"')
+    if not raw:
+        return jsonify({"error": "缺少案例路径"}), 400
+    path = Path(raw)
+    if not path.is_absolute():
+        return jsonify({"error": "请提供绝对路径"}), 400
+    try:
+        path = path.resolve()
+    except OSError:
+        return jsonify({"error": "路径不可用"}), 400
+    if not path.is_dir() or not _is_case_dir(path):
+        return jsonify({"error": "不是有效案例目录（需要 getm.inp、getm.dat 或 bathymetry.nc）"}), 400
+    _register_external_case(path)
+    return jsonify({"success": True, "path": str(path), "name": path.name})
+
 
 @app.route("/api/system/case-storage")
 def case_storage_status():
@@ -3159,7 +3437,7 @@ def case_delete():
     protected = {BASE_DIR.resolve(), APP_DIR.resolve(), *_case_roots(), Path.home().resolve()}
     if p in protected or p.parent == p:
         return jsonify({"error": "非法目录"}), 400
-    if not p.is_dir() or not _is_case_dir(p):
+    if not p.is_dir() or not (_is_case_dir(p) or (_under_case_dir(p) and _is_app_case_shell(p))):
         return jsonify({"error": "目录不存在或不是有效案例"}), 400
     if not _under_case_dir(p):
         known = any(str(Path(x).resolve()).lower() == str(p).lower()
@@ -3414,7 +3692,9 @@ def _parse_output_yaml(out_path):
     ts = re.search(r"time_step\s*:\s*([0-9.]+)", text)
     si = re.search(r"sync_interval\s*:\s*(-?[0-9.]+)", text)
     # Extract the `variables:` block as raw text (everything after the variables: line)
-    var_match = re.search(r"\n\s*variables\s*:\s*\n(.*)$", text, re.DOTALL)
+    # Stop at the next top-level key so a second file (ext_wq:) is not
+    # swallowed into the first file's variable list.
+    var_match = re.search(r"\n\s*variables\s*:\s*\n(.*?)(?=\n\S|\Z)", text, re.DOTALL)
     variables_raw = var_match.group(1).strip() if var_match else ""
     return {
         "time_unit": tu.group(1) if tu else "day",
@@ -3426,8 +3706,11 @@ def _parse_output_yaml(out_path):
 # ── Output subscription (P0) ─────────────────────────────────────────────
 # FABM's output manager (flexout) resolves each `source:` entry as:
 #   `*`        → root category = EVERY registered variable (the 17.9 GB trap)
-#   `NAME/*`   → category NAME (one FABM model instance, e.g. `abiotic_water/*`)
-#   `NAME`     → that single variable by exact name
+#   `fabm/NAME/*` → category fabm/NAME. GETM registers FABM fields there
+#                 (`getm_fabm.F90`); `NAME/*` is an empty category and
+#                 makes flexout skip ext_wq.nc.
+#   `NAME`     → that single variable by its registered name
+#                 (slashes become underscores, e.g. abiotic_water_sO2W)
 # See src/gotm/extern/flexout/src/output_manager.F90:683-704.
 # 注意：flexout 的 field manager 只注册了 temp/salt/hn/z/D 这几个水动力场
 # （实测 NativeTest 全量输出 output.nc 中仅有这 5 个）。elev/u/v 由 GETM 原生
@@ -4081,6 +4364,9 @@ def run_start():
         return jsonify({"success": False, "error": "MPI 性能调优正在运行，请取消或等待其结束后再启动模型"}), 409
     if run_thread is not None and run_thread.is_alive():
         return jsonify({"success": False, "error": "上次运行仍在结束或检查结果，请稍后再启动"}), 409
+    with _core_calibration_lock:
+        if _core_calibration.get("status") == "running":
+            return jsonify(success=False, error="正在测定核数，请等测定结束后再开始运行。"), 409
     if not active_case_path:
         return jsonify({"success": False, "error": "请先加载案例"}), 400
     raw_request = request.get_data(cache=True)
@@ -4092,13 +4378,31 @@ def run_start():
             return jsonify(success=False, error="请求体必须是 JSON 对象。"), 400
     if "compress_results" in run_request and type(run_request["compress_results"]) is not bool:
         return jsonify(success=False, error="compress_results 必须是布尔值。"), 400
+    if run_status == "running":
+        return jsonify({"success": False, "error": "模型正在运行中"}), 400
     compress_results = bool(run_request.get("compress_results", True))
     mpi_requested = bool(run_request.get("mpi", False))
+    from core_plan import (case_requests_hotstart, detect_hardware, parse_core_count,
+                            read_case_grid, resolve_plan)
+    try:
+        raw_cores = run_request.get("cores")
+        requested_cores = None if raw_cores in (None, "") else parse_core_count(raw_cores)
+        mode = run_request.get("parallel_mode") or ("mpi" if mpi_requested else "auto")
+        hardware = detect_hardware()
+        grid = read_case_grid(active_case_path) if (Path(active_case_path) / "getm.inp").is_file() else {}
+        solver_path = active_solver_path()
+        hotstart = case_requests_hotstart(active_case_path) if (Path(active_case_path) / "getm.inp").is_file() else False
+        plan = resolve_plan(hardware, grid, solver_path, requested_cores=requested_cores, mode=mode, hotstart=hotstart)
+    except ValueError as exc:
+        return jsonify(success=False, error=str(exc)), 400
+    plan_note = plan.get("note")
+    mpi_requested = plan["mode"] in {"mpi", "hybrid"}
     mpi_options = None
+    mpi_cpu_ceiling = None
     if mpi_requested:
         from mpi_runner import (MPI_RUN_ENABLED, discover_mpi_installation,
                                 merge_case_rank_outputs, mpi_capabilities,
-                                mpi_hotstart_error, validate_process_count)
+                                mpi_hotstart_error)
         if not (active_case_path / "getm.inp").is_file():
             return jsonify(success=False, error="MPI 仅支持包含 getm.inp 的 GETM 网格案例。"), 400
         mpi_grid_shape = _mpi_grid_shape(active_case_path)
@@ -4110,16 +4414,35 @@ def run_start():
                                         merger=merge_case_rank_outputs,
                                         feature_enabled=MPI_RUN_ENABLED,
                                         grid_shape=mpi_grid_shape)
+        n = int(plan["ranks"])
+        # Windows uses the packaged MS-MPI runtime when its check passes.
+        # Linux and a cluster use srun or the system mpiexec plus the native solver.
+        if os.name == "nt" and capabilities["enabled"]:
+            pass
+        else:
+            launcher = hardware.get("srun") or hardware.get("mpi_launcher")
+            solver = hardware.get("parallel_solver")
+            capabilities = {"enabled": False, "reason": capabilities.get("reason")}
         if not capabilities["enabled"]:
-            return jsonify(success=False, error=capabilities["reason"], mpi=capabilities), 400
-        try:
-            n = validate_process_count(run_request.get("processes", 1),
-                                       allowed_processes=capabilities["allowed_processes"])
-        except ValueError as exc:
-            return jsonify(success=False, error=str(exc)), 400
-        mpi_options = (launcher, solver, n, installation["runtime_dirs"])
-    if run_status == "running":
-        return jsonify({"success": False, "error": "模型正在运行中"}), 400
+            if launcher is installation["launcher"] and solver is installation["solver"]:
+                launcher = hardware.get("srun") or hardware.get("mpi_launcher")
+                solver = hardware.get("parallel_solver")
+            if not launcher or not solver or not Path(launcher).is_file() or not Path(solver).is_file():
+                return jsonify(success=False, error=capabilities["reason"], mpi=capabilities), 400
+            mpi_cpu_ceiling = n
+            mpi_options = (launcher, solver, n, [])
+        else:
+            allowed = set(capabilities.get("allowed_processes") or [])
+            if n not in allowed and not hardware.get("srun"):
+                # Counts the packaged probe did not pre-check still launch.
+                # GETM rejects a decomposition that does not fit the halo.
+                plan_note = (plan_note or "") + (
+                    f" {n} 个 MPI 进程不在本机已探测的分解里；若网格容不下，求解器会在启动时停下。")
+            if n > int(capabilities.get("max_processes") or n) and not hardware.get("srun"):
+                plan_note = (plan_note or "") + (
+                    f" 进程数 {n} 超过本机逻辑核。单机可能过载；多节点请用 srun。")
+            mpi_cpu_ceiling = max(n, int(capabilities.get("max_processes") or n))
+            mpi_options = (launcher, solver, n, installation["runtime_dirs"])
     active_is_native_gotm = (not (active_case_path / "getm.inp").is_file()
                              and (_is_gotm_result_dir(active_case_path)
                                   or _is_trusted_gotm_working_copy(active_case_path)))
@@ -4131,16 +4454,16 @@ def run_start():
         gotm_exe = active_case_path / "gotm_release.exe"
         if gotm_exe.is_symlink() or not gotm_exe.is_file() or gotm_exe.resolve().parent != active_case_path.resolve():
             return jsonify({"success": False, "error": "GOTM 工作副本缺少受校验的 gotm_release.exe；请从只读 reference 重新另存。"}), 400
-        if os.name != "nt":
-            return jsonify({"success": False, "error": "随附的 gotm_release.exe 需要 Windows 原生运行环境。"}), 400
-        if gotm_exe.read_bytes()[:2] != b"MZ":
-            return jsonify({"success": False, "error": "GOTM 工作副本的 gotm_release.exe 不是有效 Windows PE 文件；请从 reference 重新另存。"}), 400
         try:
             config = yaml.safe_load((active_case_path / "gotm.yaml").read_text(encoding="utf-8")) or {}
             times = config.get("time", {})
             start, stop, dt = _parse_gotm_time_interval(times)
         except Exception as exc:
             return jsonify({"success": False, "error": f"GOTM 时间配置无效: {exc}"}), 400
+        if os.name != "nt":
+            return jsonify({"success": False, "error": "随附的 gotm_release.exe 需要 Windows 原生运行环境。"}), 400
+        if gotm_exe.read_bytes()[:2] != b"MZ":
+            return jsonify({"success": False, "error": "GOTM 工作副本的 gotm_release.exe 不是有效 Windows PE 文件；请从 reference 重新另存。"}), 400
         try:
             (active_case_path / "output.nc").unlink(missing_ok=True)
         except OSError as exc:
@@ -4163,10 +4486,10 @@ def run_start():
     namelist_path = Path(active_case_path) / 'getm.inp'
     if namelist_path.is_file() and quoted_logicals(namelist_path.read_bytes()):
         return jsonify(success=False,error='逻辑值不能带引号，请运行体检并修复逻辑值引号。'),400
-    if not EXE_PATH.exists():
-        return jsonify({"success": False, "error": f"可执行文件不存在: {EXE_PATH}"}), 400
-    if str(EXE_PATH).lower().endswith('.exe'):
-        runtime_check = inspect_runtime(EXE_PATH, probe=True)
+    if not solver_path.exists():
+        return jsonify({"success": False, "error": f"可执行文件不存在: {solver_path}"}), 400
+    if str(solver_path).lower().endswith('.exe'):
+        runtime_check = inspect_runtime(solver_path, probe=True)
         if not runtime_check['ready']:
             return jsonify(success=False, error=runtime_check['detail'], runtime=runtime_check), 400
 
@@ -4174,13 +4497,14 @@ def run_start():
     run_logs = []
     inp_path = active_case_path / "getm.inp"
     config = parse_getm_inp(inp_path) if inp_path.exists() else {}
+    hotstart_disabled = False
     if mpi_options:
         hotstart_error = mpi_hotstart_error(config)
         if hotstart_error:
-            return jsonify(success=False, error=(
-                "当前并行求解器不支持 FABM 热启动：读取串行检查点会在 FABM temporal checkpoint 处失败。"
-                "请关闭热启动后冷启动并行运行，或改用串行求解器。"
-            )), 400
+            hotstart_disabled = True
+            plan_note = (plan_note or "") + (
+                " FABM 热启动不能和 MPI 一起读串行检查点（会在 FABM 时间检查点处失败）。"
+                "这次已自动关掉热启动，按冷启动计算。案例目录里的 getm.inp 没有改。")
     meteo_enabled = bool((config.get("meteo", {}) or {}).get("metforcing", False))
     meteo_file_exists = (active_case_path / "meteo.nc").is_file()
     if meteo_file_exists and not meteo_enabled:
@@ -4238,15 +4562,28 @@ def run_start():
     _run_identity = uuid.uuid4().hex
     run_config = estimate_run_time(active_case_path, config)
     run_config["compress_results"] = compress_results
+    run_config["requested_cores"] = plan["cores"]
+    run_config["parallel_mode"] = plan["mode"]
+    run_config["fallback_serial"] = False
+    run_config["hotstart_disabled"] = hotstart_disabled
+    run_config["mpi_cpu_ceiling"] = mpi_cpu_ceiling
+    if plan_note:
+        run_logs.append("[WARN] " + plan_note)
     run_start_time = time.time()
     if mpi_options:
         launcher, solver, n, runtime_dirs = mpi_options
-        run_config["solver_mode"] = f"MPI ({n} ranks)"
+        run_config["solver_mode"] = f"MPI ({n} ranks) × OpenMP {plan['threads']}"
+        run_config["mpi_ranks"] = n
+        run_config["omp_threads"] = plan["threads"]
         run_config["phase"] = "preparing"
         run_thread = threading.Thread(target=run_mpi_model_thread,
                                       args=(active_case_path, launcher, solver, n, runtime_dirs), daemon=True)
     else:
-        run_thread = threading.Thread(target=run_model_thread, args=(active_case_path, EXE_PATH), daemon=True)
+        run_config["mpi_ranks"] = 1
+        run_config["omp_threads"] = plan["threads"]
+        run_config["solver_mode"] = f"OpenMP ({plan['threads']} threads)" if plan["threads"] > 1 else "串行 (1 核)"
+        run_thread = threading.Thread(target=run_model_thread,
+                                      args=(active_case_path, solver_path, plan["threads"]), daemon=True)
     run_metrics.start(run_config, now=run_start_time)
     run_thread.start()
     return jsonify({"success": True})
@@ -4292,7 +4629,76 @@ def run_status_api():
         "performance": {"solver_mode": solver_mode, "step_cost_seconds":
                         1 / metrics['steps_per_second'] if metrics['steps_per_second'] and metrics['steps_per_second'] > 0 else None,
                         "estimate": run_config},
+        "monitor": build_run_monitor(run_status, metrics, run_config, result_case,
+                                     pid=getattr(run_process, "pid", None)),
     })
+
+
+def _core_plan_payload():
+    from core_plan import (case_requests_hotstart, compact_trials, describe_plan,
+                           detect_hardware, hardware_fingerprint, heuristic_plan,
+                           lookup_entry, read_case_grid, resolve_plan)
+    from mpi_runner import windows_mpi_status
+    hardware = detect_hardware()
+    has_case = bool(active_case_path and (Path(active_case_path) / "getm.inp").is_file())
+    grid = read_case_grid(active_case_path) if has_case else {}
+    solver_path = active_solver_path()
+    hotstart = case_requests_hotstart(active_case_path) if has_case else False
+    recommendation = (resolve_plan(hardware, grid, solver_path, mode="auto", hotstart=hotstart)
+                      if has_case else heuristic_plan(hardware, grid))
+    choice = recommendation.get("source") == "measured"
+    with _core_calibration_lock:
+        status = _core_calibration.get("status")
+        error = _core_calibration.get("error")
+    windows_mpi = windows_mpi_status()
+    summary = describe_plan(hardware, grid, recommendation,
+                            cached=bool(choice), calibrating=status == "running")
+    if windows_mpi.get("message"):
+        summary = summary + windows_mpi["message"]
+    entry = lookup_entry(hardware, grid, solver_path, hotstart=hotstart) if has_case else None
+    return {
+        "hardware": hardware,
+        "fingerprint": hardware_fingerprint(hardware),
+        "grid": grid,
+        "recommendation": recommendation,
+        "trials": compact_trials(entry),
+        "cached": bool(choice),
+        "calibrating": status == "running",
+        "calibration_error": error,
+        "can_calibrate": has_case and solver_path.is_file(),
+        "windows_mpi": windows_mpi,
+        "summary": summary,
+    }
+
+
+@app.route("/api/run/core-plan", methods=["GET", "POST"])
+def core_plan_api():
+    """Hardware, the recommended core count, and a short cached timing trial."""
+    if request.method == "GET":
+        return jsonify(_core_plan_payload())
+    if run_status == "running" or (run_thread is not None and run_thread.is_alive()):
+        return jsonify(success=False, error="模型正在运行，测定推迟。"), 409
+    with _core_calibration_lock:
+        if _core_calibration.get("status") == "running":
+            return jsonify(success=True, started=False, **_core_plan_payload())
+        if not active_case_path or not (Path(active_case_path) / "getm.inp").is_file():
+            return jsonify(success=False, error="请先加载 GETM 案例"), 400
+        _core_calibration.update(status="running", error=None)
+        case = Path(active_case_path)
+        exe = active_solver_path()
+
+    def work():
+        from core_plan import calibrate
+        try:
+            calibrate(case, exe, log=run_logs.append)
+            with _core_calibration_lock:
+                _core_calibration.update(status="completed", error=None)
+        except Exception as exc:
+            with _core_calibration_lock:
+                _core_calibration.update(status="failed", error=str(exc))
+
+    threading.Thread(target=work, daemon=True).start()
+    return jsonify(success=True, started=True, **_core_plan_payload())
 
 
 @app.route("/api/run/mpi-capabilities")
@@ -9407,13 +9813,9 @@ def case_build():
     output_seconds_yaml = (str(int(output_seconds))
                            if float(output_seconds).is_integer()
                            else str(output_seconds))
+    from flexout_output import case_output_yaml
     (case_path / "output.yaml").write_text(
-        "output:\n"
-        "   time_unit: second\n"
-        f"   time_step: {output_seconds_yaml}\n"
-        "   sync_interval: 1\n"
-        "   variables:\n"
-        "      - source: *\n", encoding="utf-8")
+        case_output_yaml(output_seconds_yaml), encoding="utf-8")
     if not (case_path / "meteo_input.txt").exists():
         (case_path / "meteo_input.txt").write_text("meteo.nc\n", encoding="utf-8")
     # Refresh caches so the case list / config pages see the new files
@@ -9462,15 +9864,12 @@ class _TkUnavailable(Exception):
 
 
 def _tk_pick_dir(start=""):
-    """Show the native Windows folder dialog from *this* process.
-
-    Runs tkinter directly (no child process), which is far more reliable than
-    launching a hidden ``powershell.exe``: a WinForms dialog owned by a hidden
-    window frequently never becomes visible.
-    Returns the chosen path, or "" when the user cancels.
-    """
-    import tkinter as tk
-    from tkinter import filedialog
+    """Tk folder dialog. Only used where tkinter is actually installed."""
+    try:
+        import tkinter as tk
+        from tkinter import filedialog
+    except Exception as e:
+        raise _TkUnavailable(str(e))
 
     global _PICK_TK_ROOT
     with _PICK_TK_LOCK:
@@ -9478,7 +9877,7 @@ def _tk_pick_dir(start=""):
             if _PICK_TK_ROOT is None or not _PICK_TK_ROOT.winfo_exists():
                 _PICK_TK_ROOT = tk.Tk()
             root = _PICK_TK_ROOT
-        except Exception as e:  # TclError / ImportError / no display
+        except Exception as e:  # TclError / no display
             raise _TkUnavailable(str(e))
     # 保持主窗口 withdrawn：只让系统文件夹对话框自己显示，避免闪出一个 Tk 空窗口
     try:
@@ -9502,9 +9901,11 @@ def _tk_pick_dir(start=""):
 
 
 def _ps_pick_dir(start=""):
-    """Fallback: folder dialog in a helper PowerShell process."""
+    """Last-resort folder dialog. The result file is the one Python polls."""
+    APP_TEMP_DIR.mkdir(parents=True, exist_ok=True)
     cmd = ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass",
-           "-Sta", "-File", str(PICKER_SCRIPT)]
+           "-Sta", "-File", str(PICKER_SCRIPT),
+           "-ResultFile", str(PICKER_RESULT)]
     if start:
         cmd += ["-StartDir", start]
     subprocess.Popen(cmd, cwd=str(APP_DIR),
@@ -9532,33 +9933,57 @@ def _pick_log(msg):
         pass
 
 
-def _run_folder_picker(start):
-    """Backend of the picker: write the result for the frontend to poll."""
-    path, err, engine = "", "", "tkinter"
-    _pick_log(f"picker start, start_dir={start!r}")
+def _write_picker_payload(payload):
     try:
-        path = _tk_pick_dir(start)
-    except _TkUnavailable as e:
-        _pick_log(f"tkinter unavailable: {e}")
-        err = f"本机无法弹出系统窗口（{e}），已改用备用方式"
-        engine = "powershell(回退)"
-        try:
-            path = _ps_pick_dir(start)
-        except Exception as e2:
-            _pick_log(f"powershell fallback failed: {e2}")
-            err = f"启动文件夹选择窗口失败: {e2}"
-    except Exception as e:  # noqa: BLE001
-        _pick_log(f"picker crashed: {e!r}")
-        err = f"文件夹选择窗口异常: {e}"
-        engine = "none"
-    _pick_log(f"picker done engine={engine} path={path!r} err={err!r}")
-    try:
-        PICKER_RESULT.write_text(
-            json.dumps({"path": path, "error": err, "engine": engine,
-                        "done": True}, ensure_ascii=False),
-            encoding="utf-8")
+        APP_TEMP_DIR.mkdir(parents=True, exist_ok=True)
+        PICKER_RESULT.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     except Exception:
         pass
+
+
+def _run_folder_picker(start):
+    """Show a folder dialog on an STA thread and write JSON for the poller.
+
+    Windows uses SHBrowseForFolder on its own STA thread. Tk is not the first
+    attempt: the embedded runtime has no tkinter, and a missing import must
+    not be reported as a chosen path. PowerShell is only the last fallback,
+    and it writes the same result file Python is polling.
+    """
+    from native_dialog import choose_directory, parse_picker_payload, result_payload
+    _pick_log(f"picker start, start_dir={start!r}")
+    payload = {"path": "", "paths": [], "error": "", "engine": "none",
+               "cancelled": True, "done": True}
+    if os.name == "nt":
+        try:
+            payload = result_payload(choose_directory(start, title="3DWET 选择文件夹"))
+        except Exception as exc:
+            _pick_log(f"native dialog crashed: {exc!r}")
+            payload["error"] = f"文件夹选择窗口异常: {exc}"
+            payload["cancelled"] = False
+        if not payload.get("path") and not payload.get("cancelled"):
+            _pick_log(f"native dialog failed ({payload.get('error')}); trying PowerShell")
+            try:
+                try:
+                    PICKER_RESULT.unlink(missing_ok=True)
+                except OSError:
+                    pass
+                text = _ps_pick_dir(start)
+                if text:
+                    payload = parse_picker_payload(text)
+                    payload["engine"] = payload.get("engine") or "powershell"
+            except Exception as exc:
+                _pick_log(f"powershell fallback failed: {exc!r}")
+                payload["error"] = f"启动文件夹选择窗口失败: {exc}"
+    else:
+        try:
+            path = _tk_pick_dir(start)
+            payload = {"path": path or "", "paths": [path] if path else [], "error": "",
+                       "engine": "tkinter", "cancelled": not path, "done": True}
+        except Exception as exc:
+            payload["error"] = f"当前环境没有文件夹对话框: {exc}"
+    _pick_log(f"picker done engine={payload.get('engine')} path={payload.get('path')!r} "
+              f"err={payload.get('error')!r}")
+    _write_picker_payload(payload)
 
 
 @app.route("/api/system/pick_folder", methods=["POST"])
@@ -9588,11 +10013,13 @@ def system_pick_folder_result():
         txt = PICKER_RESULT.read_text(encoding="utf-8", errors="replace").strip()
     except Exception:
         return jsonify({"path": None, "done": False})
+    from native_dialog import parse_picker_payload
+    payload = parse_picker_payload(txt)
     try:
         PICKER_RESULT.unlink(missing_ok=True)
     except OSError:
         pass
-    return jsonify({"path": txt or None, "done": True})
+    return jsonify(payload)
 
 
 @app.route("/api/system/list_dir")

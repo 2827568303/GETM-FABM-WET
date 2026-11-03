@@ -44,8 +44,11 @@ def build(client, eco=True):
     assert response.get_json()['success']
 
 
-def test_build_falls_back_to_case_storage_luoma_templates(initial_client, monkeypatch):
+def test_build_falls_back_to_case_storage_luoma_templates(initial_client, monkeypatch, tmp_path):
     client, path = initial_client
+    # The repository already contains Lake Luoma under the app tree, so the
+    # case-storage fallback is only visible when that app copy is absent.
+    monkeypatch.setattr(server, 'BASE_DIR', tmp_path / 'app-without-luoma')
     copied_sources = []
     copy2 = shutil.copy2
     def record_copy(source, destination, *args, **kwargs):

@@ -1,4 +1,5 @@
 import ast
+import threading
 from pathlib import Path
 
 from flask import Flask, jsonify, request
@@ -14,6 +15,8 @@ def _run_start_client(tmp_path):
         'request': request,
         'jsonify': jsonify,
         '_mpi_tuning_state': {'status': 'idle'},
+        '_core_calibration_lock': threading.Lock(),
+        '_core_calibration': {'status': 'idle', 'error': None},
         'run_thread': None,
         'run_status': 'running',
         'active_case_path': tmp_path,

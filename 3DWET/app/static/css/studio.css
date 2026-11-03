@@ -197,6 +197,18 @@ table tbody tr:hover{background:#eef4f7}
 .diagnostic-item:hover{transform:none;box-shadow:0 2px 4px rgba(35,46,52,.13)}
 #run-check-panel{border:1px solid #b8c2c7;border-radius:2px;background:#fff;box-shadow:0 1px 2px rgba(35,46,52,.08);padding:12px}
 #run-log{border:1px solid #435159;border-radius:2px;background:#29343a;color:#d8e0e3;box-shadow:inset 0 1px 5px rgba(0,0,0,.2);font-family:'Cascadia Mono','Consolas',monospace;line-height:1.55}
+.run-monitor{margin:0 0 12px;padding:10px 12px;border:1px solid var(--ui-border);background:var(--ui-surface,#fff)}
+.run-monitor h3{margin:0;font-size:14px}
+.run-monitor-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.run-monitor-alert{font-size:12px;padding:4px 8px;border-radius:2px}
+.run-monitor-alert.warn{background:#fff4d6;color:#7a4b00}
+.run-monitor-alert.error{background:#fde8e8;color:#8a1f1f}
+.run-monitor-metrics{display:flex;flex-wrap:wrap;gap:8px 16px;margin:8px 0;font:12px 'Cascadia Mono','Consolas',monospace}
+.run-monitor-ranks{display:flex;flex-direction:column;gap:6px}
+.run-monitor-ranks details{border:1px solid var(--ui-border)}
+.run-monitor-ranks summary{cursor:pointer;padding:4px 8px;font-size:12px}
+.run-monitor-ranks pre{margin:0;max-height:160px;overflow:auto;padding:8px;font:11px 'Cascadia Mono','Consolas',monospace;background:#111;color:#d6d6d6}
+.run-monitor-ranks details.error summary{color:#8a1f1f;font-weight:600}
 .run-console-toolbar{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;padding:12px 14px;margin:10px 0 0;border:1px solid var(--ui-border);border-bottom:0;background:#e7e9df}
 .run-physics-summary{margin:0 0 14px;padding:12px 14px;border:1px solid var(--ui-border);background:var(--ui-surface,#fff);color:var(--ui-ink);border-radius:2px}.run-physics-summary h3{margin:0 0 6px;font-size:14px}.run-physics-summary [role=status]{font-size:12px;color:var(--ui-muted);line-height:1.45}.run-physics-point{margin-top:5px;font:12px 'Cascadia Mono','Consolas',monospace;color:var(--ui-ink)}.run-physics-values{display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:8px 18px;margin:9px 0 4px}.run-physics-values div{display:flex;justify-content:space-between;gap:10px;align-items:baseline;border-bottom:1px solid var(--ui-border);padding:4px 0}.run-physics-values dt{font-size:12px;color:var(--ui-muted)}.run-physics-values dd{margin:0;font:600 14px 'Cascadia Mono','Consolas',monospace;font-variant-numeric:tabular-nums}.run-physics-source{font-size:11px;color:var(--ui-muted)}
 .run-console-meta{min-width:240px;flex:1}.run-console-state-line{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;color:var(--ui-ink);font-size:13px}.run-console-case{margin-left:8px;color:var(--ui-muted);font:12px 'Cascadia Mono','Consolas',monospace;overflow-wrap:anywhere}.run-console-source{margin-top:5px;color:var(--ui-muted);font-size:12px;line-height:1.5}.run-console-actions{display:flex;gap:8px;flex-wrap:wrap}.run-console-actions button:disabled{opacity:.55;cursor:not-allowed}#run-log{margin:0;border-radius:0 0 3px 3px;min-height:220px;max-height:440px;height:42vh;padding:14px;font-size:12px;line-height:1.55;overscroll-behavior:contain;scrollbar-gutter:stable}.run-console-actions button:focus-visible,#run-log:focus-visible{outline:3px solid #16766c;outline-offset:2px}

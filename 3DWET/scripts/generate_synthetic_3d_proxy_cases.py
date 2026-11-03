@@ -24,6 +24,7 @@ CASE_NAMES = {
 }
 HYDRO_DIR = Path("build/proxy-engineering-20261027/HydroLAKES_Europe")
 OSM_XML = Path("build/proxy-engineering-20261027/source-downloads/bryrup_langso_osm_way_69314701.xml")
+RAVN_ARCHIVE = Path("build/source-research-au-cases-20261027/testcase_Lake_Ravn.zip")
 WET_ROOT = Path("3DWET/src/wet/testcases")
 TESTLAKE = Path("3DWET/workflow/cases/TestLake")
 HYDRO_URL = "https://www.hydrosheds.org/products/hydrolakes"
@@ -170,7 +171,8 @@ def _hypsograph_mean(path: Path) -> tuple[float, float]:
     area = np.asarray([row[1] for row in rows], dtype=float)
     if np.any(np.diff(depth) <= 0) or np.any(area <= 0):
         raise ValueError(f"Invalid depth/area sequence: {path}")
-    volume = float(np.trapezoid(area, depth))
+    integrate = getattr(np, "trapezoid", None) or getattr(np, "trapz")
+    volume = float(integrate(area, depth))
     return volume / float(area[-1]), float(depth[-1])
 
 
@@ -358,7 +360,7 @@ def _source_catalog(repo: Path, case: Path, lake: str, polygons_ll):
                       "mean_depth_m": mean_depth, "max_depth_m": max_depth,
                       "method": "trapezoidal integral of tabulated area versus depth divided by maximum-depth lake area; derived proxy, not measured bathymetry"}
     if lake == "Lake Ravn":
-        source = Path("build/source-research-au-cases-20261027/testcase_Lake_Ravn.zip")
+        source = RAVN_ARCHIVE
         records.append(_copy_source(repo, case, source, Path("sources/upstream/testcase_Lake_Ravn.zip"),
                                     purpose="upstream 1D GOTM reference; not a GETM 3D grid or forcing source"))
     else:

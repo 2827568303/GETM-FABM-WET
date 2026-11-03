@@ -134,11 +134,11 @@
    save_t = .true.
    save_rho = .false.
    save_rad = .false.
-   save_turb = .true.
-   save_tke = .true.
-   save_eps = .true.
-   save_num = .true.
-   save_nuh = .true.
+   save_turb = .false.
+   save_tke = .false.
+   save_eps = .false.
+   save_num = .false.
+   save_nuh = .false.
    save_ss_nn = .false.
    save_taub = .false.
    first_2d = 1

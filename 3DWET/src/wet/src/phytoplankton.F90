@@ -323,7 +323,7 @@ subroutine do(self,_ARGUMENTS_DO_)
 
    !DECLARE LOCAL VARIABLES::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
    real(rk)   :: uTm, dz, extc, Day, meanpar, meanparout, lat, aCorO2BOD, afCovSurfVeg, sDW, sPW, sNW, sSiO2W, sPO4W, sNH4W, sNO3W, sO2W, rPDW, rNDW, uFunTm, wDW, wPW, wNW, aPLim, aNLim, aSiLim, aNutLim
-   real(rk)   :: aLPARBot, ufDay, uLPARSurf, uhL, uOpt, aLLim, aMuTmL, aMu, wDAss, wDRespW, ukDRespTm, wDMortW, wPMortW, wNMortW, wPUpt, aVPUpt, aVPUptMaxCr, aVNUptMaxCr, ahNUpt, aVNUpt, wNUpt
+   real(rk)   :: aLPARBot, ufDay, uLPARSurf, opticsHalf, uhL, uOpt, aLLim, aMuTmL, aMu, wDAss, wDRespW, ukDRespTm, wDMortW, wPMortW, wNMortW, wPUpt, aVPUpt, aVPUptMaxCr, aVNUptMaxCr, ahNUpt, aVNUpt, wNUpt
    real(rk)   :: sCW, rCDW, wCW, wCO2UptW, wCO2RespW, wCO2W, wCMortTOMW, wCPOMW, wCDOMW, wCMortW, wCAss, wCRespW, wCMortPOMW, wCMortDOMW
    real(rk)   :: wPExcrW, aNFixLim, aNFix, wNFix, wNExcrW, wNNH4W, wNNO3W, wPPO4W, wPPO4W_out, wSiSiO2W, wO2W, wDPOMW, wNPOMW, wPPOMW, wSiPaW, wDDOMW, wNDOMW, wPDOMW, wSiO2MortW, wNUptNH4, afNH4Upt, wNMortNH4W
    real(rk)   :: wNUptNO3, wPMortPO4W, wSiExcrW, wSiUpt, wO2Prod, wO2RespW, wO2UptNO3, wNMortTOMW, wPMortTOMW, wSiMortW, oSiW, rChD, oChla
@@ -379,19 +379,35 @@ subroutine do(self,_ARGUMENTS_DO_)
         !===========================================================================================================!
         ! 2.2 Light functions for pelagic phytoplankton                                                             !
         !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!
-        uLPARSurf = meanpar / EXP( -extc * dz/2.0_rk )                                                              !  light at the top of the local layer
-        aLPARBot = meanpar * EXP( -extc * dz/2.0_rk )                                                               !  light at the bottom of the local layer
+        uLPARSurf = 0.0_rk
+        aLPARBot = 0.0_rk
+        if (meanpar > 0.0_rk) then
+           ! Cap optical depth so meanpar*exp(+/- eps*dz/2) cannot overflow when
+           ! extinction is extreme in thin layers (same class of bug as macrophytes).
+           opticsHalf = min(max(extc, 0.0_rk) * dz/2.0_rk, 8.0e1_rk)
+           uLPARSurf = meanpar * exp(opticsHalf)
+           aLPARBot = meanpar * exp(-opticsHalf)
+        end if
+        if (meanpar > 0.0_rk .and. extc * dz > NearZero) then
         select case(self%qLightMethod)                                                                              !  select light limitation function
            case(1)                                                                                                  !    case 1, without photoinhibition, Chalker (1980) model
               uhL=self%hLRef*uFunTm                                                                                 !      half-saturation light intensity at current temperature
-              aLLim= 1.0_rk /(extc * dz) * log((1.0_rk + uLPARSurf / uhL) / (1.0_rk + aLPARBot /uhL))               !      light limitation function, no photo-inhibition
+              if (uhL > 0.0_rk) then
+                 aLLim= 1.0_rk /(extc * dz) * log((1.0_rk + uLPARSurf / uhL) / (1.0_rk + aLPARBot /uhL))               !      light limitation function, no photo-inhibition
+              else
+                 aLLim = 0.0_rk
+              end if
            case(2)                                                                                                  !    case 2, Klepper et al. (1988) / Ebenhoh et al. (1997) model.
               uOpt=uFunTm*self%cLOptRef                                                                             !      half-saturation light intensity at current temperature
-              aLLim = exp(1.0_rk) /(extc * dz) *(exp(- aLPARBot /uOpt) - exp(- uLPARSurf /uOpt))                    !      light limitation function, no photo-inhibition
+              if (uOpt > 0.0_rk) then
+                 aLLim = exp(1.0_rk) /(extc * dz) *(exp(- aLPARBot /uOpt) - exp(- uLPARSurf /uOpt))                    !      light limitation function, no photo-inhibition
+              else
+                 aLLim = 0.0_rk
+              end if
         end select                                                                                                  !
-        !===========================================================================================================!
-        ! 2.2 Day length and current max growth                                                                     !
-        !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!
+        else
+           aLLim = 0.0_rk
+        end if
         ufDay = DayLength(lat,int(Day))                                                                             ! calculate day length
         aMuTmL = ufDay *(1.0_rk - afCovSurfVeg)*aLLim * uFunTm*self%cMuMax                                          ! calculate max growth rate as dictated by current light and temp.
         !===========================================================================================================!
@@ -428,14 +444,22 @@ subroutine do(self,_ARGUMENTS_DO_)
              !------------------------------------------------------------------------------------------------------!
              aVNUptMaxCr = max(0.0_rk,self%cVNUptMax * uFunTm * (self%cNDMax - rNDW) /(self%cNDMax - self%cNDMin))  ! maximum specific N uptake rate, corrected for N/D ratio
              ahNUpt = aVNUptMaxCr / self%cAffNUpt                                                                   ! half-sat. N for uptake
-             aVNUpt = (sNO3W + sNH4W) * aVNUptMaxCr /(ahNUpt + sNO3W + sNH4W)                                       ! current specific N uptake rate
+             if (aVNUptMaxCr > 0.0_rk .and. (sNH4W + sNO3W) > 0.0_rk) then                                          !
+                aVNUpt = (sNO3W + sNH4W) * aVNUptMaxCr /(ahNUpt + sNO3W + sNH4W)                                    ! current specific N uptake rate
+             else                                                                                                   ! zero DIN or zero capacity is 0/0
+                aVNUpt = 0.0_rk                                                                                     !
+             end if                                                                                                 !
              wNUpt = aVNUpt * sDW                                                                                   ! absolute N uptake rate
              wNFix = aNFix * sDW                                                                                    ! absolute N fixation rate
              !::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!
              ! 3.2.2 Phosphorous                                                                                    !
              !------------------------------------------------------------------------------------------------------!
              aVPUptMaxCr = max(0.0_rk,self%cVPUptMax * uFunTm *(self%cPDMax - rPDW)/(self%cPDMax - self%cPDMin))    ! maximum specific P uptake rate, corrected for P/D ratio
-             aVPUpt = sPO4W * aVPUptMaxCr /(aVPUptMaxCr / self%cAffPUpt + sPO4W)                                    ! realized specific P uptake rate
+             if (aVPUptMaxCr > 0.0_rk .and. sPO4W > 0.0_rk) then                                                     !
+                aVPUpt = sPO4W * aVPUptMaxCr /(aVPUptMaxCr / self%cAffPUpt + sPO4W)                                 ! realized specific P uptake rate
+             else                                                                                                   ! zero PO4 or quota at the cap is 0/0
+                aVPUpt = 0.0_rk                                                                                     !
+             end if                                                                                                 !
              wPUpt = aVPUpt * sDW                                                                                   ! absolute P uptake rate
    !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%!
    ! 4. calculate respiration, excretion and mortality                                                              !
@@ -476,7 +500,11 @@ subroutine do(self,_ARGUMENTS_DO_)
            !::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::!
            ! 5.2.2 nitrogen                                                                                         !
            !--------------------------------------------------------------------------------------------------------!
-           afNH4Upt = sNH4W*sNO3W/((ahNUpt+sNH4W)*(ahNUpt+sNO3W)) + sNH4W*ahNUpt/((sNH4W+sNO3W)*(ahNUpt+sNO3W))     ! fraction of N uptake taken as ammonia
+           if ((sNH4W + sNO3W) > 0.0_rk .and. (ahNUpt + sNH4W) > 0.0_rk .and. (ahNUpt + sNO3W) > 0.0_rk) then       !
+              afNH4Upt = sNH4W*sNO3W/((ahNUpt+sNH4W)*(ahNUpt+sNO3W)) + sNH4W*ahNUpt/((sNH4W+sNO3W)*(ahNUpt+sNO3W))  ! fraction of N uptake taken as ammonia
+           else                                                                                                     ! empty DIN makes the WASP fraction 0/0
+              afNH4Upt = 0.0_rk                                                                                     !
+           end if                                                                                                   !
            wNUptNH4 = afNH4Upt * wNUpt                                                                              ! absolute ammonia uptake
            wNMortNH4W = self%fDissMort * wNMortW                                                                    ! fraction of mortality N released as ammonia
            wNNH4W = wNExcrW + wNMortNH4W - wNUptNH4                                                                 ! total flux of ammonia to the water column

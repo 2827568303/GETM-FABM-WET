@@ -37,7 +37,7 @@
 !  within a time loop.
 !
 ! !USES:
-   use time,     only: update_time,timestep
+   use time,     only: update_time,timestep,jul0,secs0
    use time,     only: julianday,secondsofday,microseconds
    use domain,   only: kmax
    use meteo,    only: do_meteo,tausx,tausy,airp,swr,albedo
@@ -63,7 +63,7 @@
 #endif
    use input,    only: do_input
    use output_processing, only: do_output_processing
-   use output,   only: do_output
+   use output,   only: do_output, save_mean, mean0, save_fabm_native, save_3d, first_3d, step_3d
 #ifdef TEST_NESTING
    use nesting,   only: nesting_file
 #endif
@@ -137,7 +137,7 @@
          if (spm_calc) call do_spm()
 #endif
 #ifdef _FABM_
-         if (fabm_calc) call do_getm_fabm(M*timestep)
+         if (fabm_calc) call do_getm_fabm(M*timestep, fabm_output_pending(n))
 #endif
 #ifdef GETM_BIO
          if (bio_calc) call do_getm_bio(M*timestep)
@@ -188,6 +188,49 @@
    write(debug,*)
 #endif
    return
+
+   contains
+
+   ! True when an output reader will use the biogeochemical fields produced
+   ! by this bio step before the next one. Bio runs every M hydro steps, and
+   ! output can fall on any of the following M steps.
+   logical function fabm_output_pending(n0)
+   integer, intent(in) :: n0
+   integer :: k, last, nsecs, jd, sod, usec
+   REALTYPE :: fsecs
+
+   fabm_output_pending = .false.
+#ifndef NO_3D
+   if (save_mean .and. n0 > mean0) then
+      fabm_output_pending = .true.
+      return
+   end if
+   last = min(n0 + M - 1, MaxN)
+   if (save_fabm_native .and. save_3d .and. step_3d > 0) then
+      do k = n0, last
+         if (k >= first_3d .and. mod(k, step_3d) == 0) then
+            fabm_output_pending = .true.
+            return
+         end if
+      end do
+   end if
+   do k = n0, last
+      nsecs = int(k*timestep) + secs0
+      fsecs = k*timestep + secs0
+      jd = jul0 + nsecs/86400
+      sod = mod(nsecs, 86400)
+      usec = nint((fsecs - nsecs) * 1000000)
+      if (usec >= 999990) usec = 0
+      if (output_manager_host_data_required(jd, sod, usec, k)) then
+         fabm_output_pending = .true.
+         return
+      end if
+   end do
+#else
+   fabm_output_pending = .true.
+#endif
+   end function fabm_output_pending
+
    end subroutine time_loop
 !EOC
 

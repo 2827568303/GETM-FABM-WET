@@ -94,13 +94,17 @@ function resultVariablePriority(variable) {
     if (name==='ho2bod' || name.startsWith('ho2bod_')) return 2;
     // Rank only variables present in the actual results inventory. Names below
     // are output fields; model parameters and derived quantities are not added.
-    if (/^(elev|z|depth|water_depth|d|temp|temperature|u|v|w|uu|vv|ww)$/.test(name)) return 0;
+    if (/^(elev|z|depth|water_depth|d|temp|temperature|salt|salinity|u|v|w|uu|vv|ww)$/.test(name)) return 0;
+    if (/(^|[_-])s?o2w$/.test(name) || /abiotic_water_so2w$/.test(name)
+        || /(dissolved oxygen|溶解氧)/.test(`${name} ${label}`)) return 0;
+    // Chlorophyll, nutrients, organic matter and COD are loaded when chosen.
     if (/^(wet_)?(totn|totp|totnwater|totpwater|chla|total_chla|tot_chla|totsuspar)$/.test(name)
-        || /^wet_(totn|totp|chla)_calculator_result$/.test(name)) return 1;
-    if (/(^|[_-])s?(o2|nh4|no3|po4|tn|tp)w$/.test(name) || /abiotic_water_s(o2|nh4|no3|po4)w$/.test(name)) return 1;
+        || /^wet_(totn|totp|chla)_calculator_result$/.test(name)) return 2;
+    if (/(^|[_-])s?(nh4|no3|po4|tn|tp)w$/.test(name) || /abiotic_water_s(nh4|no3|po4)w$/.test(name)) return 2;
+    if (/(^|[_-])cod($|[_-])|化学需氧量/.test(`${name} ${label}`)) return 2;
     if ((/(^|[_-])bod($|[_-])|biochemical oxygen demand|生化需氧量/.test(`${name} ${label}`)) && !name.startsWith('ho2bod')) return 1;
-    if (/(dissolved oxygen|溶解氧|(^|[_-])ph($|[_-])|酸碱度|(^|[_-])cod($|[_-])|化学需氧量)/.test(`${name} ${label}`)) return 1;
-    if (/(^|[_-])(nh4|no3|po4|tn|tp)([_-]|$)|氨氮|硝酸盐|磷酸盐|总氮|总磷/.test(`${name} ${label}`)) return 1;
+    if (/(^|[_-])ph($|[_-])|酸碱度/.test(`${name} ${label}`)) return 1;
+    if (/(^|[_-])(nh4|no3|po4|tn|tp)([_-]|$)|氨氮|硝酸盐|磷酸盐|总氮|总磷/.test(`${name} ${label}`)) return 2;
     if (/total suspended|总悬浮|totsuspar/.test(`${name} ${label}`)) return 1;
     const biomass=/_sd(?:_pv)?$/.test(name) || /biomass|生物量|干重/.test(label);
     if (/(fish|jufish|adfish|piscfish|鱼类)/.test(`${name} ${label}`) && biomass) return 1;
@@ -151,6 +155,20 @@ function toast(msg, type='info') {
     $('toast-container').appendChild(t);
     setTimeout(() => t.remove(), 3000);
 }
+function serverOfflineMessage() {
+    return '无法连接本机 3DWET 服务。请查看 %LOCALAPPDATA%\\3DWET\\logs\\launcher.log，然后从开始菜单重新打开 3DWET。';
+}
+function showServerOffline(message) {
+    let banner = document.getElementById('server-offline-banner');
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'server-offline-banner';
+        banner.setAttribute('role', 'alert');
+        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:100000;background:#7f1d1d;color:#fff;padding:12px 16px;font-size:14px;line-height:1.45;';
+        document.body.appendChild(banner);
+    }
+    banner.textContent = message || serverOfflineMessage();
+}
 function closeModal(id) { $(id).classList.remove('active'); }
 function showModal(id) { $(id).classList.add('active'); }
 
@@ -186,7 +204,9 @@ async function api(url, opts={}) {
             }
         };
         xhr.onerror = function() {
-            finish({error: 'Network error (XHR) - cannot connect to server'});
+            const message = serverOfflineMessage();
+            showServerOffline(message);
+            finish({error: message, offline: true});
         };
         xhr.ontimeout = function() {
             finish({error: 'Request timeout'});
@@ -280,7 +300,12 @@ async function loadCases() {
     const cases = await api('/api/cases');
     const tbody = $('case-table').querySelector('tbody');
     tbody.innerHTML = '';
-    if (cases.error) { tbody.innerHTML = `<tr><td colspan="8">[XHR_DEBUG] ${cases.error}</td></tr>`; return; }
+    if (!cases || cases.error || !Array.isArray(cases)) {
+        const message = (cases && cases.error) || '案例列表不可用';
+        if (cases && cases.offline) showServerOffline(message);
+        tbody.innerHTML = `<tr><td colspan="8">${escapeHtml(message)}</td></tr>`;
+        return;
+    }
     state.cases = cases;
     const activePath = (state.activeCasePath || '').toLowerCase();
     cases.forEach((c, idx) => {
@@ -381,7 +406,9 @@ function renderProxyCaseStatus(caseData) {
             : caseData?.read_only ? `${caseData.case_name} · 只读 GOTM 单水柱` : (caseData?.case_name || '未加载案例');
         const nativePeriod = Array.isArray(caseData?.native_time_range) && caseData.native_time_range.length === 2
             ? ` · ${caseData.native_time_range[0]} — ${caseData.native_time_range[1]}` : '';
-        badge.innerHTML = `<span class="case-name">${escapeHtml(base + nativePeriod)}</span>${proxyCaseBadgeMarkup(caseData)}`;
+        const label = escapeHtml(base + nativePeriod);
+        const proxyMarkup = proxyCaseBadgeMarkup(caseData);
+        badge.innerHTML = proxyMarkup ? `<span class="case-name">${label}</span>${proxyMarkup}` : label;
         badge.style.display = caseData?.case_name ? 'inline-flex' : 'none';
     }
     const details = proxyCaseDetailsMarkup(caseData);
@@ -491,6 +518,7 @@ function applyLoadedCase(data) {
     pollRunStatus();
     // 刷新案例管理表（高亮当前案例）
     loadCases();
+    loadCorePlan();
     loadMpiRunCapabilities();
 }
 
@@ -567,41 +595,111 @@ async function dirBrowserUse() {
     await openCaseByPath();
 }
 
+async function chooseDesktopFolder(start) {
+    const bridge = window.pywebview && window.pywebview.api && window.pywebview.api.pick_folder;
+    if (bridge) {
+        try {
+            const chosen = await window.pywebview.api.pick_folder(start || '');
+            if (chosen && typeof chosen === 'object') return chosen;
+            const path = typeof chosen === 'string' ? chosen : '';
+            return {path, error: '', cancelled: !path, done: true};
+        } catch (error) {
+            return {path: '', error: String(error && error.message || error), cancelled: false, done: true};
+        }
+    }
+    const launched = await api('/api/system/pick_folder', {method:'POST', body:{start_dir: start || ''}});
+    if (launched.error || launched.offline) {
+        return {path: '', error: launched.error || serverOfflineMessage(), cancelled: false, done: true};
+    }
+    const deadline = Date.now() + 120000;
+    while (Date.now() < deadline) {
+        await new Promise(resolve => setTimeout(resolve, 400));
+        const result = await api('/api/system/pick_folder_result');
+        if (result.offline) return {path: '', error: result.error, cancelled: false, done: true};
+        if (result.done) return result;
+    }
+    return {path: '', error: '等待文件夹窗口超时。可改用「浏览目录」。', cancelled: false, done: true};
+}
+window.chooseDesktopFolder = chooseDesktopFolder;
+
 async function pickCaseFolder(fixedPath) {
     const statusEl = $('pick-folder-status');
     const input = $('open-case-path');
     const start = fixedPath || input.value.trim() || state.activeCasePath || '';
-    if (statusEl) { statusEl.style.display = 'block'; statusEl.innerHTML = '<span>正在启动文件夹选择窗口…</span>'; }
-    const r = await api('/api/system/pick_folder', {method:'POST', body:{start_dir: start}});
-    if (r.error) { if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger)">${r.error}</span>`; return; }
-    if (statusEl) statusEl.innerHTML = '<span style="color:var(--info)">请在弹出的「浏览文件夹」窗口中选择案例目录，然后点【确定】…</span>';
+    if (statusEl) { statusEl.style.display = 'block'; statusEl.innerHTML = '<span>正在打开文件夹窗口…</span>'; }
     clearInterval(_pickTimer);
-    const deadline = Date.now() + 120000;
-    _pickTimer = setInterval(async () => {
-        const res = await api('/api/system/pick_folder_result');
-        if (res.error) {
-            clearInterval(_pickTimer);
-            if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger)">${res.error}</span>`;
-            return;
-        }
-        if (!res.done) {
-            if (Date.now() > deadline) {
-                clearInterval(_pickTimer);
-                if (statusEl) statusEl.innerHTML =
-                    '<span style="color:var(--warning)">没有检测到弹出的选择窗口（可能是浏览器环境限制）。' +
-                    '请改用右侧「<svg class="studio-icon" aria-hidden="true" focusable="false"><use href="#studio-icon-folder"></use></svg> 浏览目录」，在页面内逐级选择案例目录，功能完全一致。</span>';
-            }
-            return;
-        }
-        clearInterval(_pickTimer);
-        if (!res.path) {
-            if (statusEl) statusEl.innerHTML = '<span style="color:var(--text-muted)">已取消（未选择目录）</span>';
-            return;
-        }
-        if (statusEl) statusEl.innerHTML = `<span style="color:var(--success)">已选择：${res.path}</span>`;
-        input.value = res.path;
-        await openCaseByPath();
-    }, 600);
+    const result = await chooseDesktopFolder(start);
+    if (result.error && !result.path) {
+        if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger)">${escapeHtml(result.error)}</span>`;
+        return;
+    }
+    if (!result.path) {
+        if (statusEl) statusEl.innerHTML = '<span style="color:var(--text-muted)">已取消（未选择目录）</span>';
+        return;
+    }
+    if (statusEl) statusEl.innerHTML = `<span style="color:var(--success)">已选择：${escapeHtml(result.path)}</span>`;
+    input.value = result.path;
+    await openCaseByPath();
+}
+
+async function browseSaveAsDest() {
+    const input = $('save-as-dest');
+    const result = await chooseDesktopFolder(input && input.value.trim());
+    if (result && result.path && input) input.value = result.path;
+    else if (result && result.error) toast(result.error, 'error');
+}
+
+let _caseScanTimer = null;
+function renderCaseScan(state) {
+    const status = $('case-scan-status');
+    const host = $('case-scan-results');
+    const cancel = $('case-scan-cancel');
+    if (!status || !host) return;
+    if (cancel) cancel.hidden = !(state && state.running);
+    if (!state) { status.textContent = ''; return; }
+    const count = (state.found || []).length;
+    if (state.error) status.textContent = state.error;
+    else if (state.running) status.textContent = `正在扫描 ${state.current || ''}（已找到 ${count} 个，${state.progress || 0}%）`;
+    else status.textContent = state.cancelled
+        ? `已取消。找到 ${count} 个案例。扫描只在本机进行，不会上传路径。`
+        : `扫描完成，找到 ${count} 个案例。扫描只在本机进行，不会上传路径。`;
+    host.innerHTML = (state.found || []).map(item =>
+        `<div style="display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap;">
+            <span style="flex:1;min-width:220px;word-break:break-all;">${escapeHtml(item.path)}</span>
+            <button class="btn btn-sm" type="button" data-scan-add="${escapeAttr(item.path)}">加入列表</button>
+            <button class="btn btn-sm btn-primary" type="button" data-scan-load="${escapeAttr(item.path)}">加载</button>
+        </div>`).join('');
+    host.querySelectorAll('[data-scan-add]').forEach(button => button.addEventListener('click', () => registerScannedCase(button.dataset.scanAdd)));
+    host.querySelectorAll('[data-scan-load]').forEach(button => button.addEventListener('click', () => loadExternalCase(button.dataset.scanLoad)));
+}
+async function registerScannedCase(path) {
+    const result = await api('/api/cases/register', {method:'POST', body:{path}});
+    if (result.error) { toast(result.error, 'error'); return; }
+    toast('已加入案例列表', 'success');
+    loadCases();
+}
+async function pollCaseScan() {
+    const state = await api('/api/cases/scan');
+    if (state.offline) return;
+    renderCaseScan(state);
+    if (state.running) _caseScanTimer = setTimeout(pollCaseScan, 700);
+}
+async function startCaseScan() {
+    clearTimeout(_caseScanTimer);
+    const status = $('case-scan-status');
+    if (status) status.textContent = '开始扫描本机案例…';
+    const state = await api('/api/cases/scan', {method:'POST', body:{}});
+    if (state.error && state.offline) { showServerOffline(state.error); return; }
+    renderCaseScan(state);
+    if (!state.done) pollCaseScan();
+}
+async function cancelCaseScan() {
+    const state = await api('/api/cases/scan/cancel', {method:'POST', body:{}});
+    renderCaseScan(state);
+}
+async function maybeAutoScanCases() {
+    const boot = await api('/api/cases/scan/bootstrap');
+    if (boot && boot.auto && !boot.offline) startCaseScan();
 }
 
 async function exploreCasePath(path) {
@@ -693,6 +791,7 @@ async function deleteCase(c) {
         $('footer-status').textContent = '未加载案例';
         syncQgisStatusBar();
         clearResultInventory();
+        loadCorePlan();
         loadMpiRunCapabilities();
     }
     loadCases();
@@ -2130,10 +2229,14 @@ document.addEventListener('DOMContentLoaded', () => {
 // ── Run Control ───────────────────────────────────────────────────────
 async function startRun() {
     if (!state.activeCase) { toast('请先加载案例', 'error'); return; }
-    const mpi = !!document.getElementById('mpi-run-enabled')?.checked;
-    const processCount = Number(document.getElementById('mpi-process-count')?.value || 1);
+    const coreInput = document.getElementById('core-count');
+    const modeInput = document.getElementById('parallel-mode');
+    const cores = Math.max(1, Math.floor(Number(coreInput && coreInput.value) || 1));
+    const parallelMode = (modeInput && modeInput.value) || 'auto';
     const compressResults = !!document.getElementById('compress-run-results')?.checked;
-    const res = await api('/api/run/start', {method:'POST', body:{mpi, processes:processCount, compress_results:compressResults}});
+    const mpi = parallelMode === 'mpi' || parallelMode === 'hybrid';
+    const res = await api('/api/run/start', {method:'POST', body:{
+        cores, parallel_mode: parallelMode, compress_results:compressResults, mpi, processes: cores}});
     if (!res.success) { toast(res.error || '启动失败', 'error'); return; }
     advanceOutputRevision();
     $('btn-start-run').disabled = true;
@@ -2243,83 +2346,274 @@ async function copyRunLogs() {
     }
 }
 
+function coreStorageKey(casePath, kind) {
+    return `3dwet-${kind}:${casePath || ''}`;
+}
+
+function readCoreOverride(casePath) {
+    try {
+        const mode = localStorage.getItem(coreStorageKey(casePath, 'mode'))
+            || localStorage.getItem('3dwet-mode');
+        const cores = localStorage.getItem(coreStorageKey(casePath, 'cores'))
+            || localStorage.getItem('3dwet-cores');
+        if (!mode || mode === 'auto') return null;
+        const n = Math.floor(Number(cores));
+        if (!Number.isInteger(n) || n < 1) return null;
+        return {mode, cores: n};
+    } catch (_) {
+        return null;
+    }
+}
+
+function writeCoreOverride(casePath, mode, cores) {
+    try {
+        localStorage.setItem(coreStorageKey(casePath, 'mode'), mode);
+        localStorage.setItem(coreStorageKey(casePath, 'cores'), String(cores));
+        localStorage.setItem('3dwet-mode', mode);
+        localStorage.setItem('3dwet-cores', String(cores));
+    } catch (_) {}
+}
+
+function clearCoreOverrides() {
+    try {
+        const drop = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.startsWith('3dwet-mode') || key.startsWith('3dwet-cores'))) drop.push(key);
+        }
+        drop.forEach(key => localStorage.removeItem(key));
+    } catch (_) {}
+}
+
+function bindCoreControls() {
+    const count = document.getElementById('core-count');
+    const mode = document.getElementById('parallel-mode');
+    if (!count || !mode || count.dataset.bound === '1') return;
+    count.dataset.bound = '1';
+    count.addEventListener('input', () => {
+        state.corePlanTouched = true;
+        if (mode.value === 'auto') mode.value = 'threads';
+        const n = Math.max(1, Math.floor(Number(count.value) || 1));
+        writeCoreOverride(state.activeCasePath, mode.value, n);
+    });
+    mode.addEventListener('change', () => {
+        state.corePlanTouched = true;
+        const n = Math.max(1, Math.floor(Number(count.value) || 1));
+        if (mode.value === 'auto') {
+            try {
+                localStorage.removeItem(coreStorageKey(state.activeCasePath, 'mode'));
+                localStorage.removeItem(coreStorageKey(state.activeCasePath, 'cores'));
+                localStorage.setItem('3dwet-mode', 'auto');
+            } catch (_) {}
+            return;
+        }
+        writeCoreOverride(state.activeCasePath, mode.value, n);
+    });
+}
+
+function applyCoreRecommendation(plan) {
+    const count = document.getElementById('core-count');
+    const mode = document.getElementById('parallel-mode');
+    const note = document.getElementById('core-plan-note');
+    if (!count || !mode || !note || state.corePlanTouched) {
+        if (note && plan) note.textContent = plan.summary || note.textContent;
+        return;
+    }
+    const override = readCoreOverride(state.activeCasePath);
+    const rec = plan.recommendation || {};
+    if (override) {
+        mode.value = override.mode;
+        count.value = String(override.cores);
+    } else {
+        mode.value = 'auto';
+        count.value = String(Math.max(1, Number(rec.cores) || 1));
+    }
+    note.textContent = plan.summary || '';
+    renderCoreTrials(plan.trials);
+}
+
+function renderCoreTrials(trials) {
+    const table = document.getElementById('core-trial-table');
+    if (!table) return;
+    const rows = Array.isArray(trials) ? trials : [];
+    if (!rows.length) {
+        table.replaceChildren();
+        return;
+    }
+    const labels = {serial: '串行', threads: 'OpenMP', mpi: 'MPI', hybrid: '混合'};
+    const head = document.createElement('thead');
+    const headRow = document.createElement('tr');
+    ['方式', '规模', '步/秒'].forEach(text => {
+        const cell = document.createElement('th');
+        cell.textContent = text;
+        cell.style.textAlign = 'left';
+        cell.style.fontWeight = '600';
+        cell.style.paddingRight = '12px';
+        headRow.appendChild(cell);
+    });
+    head.appendChild(headRow);
+    const body = document.createElement('tbody');
+    rows.forEach(row => {
+        const ranks = Number(row.ranks) || 1;
+        const threads = Number(row.threads) || 1;
+        const shape = ranks > 1 && threads > 1 ? `${ranks}×${threads}` : String(ranks > 1 ? ranks : threads);
+        const rate = row.ok && Number.isFinite(Number(row.steps_per_second))
+            ? Number(row.steps_per_second).toFixed(1) : '失败';
+        const line = document.createElement('tr');
+        [labels[row.mode] || row.mode || '', shape, rate].forEach(text => {
+            const cell = document.createElement('td');
+            cell.textContent = text;
+            cell.style.paddingRight = '12px';
+            line.appendChild(cell);
+        });
+        body.appendChild(line);
+    });
+    table.replaceChildren(head, body);
+}
+
+async function remeasureCorePlan() {
+    const note = document.getElementById('core-plan-note');
+    const button = document.getElementById('core-recalibrate');
+    if (button) button.disabled = true;
+    if (note) note.textContent = '正在重新测定…';
+    state.corePlanTouched = false;
+    try {
+        let plan = await api('/api/run/core-plan', {method: 'POST', body: {}});
+        while (plan && plan.calibrating) {
+            if (note) note.textContent = plan.summary || '正在测定核数…';
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            plan = await api('/api/run/core-plan');
+        }
+        if (!plan) return;
+        applyCoreRecommendation(plan);
+        renderCoreTrials(plan.trials);
+    } catch (error) {
+        if (note) note.textContent = '重新测定没有完成。可稍后再试。';
+    } finally {
+        if (button) button.disabled = false;
+    }
+}
+
+async function loadCorePlan() {
+    const count = document.getElementById('core-count');
+    const mode = document.getElementById('parallel-mode');
+    const note = document.getElementById('core-plan-note');
+    if (!count || !mode || !note) return;
+    const request = state.corePlanRequest = (state.corePlanRequest || 0) + 1;
+    const casePath = state.activeCasePath;
+    const isCurrent = () => request === state.corePlanRequest && casePath === state.activeCasePath;
+    state.corePlanTouched = false;
+    bindCoreControls();
+    try {
+        let plan = await api('/api/run/core-plan');
+        if (!isCurrent()) return;
+        if (plan.error && !plan.hardware) {
+            note.textContent = plan.error;
+            return;
+        }
+        const fingerprint = plan.fingerprint || '';
+        try {
+            const seen = localStorage.getItem('3dwet-hw');
+            if (seen && fingerprint && seen !== fingerprint) clearCoreOverrides();
+            if (fingerprint) localStorage.setItem('3dwet-hw', fingerprint);
+        } catch (_) {}
+        applyCoreRecommendation(plan);
+        renderCoreTrials(plan.trials);
+        const posted = state.coreCalibrationPosted || (state.coreCalibrationPosted = new Set());
+        const postKey = `${casePath || ''}|${fingerprint}`;
+        if (!plan.cached && plan.can_calibrate && !plan.calibrating && !posted.has(postKey)) {
+            posted.add(postKey);
+            const started = await api('/api/run/core-plan', {method:'POST', body:{}});
+            if (!isCurrent()) return;
+            if (started && started.hardware) plan = started;
+            else if (started && started.error) note.textContent = started.error;
+        }
+        while (isCurrent() && plan.calibrating) {
+            note.textContent = plan.summary || '正在测定核数…';
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            if (!isCurrent()) return;
+            plan = await api('/api/run/core-plan');
+        }
+        if (!isCurrent()) return;
+        if (plan.calibration_error) {
+            note.textContent = `测定没有完成（${plan.calibration_error}）。${plan.summary || ''}`;
+        }
+        applyCoreRecommendation(plan);
+        renderCoreTrials(plan.trials);
+    } catch (error) {
+        if (!isCurrent()) return;
+        note.textContent = '无法读取本机核数。可手动填写使用核数。';
+    }
+}
+
 async function loadMpiRunCapabilities() {
-    const panel = document.getElementById('mpi-run-control');
     const toggle = document.getElementById('mpi-run-enabled');
     const count = document.getElementById('mpi-process-count');
     const note = document.getElementById('mpi-run-capability');
     const detectButton = document.getElementById('mpi-detect-recommendation');
-    if (!panel || !toggle || !count || !note || !detectButton) return;
+    if (!toggle || !count || !note || !detectButton) return;
+    const tuneButton = document.getElementById('mpi-start-tuning');
     const request = state.mpiCapabilitiesRequest = (state.mpiCapabilitiesRequest || 0) + 1;
     const caseRevision = state.caseRevision || 0;
     const casePath = state.activeCasePath;
     const caseType = state.caseType;
+    const readOnly = state.storageReadOnly;
     const isCurrent = () => request === state.mpiCapabilitiesRequest
         && caseRevision === (state.caseRevision || 0)
         && casePath === state.activeCasePath
-        && caseType === state.caseType;
-    // Lock the control while refreshing so a fast case switch cannot briefly
-    // leave MPI enabled for a read-only or single-column case.
-    toggle.checked = false;
-    toggle.disabled = true;
-    count.disabled = true;
-    detectButton.disabled = true;
+        && caseType === state.caseType
+        && readOnly === state.storageReadOnly;
+    const eligible = () => !!state.activeCasePath && state.caseType === 'getm' && !state.storageReadOnly;
+    if (!eligible()) {
+        toggle.checked = false;
+        toggle.disabled = true;
+        count.disabled = true;
+        detectButton.disabled = true;
+        if (tuneButton) tuneButton.disabled = true;
+    }
     try {
-        const capabilities = await api('/api/run/mpi-capabilities');
+        const caps = await api('/api/run/mpi-capabilities');
         if (!isCurrent()) return;
-        const maxProcesses = Math.max(1, Number(capabilities.max_processes) || 1);
-        const targetProcesses = Math.max(1, Math.ceil(maxProcesses / 2));
-        const recommended = Math.max(1, Math.min(maxProcesses,
-            Number(capabilities.recommended_processes) || targetProcesses));
-        const allowedProcesses = Array.isArray(capabilities.allowed_processes)
-            ? [...new Set(capabilities.allowed_processes.map(Number)
-                .filter(value => Number.isInteger(value) && value >= 1 && value <= maxProcesses))]
-                .sort((a, b) => a - b)
-            : Array.from({length: maxProcesses}, (_, index) => index + 1);
-        const preference = state.mpiProcessCountByCase instanceof Map
-            ? state.mpiProcessCountByCase.get(casePath) : null;
-        const selectedCount = allowedProcesses.includes(preference) ? preference
-            : (allowedProcesses.includes(recommended) ? recommended
-                : ([...allowedProcesses].sort((a, b) =>
-                    Math.abs(a - targetProcesses) - Math.abs(b - targetProcesses) || a - b)[0] || 1));
-        count.replaceChildren(...allowedProcesses.map(value => {
+        if (!eligible() || !caps.enabled) {
+            toggle.checked = false;
+            toggle.disabled = true;
+            count.disabled = true;
+            detectButton.disabled = true;
+            if (tuneButton) tuneButton.disabled = true;
+            if (caps.reason) note.textContent = caps.reason;
+            return;
+        }
+        const allowed = Array.isArray(caps.allowed_processes) ? caps.allowed_processes : [];
+        count.replaceChildren(...allowed.map(value => {
             const option = document.createElement('option');
             option.value = String(value);
             option.textContent = String(value);
             return option;
         }));
-        count.value = String(selectedCount);
-        const eligibleCase = !!casePath && caseType === 'getm' && !state.storageReadOnly;
-        const enabled = capabilities.enabled === true && eligibleCase && allowedProcesses.length > 0;
-        toggle.disabled = !enabled;
-        detectButton.disabled = !enabled;
-        if (enabled) {
-            const hasPreference = state.mpiSelectionByCase instanceof Map
-                && state.mpiSelectionByCase.has(casePath);
-            toggle.checked = hasPreference ? state.mpiSelectionByCase.get(casePath) : true;
-        } else {
-            toggle.checked = false;
-        }
-        count.disabled = !enabled || !toggle.checked;
-        note.textContent = !eligibleCase
-            ? (casePath ? 'MPI 仅适用于可写的 GETM 网格案例' : '请先加载可写的 GETM 网格案例')
-            : (capabilities.reason || `当前进程可用逻辑处理器：${maxProcesses}；建议 ${recommended} 个进程。建议值不保证最快。`);
-        toggle.onchange = () => {
-            if (!isCurrent() || !enabled) return;
-            count.disabled = !toggle.checked;
-            state.mpiSelectionByCase.set(casePath, toggle.checked);
-        };
+        const allowedText = allowed.map(String);
+        const savedCount = state.mpiProcessCountByCase && state.mpiProcessCountByCase.get(casePath);
+        if (savedCount != null && allowedText.includes(String(savedCount))) count.value = String(savedCount);
+        else if (allowedText.includes(String(caps.recommended_processes))) count.value = String(caps.recommended_processes);
         count.onchange = () => {
-            if (!isCurrent() || !enabled || !allowedProcesses.includes(Number(count.value))) return;
-            state.mpiProcessCountByCase.set(casePath, Number(count.value));
+            const selected = Number(count.value);
+            if (Number.isInteger(selected) && state.mpiProcessCountByCase) {
+                state.mpiProcessCountByCase.set(state.activeCasePath, selected);
+            }
         };
+        const remembered = state.mpiSelectionByCase && state.mpiSelectionByCase.get(casePath);
+        toggle.checked = remembered == null ? true : !!remembered;
+        toggle.disabled = false;
+        count.disabled = !toggle.checked;
+        detectButton.disabled = false;
+        if (tuneButton) tuneButton.disabled = false;
+        toggle.onchange = () => {
+            if (state.mpiSelectionByCase) state.mpiSelectionByCase.set(state.activeCasePath, toggle.checked);
+            count.disabled = !toggle.checked;
+        };
+        note.textContent = `当前进程可用逻辑处理器：${caps.max_processes}；建议 ${caps.recommended_processes} 个进程。建议值不保证最快。`;
     } catch (error) {
         if (!isCurrent()) return;
-        toggle.checked = false;
-        toggle.disabled = true;
-        count.disabled = true;
-        detectButton.disabled = true;
-        note.textContent = '无法读取 MPI 运行能力';
+        note.textContent = String(error?.message || error || '无法读取 MPI 运行能力');
     }
 }
 
@@ -2329,7 +2623,6 @@ async function detectAndApplyMpiRecommendation() {
     const note = document.getElementById('mpi-run-capability');
     const detectButton = document.getElementById('mpi-detect-recommendation');
     if (!toggle || !count || !note || !detectButton) return;
-
     const request = state.mpiRecommendationRequest = (state.mpiRecommendationRequest || 0) + 1;
     const caseRevision = state.caseRevision || 0;
     const casePath = state.activeCasePath;
@@ -2338,47 +2631,24 @@ async function detectAndApplyMpiRecommendation() {
         && caseRevision === (state.caseRevision || 0)
         && casePath === state.activeCasePath
         && caseType === state.caseType;
-    const eligibleCase = !!casePath && caseType === 'getm' && !state.storageReadOnly;
-    if (!eligibleCase || toggle.disabled) return;
-
+    if (!casePath || caseType !== 'getm' || state.storageReadOnly || toggle.disabled) return;
     detectButton.disabled = true;
-    note.textContent = '正在创建隔离副本并实测候选进程数；过程包含输出合并，可持续数分钟…';
     try {
-        const started = await api('/api/run/mpi-tuning', {method:'POST', body:{duration_seconds:10800,repetitions:2}});
-        if (!started.success) throw new Error(started.error || '无法启动测量');
-        const cancel = document.getElementById('mpi-tuning-cancel');
-        if (started.cached) {
-            applyMpiTuningResult(started.result, casePath, note, count);
-            return;
+        const caps = await api('/api/run/mpi-capabilities');
+        if (!isCurrent()) return;
+        const recommended = Number(caps.recommended_processes);
+        const allowed = (caps.allowed_processes || []).map(Number);
+        if (!Number.isInteger(recommended) || (allowed.length && !allowed.includes(recommended))) {
+            throw new Error(caps.reason || '没有可用的建议进程数');
         }
-        if (cancel) cancel.style.display = '';
-        const trialHours = Math.ceil(Number(started.duration_seconds || 0) / 3600);
-        note.textContent = `${started.candidate_count} 个候选 × ${started.repetitions} 次；每次覆盖至少 ${trialHours} 小时的模拟时段并按原设置输出。实际墙钟耗时取决于各进程数的实测，当前无法预估；可随时取消。`;
-        while (isCurrent()) {
-            await new Promise(resolve => setTimeout(resolve, 2500));
-            const status = await api('/api/run/mpi-tuning');
-            if (!isCurrent()) return;
-            if (status.status === 'completed') {
-                applyMpiTuningResult(status.result, casePath, note, count);
-                return;
-            }
-            if (status.status === 'failed') throw new Error(status.error || '所有候选测量均失败');
-            if (status.status === 'cancelled') { note.textContent = 'MPI 调优已取消；临时副本已清理。'; return; }
-            const p = status.progress;
-            note.textContent = p
-                ? `正在实测 ${p.candidate} 个进程（候选 ${p.repeat}/${p.repetitions}）；总计已用 ${Math.floor(p.elapsed_seconds || 0)} 秒，本次已用 ${Math.floor(p.current_trial_seconds || 0)} 秒…`
-                : `正在实测 ${started.candidate_processes?.join(', ') || '候选'} 个进程；包含结果合并…`;
-        }
+        count.value = String(recommended);
+        if (state.mpiProcessCountByCase) state.mpiProcessCountByCase.set(casePath, recommended);
+        note.textContent = `可用逻辑处理器：${caps.max_processes}。已采用建议 ${recommended} 个进程。这是起点，不保证最快。`;
     } catch (error) {
         if (!isCurrent()) return;
-        const detail = String(error?.message || error || '无法读取 MPI 运行能力');
-        note.textContent = `检测失败：${detail}`;
+        note.textContent = String(error?.message || error || '无法读取 MPI 运行能力');
     } finally {
-        if (isCurrent()) {
-            detectButton.disabled = toggle.disabled;
-            const cancel = document.getElementById('mpi-tuning-cancel');
-            if (cancel) cancel.style.display = 'none';
-        }
+        if (isCurrent()) detectButton.disabled = !!toggle.disabled;
     }
 }
 
@@ -2392,6 +2662,13 @@ function applyMpiTuningResult(result, casePath, note, count) {
     note.textContent = `实测选择 ${selected} 个进程；本机/案例指纹已缓存。候选耗时含结果合并；最快样本 ${Number.isFinite(fastest) ? fastest.toFixed(1) : '—'} 秒。此结果不代表其他案例或硬件。`;
 }
 
+async function startMpiTuning() {
+    const trialHours = 3;
+    const note = document.getElementById('mpi-run-capability');
+    if (note) note.textContent = `覆盖至少 ${trialHours} 小时的模拟时段`;
+    await api('/api/run/mpi-tuning', {method:'POST', body:{duration_seconds:10800,repetitions:2}});
+}
+
 async function cancelMpiTuning() {
     try {
         await api('/api/run/mpi-tuning', {method:'DELETE'});
@@ -2401,7 +2678,10 @@ async function cancelMpiTuning() {
         toast(String(error?.message || error || '无法取消测量'), 'error');
     }
 }
-document.addEventListener('DOMContentLoaded', loadMpiRunCapabilities);
+document.addEventListener('DOMContentLoaded', () => {
+    loadCorePlan();
+    loadMpiRunCapabilities();
+});
 
 function advanceOutputRevision() {
     state.outputRevision=(state.outputRevision || 0)+1;
@@ -2572,6 +2852,48 @@ function renderFabmRepairSummary(summary) {
         : `FABM 状态检查汇总：${counts}。计数表示检查事件，不是变量、网格单元或实际修改总数。`;
 }
 
+function renderRunMonitor(status) {
+    const box = $('run-monitor-metrics');
+    const alertBox = $('run-monitor-alert');
+    const ranks = $('run-monitor-ranks');
+    if (!box || !alertBox || !ranks) return;
+    const m = status?.monitor || {};
+    const rate = Number.isFinite(m.steps_per_second) ? m.steps_per_second.toFixed(1) : '—';
+    const days = Number.isFinite(m.sim_days_per_wall_hour) ? m.sim_days_per_wall_hour.toFixed(2) : '—';
+    const cpu = Number.isFinite(m.cpu_percent) ? `${m.cpu_percent.toFixed(0)}%` : '—';
+    const eta = runEtaText(status);
+    const modeLabel = {serial:'串行', threads:'OpenMP', mpi:'MPI', hybrid:'MPI×OpenMP', auto:'自动'}[m.parallel_mode] || '';
+    const chosen = Number.isFinite(m.requested_cores)
+        ? `使用核数 ${m.requested_cores}${modeLabel ? `（${modeLabel}）` : ''}`
+        : '';
+    const fallback = m.fallback_serial ? ' · 已回退串行' : '';
+    const hotstart = m.hotstart_disabled ? ' · 已关闭热启动' : '';
+    box.textContent = `${chosen ? chosen + ' · ' : ''}实际 MPI ${m.mpi_ranks || 1} 进程 · OpenMP ${m.omp_threads ?? '—'} 线程 · ${rate} 步/秒 · ${days} 模拟天/墙钟小时 · 剩余 ${eta} · CPU ${cpu}${fallback}${hotstart}`;
+    if (m.level === 'error' || m.level === 'warn') {
+        alertBox.hidden = false;
+        alertBox.className = `run-monitor-alert ${m.level}`;
+        alertBox.textContent = m.message || (m.level === 'error' ? '求解器报错' : '步进停滞');
+    } else {
+        alertBox.hidden = true;
+        alertBox.textContent = '';
+    }
+    const consoles = Array.isArray(m.consoles) ? m.consoles : [];
+    const openId = ranks.querySelector('details[open]')?.dataset.id;
+    ranks.replaceChildren();
+    consoles.forEach((item, index) => {
+        const details = document.createElement('details');
+        details.dataset.id = item.id;
+        if (item.id === openId || (!openId && index === 0)) details.open = true;
+        if (item.error) details.className = 'error';
+        const summary = document.createElement('summary');
+        summary.textContent = `${item.label || item.id}${item.error ? ' · 有报错' : ''}`;
+        const pre = document.createElement('pre');
+        pre.textContent = (item.lines || []).join('\n') || '（暂无输出）';
+        details.append(summary, pre);
+        ranks.appendChild(details);
+    });
+}
+
 async function pollRunStatus() {
     if (state.runPollBusy) return;
     state.runPollBusy = true;
@@ -2614,6 +2936,7 @@ async function pollRunStatus() {
     $('run-console-state').textContent = runLabel;
     $('run-console-case').textContent = s.log_case_directory || s.case_directory || (state.activeCasePath || state.activeCase || window.StudioI18n?.t?.('尚未加载案例') || '尚未加载案例');
     updateRunPhysicsDisplay(s);
+    renderRunMonitor(s);
     const loadMoreButton = $('run-console-load-more');
     loadMoreButton.disabled = (s.total_logs || 0) <= (state.runLogLimit || 80) || (state.runLogLimit || 80) >= 5000;
     const logStatus = $('run-console-log-status');
@@ -2792,6 +3115,7 @@ async function restoreCurrentCase() {
         $('dashboard-vars').innerHTML = empty;
         loadDashboardStaticPreview();
     }
+    loadCorePlan();
     loadMpiRunCapabilities();
     return true;
 }
@@ -3213,7 +3537,11 @@ async function updateViz2d() {
     const outline=validatedBoundary
         ? (window.StudioI18n?.scientificText(`边界：${validatedBoundary.source}与湿干掩膜一致（仅用于显示裁切；地理/科学真实性未验证）`,`Boundary: ${validatedBoundary.source} agrees with the wet/dry mask (display clipping only; geographic/scientific validity unverified)`)||`边界：${validatedBoundary.source}与湿干掩膜一致（仅用于显示裁切；地理/科学真实性未验证）`)
         : (window.StudioI18n?.scientificText('边界：湿格边缘代理（未验证）','Boundary: wet-cell edge proxy (unverified)')||'边界：湿格边缘代理（未验证）');
-    $('viz2d-info').textContent = `${window.StudioI18n?.scientificText('变量','Variable')||'变量'}: ${resultLabel(data,varName)} (${varName}) | ${outline} | ${window.StudioI18n?.scientificText('时步','Frame')||'时步'}: ${timestep}${dateLabel ? ' (' + dateLabel + ')' : ''} | ${window.StudioI18n?.scientificText('均值','Mean')||'均值'}: ${fmt(data.mean,4)} | ${window.StudioI18n?.scientificText('形状','Shape')||'形状'}: ${data.shape?.join('×')}`;
+    const contrast=data.layer_contrast;
+    const contrastText=contrast
+        ? ` | 底层k=${contrast.bottom_index}均值 ${fmt(contrast.bottom_mean,4)} · 表层k=${contrast.surface_index}均值 ${fmt(contrast.surface_mean,4)} · |表-底|均值 ${fmt(contrast.mean_abs_diff,4)} · 最大 ${fmt(contrast.max_abs_diff,4)}${contrast.well_mixed?'（垂向差异很小）':''}`
+        : (data.level_applies===false ? ' | 该变量没有垂向层，切换层不会改变数值和色标' : '');
+    $('viz2d-info').textContent = `${window.StudioI18n?.scientificText('变量','Variable')||'变量'}: ${resultLabel(data,varName)} (${varName}) | ${outline} | ${window.StudioI18n?.scientificText('时步','Frame')||'时步'}: ${timestep}${dateLabel ? ' (' + dateLabel + ')' : ''} | ${window.StudioI18n?.scientificText('均值','Mean')||'均值'}: ${fmt(data.mean,4)} | ${window.StudioI18n?.scientificText('形状','Shape')||'形状'}: ${data.shape?.join('×')}${contrastText}`;
     drawColorbar('viz2d-colorbar', range.min, range.max, resultLabel(data,varName), data.units);
     perf?.stage(perfTicket,'draw',perfClock()-drawStartedAt);
     window.ScientificWorkspace?.publish('viz2d',{variable:varName,label:resultLabel(data,varName),units:data.units,min:data.min,max:data.max,range,field:data.data,date:dateLabel,time:timestep,level});
@@ -3264,6 +3592,8 @@ async function onViz2dVarChange(preserveLayer=false) {
         levelSel.appendChild(opt);
     }
     if(preserveLayer && Array.from(levelSel.options).some(option=>String(option.value)===previous))levelSel.value=previous;
+    levelSel.disabled=!is3d;
+    levelSel.title=is3d?'':'这个变量没有垂向层，切换层不会改变数值或色标';
     await updateViz2d();
 }
 
@@ -5077,37 +5407,15 @@ async function mapPickTimeseries(i, j) {
 
 // ── Init ──────────────────────────────────────────────────────────────
 function ensureViz3dVolumePresetCompatibility() {
+    // GETM cannot solve triangular meshes. Drop the old preset button and
+    // any leftover "triangles" option so a cached page cannot turn them back on.
+    document.getElementById('viz3d-volume-preset')?.remove();
+    document.querySelectorAll('#viz3d-mesh-mode option').forEach(opt => {
+        if (opt.value === 'triangles') opt.remove();
+    });
     const mesh = document.getElementById('viz3d-mesh-mode');
-    const stack = document.getElementById('viz3d-iso-stack');
-    const layer = document.getElementById('viz3d-iso-layer');
-    const controls = document.querySelector('.sw-3d-display-controls');
-    if (!mesh || !stack || !layer || !controls) return false;
-
-    let button = document.getElementById('viz3d-volume-preset');
-    if (!button) {
-        button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'btn btn-sm';
-        button.id = 'viz3d-volume-preset';
-        button.setAttribute('aria-pressed', 'false');
-        button.setAttribute('data-i18n', '体网格预设');
-        button.setAttribute('title', '此预设临时启用派生三角显示剖分与全部可用垂向层。再次点击后恢复预设前的剖分与叠层选择。');
-        button.textContent = '体网格预设';
-        controls.appendChild(button);
-    }
-
-    if (window.Viz3dVolumePreset) {
-        window.Viz3dVolumePreset.bind();
-        return true;
-    }
-    if (!document.querySelector('script[data-viz3d-volume-preset-compat]')) {
-        const script = document.createElement('script');
-        script.src = '/static/js/viz3d_volume_preset.js?v=1';
-        script.setAttribute('data-viz3d-volume-preset-compat', '');
-        script.onload = () => window.Viz3dVolumePreset?.bind?.();
-        (document.head || document.body).appendChild(script);
-    }
-    return true;
+    if (mesh && mesh.value === 'triangles') mesh.value = 'continuous';
+    return false;
 }
 
 window.addEventListener('load', () => {
@@ -5116,6 +5424,7 @@ window.addEventListener('load', () => {
     ensureViz3dVolumePresetCompatibility();
     refreshScientificTerms();
     loadCases();
+    maybeAutoScanCases();
     const pending=(async()=>{
         if(await restoreCurrentCase())await loadVariables();
         else $('stat-water').textContent='-';

@@ -4,6 +4,7 @@ from __future__ import annotations
 import importlib.util
 import hashlib
 import json
+import logging
 import os
 import socket
 from pathlib import Path
@@ -303,7 +304,13 @@ class LocalService:
             # Closing retained browser sockets can interrupt select() on Windows.
             # Suppress only that expected shutdown race, never a serving error.
             if not self._stopping.is_set() or error.errno not in (9, 10038):
+                logging.exception('本机 HTTP 服务异常退出')
+                self.serve_error = error
                 raise
+        except Exception as error:
+            logging.exception('本机 HTTP 服务异常退出')
+            self.serve_error = error
+            raise
 
     def start(self):
         self.thread.start()

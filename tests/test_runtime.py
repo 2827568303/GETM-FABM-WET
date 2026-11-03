@@ -490,6 +490,15 @@ class RuntimeTests(unittest.TestCase):
         view.create_window.assert_called_once()
         browser.assert_not_called()
 
+    def test_windows_launch_defaults_to_desktop_without_web_flag(self):
+        import launcher
+        plain = SimpleNamespace(web=False, desktop=False, check=False, self_test=False, ui_smoke=False)
+        web = SimpleNamespace(web=True, desktop=False, check=False, self_test=False, ui_smoke=False)
+        self.assertTrue(launcher.launch_is_desktop(plain, frozen=False, platform='nt'))
+        self.assertFalse(launcher.launch_is_desktop(web, frozen=False, platform='nt'))
+        self.assertFalse(launcher.launch_is_desktop(plain, frozen=False, platform='posix'))
+        self.assertTrue(launcher.launch_is_desktop(plain, frozen=True, platform='posix'))
+
 
 if __name__ == '__main__':
     unittest.main()

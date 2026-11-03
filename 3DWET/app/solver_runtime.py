@@ -27,13 +27,74 @@ def log_has_solver_failure(log):
     """Recognize failures without treating 'NaN checks disabled' as an error."""
     return bool(re.search(
         r'(?im)^\s*STOP\s+[1-9]\d*\b|'
+        r'Non-finite value of FABM state variable\s+\S+|'
         r'^\s*Error:\s*state variable\s+\d+\s+is zero and has negative derivative!|'
           r'\b(?:fatal_error|FATAL GETM ERROR|FATAL ERROR|out-of-bound values encountered|'
         r'IEEE_INVALID(?:_FLAG)?|IEEE_DIVIDE_BY_ZERO(?:_FLAG)?|Floating invalid|forrtl:)'
         r'|\bNaN\s+(?:detected|found|at|in)\b|\b(?:is|contains)\s+NaN\b', log))
 
 
-def solver_environment(exe_path, parent_env=None):
+_PATANKAR_NOISE = re.compile(
+    r'small pi=|is zero and has negative derivative|EMP uses a 1e-12 floor|'
+    r'further EMP small-pi')
+
+
+def recommended_openmp_threads(logical=None, wet_columns=None):
+    """A starting thread count. Not a limit: the selector accepts any positive integer.
+
+    Unknown grids leave one core for the interface on machines with at least
+    four logical cores. A known wet-column count scales slowly, and lakes
+    smaller than 4000 wet columns stay at 4 or fewer until a timed trial
+    says otherwise. Dianchi (about 1150 wet columns) is in that range:
+    extra hydro threads made the small grid slower, while tracer advection
+    gained from only a few cores.
+    """
+    count = logical if logical is not None else os.cpu_count()
+    try:
+        count = int(count)
+    except (TypeError, ValueError):
+        count = 1
+    count = max(1, count)
+    if wet_columns is None:
+        if count >= 4:
+            return count - 1
+        return count
+    try:
+        wet = int(wet_columns)
+    except (TypeError, ValueError):
+        wet = 0
+    if wet <= 0:
+        return recommended_openmp_threads(count)
+    by_grid = max(1, (wet + 399) // 400)
+    if wet < 4000:
+        by_grid = min(by_grid, 4)
+    return max(1, min(count, by_grid))
+
+
+def prepare_solver_log_chunk(text, *, keep=3):
+    """Drop repeated Patankar lines so a stiff step cannot bury progress.
+
+    The first few warnings are kept so a real zero-state failure remains visible.
+    Returns (filtered_text, dropped_count).
+    """
+    if not text:
+        return '', 0
+    kept = []
+    dropped = 0
+    limit = max(0, int(keep))
+    for line in text.splitlines():
+        if _PATANKAR_NOISE.search(line):
+            dropped += 1
+            if dropped <= limit:
+                kept.append(line)
+            continue
+        kept.append(line)
+    if dropped > limit:
+        kept.append(f'[INFO] 本段省略 Patankar 重复警告 {dropped - limit} 条')
+    return '\n'.join(kept), dropped
+
+
+def solver_environment(exe_path, parent_env=None, threads=None):
     exe_path = Path(exe_path).resolve()
     env = dict(os.environ if parent_env is None else parent_env)
     dirs = [exe_path.parent / 'runtime', exe_path.parent]
@@ -43,6 +104,21 @@ def solver_environment(exe_path, parent_env=None):
     env['PATH'] = os.pathsep.join(str(p) for p in dirs if p.is_dir()) + os.pathsep + env.get('PATH', '')
     env['GFORTRAN_UNBUFFERED_PRECONNECTED'] = 'y'
     env['GFORTRAN_UNBUFFERED_ALL'] = 'y'
+    # An explicit core choice always wins, including on the MPI executable
+    # (hybrid MPI × OpenMP). Without one, a parallel executable stays at
+    # 1 OpenMP thread so ranks do not also take every core.
+    if threads is not None:
+        try:
+            chosen = int(threads)
+        except (TypeError, ValueError):
+            chosen = 1
+        env['OMP_NUM_THREADS'] = str(max(1, chosen))
+    elif 'OMP_NUM_THREADS' not in env:
+        parallel = 'parallel' in exe_path.name.lower()
+        env['OMP_NUM_THREADS'] = '1' if parallel else str(recommended_openmp_threads())
+    env.setdefault('OMP_PROC_BIND', 'close')
+    env.setdefault('OMP_SCHEDULE', 'static')
+    env.setdefault('OMP_WAIT_POLICY', 'PASSIVE')
     return env
 
 

@@ -26,6 +26,7 @@
 #endif
 #ifdef _FABM_
    use getm_fabm, only: model,fabm_calc,output_none
+   use output, only: save_fabm_native
 #endif
    use getm_version
 !
@@ -476,7 +477,7 @@
 #endif
 
 #ifdef _FABM_
-   if (fabm_calc) then
+   if (fabm_calc .and. save_fabm_native) then
       allocate(fabm_ids(size(model%state_variables)),stat=rc)
       if (rc /= 0) stop 'init_3d_ncdf(): Error allocating memory (fabm_ids)'
       fabm_ids = -1

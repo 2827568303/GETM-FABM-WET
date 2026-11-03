@@ -1,11 +1,11 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const {test}=require('node:test');
 const source=fs.readFileSync('3DWET/app/static/js/viz3d.js','utf8');
-test('the 3D renderer asset URL cache-bust tracks the v173 renderer source',()=>{
+test('the 3D renderer asset URL cache-bust tracks the v174 renderer source',()=>{
  const html=fs.readFileSync('3DWET/app/templates/index.html','utf8');
  const match=html.match(/\/static\/js\/viz3d\.js\?v=(\d+)/);
  assert.ok(match,'the index template must include the 3D renderer');
- assert.equal(Number(match[1]),173,'renderer changes must invalidate cached v172 assets');
+ assert.equal(Number(match[1]),174,'renderer changes must invalidate cached v173 assets');
 });
 function fixtureTopology(data){
  if(!data||Object.prototype.hasOwnProperty.call(data,'display_topology'))return data;
@@ -290,15 +290,17 @@ test('display controls are explicitly display-only and call the existing rendere
  const html=fs.readFileSync('3DWET/app/templates/index.html','utf8'),app=fs.readFileSync('3DWET/app/static/js/app.js','utf8');
  assert.match(html,/\/static\/js\/viz3d\.js\?v=\d+/,'desktop page must include a versioned renderer URL so cached scripts can be invalidated');
  for(const id of ['viz3d-mesh-mode','viz3d-line-density','viz3d-line-opacity','viz3d-show-land','viz3d-mesh-nodes']){assert.ok(html.includes(`id="${id}"`));assert.ok(app.includes(`$('${id}')`));}
- for(const value of ['continuous','orthogonal','triangles','hidden'])assert.ok(html.includes(`value="${value}"`));
+ for(const value of ['continuous','orthogonal','hexa','curvilinear','hidden'])assert.ok(html.includes(`value="${value}"`));
+ assert.doesNotMatch(html,/value="triangles"/);
  assert.match(html,/仅改变显示/);assert.match(html,/陆地高程未提供/);
 });
-test('first 3D view defaults to continuous display while retaining alternatives',()=>{
+test('first 3D view defaults to continuous display while retaining structured alternatives',()=>{
  const html=fs.readFileSync('3DWET/app/templates/index.html','utf8');
  const select=html.match(/<select class="form-select" id="viz3d-mesh-mode"[^>]*>([\s\S]*?)<\/select>/)?.[1];
  assert.ok(select,'3D mesh selector must exist');
  assert.match(select,/<option value="continuous" selected>/,'first open uses the continuous surface display');
- for(const value of ['orthogonal','triangles','hidden'])assert.match(select,new RegExp(`<option value="${value}"(?: selected)?>`));
+ for(const value of ['hexa','curvilinear','orthogonal','hidden'])assert.match(select,new RegExp(`<option value="${value}"(?: selected)?>`));
+ assert.doesNotMatch(select,/triangles/);
 });
 test('high-quality 3D water rendering can resolve Dianchi shoreline at native mesh resolution',()=>{
  const html=fs.readFileSync('3DWET/app/templates/index.html','utf8'),app=fs.readFileSync('3DWET/app/static/js/app.js','utf8');
@@ -475,15 +477,15 @@ test('triangle wire nodes are optional and hidden by default for a clean referen
  assert.ok(withNodes.plots[0].traces.some(t=>t.meta?.displayOnly&&t.mode==='markers'));
 });
 
-test('3D triangle lines are labeled as a display triangulation, not native solver topology',()=>{
+test('3D mesh menu offers structured displays and no triangle-mesh product entry',()=>{
  const html=fs.readFileSync('3DWET/app/templates/index.html','utf8');
  assert.match(html,/option value="orthogonal">正交网格线/);
- assert.match(html,/option value="triangles">三角网格（显示剖分）/);
+ assert.match(html,/option value="hexa">结构网格六面体（求解网格原样）/);
+ assert.doesNotMatch(html,/value="triangles"/);
+ assert.doesNotMatch(html,/id="viz3d-volume-preset"/);
  assert.match(html,/拖动旋转，滚轮缩放/,'the camera interaction is discoverable beside the view controls');
- assert.match(html,/本案例为结构四边形网格/);
- assert.match(html,/图例随当前帧列出实际参与绘制的湿单元与显示边/);
- assert.match(html,/不是求解器原生三角拓扑/);
- assert.match(html,/默认以稳定对角线将当前有效湿四边形显示为三角面/);
+ assert.match(html,/不提供三角网或非结构网格/);
+ assert.match(html,/水体单元是结构网格上的湿四边形/);
  assert.match(html,/网格线间距/);
  assert.match(html,/网格线透明度/);
 });

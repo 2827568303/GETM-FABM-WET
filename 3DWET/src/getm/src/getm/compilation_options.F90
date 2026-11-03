@@ -21,6 +21,7 @@
 #else
    LEVEL1 'Compiled for serial execution'
 #endif
+   LEVEL1 '3DWET solver revision 20261102'
 
 #ifdef GETM_OMP
    LEVEL1 '   with OpenMP thread capability'

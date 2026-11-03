@@ -26,6 +26,9 @@ function environment(patch={}) {
         localizedVariableLabel:v=>v.name,populateCalibrationVariables(){},fmt:String});
     context.verticalResultSelectIds=new Set(['viz3d-var','viz3d-avg-var']);
     context.updateResultVariableSearch=()=>{};
+    const priorityStart=appSource.indexOf('function resultVariablePriority(');
+    const priorityEnd=appSource.indexOf('// ── Utilities', priorityStart);
+    vm.runInContext(appSource.slice(priorityStart, priorityEnd), context);
     const verticalStart=appSource.indexOf('function hasVerticalResultDimension('),verticalEnd=appSource.indexOf('\nfunction resultVariableOptionLabel',verticalStart);
     vm.runInContext(appSource.slice(verticalStart,verticalEnd),context);
     const labelStart=appSource.indexOf('function resultVariableOptionLabel('),labelEnd=appSource.indexOf('// ── Utilities',labelStart);

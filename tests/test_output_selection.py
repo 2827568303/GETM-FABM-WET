@@ -34,6 +34,38 @@ def output(path, variables, records=2, start=0):
                 variable[:] = 1
 
 
+def test_archived_and_root_weekly_files_both_stay_visible(tmp_path):
+    archived = tmp_path / 'output' / 'ext_wq.nc'
+    output(archived, ['abiotic_water_sNH4W'], records=1)
+    find = load_function()
+    assert archived in find(tmp_path)['3d_candidates']
+    root = tmp_path / 'ext_wq.nc'
+    output(root, ['abiotic_water_sNH4W'], records=1, start=10)
+    found = {path.resolve() for path in find(tmp_path)['3d_candidates']}
+    assert root.resolve() in found
+    assert archived.resolve() in found
+
+
+def test_weekly_ecology_file_is_a_3d_candidate(tmp_path):
+    weekly = tmp_path / 'ext_wq.nc'
+    output(weekly, ['abiotic_water_sNH4W'], records=1)
+    files = load_function()(tmp_path)
+    assert files['3d'] == weekly
+    assert weekly in files['3d_candidates']
+
+
+def test_weekly_only_variable_is_read_from_ext_wq(tmp_path):
+    daily = tmp_path / 'output.nc'
+    weekly = tmp_path / 'ext_wq.nc'
+    output(daily, ['temp', 'abiotic_water_sO2W'], records=3)
+    output(weekly, ['abiotic_water_sNH4W', 'cyanobacteria_sDW'], records=1)
+    find = load_function()
+    assert find(tmp_path, 'abiotic_water_sNH4W')['3d'] == weekly
+    assert find(tmp_path, 'cyanobacteria_sDW')['3d'] == weekly
+    assert find(tmp_path, 'temp')['3d'] == daily
+    assert weekly in find(tmp_path)['3d_candidates']
+
+
 def test_primary_ecology_is_preferred_but_legacy_velocity_accessible(tmp_path):
     primary = tmp_path / 'output/output.nc'
     legacy = tmp_path / 'output/lake.3d.nc'

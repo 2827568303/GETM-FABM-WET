@@ -99,11 +99,10 @@ def test_clone_ui_keeps_copy_default_and_requires_review_of_split_preview():
     html = (root / 'templates' / 'index.html').read_text(encoding='utf-8')
     script = (root / 'static' / 'js' / 'ecology_network.js').read_text(encoding='utf-8')
     assert 'ecology_network.js?v=34' in html
-    assert '本案例为结构四边形网格' in html
-    assert '不是求解器原生三角拓扑' in html
-    assert '<option value="continuous" selected>\u8fde\u7eed\u66f2\u9762</option>' in html
-    assert '<option value="triangles">\u4e09\u89d2\u7f51\u683c\uff08\u663e\u793a\u5256\u5206\uff09</option>' in html
-    assert '\u8fde\u7eed\u66f2\u9762\u53ef\u4f5c\u4e3a\u5927\u578b\u7f51\u683c\u6216\u64ad\u653e\u573a\u666f\u7684\u8f7b\u91cf\u66ff\u4ee3' in html
+    assert '不提供三角网或非结构网格' in html
+    assert 'value="triangles"' not in html
+    assert '<option value="continuous" selected>结构网格连续曲面</option>' in html
+    assert '水体单元是结构网格上的湿四边形' in html
     assert 'value="copy">完整复制（默认）' in script
     assert 'value="split">同功能群等总量分摊' in script
     assert 'window.confirm(summary)' in script

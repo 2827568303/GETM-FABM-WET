@@ -23,6 +23,7 @@
    module wet_inorganic_carbon
    !USES:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
    use fabm_types
+   use fabm_driver, only: host_save_diagnostics
    use fabm_standard_variables
    use fabm_particle
    use wet_utility, ONLY: uFunTmArrh
@@ -156,13 +157,16 @@ subroutine do(self,_ARGUMENTS_DO_)
    _GET_(self%id_sDICW,sDICW)
    _GET_(self%id_sAlkW,sAlkW)
 
-   ! 2. 淡水碳酸盐平衡（二分法，绝不发散）
-   call CarbonateEq(sDICW,sAlkW,uTm,pH,pCO2W,CO2W,HCO3W,CO3W)
-   _SET_DIAGNOSTIC_(self%id_pH,pH)
-   _SET_DIAGNOSTIC_(self%id_pCO2W,pCO2W)
-   _SET_DIAGNOSTIC_(self%id_CO2W,CO2W)
-   _SET_DIAGNOSTIC_(self%id_HCO3W,HCO3W)
-   _SET_DIAGNOSTIC_(self%id_CO3W,CO3W)
+   ! 2. 淡水碳酸盐平衡只服务于 pH/pCO2 诊断。DIC 源汇用的是生物通量，
+   !    不用这里的 pH。气-水交换在 do_surface 里单独求解。宿主不读诊断时跳过。
+   if (host_save_diagnostics) then
+      call CarbonateEq(sDICW,sAlkW,uTm,pH,pCO2W,CO2W,HCO3W,CO3W)
+      _SET_DIAGNOSTIC_(self%id_pH,pH)
+      _SET_DIAGNOSTIC_(self%id_pCO2W,pCO2W)
+      _SET_DIAGNOSTIC_(self%id_CO2W,CO2W)
+      _SET_DIAGNOSTIC_(self%id_HCO3W,HCO3W)
+      _SET_DIAGNOSTIC_(self%id_CO3W,CO3W)
+   end if
 
    ! 3. 生物碳通量（读取既有 WET 模块的诊断通量，gC/m3/s）
    wCDIC = 0.0_rk
@@ -305,8 +309,11 @@ pure subroutine CarbonateEq(sDICW,sAlkW,uTm,pH,pCO2W,CO2W,HCO3W,CO3W)
       denom = H*H + K1*H + K1*K2
       f = CT*K1*H/denom + 2.0_rk*CT*K1*K2/denom + KW/H - H - TA
       if (f > 0.0_rk) then
+         ! 中点已等于下界时，再迭代也不会改区间，与跑满 100 次相同。
+         if (H == Hlo) exit
          Hlo = H                        ! TA 偏大 -> 需要更大的 H
       else
+         if (H == Hhi) exit
          Hhi = H
       end if
    end do

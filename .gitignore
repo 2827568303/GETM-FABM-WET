@@ -76,6 +76,9 @@ hotstart_out.nc
 # 注意：含斜杠的规则会被锚定到 .gitignore 所在目录（本文件在仓库根），
 # 所以必须写全路径前缀（或用 **/ 通配），否则匹配不到 3DWET/... 下的文件。
 **/case/*/output/
+3DWET/case/.temp/
+3DWET/case/.logs/
+3DWET/case/.state/
 **/case/_fish_probe/
 **/case/_dc_verify/
 **/case/_out_probe/

@@ -39,7 +39,7 @@
    use gotm_fabm, only: gotm_fabm_create_model
 #endif
    use gotm_fabm, only: init_gotm_fabm,start_gotm_fabm,set_env_gotm_fabm,do_gotm_fabm
-   use gotm_fabm, only: gotm_fabm_calc=>fabm_calc, model, cc_col=>cc, cc_diag_col=>cc_diag, cc_diag_hz_col=>cc_diag_hz, cc_transport
+   use gotm_fabm, only: gotm_fabm_calc=>fabm_calc, model, cc_col=>cc, cc_diag_col=>cc_diag, cc_diag_hz_col=>cc_diag_hz, cc_transport, save_instant_diagnostics
 
 #ifndef _OLD_FABM_
    use fabm_v0_compatibility, only: type_horizontal_variable_id, fabm_is_variable_used
@@ -47,7 +47,10 @@
 #else
    use fabm, only: type_horizontal_variable_id, fabm_is_variable_used
 #endif
-   use fabm_types,only: output_instantaneous, output_none, type_bulk_standard_variable
+   use fabm_types,only: output_instantaneous, output_none, output_time_integrated, &
+      output_time_step_averaged, output_time_step_integrated, type_bulk_standard_variable
+   use fabm_driver, only: host_save_diagnostics
+!$ use omp_lib
    use fabm, only: fabm_link_scalar_data, fabm_get_scalar_variable_id, type_scalar_variable_id
    use fabm_standard_variables, only: standard_variables
    use fabm, only: fabm_get_bulk_diagnostic_data
@@ -64,6 +67,9 @@
    public register_fabm_variables
    public define_temporal_memory, read_temporal_memory, write_temporal_memory
    integer, public :: fabm_init_method=0
+   integer, allocatable :: diag_keep(:), diag_hz_keep(:)
+   integer :: n_diag_keep=0, n_diag_hz_keep=0
+   logical :: diag_keep_ready=.false.
    character(len=PATH_MAX)   :: fabm_init_file
    integer                   :: fabm_init_format, fabm_field_no
    logical, public :: fabm_calc
@@ -557,7 +563,7 @@ end interface
 ! !IROUTINE:  do_getm_fabm()
 !
 ! !INTERFACE:
-   subroutine do_getm_fabm(dt)
+   subroutine do_getm_fabm(dt,publish_diagnostics)
 !
 ! !DESCRIPTION:
 !
@@ -567,6 +573,7 @@ end interface
 !
 ! !INPUT PARAMETERS:
    REALTYPE, intent(in)                :: dt
+   logical, intent(in), optional       :: publish_diagnostics
 !
 ! !REVISION HISTORY:
 !  See the log for the module
@@ -574,6 +581,8 @@ end interface
 ! !LOCAL VARIABLES:
    integer         :: n
    integer         :: i,j,k,kk
+   integer         :: nthreads
+   logical         :: publish
    REALTYPE        :: bioshade(1:kmax)
    REALTYPE        :: wind_speed,I_0,taub_nonnorm,cloud
    REALTYPE        :: z(1:kmax)
@@ -585,6 +594,17 @@ end interface
 !BOC
 
    call tic(TIM_GETM_FABM)
+
+   publish = .true.
+   if (present(publish_diagnostics)) publish = publish_diagnostics
+   call ensure_diag_keep()
+   ! Instantaneous diagnostics are recomputed from the state. The 3D
+   ! field is only read by output, so scatter them on output steps.
+   ! Time-integrated diagnostics stay in the 3D field every step.
+   save_instant_diagnostics = publish
+   ! Pelagic carbonate equilibrium is diagnostic-only. Surface exchange
+   ! still solves it. See wet/inorganic_carbon.F90.
+   host_save_diagnostics = publish
 
 !  First update all input fields
    if (month .ne. old_month) then
@@ -653,12 +673,23 @@ end interface
             do n=1,size(model%bottom_state_variables)
                cc_col(1,size(model%state_variables)+n) = fabm_ben(i,j,n)
             end do
-            do n=1,size(model%diagnostic_variables)
-               cc_diag_col(:,n) = fabm_diag(i,j,1:,n)
-            end do
-            do n=1,size(model%horizontal_diagnostic_variables)
-               cc_diag_hz_col(n) = fabm_diag_hz(i,j,n)
-            end do
+            if (publish) then
+               do n=1,size(model%diagnostic_variables)
+                  cc_diag_col(:,n) = fabm_diag(i,j,1:,n)
+               end do
+               do n=1,size(model%horizontal_diagnostic_variables)
+                  cc_diag_hz_col(n) = fabm_diag_hz(i,j,n)
+               end do
+            else
+               do kk=1,n_diag_keep
+                  n = diag_keep(kk)
+                  cc_diag_col(:,n) = fabm_diag(i,j,1:,n)
+               end do
+               do kk=1,n_diag_hz_keep
+                  n = diag_hz_keep(kk)
+                  cc_diag_hz_col(n) = fabm_diag_hz(i,j,n)
+               end do
+            end if
 
 !           Transfer pointers to physical environment variables to FABM.
             call set_env_gotm_fabm(latc(i,j),lonc(i,j),dt,0,0,T(i,j,1:),S(i,j,1:), &
@@ -704,12 +735,23 @@ end interface
             do n=1,size(model%bottom_state_variables)
                fabm_ben(i,j,n) = cc_col(1,size(model%state_variables)+n)
             end do
-            do n=1,size(model%diagnostic_variables)
-               fabm_diag(i,j,1:,n) = cc_diag_col(:,n)
-            end do
-            do n=1,size(model%horizontal_diagnostic_variables)
-               fabm_diag_hz(i,j,n) = cc_diag_hz_col(n)
-            end do
+            if (publish) then
+               do n=1,size(model%diagnostic_variables)
+                  fabm_diag(i,j,1:,n) = cc_diag_col(:,n)
+               end do
+               do n=1,size(model%horizontal_diagnostic_variables)
+                  fabm_diag_hz(i,j,n) = cc_diag_hz_col(n)
+               end do
+            else
+               do kk=1,n_diag_keep
+                  n = diag_keep(kk)
+                  fabm_diag(i,j,1:,n) = cc_diag_col(:,n)
+               end do
+               do kk=1,n_diag_hz_keep
+                  n = diag_hz_keep(kk)
+                  fabm_diag_hz(i,j,n) = cc_diag_hz_col(n)
+               end do
+            end if
 
          end if
       end do
@@ -722,8 +764,18 @@ end interface
    end do
 #endif
 
-!  Advect pelagic biogeochemical variables.
+!  Advect pelagic biogeochemical variables. Each tracer is independent.
+!  The team size is omp_get_max_threads(), which follows OMP_NUM_THREADS,
+!  so the run-control core count applies here. Nesting stays off, so the
+!  inner advection regions use one thread. Not used for MPI: halo exchange
+!  shares one tag.
    call tic(TIM_ADVECTFABM)
+   nthreads = 1
+!$ nthreads = omp_get_max_threads()
+   if (nthreads < 1) nthreads = 1
+#ifndef GETM_PARALLEL
+!$omp parallel do if(nthreads>1) num_threads(nthreads) default(shared) private(n) schedule(static)
+#endif
    do n=1,size(model%state_variables)
 
       call update_3d_halo(fabm_pel(:,:,:,n),fabm_pel(:,:,:,n),az, &
@@ -734,11 +786,75 @@ end interface
                                                 fabm_adv_split,fabm_adv_hor,fabm_adv_ver,fabm_AH,H_TAG)
 
    end do
+#ifndef GETM_PARALLEL
+!$omp end parallel do
+#endif
    call toc(TIM_ADVECTFABM)
 
    call toc(TIM_GETM_FABM)
 
    end subroutine do_getm_fabm
+!EOC
+
+!-----------------------------------------------------------------------
+!BOP
+!
+! !IROUTINE: ensure_diag_keep
+!
+! !INTERFACE:
+   subroutine ensure_diag_keep()
+!
+! !DESCRIPTION:
+!  Index diagnostics whose host copy must be kept every bio step.
+!  Instantaneous diagnostics are overwritten from the current state, so
+!  the strided 3D gather is only needed on steps that write output.
+!
+! !LOCAL VARIABLES:
+   integer :: n, nkeep
+!EOP
+!-----------------------------------------------------------------------
+!BOC
+   if (diag_keep_ready) return
+
+   nkeep = 0
+   do n=1,size(model%diagnostic_variables)
+      select case (model%diagnostic_variables(n)%output)
+      case (output_time_integrated, output_time_step_averaged, output_time_step_integrated)
+         nkeep = nkeep + 1
+      end select
+   end do
+   allocate(diag_keep(max(nkeep,1)))
+   n_diag_keep = 0
+   do n=1,size(model%diagnostic_variables)
+      select case (model%diagnostic_variables(n)%output)
+      case (output_time_integrated, output_time_step_averaged, output_time_step_integrated)
+         n_diag_keep = n_diag_keep + 1
+         diag_keep(n_diag_keep) = n
+      end select
+   end do
+
+   nkeep = 0
+   do n=1,size(model%horizontal_diagnostic_variables)
+      select case (model%horizontal_diagnostic_variables(n)%output)
+      case (output_time_integrated, output_time_step_averaged, output_time_step_integrated)
+         nkeep = nkeep + 1
+      end select
+   end do
+   allocate(diag_hz_keep(max(nkeep,1)))
+   n_diag_hz_keep = 0
+   do n=1,size(model%horizontal_diagnostic_variables)
+      select case (model%horizontal_diagnostic_variables(n)%output)
+      case (output_time_integrated, output_time_step_averaged, output_time_step_integrated)
+         n_diag_hz_keep = n_diag_hz_keep + 1
+         diag_hz_keep(n_diag_hz_keep) = n
+      end select
+   end do
+
+   diag_keep_ready = .true.
+   LEVEL2 'FABM host diagnostics kept every step:', n_diag_keep, 'bulk,', n_diag_hz_keep, 'horizontal'
+   LEVEL2 'Instantaneous FABM diagnostics are written to the 3D field only on output steps.'
+
+   end subroutine ensure_diag_keep
 !EOC
 
 !-----------------------------------------------------------------------
