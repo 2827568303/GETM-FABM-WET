@@ -370,11 +370,63 @@ PY
     tail -n 40 "$out" >&2 || true
     return 1
   }
+  local serial_ok=0
   if ( cd "$case_dir" && run_one serial "$serial" ); then
+    serial_ok=1
+  else
+    log "serial 1-day NativeTest did not finish; trying OpenMP"
+    if ( cd "$case_dir" && run_one openmp "$openmp" ); then
+      serial_ok=1
+    fi
+  fi
+  [[ "$serial_ok" == 1 ]] || return 1
+  smoke_mpi "$app" "$runtime" "$mpi" || true
+}
+
+# A few MPI steps under Wine. Failure is recorded and does not fail the
+# installer: MS-MPI's process manager often cannot start under Wine.
+smoke_mpi() {
+  local app="$1" runtime="$2" mpi="$3"
+  local mpiexec="${app}/3DWET/bin/mpi/mpiexec.exe"
+  local parallel="${app}/3DWET/bin/getm_cartesian_parallel.exe"
+  local out="${WORK}/solver-mpi.log"
+  if [[ ! -f "$mpiexec" || ! -f "$parallel" ]]; then
+    log "MPI smoke skipped: mpiexec or the parallel solver is not installed"
     return 0
   fi
-  log "serial 1-day NativeTest did not finish; trying OpenMP"
-  ( cd "$case_dir" && run_one openmp "$openmp" )
+  local case_dir="${WORK}/solver-smoke-mpi"
+  rm -rf "$case_dir"
+  mkdir -p "$case_dir"
+  cp -a "${ROOT}/3DWET/case/NativeTest/." "$case_dir/"
+  python3 - "$case_dir" <<'PY'
+import pathlib, sys
+root = pathlib.Path(sys.argv[1])
+inp = root / "getm.inp"
+text = inp.read_text(encoding="utf-8")
+text = text.replace("stop = '2020-01-03 00:00:00'", "stop = '2020-01-01 00:10:00'")
+text = text.replace("parallel = .false.", "parallel = .true.")
+inp.write_text(text, encoding="utf-8")
+(root / "parallel.inp").write_text(
+    "&nampar\n MeshMethod=1, reorder=.false., MsgMethod=3\n/\n", encoding="ascii")
+PY
+  log "solver smoke mpi: NativeTest 2020-01-01 00:00 to 00:10, 2 ranks"
+  set +e
+  (
+    cd "$case_dir"
+    WINEPREFIX="$WINEPREFIX" WINEDEBUG="${WINEDEBUG:--all}" \
+      WINEPATH="${runtime};${mpi}" OMP_NUM_THREADS=1 \
+      timeout 180 wine "$(to_win "$mpiexec")" -n 2 "$(to_win "$parallel")" \
+      </dev/null >"$out" 2>&1
+  )
+  local code=$?
+  set -e
+  if [[ "$code" -eq 0 ]] && grep -q 'getm: Completed on' "$out" && ! grep -q 'Non-finite' "$out"; then
+    log "mpi finished the 10-minute NativeTest"
+    return 0
+  fi
+  log "mpi 10-minute NativeTest did not finish under Wine (exit ${code})"
+  tail -n 30 "$out" >&2 || true
+  return 0
 }
 
 main() {
@@ -412,7 +464,7 @@ PY
   fi
   if [[ -d "$ARTIFACT_DIR" || "$ARTIFACT_DIR" == /opt/cursor/artifacts ]]; then
     mkdir -p "$ARTIFACT_DIR"
-    python3 - "$setup" "${ARTIFACT_DIR}/3DWET-Setup-${VERSION}-nativetest.exe" <<'PY'
+    python3 - "$setup" "${ARTIFACT_DIR}/${SETUP_NAME}" <<'PY'
 import hashlib, pathlib, sys
 src = pathlib.Path(sys.argv[1])
 dst = pathlib.Path(sys.argv[2])
